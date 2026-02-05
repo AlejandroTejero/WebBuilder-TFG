@@ -1,0 +1,98 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block body_class %}preview{% endblock %}
+
+{% block content %}
+<div class="wb-container">
+
+  <header class="wb-header">
+    <h1 class="wb-title">Preview</h1>
+    <p class="wb-subtitle">Vista previa de los items normalizados a un estándar interno</p>
+  </header>
+
+  {% if messages %}
+    <div class="wb-messages">
+      {% for message in messages %}
+        <div class="wb-message wb-message--{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <section class="wb-card">
+    <h2 class="wb-card__title">Información</h2>
+
+    <div class="wb-kv">
+      <div class="wb-kv__item wb-kv__item--full">
+        <span class="wb-kv__k">URL</span>
+        <span class="wb-kv__v wb-mono">{{ api_request.api_url }}</span>
+      </div>
+
+      <div class="wb-kv__item">
+        <span class="wb-kv__k">Estado</span>
+        <span class="wb-kv__v">{{ api_request.status }}</span>
+      </div>
+
+      <div class="wb-kv__item">
+        <span class="wb-kv__k">APIRequest</span>
+        <span class="wb-kv__v">#{{ api_request.id }}</span>
+      </div>
+    </div>
+
+    <div class="wb-actions">
+      <a class="wb-btn wb-btn--secondary" href="{% url 'assistant' %}?api_request_id={{ api_request.id }}">
+        ← Volver al asistente (este análisis)
+      </a>
+      <a class="wb-btn wb-btn--secondary" href="{% url 'assistant' %}">
+        Volver al asistente
+      </a>
+      <a class="wb-btn wb-btn--secondary" href="{% url 'history' %}">
+        Ir al historial
+      </a>
+    </div>
+  </section>
+
+  <section class="wb-card">
+    <h2 class="wb-card__title">Items</h2>
+    <p class="wb-hint">Si sale vacío, revisa el mapping y/o la colección principal detectada.</p>
+
+    <div class="wb-divider"></div>
+
+    {% if items %}
+      <div class="wb-grid">
+        {% for it in items %}
+          <div class="wb-card">
+            <h3 class="wb-card__title">{{ it.title|default:"(Sin título)" }}</h3>
+
+            {% if it.image %}
+              <img src="{{ it.image }}" alt="" class="wb-preview-img">
+              <div class="wb-divider"></div>
+            {% endif %}
+
+            {% if it.description %}
+              <p class="wb-card__subtitle">{{ it.description }}</p>
+            {% else %}
+              <p class="wb-muted">Sin descripción</p>
+            {% endif %}
+
+            {% if it.link %}
+              <div class="wb-actions">
+                <a class="wb-btn wb-btn--primary" href="{{ it.link }}" target="_blank" rel="noopener noreferrer">
+                  Ver enlace
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="wb-muted">
+        No se han podido extraer items normalizados. Revisa el mapping y/o el path de la colección principal.
+      </p>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+/* =================== Curvas “esquinadas” tipo Clearwater =================== */
+/* ====== BASE: Pantalla normal (portátil/desktop estándar) ====== */
+
+.corner-curves{
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  isolation: isolate;
+}
+
+.corner{
+  position: absolute;
+  width: clamp(1100px, 80vw, 2000px);
+  height: clamp(850px, 75vh, 1600px);
+  opacity: .9;
+}
+
+
+/* Posicionamiento */
+.corner.tl{
+  top: -14vw; left: -10vw;
+  animation: floatTL 26s ease-in-out infinite;
+}
+.corner.br{
+  bottom: -17vw; right: -12vw;
+  animation: floatBR 30s ease-in-out infinite;
+}
+
+/* Leves respiraciones (no cambian la forma, solo el movimiento) */
+@keyframes floatTL{
+  0%   { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+  40%  { transform: translate3d(1.2vmax,0.6vmax,0) rotate(1.5deg) scale(1.015); }
+  70%  { transform: translate3d(0.3vmax,-0.4vmax,0) rotate(-.8deg) scale(0.995); }
+  100% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+}
+@keyframes floatBR{
+  0%   { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+  35%  { transform: translate3d(-1.3vmax,-0.6vmax,0) rotate(-1.4deg) scale(1.012); }
+  80%  { transform: translate3d(-0.4vmax,0.5vmax,0) rotate(.9deg) scale(0.993); }
+  100% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+}
+
+/* Rendimiento y compatibilidad con parallax */
+.corner { will-change: transform; }
+.corner-curves.js-parallax .corner { animation: none; }
+
+
+
+/* ====== MEDIA QUERIES ====== */
+/* Muy grandes: monitores grandes (>=1600px) — mantén escala cómoda */
+@media (min-width: 2560px){
+  .corner{
+    /* Mantengo tu escala “perfecta” de grandes, solo fijo tope confortable */
+    width: clamp(1200px, 80vw, 2200px);
+    height: clamp(900px, 75vh, 1700px);
+  }
+  .corner.tl{ top: -13vw; left: -9vw; }
+  .corner.br{ bottom: -14.5vw; right: -11vw; }
+}

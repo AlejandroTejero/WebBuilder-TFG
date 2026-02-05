@@ -1,0 +1,586 @@
+/* ===============================================
+   WebBuilder - Navbar Moderna
+   Diseño: Negro, blanco, minimalista con desplegables
+   =============================================== */
+
+:root {
+  --navbar-bg: #0a0a0a;
+  --navbar-border: rgba(255, 255, 255, 0.08);
+  --navbar-text: #ffffff;
+  --navbar-text-hover: #ffffff;
+  --navbar-text-muted: rgba(255, 255, 255, 0.6);
+  --navbar-hover-bg: rgba(255, 255, 255, 0.06);
+  --navbar-active-bg: rgba(255, 255, 255, 0.1);
+  --navbar-accent: #4a9eff;
+  --dropdown-bg: #0f0f0f;
+  --dropdown-border: rgba(255, 255, 255, 0.1);
+  --dropdown-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  --navbar-height: 64px;
+}
+
+/* ==================== NAVBAR PRINCIPAL ==================== */
+
+.wb-navbar {
+  background-color: var(--navbar-bg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--navbar-border);
+  height: var(--navbar-height);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.wb-navbar-container {
+  max-width: 1400px;  /* Ancho máximo del contenido */
+  margin: 0 auto;     /* Centrar horizontalmente */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 100%;
+}
+
+/* ==================== LOGO Y BRAND ==================== */
+
+.wb-navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--navbar-text);
+  font-weight: 700;
+  font-size: 1.25rem;
+  transition: opacity 0.2s ease;
+}
+
+.wb-navbar-brand:hover {
+  opacity: 0.8;
+}
+
+.wb-navbar-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+}
+
+.wb-navbar-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.wb-navbar-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ==================== MENÚ DE NAVEGACIÓN ==================== */
+
+.wb-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+  margin-left: 3rem;
+}
+
+.wb-nav-item {
+  position: relative;
+}
+
+.wb-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 0.875rem;
+  color: var(--navbar-text);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.wb-nav-link:hover {
+  background-color: var(--navbar-hover-bg);
+  color: var(--navbar-text-hover);
+}
+
+.wb-nav-link--active {
+  background-color: var(--navbar-active-bg);
+  color: var(--navbar-text);
+}
+
+/* Flecha del dropdown */
+.wb-nav-arrow {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  transition: transform 0.3s ease;
+  margin-left: 2px;
+}
+
+.wb-nav-item--open .wb-nav-arrow {
+  transform: rotate(180deg);
+}
+
+/* ==================== DROPDOWN MENÚS ==================== */
+
+.wb-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: -1rem;
+  background-color: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
+  border-radius: 12px;
+  box-shadow: var(--dropdown-shadow);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 240px;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+
+.wb-nav-item--open .wb-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown alineado a la derecha (para menú de usuario) */
+.wb-dropdown--right {
+  left: auto;
+  right: -1rem;
+}
+
+/* Items del dropdown */
+.wb-dropdown-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--navbar-text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.wb-dropdown-item:hover {
+  background-color: var(--navbar-hover-bg);
+}
+
+.wb-dropdown-content {
+  flex: 1;
+}
+
+.wb-dropdown-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: 0.125rem;
+  color: var(--navbar-text);
+  line-height: 1.3;
+}
+
+.wb-dropdown-description {
+  font-size: 0.8125rem;
+  color: var(--navbar-text-muted);
+  line-height: 1.4;
+}
+
+/* Divider en dropdown */
+.wb-dropdown-divider {
+  height: 1px;
+  background-color: var(--navbar-border);
+  margin: 0.5rem 0;
+}
+
+/* ==================== SECCIÓN DERECHA ==================== */
+
+.wb-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Icono de usuario */
+.wb-user-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navbar-accent), #6bb0ff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #000;
+}
+
+/* Botones de la navbar */
+.wb-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+}
+
+.wb-nav-btn--secondary {
+  background-color: transparent;
+  color: var(--navbar-text);
+  border: 1px solid var(--navbar-border);
+}
+
+.wb-nav-btn--secondary:hover {
+  background-color: var(--navbar-hover-bg);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wb-nav-btn--primary {
+  background-color: var(--navbar-accent);
+  color: #000;
+  font-weight: 700;
+}
+
+.wb-nav-btn--primary:hover {
+  background-color: #6bb0ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.4);
+}
+
+/* ==================== BOTÓN HAMBURGUESA MÓVIL ==================== */
+
+.wb-nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.wb-nav-toggle span {
+  width: 100%;
+  height: 2px;
+  background-color: var(--navbar-text);
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.wb-nav-toggle--active span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.wb-nav-toggle--active span:nth-child(2) {
+  opacity: 0;
+}
+
+.wb-nav-toggle--active span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* ==================== ESPACIADO PARA CONTENIDO ==================== */
+
+/* ==================== ESPACIADO PARA CONTENIDO ==================== */
+
+/* Añadir padding-top al body para compensar navbar fija */
+body {
+  padding-top: var(--navbar-height);
+}
+
+/* Asegurar que el asistente tenga espacio adicional */
+.wb-assistant {
+  margin-top: 0; /* Eliminar cualquier margin-top del asistente */
+  padding-top: 0;
+}
+
+/* El main content del asistente necesita espacio superior */
+.wb-main {
+  padding-top: 2.5rem; /* Espacio adicional arriba */
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1024px) {
+  .wb-navbar-container {
+    padding: 0 1.5rem;
+  }
+  
+  .wb-nav-menu {
+    margin-left: 2rem;
+    gap: 0;
+  }
+  
+  .wb-nav-link {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .wb-nav-toggle {
+    display: flex;
+  }
+  
+  .wb-navbar-container {
+    padding: 0 1rem;
+  }
+  
+  .wb-navbar-title {
+    font-size: 1.125rem;
+  }
+  
+  /* Menú móvil */
+  .wb-nav-menu {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    right: 0;
+    background-color: var(--navbar-bg);
+    border-bottom: 1px solid var(--navbar-border);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    padding: 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .wb-nav-menu--active {
+    max-height: calc(100vh - var(--navbar-height));
+    overflow-y: auto;
+  }
+  
+  .wb-nav-link {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .wb-nav-item {
+    width: 100%;
+  }
+  
+  /* Dropdowns en móvil */
+  .wb-dropdown {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    border-top: 1px solid var(--navbar-border);
+    border-radius: 0;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  
+  .wb-nav-item--open .wb-dropdown {
+    max-height: 500px;
+    padding: 0.5rem 0;
+  }
+  
+  .wb-dropdown--right {
+    left: 0;
+    right: 0;
+  }
+  
+  /* Botones en móvil */
+  .wb-nav-right {
+    display: none; /* Ocultar en móvil por ahora, se puede adaptar si es necesario */
+  }
+}
+
+@media (max-width: 480px) {
+  .wb-navbar-container {
+    padding: 0 0.75rem;
+  }
+  
+  .wb-navbar-logo {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .wb-navbar-title {
+    font-size: 1rem;
+  }
+}
+
+/* ==================== ANIMACIONES ==================== */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== ACCESIBILIDAD ==================== */
+
+.wb-nav-link:focus,
+.wb-nav-btn:focus,
+.wb-dropdown-item:focus {
+  outline: 2px solid var(--navbar-accent);
+  outline-offset: 2px;
+}
+
+/* ==================== SCROLL BEHAVIOR ==================== */
+
+/* Opcionalmente, hacer la navbar más compacta al hacer scroll */
+.wb-navbar--scrolled {
+  height: 56px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.wb-navbar--scrolled .wb-navbar-logo {
+  width: 32px;
+  height: 32px;
+}
+
+.wb-navbar--scrolled .wb-navbar-title {
+  font-size: 1.125rem;
+}
+
+/* Script para activar la clase --scrolled (agregar al final del HTML) */
+/*
+<script>
+window.addEventListener('scroll', function() {
+  const navbar = document.querySelector('.wb-navbar');
+  if (window.scrollY > 20) {
+    navbar.classList.add('wb-navbar--scrolled');
+  } else {
+    navbar.classList.remove('wb-navbar--scrolled');
+  }
+});
+</script>
+*/
+
+
+/* FIX PARA QUE NO SE COMA EL CONTENIDO DE LAS TEMPLATES */ 
+
+/* ===============================================
+   PARCHE UNIVERSAL NAVBAR
+   Aplica a TODAS las páginas que heredan de base.html
+   para evitar que la navbar se coma el contenido
+   =============================================== */
+
+:root {
+  --navbar-height: 64px;
+}
+
+/* ==================== BODY BASE ==================== */
+
+/* El body DEBE tener padding-top igual a la altura de la navbar */
+body {
+  padding-top: var(--navbar-height) !important;
+  margin: 0;
+}
+
+/* ==================== CONTENEDOR PRINCIPAL ==================== */
+
+/* 
+  Si tienes un contenedor principal (.container, .main-content, etc.)
+  asegúrate de que NO tenga margin-top negativo que anule el padding
+*/
+.container,
+.main-content,
+.content-wrapper {
+  margin-top: 0;
+}
+
+/* ==================== PREVENIR OVERLAP ==================== */
+
+/* 
+  Cualquier elemento con position: fixed o absolute 
+  que no sea la navbar debe estar debajo
+*/
+body > *:not(.wb-navbar) {
+  z-index: auto;
+}
+
+/* La navbar siempre en la capa superior */
+.wb-navbar {
+  z-index: 1000 !important;
+}
+
+/* ==================== PÁGINA HOME ==================== */
+
+/* Si home tiene un hero full-screen, ajustar */
+.scatter-hero,
+.hero-section,
+.full-screen-hero {
+  min-height: calc(100vh - var(--navbar-height));
+  margin-top: 0;
+}
+
+/* Canvas de partículas (si lo tienes) */
+#bg-canvas {
+  top: var(--navbar-height);
+  height: calc(100% - var(--navbar-height));
+}
+
+/* ==================== PÁGINA HISTORY ==================== */
+
+/* Contenedor de history */
+.wb-container {
+  padding-top: 2rem;  /* Espacio adicional después de navbar */
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  body {
+    padding-top: var(--navbar-height) !important;
+  }
+}
+
+/* ==================== DEBUG MODE (OPCIONAL) ==================== */
+
+/* 
+  Descomenta esto temporalmente para ver el área de la navbar
+  Útil para debugging
+*/
+
+/*
+.wb-navbar {
+  background: rgba(255, 0, 0, 0.3) !important;
+}
+
+body {
+  outline: 2px solid green;
+}
+*/

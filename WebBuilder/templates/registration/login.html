@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iniciar sesión — WebBuilder</title>
+
+  <!-- Icono opcional -->
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+
+  <!-- Fuente opcional (puedes quitarla si no la necesitas) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <!-- Estilos del login (estilo Uiverse adaptado) -->
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body class="login-page">
+
+  <div class="login-container">
+    <h3>Sign In</h3>
+    <p class="sub">Inicia sesión para continuar</p>
+
+    {# Errores globales (p.ej. credenciales inválidas) #}
+    {% if form.non_field_errors %}
+      <div class="error-message">
+        {% for err in form.non_field_errors %}
+          <div>{{ err }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form action="{% url 'login' %}" method="post" class="form" novalidate>
+      {% csrf_token %}
+
+      <div class="field">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="error-message">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+        {% if form.password.errors %}
+          <div class="error-message">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <span class="forgot-password">
+        <a href="{% url 'history' %}">¿Olvidaste tu contraseña?</a>
+      </span>
+
+      <input class="login-button" type="submit" value="Iniciar sesión">
+    </form>
+
+    <div class="social-account-container">
+      <span class="title">O inicia sesión con</span>
+      <div class="social-accounts">
+        <!-- De momento redirige a historial, cuando actives Google OAuth cambiamos esta URL -->
+        <a class="social-button google" href="{% url 'history' %}" aria-label="Iniciar sesión con Google (próximamente)">
+          <svg class="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512" aria-hidden="true" focusable="false">
+            <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <p>¿No tienes cu

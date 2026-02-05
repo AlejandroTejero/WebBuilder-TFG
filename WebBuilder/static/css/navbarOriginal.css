@@ -1,0 +1,174 @@
+/* =============================== Fondo global =============================== */
+.page-bg {
+  position: fixed;   /* ocupa toda la ventana */
+  inset: 0;
+  z-index: -1;       /* siempre al fondo */
+  pointer-events: none;
+  background: var(--page-bg, #fff); /* usa variable definida por página */
+  background-attachment: fixed;    /* opcional para efecto fijo */
+}
+
+/* =============================== Navbar =============================== */
+/* ---------- Barra ---------- */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;   /* extremos ocupados */
+  width: min(950px, 60%);          /* ancho fluido y consistente */
+  max-width: 1500px;                /* límite max */
+  margin: 1.75rem auto;                /* centrado horizontal */
+  padding: 0.9rem 1.5rem;
+  /*
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  */
+  background: #EDF2F2;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  border-radius: 50px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- Secciones ---------- */
+.nav-brand {
+  flex: 0 0 auto;
+  margin-left: 1rem;   /* mueve Inicio hacia dentro */
+}
+
+.nav-center {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-right {
+  display: flex;
+  gap: 1rem;
+  flex: 0 0 auto;
+  margin-right: 0.5rem;  /* mueve Login hacia dentro */
+}
+
+/* ---------- Brand ---------- */
+.nav-a-brand {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #000;
+  text-decoration: none;
+}
+
+/* ---------- Radios ocultos ---------- */
+.nav-radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Links ---------- */
+.nav-link { position: relative; }
+
+.nav-a {
+  position: relative;
+  color: #000;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+  font-weight: 400;
+}
+
+.nav-a:hover {
+  transform: scale(1.05);
+  color: #222;
+}
+
+/* ---------- Subrayado animado ---------- */
+.nav-a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 3px;
+  background: #222;
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+/* ---------- Estados activos ---------- */
+#nav-asistente:checked  + .nav-link .nav-a,
+#nav-historial:checked  + .nav-link .nav-a,
+#nav-login:checked      + .nav-link .nav-a,
+#nav-registro:checked   + .nav-link .nav-a {
+  color: #000;
+  font-weight: 700;
+}
+
+#nav-asistente:checked  + .nav-link .nav-a::after,
+#nav-historial:checked  + .nav-link .nav-a::after,
+#nav-login:checked      + .nav-link .nav-a::after,
+#nav-registro:checked   + .nav-link .nav-a::after {
+  transform: scaleX(1);
+}
+
+/* =============================== Logo =============================== */
+.nav-wrapper {
+  position: relative; /* referencia para el logo absoluto */
+}
+
+.nav-logo-wrapper {
+  position: absolute;
+  top: 50%;           /* centra verticalmente respecto a la navbar */
+  left: 50px;          /* ajusta la distancia hacia la izquierda */
+  transform: translateY(-50%); /* lo alinea al medio exacto */
+}
+
+.nav-logo {
+  height: 200px;      /* tamaño del logo (base 1920) */
+  width: auto;
+  display: block;
+}
+
+/* =============================== Breakpoints =============================== */
+/* ≥ 2560px — pantallas grandes (QHD/4K) */
+@media (min-width: 2560px) {
+     .nav { width: min(1300px, 50%); }
+     .nav-a { font-size: 1.15rem; }
+     .nav-logo { height: 200px; }
+}
+
+/* ≤ 1280px — portátiles pequeños / tablets en apaisado */
+@media (max-width: 1280px) {
+     .nav { padding: 1rem 1.5rem; width: min(600px, 55%); }
+     .nav-center { gap: 1.5rem; }
+     .nav-a { font-size: 0.95rem; }
+     .nav-logo { height: 50px; }
+}
+
+/* ≤ 768px — móviles */
+@media (max-width: 768px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0.8rem 1.2rem;
+    width: min(1200px, 94%);
+  }
+
+  .nav-center {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .nav-right { order: 2; }
+  .nav-brand { order: 1; }
+
+  /* Logo más pequeño en móvil (opcional) */
+  /* .nav-logo { height: 160px; } */
+}

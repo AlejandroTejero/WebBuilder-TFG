@@ -1,0 +1,223 @@
+{% load static %}
+
+<nav class="wb-navbar">
+  <div class="wb-navbar-container">
+    
+    <!-- Logo y nombre -->
+    <a href="{% url 'home' %}" class="wb-navbar-brand">
+      <div class="wb-navbar-logo">
+        <img src="{% static 'images/logo.png' %}" alt="WebBuilder">
+      </div>
+      <span class="wb-navbar-title">WebBuilder</span>
+    </a>
+
+    <!-- Menú de navegación -->
+    <div class="wb-nav-menu">
+      
+      <!-- Inicio (sin desplegable) -->
+      <a href="{% url 'home' %}" 
+         class="wb-nav-link {% if request.resolver_match.url_name == 'home' %}wb-nav-link--active{% endif %}">
+        Inicio
+      </a>
+
+      <!-- Asistente (con desplegable) -->
+      <div class="wb-nav-item" data-dropdown="asistente">
+        <div class="wb-nav-link {% if request.resolver_match.url_name == 'assistant' %}wb-nav-link--active{% endif %}">
+          Asistente
+          <span class="wb-nav-arrow"></span>
+        </div>
+        <div class="wb-dropdown">
+          <a href="{% url 'assistant' %}" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Nuevo Proyecto</div>
+              <div class="wb-dropdown-description">Crear una nueva web desde cero</div>
+            </div>
+          </a>
+          <a href="{% url 'assistant' %}" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Cargar API</div>
+              <div class="wb-dropdown-description">Importar datos desde una URL</div>
+            </div>
+          </a>
+          <a href="{% url 'history' %}" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Proyectos Recientes</div>
+              <div class="wb-dropdown-description">Ver tus últimos proyectos</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Historial (con desplegable) -->
+      <div class="wb-nav-item" data-dropdown="historial">
+        <div class="wb-nav-link {% if request.resolver_match.url_name == 'history' %}wb-nav-link--active{% endif %}">
+          Historial
+          <span class="wb-nav-arrow"></span>
+        </div>
+        <div class="wb-dropdown">
+          <a href="{% url 'history' %}" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Todos los Proyectos</div>
+              <div class="wb-dropdown-description">Ver historial completo</div>
+            </div>
+          </a>
+          {% if api_request %}
+          <a href="{% url 'preview' api_request.id %}" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Preview</div>
+              <div class="wb-dropdown-description">Vista previa del proyecto actual</div>
+            </div>
+          </a>
+          {% endif %}
+          <div class="wb-dropdown-divider"></div>
+          <a href="{% url 'history' %}" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Webs Recientes</div>
+              <div class="wb-dropdown-description">Últimas webs generadas</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Ayuda (con desplegable) -->
+      <div class="wb-nav-item" data-dropdown="ayuda">
+        <div class="wb-nav-link">
+          Ayuda
+          <span class="wb-nav-arrow"></span>
+        </div>
+        <div class="wb-dropdown">
+          <a href="#" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Documentación</div>
+              <div class="wb-dropdown-description">Guías y tutoriales</div>
+            </div>
+          </a>
+          <a href="#" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">FAQ</div>
+              <div class="wb-dropdown-description">Preguntas frecuentes</div>
+            </div>
+          </a>
+          <a href="#" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Contacto</div>
+              <div class="wb-dropdown-description">¿Necesitas ayuda?</div>
+            </div>
+          </a>
+          <div class="wb-dropdown-divider"></div>
+          <a href="#" class="wb-dropdown-item">
+            <div class="wb-dropdown-content">
+              <div class="wb-dropdown-title">Reportar un problema</div>
+              <div class="wb-dropdown-description">Feedback y sugerencias</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sección derecha -->
+    <div class="wb-nav-right">
+      {% if user.is_authenticated %}
+        <!-- Usuario autenticado -->
+        <div class="wb-nav-item" data-dropdown="user">
+          <div class="wb-nav-link">
+            <span class="wb-user-icon">{{ user.username|first|upper }}</span>
+            {{ user.username }}
+            <span class="wb-nav-arrow"></span>
+          </div>
+          <div class="wb-dropdown wb-dropdown--right">
+            <a href="{% url 'history' %}" class="wb-dropdown-item">
+              <div class="wb-dropdown-content">
+                <div class="wb-dropdown-title">Mis Proyectos</div>
+              </div>
+            </a>
+            <a href="#" class="wb-dropdown-item">
+              <div class="wb-dropdown-content">
+                <div class="wb-dropdown-title">Configuración</div>
+              </div>
+            </a>
+            <a href="{% url 'login' %}" class="wb-dropdown-item">
+              <div class="wb-dropdown-content">
+                <div class="wb-dropdown-title">Cerrar Sesión</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <!-- Usuario no autenticado -->
+        <a href="{% url 'login' %}" class="wb-nav-btn wb-nav-btn--secondary">
+          Sign In
+        </a>
+        <!--
+        <a href="{% url 'register' %}" class="wb-nav-btn wb-nav-btn--primary">
+          Registrarse
+        </a>
+        -->
+      {% endif %}
+    </div>
+
+    <!-- Botón hamburguesa para móvil -->
+    <button class="wb-nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  </div>
+</nav>
+
+<!-- JavaScript para los menús desplegables -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const navItems = document.querySelectorAll('.wb-nav-item[data-dropdown]');
+    
+    // Toggle de dropdowns
+    navItems.forEach(item => {
+      const navLink = item.querySelector('.wb-nav-link');
+      
+      navLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Cerrar otros menús
+        navItems.forEach(otherItem => {
+          if (otherItem !== item) {
+            otherItem.classList.remove('wb-nav-item--open');
+          }
+        });
+        
+        // Toggle del menú actual
+        item.classList.toggle('wb-nav-item--open');
+      });
+    });
+
+    // Cerrar menús al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.wb-nav-item')) {
+        navItems.forEach(item => {
+          item.classList.remove('wb-nav-item--open');
+        });
+      }
+    });
+
+    // Prevenir que los clics dentro del dropdown cierren el menú
+    const dropdowns = document.querySelectorAll('.wb-dropdown');
+    dropdowns.forEach(dropdown => {
+      dropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    });
+
+    // Toggle del menú móvil
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.querySelector('.wb-nav-menu');
+    
+    if (navToggle) {
+      navToggle.addEventListener('click', function() {
+        navMenu.classList.toggle('wb-nav-menu--active');
+        navToggle.classList.toggle('wb-nav-toggle--active');
+      });
+    }
+  });
+</script>

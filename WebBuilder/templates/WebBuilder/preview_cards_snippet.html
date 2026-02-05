@@ -1,0 +1,32 @@
+<!-- Este es un snippet que muestra cómo deberían verse las cards en el preview -->
+<!-- Se puede usar como referencia para actualizar preview.html -->
+
+<div class="wb-preview-grid">
+  {% for item in items %}
+  <div class="wb-preview-item">
+    {% if item.image %}
+    <img src="{{ item.image }}" alt="{{ item.title }}" class="wb-preview-item__image">
+    {% else %}
+    <div class="wb-preview-item__image" style="display: flex; align-items: center; justify-content: center; background: #1a1a1a;">
+      <span style="font-size: 3rem; opacity: 0.3;">📄</span>
+    </div>
+    {% endif %}
+    
+    <div class="wb-preview-item__content">
+      <h3 class="wb-preview-item__title">{{ item.title|truncatewords:10 }}</h3>
+      
+      {% if item.description %}
+      <p class="wb-preview-item__description">
+        {{ item.description|truncatewords:20 }}
+      </p>
+      {% endif %}
+      
+      {% if item.link %}
+      <a href="{{ item.link }}" class="wb-preview-item__link" target="_blank" rel="noopener">
+        Ver más →
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>

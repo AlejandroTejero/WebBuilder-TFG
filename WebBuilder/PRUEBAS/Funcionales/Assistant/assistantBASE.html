@@ -1,0 +1,234 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block body_class %}procesos{% endblock %}
+
+{% block content %}
+<div class="wb-container">
+
+  <header class="wb-header">
+    <h1 class="wb-title">Asistente WebBuilder</h1>
+    <p class="wb-subtitle">
+      Pega una URL (JSON o XML). Analizamos la estructura y te proponemos un mapping para construir tu web.
+    </p>
+  </header>
+
+  {% if messages %}
+    <div class="wb-messages">
+      {% for message in messages %}
+        <div class="wb-message wb-message--{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- A) Cargar URL -->
+  <section class="wb-card">
+    <div class="wb-card__head">
+      <h2 class="wb-card__title">Cargar datos desde una URL</h2>
+      <p class="wb-card__subtitle">Introduce una URL que responda con JSON o XML. Nosotros nos encargamos del resto.</p>
+    </div>
+
+    <form method="post" class="wb-form">
+      {% csrf_token %}
+
+      <div class="wb-form__row">
+        <label class="wb-label" for="{{ form.api_url.id_for_label }}">URL</label>
+
+        <div class="wb-inputwrap">
+          {{ form.api_url }}
+          {% if form.api_url.errors %}
+            <div class="wb-error">{{ form.api_url.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="wb-actions wb-actions--tight">
+        <button type="submit" class="wb-btn wb-btn--primary">Analizar URL</button>
+
+        {% if api_request %}
+          <a class="wb-btn wb-btn--secondary" href="{% url 'preview' api_request.id %}">Ver preview</a>
+          <span class="wb-muted">APIRequest actual: #{{ api_request.id }}</span>
+        {% endif %}
+      </div>
+    </form>
+  </section>
+
+  {% if analysis %}
+    <!-- B) Mensaje UX cuando no hay colección -->
+    {% if analysis.message %}
+      <section class="wb-card wb-card--flat">
+        <div class="wb-message wb-message--info">
+          {{ analysis.message }}
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- C) Layout principal -->
+    <div class="wb-layout">
+
+      <!-- Izquierda: Wizard -->
+      <section class="wb-card wb-card--main">
+        <div class="wb-card__head">
+          <h2 class="wb-card__title">Wizard: elige el mapping</h2>
+          <p class="wb-card__subtitle">
+            Selecciona el campo del dataset para cada rol. Si un rol no aplica, deja “(ninguno)”.
+          </p>
+        </div>
+
+        <form method="post" class="wb-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="save_mapping">
+
+          {% if api_request %}
+            <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
+          {% endif %}
+
+          <div class="wb-rolegrid">
+            {% for row in role_options %}
+              <div class="wb-role">
+                <label class="wb-label wb-label--role">{{ row.role }}</label>
+
+                <select class="wb-select" name="map_{{ row.role }}">
+                  <option value="" {% if row.none_selected %}selected{% endif %}>(ninguno)</option>
+
+                  {% for opt in row.options %}
+                    <option value="{{ opt.key }}" 
+                            {% if opt.is_selected %}selected{% endif %}
+                            {% if opt.is_suggested %}class="wb-suggested-option"{% endif %}>
+                      {{ opt.key }}{% if opt.is_suggested %} ⭐{% endif %}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="wb-actions wb-actions--bottom">
+            <button type="submit" class="wb-btn wb-btn--secondary">Guardar mapping</button>
+
+            {% if api_request %}
+              <a class="wb-btn wb-btn--primary" href="{% url 'preview' api_request.id %}">Ver preview</a>
+            {% endif %}
+
+            {% if saved_mapping %}
+              <span class="wb-muted">Mapping guardado ✅</span>
+            {% endif %}
+          </div>
+        </form>
+
+        {% if saved_mapping %}
+          <details class="wb-details">
+            <summary class="wb-details__summary">Ver mapping guardado (debug)</summary>
+            <pre class="wb-pre">{{ saved_mapping }}</pre>
+          </details>
+        {% endif %}
+
+        {# ✨ NUEVO: Indicador de calidad del mapping #}
+        {% if mapping_quality %}
+        <div class="wb-quality-indicator wb-quality--{{ mapping_quality.color }}">
+          <div class="wb-quality__header">
+            <h3 class="wb-quality__title">📊 Calidad del Mapping</h3>
+            <span class="wb-quality__score">{{ mapping_quality.percentage }}%</span>
+          </div>
+          <p class="wb-quality__label">{{ mapping_quality.quality }}</p>
+          
+          {% if mapping_quality.issues %}
+          <ul class="wb-quality__issues">
+            {% for issue in mapping_quality.issues %}
+            <li>{{ issue }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endif %}
+      </section>
+
+      <!-- Derecha: Resumen + Detalles colapsados -->
+      <aside class="wb-side">
+        <section class="wb-card wb-card--sticky">
+          <div class="wb-card__head">
+            <h2 class="wb-card__title">Resumen del análisis</h2>
+            <p class="wb-card__subtitle">Información útil para entender la estructura detectada.</p>
+          </div>
+
+          <div class="wb-kv">
+            <div class="wb-kv__item">
+              <span class="wb-kv__k">Formato</span>
+              <span class="wb-kv__v">{{ analysis.format }}</span>
+            </div>
+
+            <div class="wb-kv__item">
+              <span class="wb-kv__k">Raíz</span>
+              <span class="wb-kv__v">{{ analysis.root_type }}</span>
+            </div>
+
+            <div class="wb-kv__item">
+              <span class="wb-kv__k">Colección</span>
+              <span class="wb-kv__v">
+                {% if analysis.main_collection.found %}Sí{% else %}No{% endif %}
+              </span>
+            </div>
+
+            <div class="wb-kv__item">
+              <span class="wb-kv__k">Nº items</span>
+              <span class="wb-kv__v">{{ analysis.main_collection.count }}</span>
+            </div>
+
+            <div class="wb-kv__item wb-kv__item--full">
+              <span class="wb-kv__k">Ruta</span>
+              <span class="wb-kv__v wb-mono">{{ analysis.main_collection.path_display }}</span>
+            </div>
+          </div>
+
+          <div class="wb-divider"></div>
+
+          <details class="wb-details" {% if not analysis.main_collection.found %}open{% endif %}>
+            <summary class="wb-details__summary">Claves más frecuentes</summary>
+            {% if analysis.main_collection.top_keys %}
+              <div class="wb-chips wb-chips--compact">
+                {% for pair in analysis.main_collection.top_keys %}
+                  <span class="wb-chip">
+                    {{ pair.0 }} <span class="wb-chip__muted">({{ pair.1 }})</span>
+                  </span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="wb-muted">No hay datos suficientes para calcular frecuencias.</p>
+            {% endif %}
+          </details>
+
+          <details class="wb-details">
+            <summary class="wb-details__summary">Sugerencias por rol</summary>
+
+            <div class="wb-suggestions">
+              {% for row in role_options %}
+                <div class="wb-suggestions__row">
+                  <div class="wb-suggestions__role">{{ row.role }}</div>
+                  <div class="wb-suggestions__opts">
+                    {% if row.options %}
+                      {# Ojo: aquí mostramos solo una “vista rápida”. El select ya contiene todo. #}
+                      {% for opt in row.options|slice:":6" %}
+                        <span class="wb-chip">{{ opt.key }}</span>
+                      {% endfor %}
+                      {% if row.options|length > 6 %}
+                        <span class="wb-muted">+{{ row.options|length|add:"-6" }} más</span>
+                      {% endif %}
+                    {% else %}
+                      <span class="wb-muted">(sin candidatos)</span>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </details>
+
+        </section>
+      </aside>
+
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

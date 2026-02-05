@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retool Navbar Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* Navbar Principal */
+        .navbar {
+            background-color: #000;
+            padding: 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 64px;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #FF6B35, #FF8C42);
+            border-radius: 6px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Menú de navegación */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            margin-left: 40px;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Flechas */
+        .arrow {
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid #fff;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Menú desplegable */
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: -20px;
+            background-color: #0F0F0F;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            min-width: 240px;
+            padding: 8px;
+        }
+
+        .nav-item.open .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Mega menú (para Platform) */
+        .mega-dropdown {
+            min-width: 600px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .dropdown-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FF6B35, #FF8C42);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 20px;
+        }
+
+        .dropdown-content {
+            flex: 1;
+        }
+
+        .dropdown-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-new {
+            background: linear-gradient(135deg, #FF6B35, #FF8C42);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .dropdown-description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.4;
+        }
+
+        /* Sección derecha */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.08);
+            border: none;
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-btn:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .kbd {
+            padding: 2px 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B35, #FF8C42);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+
+        /* Contenido de ejemplo */
+        .content {
+            margin-top: 80px;
+            padding: 40px 24px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .search-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <!-- Logo -->
+            <a href="#" class="logo">
+                <div class="logo-icon">R</div>
+                Retool
+            </a>
+
+            <!-- Menú de navegación -->
+            <div class="nav-menu">
+                <!-- Platform con mega menú -->
+                <div class="nav-item" data-dropdown="platform">
+                    <div class="nav-link">
+                        Platform
+                        <span class="arrow"></span>
+                    </div>
+                    <div class="dropdown mega-dropdown">
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-icon">🤖</div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">
+                                    Agents
+                                    <span class="badge-new">New</span>
+                                </div>
+                                <div class="dropdown-description">Build AI agents that work with your data</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-icon">✨</div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">
+                                    AI primitives
+                                    <span class="badge-new">New</span>
+                                </div>
+                                <div class="dropdown-description">Integrate AI into your applications</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-icon">📱</div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">App builder</div>
+                                <div class="dropdown-description">Build internal tools quickly</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-icon">📲</div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Mobile apps</div>
+                                <div class="dropdown-description">Native mobile experiences</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-icon">⚙️</div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Workflows</div>
+                                <div class="dropdown-description">Automate business processes</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-icon">🗄️</div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Database</div>
+                                <div class="dropdown-description">Managed database for your apps</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Audience -->
+                <div class="nav-item" data-dropdown="audience">
+                    <div class="nav-link">
+                        Audience
+                        <span class="arrow"></span>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Data teams</div>
+                                <div class="dropdown-description">Transform data into insights</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Engineering</div>
+                                <div class="dropdown-description">Build faster with less code</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Operations</div>
+                                <div class="dropdown-description">Streamline operations</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Enterprise</div>
+                                <div class="dropdown-description">Scale with confidence</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Resources -->
+                <div class="nav-item" data-dropdown="resources">
+                    <div class="nav-link">
+                        Resources
+                        <span class="arrow"></span>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Blog</div>
+                                <div class="dropdown-description">Latest news and insights</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Customer stories</div>
+                                <div class="dropdown-description">See how teams use Retool</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Documentation</div>
+                                <div class="dropdown-description">Learn how to build</div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="dropdown-content">
+                                <div class="dropdown-title">Templates</div>
+                                <div class="dropdown-description">Start with pre-built apps</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Use cases -->
+                <a href="#" class="nav-link">Use cases</a>
+
+                <!-- Pricing -->
+                <a href="#" class="nav-link">Pricing</a>
+            </div>
+
+            <!-- Sección derecha -->
+            <div class="nav-right">
+                <button class="search-btn">
+                    Search
+                    <span class="kbd">⌘K</span>
+                </button>
+                <a href="#" class="btn btn-secondary">Sign in</a>
+                <a href="#" class="btn btn-secondary">Book a demo</a>
+                <a href="#" class="btn btn-primary">Start for free</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido de ejemplo -->
+    <div class="content">
+        <h1>Tu contenido aquí</h1>
+        <p>Esta es una réplica de la navbar de Retool. Puedes empezar a agregar tu contenido debajo.</p>
+    </div>
+
+    <script>
+        // JavaScript para los menús desplegables
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item[data-dropdown]');
+            
+            navItems.forEach(item => {
+                const navLink = item.querySelector('.nav-link');
+                
+                navLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Cerrar otros menús abiertos
+                    navItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('open');
+                        }
+                    });
+                    
+                    // Toggle del menú actual
+                    item.classList.toggle('open');
+                });
+            });
+
+            // Cerrar menús al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.nav-item')) {
+                    navItems.forEach(item => {
+                        item.classList.remove('open');
+                    });
+                }
+            });
+
+            // Prevenir que los clics dentro del dropdown cierren el menú
+            const dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,477 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block body_class %}procesos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/assistant_steps.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="wb-assistant">
+
+  <!-- Boton colapso -->
+  <button class="wb-menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    ☰
+  </button>
+  
+
+  <!-- Navegación lateral -->
+  <aside class="wb-sidebar" id="sidebar">
+    <div class="wb-sidebar__header">
+      <!-- Logo ya está en navbar, aquí solo mantenemos padding -->
+    </div>
+
+    <nav class="wb-steps-nav">
+      <button class="wb-step-nav" data-step="1" id="navStep1">
+        <span class="wb-step-nav__number">1</span>
+        <span class="wb-step-nav__text">Introducir URL</span>
+      </button>
+      <button class="wb-step-nav" data-step="2" id="navStep2">
+        <span class="wb-step-nav__number">2</span>
+        <span class="wb-step-nav__text">Configurar Mapping</span>
+      </button>
+      <button class="wb-step-nav" data-step="3" id="navStep3">
+        <span class="wb-step-nav__number">3</span>
+        <span class="wb-step-nav__text">Preview</span>
+      </button>
+      <button class="wb-step-nav" data-step="4" id="navStep4">
+        <span class="wb-step-nav__number">4</span>
+        <span class="wb-step-nav__text">Generar Web</span>
+      </button>
+    </nav>
+
+    <div class="wb-sidebar__footer">
+      <a href="{% url 'history' %}" class="wb-sidebar__link">Ver historial</a>
+      <a href="{% url 'home' %}" class="wb-sidebar__link">Volver al inicio</a>
+    </div>
+  </aside>
+
+  <!-- Contenido principal -->
+  <main class="wb-main">
+    
+    <!-- Mensajes globales -->
+    {% if messages %}
+      <div class="wb-messages">
+        {% for message in messages %}
+          <div class="wb-message wb-message--{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- PASO 1: Introducir URL -->
+    <section class="wb-step" id="step1" data-step="1">
+      <div class="wb-step__container">
+        <div class="wb-step__header">
+          <h1 class="wb-step__title">Paso 1: Introducir URL</h1>
+          <p class="wb-step__description">
+            Introduce la URL de una API que devuelva datos en formato JSON o XML. 
+            Analizaremos su estructura automáticamente.
+          </p>
+        </div>
+
+        <div class="wb-step__content">
+          <form method="post" class="wb-form" id="formStep1">
+            {% csrf_token %}
+
+            <div class="wb-form-group">
+              <label class="wb-label" for="{{ form.api_url.id_for_label }}">
+                URL de la API
+              </label>
+              <div class="wb-input-wrapper">
+                {{ form.api_url }}
+                {% if form.api_url.errors %}
+                  <div class="wb-error">{{ form.api_url.errors }}</div>
+                {% endif %}
+              </div>
+              <p class="wb-hint">Ejemplo: https://api.example.com/posts</p>
+            </div>
+
+            <div class="wb-actions">
+              <button type="submit" class="wb-btn wb-btn--primary">
+                Analizar URL
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 2: Configurar Mapping -->
+    <section class="wb-step" id="step2" data-step="2" style="display: none;">
+      <div class="wb-step__container">
+        <div class="wb-step__header">
+          <h1 class="wb-step__title">Paso 2: Configurar Mapping</h1>
+          <p class="wb-step__description">
+            Hemos analizado tu API. Ahora selecciona qué campo corresponde a cada elemento de tu web.
+          </p>
+        </div>
+
+        {% if analysis %}
+        <div class="wb-step__content">
+          
+          <!-- Resumen del análisis -->
+          <div class="wb-analysis-summary">
+            <h3 class="wb-section-title">Resumen del Análisis</h3>
+            
+            <div class="wb-summary-grid">
+              {% if analysis.main_collection.found %}
+              <div class="wb-summary-item">
+                <span class="wb-summary-label">Items encontrados</span>
+                <span class="wb-summary-value">{{ analysis.main_collection.count }}</span>
+              </div>
+              <div class="wb-summary-item">
+                <span class="wb-summary-label">Formato detectado</span>
+                <span class="wb-summary-value">{{ api_request.response_summary|default:"JSON/XML" }}</span>
+              </div>
+              {% else %}
+              <div class="wb-summary-item wb-summary-item--full">
+                <span class="wb-summary-label">Estado</span>
+                <span class="wb-summary-value">{{ analysis.message|default:"No se encontraron items" }}</span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Wizard de mapping -->
+          {% if analysis.main_collection.found %}
+          <div class="wb-mapping-wizard">
+            <h3 class="wb-section-title">Asignar Campos</h3>
+            <p class="wb-section-subtitle">
+              Selecciona el campo del dataset para cada rol. Deja "(ninguno)" si no aplica.
+            </p>
+
+            <form method="post" class="wb-form" id="formStep2">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="save_mapping">
+              {% if api_request %}
+                <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
+              {% endif %}
+
+              <div class="wb-mapping-grid">
+                {% for row in role_options %}
+                  <div class="wb-mapping-row">
+                    <label class="wb-label">{{ row.role }}</label>
+                    <select class="wb-select" name="map_{{ row.role }}">
+                      <option value="" {% if row.none_selected %}selected{% endif %}>(ninguno)</option>
+                      {% for opt in row.options %}
+                        <option value="{{ opt.key }}" 
+                                {% if opt.is_selected %}selected{% endif %}
+                                {% if opt.is_suggested %}class="wb-suggested-option"{% endif %}>
+                          {{ opt.key }}{% if opt.is_suggested %} ⭐{% endif %}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                {% endfor %}
+              </div>
+
+              <!-- Indicador de calidad del mapping -->
+              {% if mapping_quality %}
+              <div class="wb-quality-card wb-quality--{{ mapping_quality.color }}">
+                <div class="wb-quality-header">
+                  <span class="wb-quality-label">Calidad del Mapping</span>
+                  <span class="wb-quality-score">{{ mapping_quality.score }}/100</span>
+                </div>
+                <div class="wb-quality-status">{{ mapping_quality.quality }}</div>
+                {% if mapping_quality.issues %}
+                <ul class="wb-quality-issues">
+                  {% for issue in mapping_quality.issues %}
+                  <li>{{ issue }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+              {% endif %}
+
+              <div class="wb-actions">
+                <button type="button" class="wb-btn wb-btn--secondary" onclick="goToStep(1)">
+                  Volver
+                </button>
+                <button type="submit" class="wb-btn wb-btn--primary">
+                  Continuar
+                </button>
+              </div>
+            </form>
+          </div>
+          {% endif %}
+
+        </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- PASO 3: Preview -->
+    <section class="wb-step" id="step3" data-step="3" style="display: none;">
+      <div class="wb-step__container">
+        <div class="wb-step__header">
+          <h1 class="wb-step__title">Paso 3: Preview</h1>
+          <p class="wb-step__description">
+            Visualiza cómo se verán tus datos con el mapping configurado.
+          </p>
+        </div>
+
+        <div class="wb-step__content">
+          
+          <!-- Aquí se cargará el preview dinámicamente via JavaScript -->
+          <div id="previewContainer">
+            <div class="wb-loading">
+              <div class="wb-loading__spinner"></div>
+              <p>Cargando preview...</p>
+            </div>
+          </div>
+
+          <div class="wb-actions">
+            <button type="button" class="wb-btn wb-btn--secondary" onclick="goToStep(2)">
+              Volver
+            </button>
+            <button type="button" class="wb-btn wb-btn--primary" onclick="confirmMapping()">
+              Confirmar
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 4: Generar Web (Placeholder) -->
+    <section class="wb-step" id="step4" data-step="4" style="display: none;">
+      <div class="wb-step__container">
+        <div class="wb-step__header">
+          <h1 class="wb-step__title">Paso 4: Generar Web</h1>
+          <p class="wb-step__description">
+            Próximamente: Generación automática de tu sitio web.
+          </p>
+        </div>
+
+        <div class="wb-step__content">
+          <div class="wb-placeholder">
+            <div class="wb-placeholder__icon">🚧</div>
+            <h3 class="wb-placeholder__title">En desarrollo</h3>
+            <p class="wb-placeholder__text">
+              Esta funcionalidad estará disponible próximamente. 
+              Aquí podrás generar y descargar tu sitio web completo.
+            </p>
+          </div>
+
+          <div class="wb-actions">
+            <button type="button" class="wb-btn wb-btn--secondary" onclick="goToStep(3)">
+              Volver
+            </button>
+            <a href="{% url 'history' %}" class="wb-btn wb-btn--primary">
+              Ver Historial
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Overlay de transición con línea de progreso -->
+  <div class="wb-transition-overlay" id="transitionOverlay">
+    <div class="wb-progress-bar">
+      <div class="wb-progress-bar__fill" id="progressBarFill"></div>
+    </div>
+    <p class="wb-transition-text" id="transitionText">Cargando...</p>
+  </div>
+
+</div>
+
+<!-- JavaScript para manejo de pasos -->
+<script>
+  // Estado actual
+  let currentStep = 1;
+  let analysisData = null;
+  
+  {% if api_request %}
+    analysisData = {
+      id: {{ api_request.id }},
+      hasAnalysis: {% if analysis %}true{% else %}false{% endif %}
+    };
+    
+    {% if analysis and analysis.main_collection.found %}
+      currentStep = 2;
+      showStep(2, false);
+    {% endif %}
+  {% endif %}
+
+  // Toggle del menú lateral
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('wb-sidebar--collapsed');
+    menuToggle.classList.toggle('wb-menu-toggle--collapsed');  // ← AÑADIR ESTA LÍNEA
+    document.querySelector('.wb-main').classList.toggle('wb-main--expanded');
+  });
+
+  // Navegación entre pasos
+  function goToStep(stepNumber) {
+    if (stepNumber < 1 || stepNumber > 4) return;
+    
+    // Validaciones básicas
+    if (stepNumber === 2 && !analysisData) {
+      alert('Primero debes analizar una URL');
+      return;
+    }
+    
+    showStep(stepNumber, true);
+  }
+
+  // Mostrar paso con transición
+  function showStep(stepNumber, withTransition = true) {
+    const overlay = document.getElementById('transitionOverlay');
+    const progressFill = document.getElementById('progressBarFill');
+    const transitionText = document.getElementById('transitionText');
+    
+    if (withTransition) {
+      // Mostrar overlay
+      overlay.classList.add('wb-transition-overlay--active');
+      progressFill.style.width = '0%';
+      transitionText.textContent = 'Cargando...';
+      
+      // Animar progreso
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 2;
+        progressFill.style.width = progress + '%';
+        
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            performStepChange(stepNumber);
+            overlay.classList.remove('wb-transition-overlay--active');
+          }, 200);
+        }
+      }, 10);
+    } else {
+      performStepChange(stepNumber);
+    }
+  }
+
+  // Realizar cambio de paso
+  function performStepChange(stepNumber) {
+    // Ocultar todos los pasos
+    document.querySelectorAll('.wb-step').forEach(step => {
+      step.style.display = 'none';
+    });
+    
+    // Mostrar paso actual
+    const currentStepEl = document.getElementById('step' + stepNumber);
+    if (currentStepEl) {
+      currentStepEl.style.display = 'block';
+      currentStepEl.classList.add('wb-step--active');
+    }
+    
+    // Actualizar navegación lateral
+    document.querySelectorAll('.wb-step-nav').forEach(nav => {
+      nav.classList.remove('wb-step-nav--active', 'wb-step-nav--completed');
+      const navStep = parseInt(nav.dataset.step);
+      
+      if (navStep === stepNumber) {
+        nav.classList.add('wb-step-nav--active');
+      } else if (navStep < stepNumber) {
+        nav.classList.add('wb-step-nav--completed');
+      }
+    });
+    
+    currentStep = stepNumber;
+    
+    // Cargar preview si es paso 3
+    if (stepNumber === 3 && analysisData) {
+      loadPreview();
+    }
+  }
+
+  // Cargar preview dinámicamente
+  function loadPreview() {
+    const container = document.getElementById('previewContainer');
+    
+    if (!analysisData || !analysisData.id) {
+      container.innerHTML = '<div class="wb-error">No hay datos para mostrar</div>';
+      return;
+    }
+    
+    // Hacer fetch al endpoint de preview
+    fetch(`/preview/${analysisData.id}/`)
+      .then(response => response.text())
+      .then(html => {
+        // Extraer solo el contenido de los items
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const items = doc.querySelectorAll('.wb-preview-item');
+        
+        if (items.length > 0) {
+          let previewHTML = '<div class="wb-preview-grid">';
+          items.forEach((item, index) => {
+            if (index < 5) { // Solo 5 items
+              previewHTML += item.outerHTML;
+            }
+          });
+          previewHTML += '</div>';
+          container.innerHTML = previewHTML;
+        } else {
+          container.innerHTML = '<div class="wb-message wb-message--warning">No se encontraron items para mostrar</div>';
+        }
+      })
+      .catch(error => {
+        console.error('Error loading preview:', error);
+        container.innerHTML = '<div class="wb-error">Error al cargar el preview</div>';
+      });
+  }
+
+  // Confirmar mapping
+  function confirmMapping() {
+    if (confirm('¿Confirmas que el mapping es correcto?')) {
+      goToStep(4);
+    }
+  }
+
+  // Event listeners para navegación lateral
+  document.querySelectorAll('.wb-step-nav').forEach(nav => {
+    nav.addEventListener('click', () => {
+      const step = parseInt(nav.dataset.step);
+      goToStep(step);
+    });
+  });
+
+  // Interceptar submit de formularios para mantener estado
+  document.getElementById('formStep1')?.addEventListener('submit', (e) => {
+    // El form se envía normalmente, Django maneja la respuesta
+  });
+
+  document.getElementById('formStep2')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    // Enviar via fetch para mantener en la misma página
+    fetch('{% url "assistant" %}', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        goToStep(3);
+      } else {
+        alert('Error al guardar el mapping');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error al guardar el mapping');
+    });
+  });
+
+  // Inicializar paso actual
+  document.addEventListener('DOMContentLoaded', () => {
+    showStep(currentStep, false);
+  });
+</script>
+
+{% endblock %}

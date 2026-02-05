@@ -1,0 +1,106 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block body_class %}history{% endblock %}
+
+{% block content %}
+<div class="wb-container">
+
+  <header class="wb-header">
+    <h1 class="wb-title">Historial</h1>
+    <p class="wb-subtitle">Aquí verás tus análisis recientes y, más adelante, tus webs generadas.</p>
+  </header>
+
+  {% if messages %}
+    <div class="wb-messages">
+      {% for message in messages %}
+        <div class="wb-message wb-message--{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- 1) Mis análisis -->
+  <section class="wb-card">
+    <h2 class="wb-card__title">Mis análisis</h2>
+    <p class="wb-hint">
+      Lista de URLs analizadas (APIRequest). Puedes abrir el asistente para ajustar el mapping o ir al preview.
+    </p>
+
+    <div class="wb-divider"></div>
+
+    {% if api_requests %}
+      <div class="wb-suggestions">
+        {% for r in api_requests %}
+          <div class="wb-suggestions__row">
+
+            <div class="wb-suggestions__role">
+              <div><strong>#{{ r.id }}</strong> — {{ r.date|date:"Y-m-d H:i" }}</div>
+              <div class="wb-muted" style="margin-top:4px;">{{ r.api_url }}</div>
+              {% if r.response_summary %}
+                <div class="wb-muted" style="margin-top:6px;">{{ r.response_summary }}</div>
+              {% endif %}
+            </div>
+
+            <div class="wb-suggestions__opts">
+              <span class="wb-chip">
+                Estado: <span class="wb-chip__muted">{{ r.status }}</span>
+              </span>
+
+              <span class="wb-chip">
+                Mapping:
+                <span class="wb-chip__muted">{% if r.field_mapping %}sí{% else %}no{% endif %}</span>
+              </span>
+
+              <a class="wb-btn wb-btn--secondary" href="{% url 'assistant' %}?api_request_id={{ r.id }}">
+                Abrir
+              </a>
+
+              {% if r.status == "processed" and r.parsed_data %}
+                <a class="wb-btn wb-btn--secondary" href="{% url 'preview' r.id %}">
+                  Preview
+                </a>
+              {% else %}
+                <span class="wb-muted">(sin preview)</span>
+              {% endif %}
+            </div>
+
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="wb-muted">Aún no tienes análisis guardados.</p>
+    {% endif %}
+  </section>
+
+  <!-- 2) Webs generadas -->
+  <section class="wb-card">
+    <h2 class="wb-card__title">Webs generadas</h2>
+    <p class="wb-hint">Aquí aparecerán tus proyectos cuando creemos el modelo de “web generada”.</p>
+
+    <div class="wb-divider"></div>
+
+    {% if generated_sites %}
+      <div class="wb-suggestions">
+        {% for w in generated_sites %}
+          <div class="wb-suggestions__row">
+            <div class="wb-suggestions__role">
+              <div><strong>{{ w.name }}</strong></div>
+              <div class="wb-muted" style="margin-top:4px;">{{ w.created_at|date:"Y-m-d H:i" }}</div>
+            </div>
+            <div class="wb-suggestions__opts">
+              <a class="wb-btn wb-btn--secondary" href="#">
+                Abrir
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="wb-muted">Todavía no hay webs generadas (próximamente).</p>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}
