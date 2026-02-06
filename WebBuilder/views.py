@@ -47,7 +47,7 @@ def home(request):
     # Intenta renderizar la plantilla
     try:
         # Devuelve la plantilla de home
-        return render(request, "WebBuilder/pruebahome.html")
+        return render(request, "WebBuilder/home.html")
     # Captura errores inesperados
     except Exception as exc:
         # Devuelve un texto plano con el error
