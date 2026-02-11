@@ -776,3 +776,53 @@
   font-weight: 600;
   color: var(--text-primary);
 }
+/* ==================== MAPPING INFO IN CARDS ==================== */
+
+.wb-mapping-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.wb-mapping-info__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.wb-mapping-info__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.wb-mapping-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.wb-mapping-badge:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+}
+
+.wb-mapping-badge__label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.wb-mapping-badge__value {
+  color: var(--accent-blue);
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}

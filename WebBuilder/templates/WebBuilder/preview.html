@@ -60,30 +60,48 @@
 
     <div class="wb-divider"></div>
 
+    <!-- Debug (puedes quitarlo cuando quieras) -->
+    <div class="wb-kv" style="margin-bottom:12px;">
+      <div class="wb-kv__item">
+        <span class="wb-kv__k">Colección detectada</span>
+        <span class="wb-kv__v">{{ analysis.main_collection.found }}</span>
+      </div>
+      <div class="wb-kv__item">
+        <span class="wb-kv__k">Path</span>
+        <span class="wb-kv__v wb-mono">{{ analysis.main_collection.path_display }}</span>
+      </div>
+      <div class="wb-kv__item">
+        <span class="wb-kv__k">Count</span>
+        <span class="wb-kv__v">{{ analysis.main_collection.count }}</span>
+      </div>
+    </div>
+    <!-- /Debug -->
+
     {% if items %}
-      <div class="wb-grid">
+      <div class="wb-preview-grid">
         {% for it in items %}
-          <div class="wb-card">
-            <h3 class="wb-card__title">{{ it.title|default:"(Sin título)" }}</h3>
-
+          <div class="wb-preview-item">
             {% if it.image %}
-              <img src="{{ it.image }}" alt="" class="wb-preview-img">
-              <div class="wb-divider"></div>
-            {% endif %}
-
-            {% if it.description %}
-              <p class="wb-card__subtitle">{{ it.description }}</p>
+              <img src="{{ it.image }}" alt="{{ it.title }}" class="wb-preview-item__image">
             {% else %}
-              <p class="wb-muted">Sin descripción</p>
-            {% endif %}
-
-            {% if it.link %}
-              <div class="wb-actions">
-                <a class="wb-btn wb-btn--primary" href="{{ it.link }}" target="_blank" rel="noopener noreferrer">
-                  Ver enlace
-                </a>
+              <div class="wb-preview-item__image" style="display:flex;align-items:center;justify-content:center;background:#1a1a1a;">
+                <span style="font-size:3rem;opacity:0.3;">📄</span>
               </div>
             {% endif %}
+
+            <div class="wb-preview-item__content">
+              <h3 class="wb-preview-item__title">{{ it.title|default:"(Sin título)"|truncatewords:10 }}</h3>
+
+              {% if it.description %}
+                <p class="wb-preview-item__description">{{ it.description|truncatewords:20 }}</p>
+              {% endif %}
+
+              {% if it.link %}
+                <a href="{{ it.link }}" class="wb-preview-item__link" target="_blank" rel="noopener">
+                  Ver más →
+                </a>
+              {% endif %}
+            </div>
           </div>
         {% endfor %}
       </div>
@@ -92,6 +110,7 @@
         No se han podido extraer items normalizados. Revisa el mapping y/o el path de la colección principal.
       </p>
     {% endif %}
+
   </section>
 
 </div>

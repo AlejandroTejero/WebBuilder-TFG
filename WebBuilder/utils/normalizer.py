@@ -95,7 +95,7 @@ def normalize_items(
     """Normaliza items para poder renderizar cards genéricas.
 
     Salida estándar:
-      - title, description, image, link, raw
+      - title, description, image, link, raw, mapping_info
     """
     raw_items = _extract_main_items(parsed_data, analysis_result)
     normalized: list[dict] = []
@@ -124,6 +124,17 @@ def normalize_items(
             id_txt = _pick_text(item, ["id", "uuid", "identifier"], max_len=80)
             title = id_txt if id_txt else f"Item #{idx}"
 
+        # Construir información del mapping para mostrar en la card
+        mapping_info = {}
+        if title_key:
+            mapping_info["title"] = title_key
+        if description_key:
+            mapping_info["description"] = description_key
+        if image_key:
+            mapping_info["image"] = image_key
+        if link_key:
+            mapping_info["link"] = link_key
+
         normalized.append(
             {
                 "title": title,
@@ -131,6 +142,7 @@ def normalize_items(
                 "image": image,
                 "link": link,
                 "raw": item,
+                "mapping_info": mapping_info if mapping_info else None,
             }
         )
 

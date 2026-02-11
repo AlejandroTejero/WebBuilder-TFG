@@ -11,7 +11,7 @@
 
   <!-- Boton colapso -->
   <button class="wb-menu-toggle" id="menuToggle" aria-label="Toggle menu">
-    ☰
+    
   </button>
   
 
@@ -280,196 +280,34 @@
 </div>
 
 <!-- JavaScript para manejo de pasos -->
+
+<!-- JavaScript externo -->
+<script src="{% static 'js/assistant.js' %}"></script>
+
+<!-- Inicialización con datos de Django -->
 <script>
-  // Estado actual
-  let currentStep = 1;
-  let analysisData = null;
-  
+  // Datos iniciales del servidor (Django template variables)
+  const initialData = {
+    analysisData: null,
+    initialStep: 1,
+    assistantUrl: '{% url "assistant" %}',
+    debug: false  // Cambiar a true para ver logs en consola
+  };
+
   {% if api_request %}
-    analysisData = {
-      id: {{ api_request.id }},
-      hasAnalysis: {% if analysis %}true{% else %}false{% endif %}
-    };
-    
-    {% if analysis and analysis.main_collection.found %}
-      currentStep = 2;
-      showStep(2, false);
-    {% endif %}
+  initialData.analysisData = {
+    id: {{ api_request.id }},
+    hasAnalysis: {% if analysis %}true{% else %}false{% endif %}
+  };
+  
+  {% if analysis and analysis.main_collection.found %}
+  initialData.initialStep = 2;
+  {% endif %}
   {% endif %}
 
-  // Toggle del menú lateral
-  const menuToggle = document.getElementById('menuToggle');
-  const sidebar = document.getElementById('sidebar');
-  
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('wb-sidebar--collapsed');
-    menuToggle.classList.toggle('wb-menu-toggle--collapsed');  // ← AÑADIR ESTA LÍNEA
-    document.querySelector('.wb-main').classList.toggle('wb-main--expanded');
-  });
-
-  // Navegación entre pasos
-  function goToStep(stepNumber) {
-    if (stepNumber < 1 || stepNumber > 4) return;
-    
-    // Validaciones básicas
-    if (stepNumber === 2 && !analysisData) {
-      alert('Primero debes analizar una URL');
-      return;
-    }
-    
-    showStep(stepNumber, true);
-  }
-
-  // Mostrar paso con transición
-  function showStep(stepNumber, withTransition = true) {
-    const overlay = document.getElementById('transitionOverlay');
-    const progressFill = document.getElementById('progressBarFill');
-    const transitionText = document.getElementById('transitionText');
-    
-    if (withTransition) {
-      // Mostrar overlay
-      overlay.classList.add('wb-transition-overlay--active');
-      progressFill.style.width = '0%';
-      transitionText.textContent = 'Cargando...';
-      
-      // Animar progreso
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 2;
-        progressFill.style.width = progress + '%';
-        
-        if (progress >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            performStepChange(stepNumber);
-            overlay.classList.remove('wb-transition-overlay--active');
-          }, 200);
-        }
-      }, 10);
-    } else {
-      performStepChange(stepNumber);
-    }
-  }
-
-  // Realizar cambio de paso
-  function performStepChange(stepNumber) {
-    // Ocultar todos los pasos
-    document.querySelectorAll('.wb-step').forEach(step => {
-      step.style.display = 'none';
-    });
-    
-    // Mostrar paso actual
-    const currentStepEl = document.getElementById('step' + stepNumber);
-    if (currentStepEl) {
-      currentStepEl.style.display = 'block';
-      currentStepEl.classList.add('wb-step--active');
-    }
-    
-    // Actualizar navegación lateral
-    document.querySelectorAll('.wb-step-nav').forEach(nav => {
-      nav.classList.remove('wb-step-nav--active', 'wb-step-nav--completed');
-      const navStep = parseInt(nav.dataset.step);
-      
-      if (navStep === stepNumber) {
-        nav.classList.add('wb-step-nav--active');
-      } else if (navStep < stepNumber) {
-        nav.classList.add('wb-step-nav--completed');
-      }
-    });
-    
-    currentStep = stepNumber;
-    
-    // Cargar preview si es paso 3
-    if (stepNumber === 3 && analysisData) {
-      loadPreview();
-    }
-  }
-
-  // Cargar preview dinámicamente
-  function loadPreview() {
-    const container = document.getElementById('previewContainer');
-    
-    if (!analysisData || !analysisData.id) {
-      container.innerHTML = '<div class="wb-error">No hay datos para mostrar</div>';
-      return;
-    }
-    
-    // Hacer fetch al endpoint de preview
-    fetch(`/preview/${analysisData.id}/`)
-      .then(response => response.text())
-      .then(html => {
-        // Extraer solo el contenido de los items
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const items = doc.querySelectorAll('.wb-preview-item');
-        
-        if (items.length > 0) {
-          let previewHTML = '<div class="wb-preview-grid">';
-          items.forEach((item, index) => {
-            if (index < 5) { // Solo 5 items
-              previewHTML += item.outerHTML;
-            }
-          });
-          previewHTML += '</div>';
-          container.innerHTML = previewHTML;
-        } else {
-          container.innerHTML = '<div class="wb-message wb-message--warning">No se encontraron items para mostrar</div>';
-        }
-      })
-      .catch(error => {
-        console.error('Error loading preview:', error);
-        container.innerHTML = '<div class="wb-error">Error al cargar el preview</div>';
-      });
-  }
-
-  // Confirmar mapping
-  function confirmMapping() {
-    if (confirm('¿Confirmas que el mapping es correcto?')) {
-      goToStep(4);
-    }
-  }
-
-  // Event listeners para navegación lateral
-  document.querySelectorAll('.wb-step-nav').forEach(nav => {
-    nav.addEventListener('click', () => {
-      const step = parseInt(nav.dataset.step);
-      goToStep(step);
-    });
-  });
-
-  // Interceptar submit de formularios para mantener estado
-  document.getElementById('formStep1')?.addEventListener('submit', (e) => {
-    // El form se envía normalmente, Django maneja la respuesta
-  });
-
-  document.getElementById('formStep2')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    
-    // Enviar via fetch para mantener en la misma página
-    fetch('{% url "assistant" %}', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        goToStep(3);
-      } else {
-        alert('Error al guardar el mapping');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error al guardar el mapping');
-    });
-  });
-
-  // Inicializar paso actual
+  // Inicializar cuando el DOM esté listo
   document.addEventListener('DOMContentLoaded', () => {
-    showStep(currentStep, false);
+    initAssistant(initialData);
   });
 </script>
 

@@ -1,5 +1,4 @@
-<!-- Este es un snippet que muestra cómo deberían verse las cards en el preview -->
-<!-- Se puede usar como referencia para actualizar preview.html -->
+<!-- Preview cards con información del mapping -->
 
 <div class="wb-preview-grid">
   {% for item in items %}
@@ -25,6 +24,42 @@
       <a href="{{ item.link }}" class="wb-preview-item__link" target="_blank" rel="noopener">
         Ver más →
       </a>
+      {% endif %}
+
+      <!-- Información del mapping -->
+      {% if item.mapping_info %}
+      <div class="wb-mapping-info">
+        <div class="wb-mapping-info__title">📋 Mapping usado:</div>
+        <div class="wb-mapping-info__fields">
+          {% if item.mapping_info.title %}
+          <span class="wb-mapping-badge">
+            <span class="wb-mapping-badge__label">título</span>
+            <span class="wb-mapping-badge__value">{{ item.mapping_info.title }}</span>
+          </span>
+          {% endif %}
+          
+          {% if item.mapping_info.description %}
+          <span class="wb-mapping-badge">
+            <span class="wb-mapping-badge__label">descripción</span>
+            <span class="wb-mapping-badge__value">{{ item.mapping_info.description }}</span>
+          </span>
+          {% endif %}
+          
+          {% if item.mapping_info.image %}
+          <span class="wb-mapping-badge">
+            <span class="wb-mapping-badge__label">imagen</span>
+            <span class="wb-mapping-badge__value">{{ item.mapping_info.image }}</span>
+          </span>
+          {% endif %}
+          
+          {% if item.mapping_info.link %}
+          <span class="wb-mapping-badge">
+            <span class="wb-mapping-badge__label">link</span>
+            <span class="wb-mapping-badge__value">{{ item.mapping_info.link }}</span>
+          </span>
+          {% endif %}
+        </div>
+      </div>
       {% endif %}
     </div>
   </div>

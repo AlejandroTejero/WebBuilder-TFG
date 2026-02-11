@@ -11,6 +11,7 @@ urlpatterns = [
     path('registro', views.register, name='register'),
 	
     path("preview/<int:api_request_id>", views.preview, name="preview"),
+    path("preview-cards/<int:api_request_id>", views.preview_cards, name="preview_cards"),
 
 ]
 
