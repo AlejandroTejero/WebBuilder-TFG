@@ -7,6 +7,9 @@ from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+# ✨ NUEVO: Sistema de caché de Django
+from django.core.cache import cache
+import hashlib
 
 from ..models import APIRequest
 from ..forms import APIRequestForm
@@ -22,6 +25,22 @@ from ..utils.mapping import (
     build_role_options,
     validate_mapping,
 )
+
+
+# ✨ NUEVO: Configuración de caché
+CACHE_TIMEOUT = 3600  # 1 hora en segundos
+CACHE_KEY_PREFIX = "api_analysis"
+
+
+# ✨ NUEVO: Función para generar clave de caché única por URL
+def _get_cache_key(api_url: str) -> str:
+    """
+    Genera una clave de caché única basada en la URL.
+    
+    Usa hash MD5 para evitar problemas con caracteres especiales en las keys.
+    """
+    url_hash = hashlib.md5(api_url.encode('utf-8')).hexdigest()
+    return f"{CACHE_KEY_PREFIX}:{url_hash}"
 
 
 # ============================== Helper de render ==============================
@@ -225,14 +244,16 @@ def save_mapping(request):
     )
 
 
-# ============================== POST: analizar URL ==============================
+# ============================== POST: analizar URL (CON CACHÉ) ==============================
 
 def analyze_url(request):
     """
     Analiza una URL (descarga + parsea + analiza + guarda en BD)
     
-    Crea un APIRequest, descarga los datos de la URL, los parsea,
-    analiza su estructura y guarda todo en la base de datos
+    ✨ MEJORAS:
+    - Sistema de caché: Si la URL ya fue analizada recientemente (< 1h), 
+      usa los datos cacheados en vez de descargar de nuevo
+    - Ahorra tiempo, ancho de banda y CPU
     """
     # Construye el form con POST para validar URL
     form = APIRequestForm(request.POST)
@@ -244,7 +265,52 @@ def analyze_url(request):
 
     # Extrae URL validada
     api_url = form.cleaned_data["api_url"]
-
+    
+    # ✨ NUEVO: Intentar obtener del caché primero
+    cache_key = _get_cache_key(api_url)
+    cached_data = cache.get(cache_key)
+    
+    if cached_data:
+        # ✨ Datos encontrados en caché - usar directamente
+        messages.info(
+            request, 
+            "⚡ Análisis cargado desde caché (datos recientes). "
+            "Si quieres forzar un nuevo análisis, espera 1 hora o cambia la URL ligeramente."
+        )
+        
+        # Crear registro en BD con los datos cacheados
+        api_request_obj = APIRequest.objects.create(
+            user=request.user,
+            api_url=api_url,
+            raw_data=cached_data["raw_text"],
+            parsed_data=cached_data["parsed_payload"],
+            response_summary=cached_data["response_summary"],
+            status="processed",
+            error_message="",
+        )
+        
+        # Guardar en sesión
+        request.session["last_api_request_id"] = api_request_obj.id
+        
+        # Reconstruir análisis
+        analysis_result = build_analysis(
+            cached_data["parsed_payload"], 
+            raw_text=cached_data["raw_text"]
+        )
+        
+        saved_mapping = get_mapping(request)
+        role_select_options = build_role_options(analysis_result, saved_mapping)
+        
+        return render_assistant(
+            request,
+            form=form,
+            api_request=api_request_obj,
+            analysis=analysis_result,
+            role_options=role_select_options,
+            saved_mapping=saved_mapping,
+        )
+    
+    # ✨ No hay caché - proceder con descarga normal
     # Crea el registro en BD como pending para poder guardar errores luego
     api_request_obj = APIRequest.objects.create(
         user=request.user,
@@ -263,14 +329,23 @@ def analyze_url(request):
         analysis_result = build_analysis(parsed_payload, raw_text=raw_text)
         # Construye resumen de lo parseado
         parse_summary = summarize_data(data_format, parsed_payload)
+        
+        response_summary = f"{fetch_summary} {parse_summary}"
 
         # Guarda en BD
         api_request_obj.raw_data = raw_text
         api_request_obj.parsed_data = parsed_payload
-        api_request_obj.response_summary = f"{fetch_summary} {parse_summary}"
+        api_request_obj.response_summary = response_summary
         api_request_obj.status = "processed"
         api_request_obj.error_message = ""
         api_request_obj.save()
+        
+        # ✨ NUEVO: Guardar en caché para futuros análisis
+        cache.set(cache_key, {
+            "raw_text": raw_text,
+            "parsed_payload": parsed_payload,
+            "response_summary": response_summary,
+        }, CACHE_TIMEOUT)
 
         # Guarda el último id analizado en sesión (fallback para mapping)
         request.session["last_api_request_id"] = api_request_obj.id

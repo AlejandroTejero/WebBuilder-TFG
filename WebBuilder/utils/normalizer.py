@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from typing import Any
-
+import re
 import json
 
 from .analysis import get_by_path
@@ -32,29 +32,96 @@ def _to_text(value: Any, *, max_len: int = 600) -> str:
 
 
 def _get_nested(item: Any, key: str) -> Any:
-    """Obtiene un valor por key. Soporta paths tipo 'a.b.c'."""
+    """
+    ✨ MEJORADO: Obtiene un valor por key con soporte de paths complejos.
+    
+    Soporta:
+    - Keys simples: "title"
+    - Paths con punto: "user.name"
+    - Paths con arrays: "images[0]", "data.items[1].url"
+    - Paths mixtos: "user.posts[0].comments[2].text"
+    
+    Ejemplos:
+        _get_nested({"user": {"name": "Ana"}}, "user.name") → "Ana"
+        _get_nested({"images": ["a.jpg", "b.jpg"]}, "images[0]") → "a.jpg"
+        _get_nested({"data": {"items": [{"id": 1}]}}, "data.items[0].id") → 1
+    """
     if not key:
         return None
     if not isinstance(item, dict):
         return None
-    # Soporta dotted paths
-    if "." in key:
-        node: Any = item
-        for part in key.split("."):
-            if isinstance(node, dict) and part in node:
-                node = node.get(part)
-            else:
+    
+    # Si no tiene caracteres especiales, acceso directo
+    if "." not in key and "[" not in key:
+        return item.get(key)
+    
+    # Parsear el path completo: "user.posts[0].title" → ["user", "posts", "[0]", "title"]
+    # Regex que captura: palabras normales O índices con corchetes
+    parts = re.findall(r'[^\.\[]+|\[\d+\]', key)
+    
+    node: Any = item
+    for part in parts:
+        # Si es un índice: [0], [1], etc.
+        if part.startswith('[') and part.endswith(']'):
+            try:
+                index = int(part[1:-1])
+            except (ValueError, IndexError):
                 return None
-        return node
-    return item.get(key)
+                
+            if not isinstance(node, list):
+                return None
+            if index < 0 or index >= len(node):
+                return None
+            node = node[index]
+            
+        # Si es una key normal
+        else:
+            if not isinstance(node, dict):
+                return None
+            if part not in node:
+                return None
+            node = node[part]
+    
+    return node
 
 
 def _looks_like_url(text: str) -> bool:
+    """
+    ✨ MEJORADO: Detecta si un texto parece una URL (absoluta o relativa).
+    
+    Soporta:
+    - URLs absolutas: http://..., https://...
+    - URLs relativas: /images/photo.jpg, ./assets/img.png
+    """
     t = (text or "").strip()
-    return t.startswith("http://") or t.startswith("https://")
+    
+    # URLs absolutas
+    if t.startswith("http://") or t.startswith("https://"):
+        return True
+    
+    # URLs relativas comunes
+    if t.startswith("/") or t.startswith("./") or t.startswith("../"):
+        # Verificar que no sea solo "/" (raíz vacía)
+        if len(t) > 1:
+            return True
+    
+    return False
 
 
-def _pick_text(item: dict, keys: list[str], *, max_len: int = 600) -> str:
+def _pick_text(item: dict, keys: list[str], *, max_len: int = 600, strict_mode: bool = False) -> str:
+    """
+    Selecciona el primer valor no vacío de una lista de keys candidatas.
+    
+    Args:
+        item: Dict del que extraer el valor
+        keys: Lista de keys candidatas (en orden de prioridad)
+        max_len: Longitud máxima del texto
+        strict_mode: Si True, solo usa la PRIMERA key (no hace fallbacks)
+    """
+    # ✨ NUEVO: En modo estricto, solo intentamos la primera key
+    if strict_mode:
+        keys = keys[:1] if keys else []
+    
     for k in keys:
         v = _get_nested(item, k)
         txt = _to_text(v, max_len=max_len)
@@ -63,7 +130,19 @@ def _pick_text(item: dict, keys: list[str], *, max_len: int = 600) -> str:
     return ""
 
 
-def _pick_url(item: dict, keys: list[str]) -> str:
+def _pick_url(item: dict, keys: list[str], strict_mode: bool = False) -> str:
+    """
+    Selecciona la primera URL válida de una lista de keys candidatas.
+    
+    Args:
+        item: Dict del que extraer la URL
+        keys: Lista de keys candidatas (en orden de prioridad)
+        strict_mode: Si True, solo usa la PRIMERA key (no hace fallbacks)
+    """
+    # ✨ NUEVO: En modo estricto, solo intentamos la primera key
+    if strict_mode:
+        keys = keys[:1] if keys else []
+    
     for k in keys:
         v = _get_nested(item, k)
         txt = _to_text(v, max_len=1200)
@@ -91,8 +170,17 @@ def normalize_items(
     analysis_result: dict,
     field_mapping: dict,
     limit: int = 20,
+    strict_mode: bool = False,
 ) -> list[dict]:
-    """Normaliza items para poder renderizar cards genéricas.
+    """
+    Normaliza items para poder renderizar cards genéricas.
+
+    Args:
+        parsed_data: Datos parseados de la API
+        analysis_result: Resultado del análisis
+        field_mapping: Mapping configurado por el usuario
+        limit: Número máximo de items a procesar
+        strict_mode: ✨ NUEVO - Si True, NO usa fallbacks automáticos (solo el mapping del usuario)
 
     Salida estándar:
       - title, description, image, link, raw, mapping_info
@@ -107,16 +195,25 @@ def normalize_items(
         image_key = (field_mapping or {}).get("image", "") or ""
         link_key = (field_mapping or {}).get("link", "") or ""
 
-        # Fallbacks "con sentido" (incluso si mapping está incompleto)
-        title_candidates = [k for k in [title_key, "title", "name", "headline", "label"] if k]
-        desc_candidates = [k for k in [description_key, "description", "summary", "content", "text", "body", "excerpt"] if k]
-        image_candidates = [k for k in [image_key, "image", "image_url", "thumbnail", "thumbnail_url", "thumb", "media.url", "media.image"] if k]
-        link_candidates = [k for k in [link_key, "link", "url", "href", "permalink", "web_url"] if k]
+        # ✨ NUEVO: En modo estricto, SOLO usa las keys del mapping (sin fallbacks)
+        # En modo normal: usa fallbacks si el mapping está vacío
+        if strict_mode:
+            # Solo usar lo que el usuario mapeó explícitamente
+            title_candidates = [title_key] if title_key else []
+            desc_candidates = [description_key] if description_key else []
+            image_candidates = [image_key] if image_key else []
+            link_candidates = [link_key] if link_key else []
+        else:
+            # Fallbacks "con sentido" (incluso si mapping está incompleto)
+            title_candidates = [k for k in [title_key, "title", "name", "headline", "label"] if k]
+            desc_candidates = [k for k in [description_key, "description", "summary", "content", "text", "body", "excerpt"] if k]
+            image_candidates = [k for k in [image_key, "image", "image_url", "thumbnail", "thumbnail_url", "thumb", "media.url", "media.image"] if k]
+            link_candidates = [k for k in [link_key, "link", "url", "href", "permalink", "web_url"] if k]
 
-        title = _pick_text(item, title_candidates, max_len=140)
-        description = _pick_text(item, desc_candidates, max_len=520)
-        image = _pick_url(item, image_candidates)
-        link = _pick_url(item, link_candidates)
+        title = _pick_text(item, title_candidates, max_len=140, strict_mode=strict_mode)
+        description = _pick_text(item, desc_candidates, max_len=520, strict_mode=strict_mode)
+        image = _pick_url(item, image_candidates, strict_mode=strict_mode)
+        link = _pick_url(item, link_candidates, strict_mode=strict_mode)
 
         # Si aún no hay title, inventa uno estable
         if not title:
