@@ -33,15 +33,31 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
+/* Todo el contenido "junto"
 .wb-navbar-container {
-  max-width: 1400px;  /* Ancho máximo del contenido */
-  margin: 0 auto;     /* Centrar horizontalmente */
+  max-width: 1400px;  
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 2rem;
   height: 100%;
 }
+*/ 
+
+
+/* Divido en 3 columnas para separar el cotenido */
+.wb-navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 2rem;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* izquierda | centro | derecha */
+  align-items: center;
+}
+
+
 
 /* ==================== LOGO Y BRAND ==================== */
 
@@ -84,7 +100,7 @@
 }
 
 /* ==================== MENÚ DE NAVEGACIÓN ==================== */
-
+/*
 .wb-nav-menu {
   display: flex;
   align-items: center;
@@ -92,6 +108,18 @@
   flex: 1;
   margin-left: 3rem;
 }
+*/
+
+.wb-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  justify-self: center; /* clave: centra el bloque en la columna central */
+  flex: 0;              /* deja de “estirarse” */
+  margin-left: 0;       /* quita el empuje artificial */
+}
+
 
 .wb-nav-item {
   position: relative;
@@ -136,6 +164,11 @@
 .wb-nav-item--open .wb-nav-arrow {
   transform: rotate(180deg);
 }
+
+.wb-nav-right {
+  justify-self: end;
+}
+
 
 /* ==================== DROPDOWN MENÚS ==================== */
 
