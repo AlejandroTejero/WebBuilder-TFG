@@ -13,6 +13,8 @@ from .analysis import ROLE_DEFS
 SESSION_MAPPING_KEY = "field_mapping"
 # Clave de sesión donde guardamos el último APIRequest analizado (fallback al guardar mapping)
 SESSION_LAST_REQUEST_ID_KEY = "last_api_request_id"
+# Clave para el mamping de tipo blog, protfolio, etc.
+SESSION_INTENT_KEY = "mapping_intent"
 
 
 # Lee map_<role> del POST y devuelve un dict (role -> key)
@@ -37,6 +39,13 @@ def store_mapping(request, field_mapping: dict) -> None:
 def get_mapping(request) -> dict:
     # Devuelve dict guardado o dict vacío
     return request.session.get(SESSION_MAPPING_KEY, {}) or {}
+
+def store_intent(request, intent: str) -> None:
+    request.session[SESSION_INTENT_KEY] = (intent or "").strip().lower()
+
+
+def get_intent(request) -> str:
+    return (request.session.get(SESSION_INTENT_KEY) or "").strip().lower()
 
 
 # Decide qué api_request_id usar al guardar mapping (POST primero, sesión después)
@@ -70,47 +79,69 @@ def save_mapping_to_db(*, user, api_request_id: str | int | None, field_mapping:
     # Devuelve el objeto actualizado
     return api_request_obj
 
+def build_role_options(
+    analysis_result: dict | None,
+    field_mapping: dict,
+    *,
+    roles: list[str] | None = None,
+    role_sections: dict[str, str] | None = None,
+    role_ui_map: dict[str, dict] | None = None,
+) -> list[dict]:
+    """
+    Construye opciones de selección por rol para el wizard de mapping.
 
-# Construye la estructura que el template usa para pintar los selects del wizard
-def build_role_options(analysis_result: dict | None, field_mapping: dict) -> list[dict]:
-    # Si no hay análisis, no hay opciones
+    - Si se pasa `roles`, se usa ese orden (guiado por intención).
+    - Si no, se usa el orden por defecto del análisis (analysis_result["roles"]).
+    - `role_sections` permite agrupar en UI: required / recommended / optional / other
+    - `role_ui_map` permite mostrar label/help humanos.
+    """
     if not analysis_result:
         return []
 
-    # Keys disponibles para el wizard (todas las keys detectadas en la colección principal)
     all_keys: list[str] = analysis_result.get("keys", {}).get("all", []) or []
-
     role_select_options: list[dict] = []
 
-    for role_name in analysis_result.get("roles", []):
-        # Sugerencias (limitadas para UX)
+    roles_to_use = roles if roles is not None else (analysis_result.get("roles", []) or [])
+
+    for role_name in roles_to_use:
         suggested_keys = (analysis_result.get("suggestions", {}).get(role_name, []) or [])[:5]
 
-        # Seleccionado actual: mapping, o primera sugerencia si existe
         selected_key = field_mapping.get(role_name) or (suggested_keys[0] if suggested_keys else "")
 
-        # Construye el listado final: sugeridas primero, luego el resto de keys
         options_keys: list[str] = []
         seen: set[str] = set()
 
+        # 1) Primero, el seleccionado actual (aunque no sea sugerido / aunque no exista ya)
+        if selected_key:
+            seen.add(selected_key)
+            options_keys.append(selected_key)
+
+        # 2) Luego, sugerencias
         for k in suggested_keys:
             if k and k not in seen:
                 seen.add(k)
                 options_keys.append(k)
 
+        # 3) Por último, todas las keys detectadas
         for k in all_keys:
             if k and k not in seen:
                 seen.add(k)
                 options_keys.append(k)
 
+        ui = (role_ui_map or {}).get(role_name, {"label": role_name, "help": ""})
+        section = (role_sections or {}).get(role_name, "other")
+
         role_select_options.append(
             {
                 "role": role_name,
+                "label": ui.get("label", role_name),
+                "help": ui.get("help", ""),
+                "section": section,
                 "options": [
                     {
                         "key": k,
                         "is_selected": (k == selected_key),
-                        "is_suggested": (k in suggested_keys),  # ✨ NUEVO: Marca sugerencias
+                        "is_suggested": (k in suggested_keys),
                     }
                     for k in options_keys
                 ],
@@ -119,7 +150,6 @@ def build_role_options(analysis_result: dict | None, field_mapping: dict) -> lis
         )
 
     return role_select_options
-
 
 def _collect_allowed_keys_from_analysis(analysis_result: dict | None) -> set[str]:
     # Si no hay análisis, no podemos validar keys contra el dataset

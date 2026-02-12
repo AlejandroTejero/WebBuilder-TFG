@@ -66,50 +66,49 @@ def preview(request, api_request_id: int):
         "items": normalized_items,
     })
 
-
 @login_required
 def preview_cards(request, api_request_id: int):
     """
-    Vista AJAX que devuelve SOLO el HTML de las cards (sin layout completo)
-    
-    Usada por el JavaScript del asistente para cargar el preview
-    dinámicamente en el paso 3 sin recargar la página
-    
-    Args:
-        request: Request de Django
-        api_request_id: ID del APIRequest a mostrar
-        
-    Returns:
-        HttpResponse con solo el HTML de las cards (snippet)
+    Vista AJAX que devuelve HTML de preview (lista + detalle).
+    Soporta ?index=N para seleccionar un item.
     """
-    # Busca el APIRequest del usuario
     api_request_obj = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
-    
     if not api_request_obj:
         return HttpResponse('<div class="wb-message wb-message--error">APIRequest no encontrado</div>')
-    
-    # Decide el mapping
+
     field_mapping = api_request_obj.field_mapping or get_mapping(request)
-    
-    # Si no hay parsed_data, devolver mensaje
+
     if not api_request_obj.parsed_data:
         return HttpResponse('<div class="wb-message wb-message--warning">No hay datos parseados</div>')
-    
-    # Reconstruir análisis
+
     analysis_result = build_analysis(
-        api_request_obj.parsed_data, 
+        api_request_obj.parsed_data,
         raw_text=api_request_obj.raw_data or ""
     )
-    
-    # Normalizar items
+
     normalized_items = normalize_items(
         parsed_data=api_request_obj.parsed_data,
         analysis_result=analysis_result,
         field_mapping=field_mapping,
         limit=20,
     )
-    
-    # Renderizar solo el snippet de cards
+
+    # index seleccionado (0-based)
+    try:
+        selected_index = int(request.GET.get("index", "0"))
+    except ValueError:
+        selected_index = 0
+
+    if selected_index < 0:
+        selected_index = 0
+    if selected_index >= len(normalized_items):
+        selected_index = max(0, len(normalized_items) - 1)
+
+    selected_item = normalized_items[selected_index] if normalized_items else None
+
     return render(request, "WebBuilder/preview_cards_snippet.html", {
         "items": normalized_items,
+        "selected_index": selected_index,
+        "selected_item": selected_item,
     })
+
