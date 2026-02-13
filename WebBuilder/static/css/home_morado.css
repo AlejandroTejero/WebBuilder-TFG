@@ -1,15 +1,14 @@
 /* ============================================================
-   VARIABLES GLOBALES - NEGRO & PLATA LUXURY
+   VARIABLES GLOBALES - PÚRPURA MINIMALISTA PREMIUM
    ============================================================ */
 :root {
-    --bg-dark: #0A0A0A;
-    --bg-darker: #050505;
-    --text-primary: #F4F4F5;
+    --bg-dark: #0F0F0F;
+    --bg-darker: #0A0A0A;
+    --text-primary: #FAFAFA;
     --text-secondary: #A1A1AA;
-    --accent-silver: #9CA3AF;
-    --accent-silver-light: #D1D5DB;
-    --accent-silver-dark: #6B7280;
-    --border-subtle: #27272A;
+    --accent-purple: #8B5CF6;
+    --accent-purple-light: #A78BFA;
+    --accent-silver: #E5E7EB;
 }
 
 
@@ -50,11 +49,11 @@
 .hero-badge {
     display: inline-block;
     padding: 0.5rem 1.25rem;
-    border: 1px solid rgba(156, 163, 175, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.25);
     border-radius: 50px;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--accent-silver-light);
+    color: var(--accent-purple-light);
     margin-bottom: 2rem;
     animation: fadeInUp 0.6s ease;
 }
@@ -64,7 +63,7 @@
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, #FFFFFF 0%, #9CA3AF 100%);
+    background: linear-gradient(135deg, #FAFAFA 0%, #A1A1AA 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -92,22 +91,20 @@
     align-items: center;
     gap: 0.75rem;
     padding: 1rem 2.5rem;
-    color: #F4F4F5;
+    color: #FAFAFA;
     font-size: 1.125rem;
     font-weight: 700;
     border-radius: 12px;
     text-decoration: none;
     transition: all 0.3s ease;
     animation: fadeInUp 0.6s ease 0.3s both;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(156, 163, 175, 0.2);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.25);
 }
 
 .hero-cta:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
-    color: #F4F4F5;
-    border-color: rgba(156, 163, 175, 0.3);
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.35);
+    color: #FAFAFA;
 }
 
 .hero-trust {
@@ -121,8 +118,8 @@
 .hero-trust-item {
     padding: 0.45rem 0.75rem;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(20, 20, 20, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(26, 26, 26, 0.4);
     color: var(--text-secondary);
     font-size: 0.85rem;
 }
@@ -143,7 +140,7 @@
 }
 
 .hero-link:hover {
-    color: var(--accent-silver-light);
+    color: var(--accent-purple-light);
 }
 
 .hero-dot {
@@ -168,11 +165,11 @@
 .section-badge {
     display: inline-block;
     padding: 0.375rem 1rem;
-    border: 1px solid rgba(156, 163, 175, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.2);
     border-radius: 50px;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--accent-silver-light);
+    color: var(--accent-purple-light);
     margin-bottom: 1rem;
 }
 
@@ -180,7 +177,7 @@
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 700;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #FFFFFF 0%, #9CA3AF 100%);
+    background: linear-gradient(135deg, #FAFAFA 0%, #A1A1AA 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -204,7 +201,7 @@
 }
 
 .step-card {
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
     padding: 2.5rem 2rem;
     text-align: center;
@@ -226,8 +223,8 @@
 
 .step-card:hover {
     transform: translateY(-5px);
-    border-color: rgba(156, 163, 175, 0.25);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
 }
 
 .step-card:hover::before {
@@ -244,7 +241,7 @@
     justify-content: center;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #F4F4F5;
+    color: #FAFAFA;
 }
 
 .step-title {
@@ -271,14 +268,14 @@
 }
 
 .feature-card {
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 16px;
     padding: 2rem;
     transition: all 0.3s ease;
 }
 
 .feature-card:hover {
-    border-color: rgba(156, 163, 175, 0.25);
+    border-color: rgba(139, 92, 246, 0.3);
     transform: translateY(-3px);
 }
 
@@ -311,7 +308,7 @@
    SHOWCASE
    ============================================================ */
 .showcase-visual {
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
     padding: 3rem;
     text-align: center;
@@ -333,7 +330,7 @@
 }
 
 .showcase-box {
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1rem;
@@ -348,12 +345,12 @@
 .showcase-value {
     font-family: 'Courier New', monospace;
     font-size: 0.875rem;
-    color: var(--accent-silver-light);
+    color: var(--accent-purple-light);
 }
 
 .showcase-arrow {
     font-size: 2rem;
-    color: var(--accent-silver);
+    color: var(--accent-purple);
 }
 
 
@@ -366,7 +363,7 @@
 }
 
 .faq-item {
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
     margin-bottom: 1rem;
     overflow: hidden;
@@ -374,7 +371,7 @@
 }
 
 .faq-item:hover {
-    border-color: rgba(156, 163, 175, 0.25);
+    border-color: rgba(139, 92, 246, 0.3);
 }
 
 .faq-question {
@@ -394,7 +391,7 @@
 }
 
 .faq-question:hover {
-    color: var(--accent-silver-light);
+    color: var(--accent-purple-light);
 }
 
 .faq-icon {
@@ -451,21 +448,19 @@
     align-items: center;
     gap: 0.75rem;
     padding: 1.125rem 3rem;
-    color: #F4F4F5;
+    color: #FAFAFA;
     font-size: 1.25rem;
     font-weight: 700;
     border-radius: 12px;
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(156, 163, 175, 0.2);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.25);
 }
 
 .cta-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
-    color: #F4F4F5;
-    border-color: rgba(156, 163, 175, 0.3);
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.35);
+    color: #FAFAFA;
 }
 
 

@@ -4,280 +4,327 @@
 {% block body_class %}home-modern{% endblock %}
 
 {% block content %}
-<!-- HERO SECTION -->
+
+<!-- ========================================
+     HERO SECTION
+     ======================================== -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="home-container">
-    <div class="hero-content">
-      <div class="hero-badge">✨ Proyecto TFG - Generación Automática de Webs</div>
-      <h1 class="hero-title">Transforma APIs en Sitios Web Profesionales</h1>
-      <p class="hero-subtitle">
-        Con tu ayuda saldrá la web que tú deseas. Conecta cualquier API, mapea los datos y genera tu sitio web personalizado en minutos.
-      </p>
-      <a href="{% url 'assistant' %}" class="hero-cta">
-        Ir al Asistente
-        <span>→</span>
-      </a>
+    <div class="hero-bg"></div>
+    <div class="home-container">
+        <div class="hero-content">
+
+            <div class="hero-badge">
+                Compatible con JSON y XML
+            </div>
+
+            <h1 class="hero-title">
+                Genera un proyecto Django a partir de tu API
+            </h1>
+
+            <p class="hero-subtitle">
+                Conecta una URL pública, asigna campos con el mapping y revisa el preview antes de generar.
+                Al final obtendrás un proyecto independiente listo para ejecutar y desplegar.
+            </p>
+
+            <div class="hero-actions">
+                <a href="{% url 'assistant' %}" class="hero-cta">
+                    Iniciar asistente
+                    <span>→</span>
+                </a>
+                <a href="#how-it-works" class="hero-cta">
+                    Ver cómo funciona
+                </a>
+            </div>
+
+            <div class="hero-trust">
+                <span class="hero-trust-item">Sin conocimientos de Django</span>
+                <span class="hero-trust-item">Mapping + preview antes de generar</span>
+                <span class="hero-trust-item">Proyecto independiente</span>
+            </div>
+
+        </div>
     </div>
-  </div>
 </section>
 
-<!-- CÓMO FUNCIONA -->
+<!-- ========================================
+     CÓMO FUNCIONA
+     ======================================== -->
+<section class="section" id="how-it-works">
+    <div class="home-container">
+
+        <div class="section-header">
+            <div class="section-badge">Proceso</div>
+            <h2 class="section-title">Cómo Funciona</h2>
+            <p class="section-subtitle">
+                Cuatro pasos simples para pasar de una URL a una web completa
+            </p>
+        </div>
+
+        <div class="steps-grid">
+
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Introduce la URL</h3>
+                <p class="step-description">
+                    Pega la URL de cualquier API que devuelva JSON o XML. Nosotros nos encargamos del resto.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Análisis Automático</h3>
+                <p class="step-description">
+                    Nuestro sistema analiza la estructura de los datos y detecta automáticamente los campos disponibles.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Configura el Mapping</h3>
+                <p class="step-description">
+                    Asigna cada campo a su rol (título, descripción, imagen...). Te sugerimos las mejores opciones.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3 class="step-title">Genera tu Web</h3>
+                <p class="step-description">
+                    Visualiza el resultado final y descarga tu sitio web listo para publicar.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ========================================
+     CARACTERÍSTICAS
+     ======================================== -->
 <section class="section">
-  <div class="home-container">
-    <div class="section-header">
-      <div class="section-badge">Proceso</div>
-      <h2 class="section-title">Cómo Funciona</h2>
-      <p class="section-subtitle">
-        Cuatro pasos simples para pasar de una URL a una web completa
-      </p>
+    <div class="home-container">
+
+        <div class="section-header">
+            <div class="section-badge">Características</div>
+            <h2 class="section-title">Todo lo que Necesitas</h2>
+            <p class="section-subtitle">
+                Herramientas potentes para crear webs profesionales sin esfuerzo
+            </p>
+        </div>
+
+        <div class="features-grid">
+
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3 class="feature-title">Detección Inteligente</h3>
+                <p class="feature-description">
+                    Análisis automático de JSON y XML con detección de tipos de datos y estructura.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Sugerencias inteligentes</h3>
+                <p class="feature-description">
+                    El sistema sugiere el mejor mapping basándose en heurísticas y patrones comunes.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">Personalización Total</h3>
+                <p class="feature-description">
+                    Tienes el control completo sobre qué campos mostrar y cómo organizarlos.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3 class="feature-title">Responsive Design</h3>
+                <p class="feature-description">
+                    Las webs generadas se adaptan perfectamente a móviles, tablets y desktop.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">Historial de Proyectos</h3>
+                <p class="feature-description">
+                    Guarda todos tus análisis y vuelve a ellos cuando quieras para modificarlos.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3 class="feature-title">Preview en Tiempo Real</h3>
+                <p class="feature-description">
+                    Visualiza cómo quedarán tus datos antes de generar la web final.
+                </p>
+            </div>
+
+        </div>
+
     </div>
-
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-number">1</div>
-        <h3 class="step-title">Introduce la URL</h3>
-        <p class="step-description">
-          Pega la URL de cualquier API que devuelva JSON o XML. Nosotros nos encargamos del resto.
-        </p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">2</div>
-        <h3 class="step-title">Análisis Automático</h3>
-        <p class="step-description">
-          Nuestro sistema analiza la estructura de los datos y detecta automáticamente los campos disponibles.
-        </p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">3</div>
-        <h3 class="step-title">Configura el Mapping</h3>
-        <p class="step-description">
-          Asigna cada campo a su rol (título, descripción, imagen...). Te sugerimos las mejores opciones.
-        </p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">4</div>
-        <h3 class="step-title">Genera tu Web</h3>
-        <p class="step-description">
-          Visualiza el resultado final y descarga tu sitio web listo para publicar.
-        </p>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- FEATURES -->
-<section class="section">
-  <div class="home-container">
-    <div class="section-header">
-      <div class="section-badge">Características</div>
-      <h2 class="section-title">Todo lo que Necesitas</h2>
-      <p class="section-subtitle">
-        Herramientas potentes para crear webs profesionales sin esfuerzo
-      </p>
-    </div>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🔍</div>
-        <h3 class="feature-title">Detección Inteligente</h3>
-        <p class="feature-description">
-          Análisis automático de JSON y XML con detección de tipos de datos y estructura.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3 class="feature-title">Sugerencias inteligentes</h3>
-        <p class="feature-description">
-          El sistema sugiere el mejor mapping basándose en heurísticas y patrones comunes.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">🎨</div>
-        <h3 class="feature-title">Personalización Total</h3>
-        <p class="feature-description">
-          Tienes el control completo sobre qué campos mostrar y cómo organizarlos.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">📱</div>
-        <h3 class="feature-title">Responsive Design</h3>
-        <p class="feature-description">
-          Las webs generadas se adaptan perfectamente a móviles, tablets y desktop.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">💾</div>
-        <h3 class="feature-title">Historial de Proyectos</h3>
-        <p class="feature-description">
-          Guarda todos tus análisis y vuelve a ellos cuando quieras para modificarlos.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">🚀</div>
-        <h3 class="feature-title">Preview en Tiempo Real</h3>
-        <p class="feature-description">
-          Visualiza cómo quedarán tus datos antes de generar la web final.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SHOWCASE -->
+<!-- ========================================
+     SHOWCASE
+     ======================================== -->
 <section class="section showcase">
-  <div class="home-container">
-    <div class="section-header">
-      <div class="section-badge">Ejemplo</div>
-      <h2 class="section-title">De API a Web en Segundos</h2>
-      <p class="section-subtitle">
-        Observa cómo transformamos datos crudos en contenido estructurado
-      </p>
+    <div class="home-container">
+
+        <div class="section-header">
+            <div class="section-badge">Ejemplo</div>
+            <h2 class="section-title">De API a Web en Segundos</h2>
+            <p class="section-subtitle">
+                Observa cómo transformamos datos crudos en contenido estructurado
+            </p>
+        </div>
+
+        <div class="showcase-visual">
+            <div class="showcase-flow">
+
+                <div class="showcase-item">
+                    <div class="showcase-box">
+                        <div class="showcase-label">Input: JSON</div>
+                        <div class="showcase-value">
+                            { "title": "...",<br>
+                            &nbsp;&nbsp;"body": "...",<br>
+                            &nbsp;&nbsp;"author": "..." }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-arrow">→</div>
+
+                <div class="showcase-item">
+                    <div class="showcase-box">
+                        <div class="showcase-label">Mapping</div>
+                        <div class="showcase-value">
+                            title → Título<br>
+                            body → Descripción<br>
+                            author → Autor
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-arrow">→</div>
+
+                <div class="showcase-item">
+                    <div class="showcase-box">
+                        <div class="showcase-label">Output: Web</div>
+                        <div class="showcase-value">
+                            ✓ Cards estructuradas<br>
+                            ✓ Diseño responsive<br>
+                            ✓ Listo para publicar
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </div>
-
-    <div class="showcase-visual">
-      <div class="showcase-flow">
-        <div class="showcase-item">
-          <div class="showcase-box">
-            <div class="showcase-label">Input: JSON</div>
-            <div class="showcase-value">
-              { "title": "...",<br>
-              &nbsp;&nbsp;"body": "...",<br>
-              &nbsp;&nbsp;"author": "..." }
-            </div>
-          </div>
-        </div>
-
-        <div class="showcase-arrow">→</div>
-
-        <div class="showcase-item">
-          <div class="showcase-box">
-            <div class="showcase-label">Mapping</div>
-            <div class="showcase-value">
-              title → Título<br>
-              body → Descripción<br>
-              author → Autor
-            </div>
-          </div>
-        </div>
-
-        <div class="showcase-arrow">→</div>
-
-        <div class="showcase-item">
-          <div class="showcase-box">
-            <div class="showcase-label">Output: Web</div>
-            <div class="showcase-value">
-              ✓ Cards estructuradas<br>
-              ✓ Diseño responsive<br>
-              ✓ Listo para publicar
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- FAQ -->
+<!-- ========================================
+     FAQ
+     ======================================== -->
 <section class="section">
-  <div class="home-container">
-    <div class="section-header">
-      <div class="section-badge">FAQ</div>
-      <h2 class="section-title">Preguntas Frecuentes</h2>
-      <p class="section-subtitle">
-        Todo lo que necesitas saber sobre WebBuilder
-      </p>
+    <div class="home-container">
+
+        <div class="section-header">
+            <div class="section-badge">FAQ</div>
+            <h2 class="section-title">Preguntas Frecuentes</h2>
+            <p class="section-subtitle">
+                Todo lo que necesitas saber sobre WebBuilder
+            </p>
+        </div>
+
+        <div class="faq-list">
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    ¿Qué tipo de APIs puedo usar?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Puedes usar cualquier API que devuelva datos en formato JSON o XML. El sistema detecta automáticamente el formato y analiza la estructura de los datos.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    ¿Necesito conocimientos técnicos?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        No necesitas ser programador. El asistente te guía paso a paso y te sugiere automáticamente cómo organizar tus datos. Solo necesitas tener la URL de la API.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    ¿Puedo modificar el mapping después?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Sí, todos tus proyectos se guardan en el historial. Puedes volver en cualquier momento, modificar el mapping y regenerar la web con los nuevos cambios.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    ¿Qué formatos de salida genera?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Actualmente el sistema genera previews visuales de cómo quedarían tus datos estructurados. La generación completa de código HTML/CSS está en desarrollo como parte del TFG.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    ¿Los datos se guardan de forma segura?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Sí, cada usuario tiene su propio espacio privado. Solo tú puedes ver y acceder a tus proyectos guardados. Los datos se almacenan de forma segura en nuestra base de datos.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
-    <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-question">
-          ¿Qué tipo de APIs puedo usar?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <div class="faq-answer-content">
-            Puedes usar cualquier API que devuelva datos en formato JSON o XML. El sistema detecta automáticamente el formato y analiza la estructura de los datos.
-          </div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question">
-          ¿Necesito conocimientos técnicos?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <div class="faq-answer-content">
-            No necesitas ser programador. El asistente te guía paso a paso y te sugiere automáticamente cómo organizar tus datos. Solo necesitas tener la URL de la API.
-          </div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question">
-          ¿Puedo modificar el mapping después?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <div class="faq-answer-content">
-            Sí, todos tus proyectos se guardan en el historial. Puedes volver en cualquier momento, modificar el mapping y regenerar la web con los nuevos cambios.
-          </div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question">
-          ¿Qué formatos de salida genera?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <div class="faq-answer-content">
-            Actualmente el sistema genera previews visuales de cómo quedarían tus datos estructurados. La generación completa de código HTML/CSS está en desarrollo como parte del TFG.
-          </div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question">
-          ¿Los datos se guardan de forma segura?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <div class="faq-answer-content">
-            Sí, cada usuario tiene su propio espacio privado. Solo tú puedes ver y acceder a tus proyectos guardados. Los datos se almacenan de forma segura en nuestra base de datos.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- CTA FINAL -->
+<!-- ========================================
+     CTA FINAL
+     ======================================== -->
 <section class="cta-section">
-  <div class="home-container">
-    <h2 class="cta-title">¿Listo para Crear tu Web?</h2>
-    <p class="cta-description">
-      Empieza ahora mismo de forma gratuita. Solo necesitas una URL.
-    </p>
-    <a href="{% url 'assistant' %}" class="cta-button">
-      Comenzar Ahora
-      <span>→</span>
-    </a>
-  </div>
-
-
+    <div class="home-container">
+        <h2 class="cta-title">¿Listo para Crear tu Web?</h2>
+        <p class="cta-description">
+            Empieza ahora mismo de forma gratuita. Solo necesitas una URL.
+        </p>
+        <a href="{% url 'assistant' %}" class="cta-button">
+            Comenzar Ahora
+            <span>→</span>
+        </a>
+    </div>
 </section>
 
 <script src="{% static 'js/home.js' %}"></script>
-
 
 {% endblock %}

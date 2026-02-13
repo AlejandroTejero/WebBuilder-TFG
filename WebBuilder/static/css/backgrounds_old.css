@@ -1,12 +1,7 @@
 /* ============================================================
    HOME BACKGROUNDS — WebBuilder
-   PALETA: NEGRO & PLATA LUXURY
-   
-   Colores principales:
-   - Base oscura: #0A0A0A, #141414 (negro profundo)
-   - Plata mate: #9CA3AF, #6B7280 (gris plateado suave)
-   - Plata clara: #D1D5DB (detalles sutiles)
-   - Acento metálico: #E5E7EB (toques de luz)
+   Archivo dedicado exclusivamente a backgrounds y animaciones
+   de fondo para facilitar la personalización de colores
    ============================================================ */
 
 
@@ -14,7 +9,7 @@
    FONDO GLOBAL
    ============================================================ */
 .home-modern {
-    background: #0A0A0A;
+    background: var(--bg-darker);
 }
 
 
@@ -28,8 +23,8 @@
     inset: 0;
     background-color: transparent;
     background-image:
-        linear-gradient(rgba(156, 163, 175, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(156, 163, 175, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(74, 158, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 158, 255, 0.03) 1px, transparent 1px);
     background-size: 50px 50px;
     animation: gridMove 20s linear infinite;
     z-index: 0;
@@ -40,19 +35,19 @@
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 30% 40%, rgba(229, 231, 235, 0.08) 0%, transparent 70%),
-        radial-gradient(circle at 70% 60%, rgba(156, 163, 175, 0.06) 0%, transparent 70%);
-    animation: glowPulse 10s ease-in-out infinite;
+        radial-gradient(circle at 30% 40%, rgba(74, 158, 255, 0.2) 0%, transparent 60%),
+        radial-gradient(circle at 70% 60%, rgba(168, 85, 247, 0.15) 0%, transparent 60%);
+    animation: glowPulse 8s ease-in-out infinite;
 }
 
 /* Badge superior */
 .hero-badge {
-    background: rgba(156, 163, 175, 0.08);
+    background: rgba(74, 158, 255, 0.1);
 }
 
 /* Botones de acción */
 .hero-cta {
-    background: linear-gradient(135deg, #18181B 0%, #27272A 100%);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
 }
 
 
@@ -62,7 +57,7 @@
 
 /* Badge de título de sección */
 .section-badge {
-    background: rgba(156, 163, 175, 0.08);
+    background: rgba(74, 158, 255, 0.1);
 }
 
 
@@ -72,17 +67,17 @@
 
 /* Cards de pasos */
 .step-card {
-    background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(24, 24, 27, 0.95));
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(20, 20, 20, 0.8));
 }
 
 /* Borde superior animado */
 .step-card::before {
-    background: linear-gradient(90deg, #9CA3AF 0%, #D1D5DB 50%, #9CA3AF 100%);
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
 }
 
 /* Número del paso */
 .step-number {
-    background: linear-gradient(135deg, #3F3F46 0%, #52525B 100%);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
 }
 
 
@@ -92,16 +87,16 @@
 
 /* Cards de características */
 .feature-card {
-    background: rgba(20, 20, 20, 0.7);
+    background: rgba(26, 26, 26, 0.5);
 }
 
 .feature-card:hover {
-    background: rgba(20, 20, 20, 0.95);
+    background: rgba(26, 26, 26, 0.8);
 }
 
 /* Icono de característica */
 .feature-icon {
-    background: linear-gradient(135deg, rgba(156, 163, 175, 0.15), rgba(107, 114, 128, 0.12));
+    background: linear-gradient(135deg, rgba(74, 158, 255, 0.2), rgba(168, 85, 247, 0.2));
 }
 
 
@@ -111,17 +106,17 @@
 
 /* Sección completa con tinte */
 .showcase {
-    background: linear-gradient(180deg, rgba(156, 163, 175, 0.04) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(74, 158, 255, 0.05) 0%, transparent 100%);
 }
 
 /* Contenedor visual */
 .showcase-visual {
-    background: rgba(20, 20, 20, 0.7);
+    background: rgba(26, 26, 26, 0.5);
 }
 
 /* Boxes de ejemplo */
 .showcase-box {
-    background: rgba(10, 10, 10, 0.9);
+    background: rgba(10, 10, 10, 0.8);
 }
 
 
@@ -131,7 +126,7 @@
 
 /* Items de preguntas frecuentes */
 .faq-item {
-    background: rgba(20, 20, 20, 0.7);
+    background: rgba(26, 26, 26, 0.5);
 }
 
 
@@ -143,14 +138,14 @@
 .cta-section {
     background: linear-gradient(
         135deg,
-        rgba(156, 163, 175, 0.08) 0%,
-        rgba(107, 114, 128, 0.05) 100%
+        rgba(74, 158, 255, 0.1) 0%,
+        rgba(168, 85, 247, 0.1) 100%
     );
 }
 
 /* Botón de CTA */
 .cta-button {
-    background: linear-gradient(135deg, #18181B 0%, #27272A 100%);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
 }
 
 
