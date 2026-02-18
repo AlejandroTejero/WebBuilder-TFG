@@ -1,31 +1,10 @@
-"""
-Cálculo de calidad del mapping
-Evalúa qué tan completo y correcto está el mapping configurado
-"""
 
 from __future__ import annotations
 
 
+# Cálculo de calidad del mapping
+# Evalúa qué tan completo y correcto está el mapping configurado
 def calculate_mapping_quality(field_mapping: dict, analysis_result: dict | None = None) -> dict:
-    """
-    Calcula un score de calidad del mapping (0-100)
-    
-    Útil para mostrar al usuario qué tan bueno es su mapping actual.
-    Considera: campos obligatorios, duplicados, y completitud.
-    
-    Args:
-        field_mapping: Mapping actual del usuario {role: key}
-        analysis_result: Análisis de la API (opcional, no usado actualmente)
-    
-    Returns:
-        {
-            'score': int,           # Score 0-100
-            'percentage': int,      # Same as score
-            'quality': str,         # 'Excelente ✅', 'Bueno 👍', etc.
-            'color': str,           # 'green', 'blue', 'orange', 'red'
-            'issues': list[str],    # Lista de problemas/sugerencias
-        }
-    """
     score = 0
     max_score = 100
     issues = []
