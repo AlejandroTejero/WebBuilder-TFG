@@ -1,8 +1,3 @@
-"""
-Vistas de preview
-Muestran los datos normalizados en formato de cards
-"""
-
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -13,33 +8,18 @@ from ..utils.analysis import build_analysis
 from ..utils.normalizer import normalize_items
 from ..utils.mapping import get_mapping
 
-
+# Vista del preview por usuario
+# request: Request de Django + api_request_id: ID del APIRequest a mostrar
 @login_required
 def preview(request, api_request_id: int):
-    """
-    Vista de preview completa (con layout completo)
-    
-    Muestra una página completa con información del análisis
-    y las cards normalizadas de los items
-    
-    Args:
-        request: Request de Django
-        api_request_id: ID del APIRequest a mostrar
-        
-    Returns:
-        HttpResponse con la página de preview renderizada
-    """
-    # Busca el APIRequest del usuario (seguridad)
+   
     api_request_obj = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
-
-    # Si no existe, devolvemos 404 simple
     if not api_request_obj:
         return HttpResponse("No encontrado.", status=404)
 
     # Decide el mapping: primero BD, si no, sesión
     field_mapping = api_request_obj.field_mapping or get_mapping(request)
 
-    # Si no hay parsed_data, no podemos hacer preview
     if not api_request_obj.parsed_data:
         messages.warning(request, "No hay datos parseados para este análisis.")
         return redirect("assistant")
@@ -58,7 +38,6 @@ def preview(request, api_request_id: int):
         limit=20,
     )
 
-    # Renderiza la plantilla de preview
     return render(request, "WebBuilder/preview.html", {
         "api_request": api_request_obj,
         "analysis": analysis_result,
@@ -66,12 +45,9 @@ def preview(request, api_request_id: int):
         "items": normalized_items,
     })
 
+# Vista preview de las cards
 @login_required
 def preview_cards(request, api_request_id: int):
-    """
-    Vista AJAX que devuelve HTML de preview (lista + detalle).
-    Soporta ?index=N para seleccionar un item.
-    """
     api_request_obj = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
     if not api_request_obj:
         return HttpResponse('<div class="wb-message wb-message--error">APIRequest no encontrado</div>')

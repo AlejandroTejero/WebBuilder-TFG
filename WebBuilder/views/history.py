@@ -8,29 +8,15 @@ from django.contrib.auth.decorators import login_required
 
 from ..models import APIRequest
 
-
+# Muestra del historial por usuario
 @login_required
 def history(request):
-    """
-    Muestra el historial de análisis del usuario
-    
-    Lista todos los APIRequest del usuario ordenados por fecha
-    (más recientes primero)
-    
-    Args:
-        request: Request de Django
-        
-    Returns:
-        HttpResponse con la página de historial renderizada
-    """
-    # Carga los análisis del usuario (más recientes primero)
+    # Carga los análisis del usuario ordenados recientes
     api_requests = (
-        APIRequest.objects
-        .filter(user=request.user)
-        .order_by("-date")
+        APIRequest.objects.filter(user=request.user).order_by("-date")
     )
 
-    # Placeholder para futuras "webs generadas"
+    # Hueco para "webs generadas"
     generated_sites = []
 
     return render(request, "WebBuilder/history.html", {

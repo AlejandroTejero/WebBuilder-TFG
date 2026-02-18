@@ -3,13 +3,12 @@ Vistas del asistente (wizard de generación de webs)
 Maneja el flujo completo: análisis, mapping, preview
 """
 
-from django.http import HttpResponseNotAllowed
-from django.shortcuts import render
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.core.cache import cache  # Sistema de caché de Django
-
-import hashlib
+from django.http import HttpResponseNotAllowed              # Para devolver 405 
+from django.shortcuts import render                         # Render del template
+from django.contrib import messages                         # Mensajes mostrados en el html
+from django.contrib.auth.decorators import login_required   # @login_required para la vista principal
+from django.core.cache import cache                         # Sistema de caché de Django
+import hashlib                                              # hash MD5 
 
 from ..models import APIRequest
 from ..forms import APIRequestForm
@@ -35,24 +34,26 @@ from ..utils.mapping import (
     store_intent,
 )
 
+# ============================== CONSTANTES DE CONFIG ==============================
 
-# Configuración de caché
-CACHE_TIMEOUT = 3600  # 1 hora en segundos
+# Guarda datos en cache por 3600seg (1h)
+CACHE_TIMEOUT = 3600
+# Prefijo para no mezclar con otras keys en cache.
 CACHE_KEY_PREFIX = "api_analysis"
 
+# ============================== CACHÉ: helpers ==============================
 
+# Construir la clave con la que se guarda la URL en cache, asi vemos si hay que analizarla de nuevo o no
 def _get_cache_key(api_url: str) -> str:
-    """
-    Genera una clave de caché única basada en la URL.
-
-    Usa hash MD5 para evitar problemas con caracteres especiales en las keys.
-    """
     url_hash = hashlib.md5(api_url.encode("utf-8")).hexdigest()
     return f"{CACHE_KEY_PREFIX}:{url_hash}"
 
 
-# ============================== Helper de render ==============================
+# ============================== HELPER DEL RENDER: IMPORTANTE ==============================
 
+# Renderiza la página del asistente con contexto consistente
+# Evita que cada handler (GET, analyze, save_mapping, set_intent…) tenga que repetir todo el proceso de
+# construccion. mapping, analysis y render template
 def render_assistant(
     request,
     *,
@@ -63,13 +64,10 @@ def render_assistant(
     saved_mapping=None,
     template="WebBuilder/assistant.html",
 ):
-    """
-    Renderiza la página del asistente con contexto consistente
-    """
+
     if saved_mapping is None:
         saved_mapping = get_mapping(request)
 
-    # Intención actual (para UI)
     mapping_intent = normalize_intent(get_intent(request))
     intent_profile = get_profile(mapping_intent)
 
@@ -80,7 +78,7 @@ def render_assistant(
         "intent_profile": intent_profile,
     }
 
-    # Calcula calidad del mapping si hay datos
+    # Calcula calidad del mapping si hay datos (ELIMINAR)
     if saved_mapping and analysis is not None:
         mapping_quality = calculate_mapping_quality(saved_mapping, analysis)
         context["mapping_quality"] = mapping_quality
@@ -95,22 +93,22 @@ def render_assistant(
     return render(request, template, context)
 
 
+# ============================== CONSTRUCTOR DE OPCIONES DEL WIZARD ==============================
+
+# Construye role_options con orden segun tipo de web, secciones (required...) y frases explicativas
 def _build_role_options_for_ui(request, analysis: dict, mapping: dict) -> list[dict]:
-    """
-    Construye role_options enriquecido con:
-    - orden guiado por intención (si aplica)
-    - secciones (required/recommended/optional/other)
-    - labels/help humanos
-    """
     intent_key = normalize_intent(get_intent(request))
+    # Coge los roles del intent correspondiente
     ordered_roles = roles_for_intent(intent_key) or None
 
     # Si no hay ordered_roles (custom), usa el orden por defecto del analysis
     roles_for_ui = ordered_roles or (analysis.get("roles", []) or [])
 
+    # Ordena los roles en required, recommended...
     role_sections = sections_for_intent(intent_key, roles_for_ui)
     role_ui_map = {r: role_ui(r) for r in roles_for_ui}
 
+    # Retornamos el contenido ordenado y bien para el UI
     return build_role_options(
         analysis,
         mapping,
@@ -122,17 +120,14 @@ def _build_role_options_for_ui(request, analysis: dict, mapping: dict) -> list[d
 
 # ============================== GET del asistente ==============================
 
+# Obtener informacion, dos modos principales (modo reabrir / modo vacio)
+# 1) Carga el parsed_data y construye el wizzard con los datos que habia en la DB
+# 2) Muestra el form vacio
 def get_assistant(request):
-    """
-    Maneja el GET del asistente
-
-    Si viene api_request_id en querystring, carga ese análisis específico
-    Si no, muestra el formulario vacío
-    """
     form = APIRequestForm()
     api_request_id = request.GET.get("api_request_id")
 
-    # Modo reabrir 
+    # 1) Modo reabrir 
     if api_request_id:
         api_request = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
 
@@ -160,15 +155,17 @@ def get_assistant(request):
             saved_mapping=saved_mapping,
         )
 
-    # Modo vacio
+    # 2) Modo vacio
     saved_mapping = get_mapping(request)
     return render_assistant(request, form=form, saved_mapping=saved_mapping)
 
 
-# ============================== POST: set intent ==============================
+# ============================== POST: set intent (tipo web) ==============================
 
+# Guarda el tipo de web selecionado o cambia los datos que ya existian en DB (NO LOS GUARDA EN DB, ESO 
+# LO HACE SAVE_MAPPING)
+# Recoge resolve_api_id y cambia el esquema de parsed_data
 def set_intent(request):
-    """Guarda la intención (tipo de web) en sesión y re-renderiza el asistente."""
     intent = normalize_intent(request.POST.get("intent"))
     store_intent(request, intent)
 
@@ -208,15 +205,14 @@ def set_intent(request):
     )
 
 
-# ============================== POST: guardar mapping ==============================
+# ============================== POST: save mapping ==============================
 
+"""
+Guarda el mapping configurado (Lo lee del POST)
+Valida el mapping, lo guarda en sesión y en BD si es posible,
+y re-renderiza el asistente con los resultados
+"""
 def save_mapping(request):
-    """
-    Guarda el mapping configurado en el paso 2
-
-    Valida el mapping, lo guarda en sesión y en BD si es posible,
-    y re-renderiza el asistente con los resultados
-    """
     field_mapping = read_mapping(request.POST)
 
     analysis_for_validation = None
@@ -311,14 +307,12 @@ def save_mapping(request):
 
 # ============================== POST: analizar URL (CON CACHÉ) ==============================
 
+"""
+Analiza una URL (descarga + parsea + analiza + guarda en BD)
+Sistema de caché: Si la URL ya fue analizada recientemente (< 1h),
+usa los datos cacheados en vez de descargar de nuevo
+"""
 def analyze_url(request):
-    """
-    Analiza una URL (descarga + parsea + analiza + guarda en BD)
-
-    MEJORAS:
-    - Sistema de caché: Si la URL ya fue analizada recientemente (< 1h),
-      usa los datos cacheados en vez de descargar de nuevo
-    """
     form = APIRequestForm(request.POST)
 
     if not form.is_valid():
@@ -432,31 +426,30 @@ def analyze_url(request):
         return render_assistant(request, form=form)
 
 
-# ============================== Vista principal ==============================
+# ============================== Vista principal (POST + GET) ==============================
 
+# Vista principal del asistente
 @login_required
 def assistant(request):
-    """
-    Vista principal del asistente (router GET/POST)
 
-    GET: Muestra la página del asistente (posiblemente con un análisis cargado)
-    POST: Decide acción según el parámetro 'action':
-          - 'set_intent': Guarda tipo de web (intención)
-          - 'save_mapping': Guarda mapping
-          - sin action: Analiza URL
-    """
+    # 1) El usuario entra en la pagina
     if request.method == "GET":
         return get_assistant(request)
 
+    # 2) Pega la URL (no hay action asi q pasa a analyze_url)
     if request.method == "POST":
+        # Se envia el post con action vacio, por eso vamos a analyze
         action = request.POST.get("action")
 
+        # 4) El user cambia el tipo de pagina
         if action == "set_intent":
             return set_intent(request)
 
+        # 5) Se guardan los cambios hechos
         if action == "save_mapping":
             return save_mapping(request)
 
+        # 3) Se analiza la URL valida o no
         return analyze_url(request)
 
     return HttpResponseNotAllowed(["GET", "POST"])
