@@ -1,9 +1,20 @@
-from __future__ import annotations
+from __future__ import annotations      # Usar todo como strings
+from dataclasses import dataclass       # Permite definir una clase de datos
+from typing import Dict, List, Tuple    # Definicion de tipos (INTENT_PROFILES)
 
-from dataclasses import dataclass
-from typing import Dict, List, Tuple
+# Tipo de web por defecto para el NORMALIZE_INTENT
+DEFAULT_INTENT_KEY = "custom"
 
 
+"""
+Creo una clase con campos para tener la configuracion en un unico objeto
+key: id interno (“blog”, “portfolio”)
+label: nombre para mostrar en UI
+description: texto corto UI
+required: roles obligatorios para ese intent
+recommended: roles recomendados
+optional: roles opcionales
+"""
 @dataclass(frozen=True)
 class IntentProfile:
     key: str
@@ -14,6 +25,13 @@ class IntentProfile:
     optional: Tuple[str, ...]
 
 
+"""
+Diccionario con los diferentes roles y sus campos sugeridos
+Para que lo uso:
+    - Para ordenar roles en el wizard
+    - Para agrupar por secciones (required/recommended/optional)
+    - Para mostrar UI más clara
+"""
 INTENT_PROFILES: Dict[str, IntentProfile] = {
     "blog": IntentProfile(
         key="blog",
@@ -57,9 +75,8 @@ INTENT_PROFILES: Dict[str, IntentProfile] = {
     ),
 }
 
-DEFAULT_INTENT_KEY = "custom"
 
-
+# Ver que valor de web coger, solo permite los conocidos en INTENT_PROFILES
 def normalize_intent(intent: str | None) -> str:
     if not intent:
         return DEFAULT_INTENT_KEY
@@ -67,12 +84,13 @@ def normalize_intent(intent: str | None) -> str:
     return intent if intent in INTENT_PROFILES else DEFAULT_INTENT_KEY
 
 
+# Recoge el campo selecionado pasando por la verificacion de normalize_intent
 def get_profile(intent: str | None) -> IntentProfile:
     return INTENT_PROFILES[normalize_intent(intent)]
 
 
+# Actualiza los roles en orden de prioridad para el wizard, si es custom no hay orden
 def roles_for_intent(intent: str | None) -> List[str]:
-    """Lista de roles ordenados por prioridad. Para 'custom', devolvemos [] (usar el orden por defecto)."""
     profile = get_profile(intent)
     if profile.key == "custom":
         return []
@@ -85,8 +103,8 @@ def roles_for_intent(intent: str | None) -> List[str]:
             out.append(r)
     return out
 
-# ====================== UI: labels + help por rol ======================
 
+# Mini descripcion de cada campo
 ROLE_UI = {
     "title": {
         "label": "Título",
@@ -155,18 +173,16 @@ ROLE_UI = {
 }
 
 
+# Se encarga de obtener el label indicado para cada campo (label)
 def role_ui(role: str) -> dict:
-    """Devuelve label/help por rol con fallback."""
     role = (role or "").strip().lower()
     data = ROLE_UI.get(role)
     if data:
         return data
-    # Fallback humano: Title Case del rol
     return {"label": role.replace("_", " ").title(), "help": ""}
 
-
+# Recoge y muestra los campos required, recommended... segun la web seleccionada
 def role_section(intent: str | None, role: str) -> str:
-    """Devuelve 'required' | 'recommended' | 'optional' | 'other' según el perfil."""
     profile = get_profile(intent)
     if role in profile.required:
         return "required"
@@ -177,6 +193,19 @@ def role_section(intent: str | None, role: str) -> str:
     return "other"
 
 
+"""
+Construye un diccionario segun las entradas que reciba:
+Entrada:
+    - intent: "blog", "portfolio", etc.
+    - roles: lista de roles que vas a mostrar en el wizard (["title","description","image","link"])
+Salida:
+{
+  "title": "required",
+  "description": "recommended",
+  "image": "optional",
+  "link": "optional",
+  ...
+}
+"""
 def sections_for_intent(intent: str | None, roles: list[str]) -> dict[str, str]:
-    """Map role -> section. Útil para pintar por bloques en la UI."""
     return {r: role_section(intent, r) for r in roles}
