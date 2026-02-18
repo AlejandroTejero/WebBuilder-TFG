@@ -1,9 +1,3 @@
-"""
-Intent (tipo de web) profiles for guided mapping.
-
-La intención NO limita tus datos: solo guía (orden/prioridad) y hace el mapping más claro.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass

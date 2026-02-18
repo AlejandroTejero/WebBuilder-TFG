@@ -1,13 +1,9 @@
-# Permite usar anotaciones de tipos como strings
-from __future__ import annotations
+from __future__ import annotations      # Usar todo como strings
+from typing import Any                  # Para analizar cualquier tipo (list,dict...)
+from ..models import APIRequest         # Modelo para cada peticion
+from .analysis import ROLE_DEFS         # Catologo de roles del wizzard
 
-# Importa Any para tipar entradas flexibles (p.ej. request.POST)
-from typing import Any
-
-# Importa el modelo donde guardamos el mapping en BD
-from ..models import APIRequest
-# Importa la fuente de verdad de roles del análisis
-from .analysis import ROLE_DEFS
+# ========================== CONSTANTES ==========================
 
 # Clave de sesión donde guardamos el mapping del usuario
 SESSION_MAPPING_KEY = "field_mapping"
@@ -16,34 +12,33 @@ SESSION_LAST_REQUEST_ID_KEY = "last_api_request_id"
 # Clave para el mamping de tipo blog, protfolio, etc.
 SESSION_INTENT_KEY = "mapping_intent"
 
+# ========================== INPUT: POST -> mapping ==========================
 
 # Lee map_<role> del POST y devuelve un dict (role -> key)
 def read_mapping(post_data: Any) -> dict:
-    # Inicializa el dict del mapping
     field_mapping: dict[str, str] = {}
-    # Recorre todos los roles definidos
     for role_name in ROLE_DEFS.keys():
         # Lee el valor del select map_<role> (o vacío si falta)
         field_mapping[role_name] = post_data.get(f"map_{role_name}", "")
-    # Devuelve el mapping final
     return field_mapping
 
 
+# ========================== SESSION DE USUARIO ==========================
+
 # Guarda el mapping en la sesión del usuario
 def store_mapping(request, field_mapping: dict) -> None:
-    # Escribe el dict en la sesión bajo la clave acordada
     request.session[SESSION_MAPPING_KEY] = field_mapping
 
 
 # Carga el mapping desde la sesión del usuario
 def get_mapping(request) -> dict:
-    # Devuelve dict guardado o dict vacío
     return request.session.get(SESSION_MAPPING_KEY, {}) or {}
 
+# Guarda el tipo de web seleccionado
 def store_intent(request, intent: str) -> None:
     request.session[SESSION_INTENT_KEY] = (intent or "").strip().lower()
 
-
+# Carga la seleccion de web desde la sesion del usuario
 def get_intent(request) -> str:
     return (request.session.get(SESSION_INTENT_KEY) or "").strip().lower()
 
@@ -52,24 +47,19 @@ def get_intent(request) -> str:
 def resolve_api_id(request, *, post_api_request_id: str | None = None) -> str | None:
     # Si viene id por POST, tiene prioridad
     if post_api_request_id:
-        # Devuelve el id del POST
         return post_api_request_id
-    # Si no, usa fallback en sesión
+    # Si no, usa fallback en sesión (se guardo como ultimo APIRequest analizado)
     return request.session.get(SESSION_LAST_REQUEST_ID_KEY)
 
 
-# Guarda el mapping en BD dentro de APIRequest.field_mapping si existe y pertenece al usuario
-def save_mapping_to_db(*, user, api_request_id: str | int | None, field_mapping: dict) -> APIRequest | None:
-    # Si no hay id, no se puede guardar en BD
-    if not api_request_id:
-        # Devuelve None para indicar que no se guardó
-        return None
+# ========================== PERSISTENCIA DE DATOS EN DB ==========================
 
-    # Busca el APIRequest por id y usuario (seguridad)
+# Guarda el mapping en BD dentro de APIRequest.field_mapping perteneciente al usuario
+def save_mapping_to_db(*, user, api_request_id: str | int | None, field_mapping: dict) -> APIRequest | None:
+    if not api_request_id:
+        return None
     api_request_obj = APIRequest.objects.filter(id=api_request_id, user=user).first()
-    # Si no existe el registro, no guardamos nada
     if not api_request_obj:
-        # Devuelve None para indicar que no se guardó
         return None
 
     # Escribe el mapping en el JSONField
@@ -79,6 +69,9 @@ def save_mapping_to_db(*, user, api_request_id: str | int | None, field_mapping:
     # Devuelve el objeto actualizado
     return api_request_obj
 
+# ========================== OPCIONES WIZZARD ==========================
+
+# Construye opciones de selección por rol para el wizard de mapping.
 def build_role_options(
     analysis_result: dict | None,
     field_mapping: dict,
@@ -87,27 +80,20 @@ def build_role_options(
     role_sections: dict[str, str] | None = None,
     role_ui_map: dict[str, dict] | None = None,
 ) -> list[dict]:
-    """
-    Construye opciones de selección por rol para el wizard de mapping.
 
-    - Si se pasa `roles`, se usa ese orden (guiado por intención).
-    - Si no, se usa el orden por defecto del análisis (analysis_result["roles"]).
-    - `role_sections` permite agrupar en UI: required / recommended / optional / other
-    - `role_ui_map` permite mostrar label/help humanos.
-    """
     if not analysis_result:
         return []
-
+    
+    # Cogemos todas las keys detectadas en la coleccion principal
     all_keys: list[str] = analysis_result.get("keys", {}).get("all", []) or []
     role_select_options: list[dict] = []
 
+    # Si tenemos campos ordenados los usamos, sino lo cogemos como viene del analisis
     roles_to_use = roles if roles is not None else (analysis_result.get("roles", []) or [])
 
     for role_name in roles_to_use:
         suggested_keys = (analysis_result.get("suggestions", {}).get(role_name, []) or [])[:5]
-
         selected_key = field_mapping.get(role_name) or (suggested_keys[0] if suggested_keys else "")
-
         options_keys: list[str] = []
         seen: set[str] = set()
 
@@ -151,8 +137,12 @@ def build_role_options(
 
     return role_select_options
 
+
+# ========================== HELPERS VALIDACION ==========================
+
+# Saca una lista fiable actualizada de la coleccion principal, para poder usar key que existen
+# Avisa si se seleciono una key que no es valida/existente
 def _collect_allowed_keys_from_analysis(analysis_result: dict | None) -> set[str]:
-    # Si no hay análisis, no podemos validar keys contra el dataset
     if not analysis_result:
         return set()
 
@@ -164,13 +154,13 @@ def _collect_allowed_keys_from_analysis(analysis_result: dict | None) -> set[str
         if isinstance(k, str) and k.strip():
             allowed.add(k.strip())
 
-    # 2) Fallback: sample_keys
+    # 2) Fallback: keys sacadas de todos los items = sample_keys
     sample_keys = analysis_result.get("main_collection", {}).get("sample_keys") or []
     for k in sample_keys:
         if isinstance(k, str) and k.strip():
             allowed.add(k.strip())
 
-    # 3) Fallback: top_keys (pares key,count)
+    # 3) Fallback: keys de listas de pares = top_keys (pares key,count)
     top_keys = analysis_result.get("main_collection", {}).get("top_keys") or []
     for pair in top_keys:
         if isinstance(pair, (list, tuple)) and len(pair) >= 1:
@@ -181,7 +171,17 @@ def _collect_allowed_keys_from_analysis(analysis_result: dict | None) -> set[str
     return allowed
 
 
-# ==================== ✨ VERSIÓN MEJORADA ✨ ====================
+# ========================== VALIDACION FINAL ==========================
+
+"""
+Valida el mapping con detección de duplicados.
+Args:
+    field_mapping: Mapping del usuario {role: key}
+    analysis_result: Análisis de la API (opcional, para validar keys)
+    required_roles: Roles obligatorios (por defecto solo "title")
+    prevent_duplicates_in: Roles críticos que no pueden duplicar keys
+    allow_duplicate_in: Roles donde duplicados son aceptables
+"""
 def validate_mapping(
     field_mapping: dict,
     *,
@@ -190,29 +190,7 @@ def validate_mapping(
     prevent_duplicates_in: tuple[str, ...] = ("title", "description", "subtitle", "content", "author"),
     allow_duplicate_in: tuple[str, ...] = ("id", "link", "date", "category", "tags"),
 ) -> dict:
-    """
-    Valida el mapping con detección MEJORADA de duplicados.
-    
-    MEJORAS vs versión anterior:
-    - prevent_duplicates_in: Roles que NO pueden compartir key (genera ERROR)
-    - allow_duplicate_in: Roles donde duplicados son razonables (sin warning)
-    - Resto de duplicados generan WARNING
-    
-    Args:
-        field_mapping: Mapping del usuario {role: key}
-        analysis_result: Análisis de la API (opcional, para validar keys)
-        required_roles: Roles obligatorios (por defecto solo "title")
-        prevent_duplicates_in: Roles críticos que no pueden duplicar keys
-        allow_duplicate_in: Roles donde duplicados son aceptables
-    
-    Returns:
-        {
-            "ok": bool,              # False si hay errores
-            "errors": list[str],     # Errores que bloquean guardado
-            "warnings": list[str],   # Advertencias que no bloquean
-            "cleaned": dict,         # Mapping limpiado (strip)
-        }
-    """
+
     errors: list[str] = []
     warnings: list[str] = []
 
@@ -240,8 +218,8 @@ def validate_mapping(
                     f"El rol '{role_name}' apunta a '{key_name}', pero esa key no aparece en la colección principal detectada."
                 )
 
-    # 3) ✨ DETECCIÓN DE DUPLICADOS MEJORADA
-    seen: dict[str, str] = {}  # key_name -> primer role_name que la usó
+    # 3) Deteccion de duplicados si existen
+    seen: dict[str, str] = {}
     
     for role_name, key_name in cleaned.items():
         if not key_name:
@@ -254,7 +232,7 @@ def validate_mapping(
             # Caso A: Ambos roles están en lista de prevención → ERROR CRÍTICO
             if role_name in prevent_duplicates_in and previous_role in prevent_duplicates_in:
                 errors.append(
-                    f"⚠️ ERROR: Los roles '{role_name}' y '{previous_role}' no pueden usar el mismo campo '{key_name}'. "
+                    f"ERROR: Los roles '{role_name}' y '{previous_role}' no pueden usar el mismo campo '{key_name}'. "
                     f"Esto haría que tu web tenga contenido repetitivo y confuso para los usuarios."
                 )
             

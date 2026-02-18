@@ -1,13 +1,13 @@
-# Permite usar anotaciones de tipos como strings
-from __future__ import annotations
-
-from typing import Any
-import re
-import json
-
-from .analysis import get_by_path
+from __future__ import annotations      # Usar todo como strings
+from typing import Any                  # Para meter cualquier cosa en parsed_data (list,dict...)
+import re                               # Parsear path
+import json                             # Dict/List
+from .analysis import get_by_path       # Navegar por paths
 
 
+# ========================== FORMATEO A TEXTO ==========================
+
+# Recortamos string a max_len para que reviente el preview
 def _truncate(text: str, max_len: int = 600) -> str:
     text = (text or "").strip()
     if len(text) <= max_len:
@@ -15,8 +15,8 @@ def _truncate(text: str, max_len: int = 600) -> str:
     return text[: max_len - 1].rstrip() + "…"
 
 
+# Convierte TODOS los valores a tipo str, para no trabajar con estructuras raras
 def _to_text(value: Any, *, max_len: int = 600) -> str:
-    """Convierte valores a texto de forma estable y "amigable" para UI."""
     if value is None:
         return ""
     if isinstance(value, str):
@@ -31,21 +31,14 @@ def _to_text(value: Any, *, max_len: int = 600) -> str:
     return _truncate(str(value), max_len=max_len)
 
 
+
+# ========================== ACCESO A CAMPOS (paths) ==========================
+
+# Extrae los valores soportando todo tipo de estructuras 
+# _get_nested({"user": {"name": "Ana"}}, "user.name") → "Ana"
+# _get_nested({"images": ["a.jpg", "b.jpg"]}, "images[0]") → "a.jpg"
+# _get_nested({"data": {"items": [{"id": 1}]}}, "data.items[0].id") → 1
 def _get_nested(item: Any, key: str) -> Any:
-    """
-    ✨ MEJORADO: Obtiene un valor por key con soporte de paths complejos.
-    
-    Soporta:
-    - Keys simples: "title"
-    - Paths con punto: "user.name"
-    - Paths con arrays: "images[0]", "data.items[1].url"
-    - Paths mixtos: "user.posts[0].comments[2].text"
-    
-    Ejemplos:
-        _get_nested({"user": {"name": "Ana"}}, "user.name") → "Ana"
-        _get_nested({"images": ["a.jpg", "b.jpg"]}, "images[0]") → "a.jpg"
-        _get_nested({"data": {"items": [{"id": 1}]}}, "data.items[0].id") → 1
-    """
     if not key:
         return None
     if not isinstance(item, dict):
@@ -55,7 +48,6 @@ def _get_nested(item: Any, key: str) -> Any:
     if "." not in key and "[" not in key:
         return item.get(key)
     
-    # Parsear el path completo: "user.posts[0].title" → ["user", "posts", "[0]", "title"]
     # Regex que captura: palabras normales O índices con corchetes
     parts = re.findall(r'[^\.\[]+|\[\d+\]', key)
     
@@ -85,14 +77,11 @@ def _get_nested(item: Any, key: str) -> Any:
     return node
 
 
+
+# ========================== VALIDACIONES ==========================
+
+# Observa si un campo se parece a una URL (tipicamente son url o imagen)
 def _looks_like_url(text: str) -> bool:
-    """
-    ✨ MEJORADO: Detecta si un texto parece una URL (absoluta o relativa).
-    
-    Soporta:
-    - URLs absolutas: http://..., https://...
-    - URLs relativas: /images/photo.jpg, ./assets/img.png
-    """
     t = (text or "").strip()
     
     # URLs absolutas
@@ -101,24 +90,17 @@ def _looks_like_url(text: str) -> bool:
     
     # URLs relativas comunes
     if t.startswith("/") or t.startswith("./") or t.startswith("../"):
-        # Verificar que no sea solo "/" (raíz vacía)
         if len(t) > 1:
             return True
     
     return False
 
 
+
+# ========================== SELECCIONADORES (pickers) ==========================
+
+# Devuelve el primer valor no vacio de las keys candidatas
 def _pick_text(item: dict, keys: list[str], *, max_len: int = 600, strict_mode: bool = False) -> str:
-    """
-    Selecciona el primer valor no vacío de una lista de keys candidatas.
-    
-    Args:
-        item: Dict del que extraer el valor
-        keys: Lista de keys candidatas (en orden de prioridad)
-        max_len: Longitud máxima del texto
-        strict_mode: Si True, solo usa la PRIMERA key (no hace fallbacks)
-    """
-    # ✨ NUEVO: En modo estricto, solo intentamos la primera key
     if strict_mode:
         keys = keys[:1] if keys else []
     
@@ -130,16 +112,8 @@ def _pick_text(item: dict, keys: list[str], *, max_len: int = 600, strict_mode: 
     return ""
 
 
+# Selecciona la primera URL válida de una lista de keys candidatas.
 def _pick_url(item: dict, keys: list[str], strict_mode: bool = False) -> str:
-    """
-    Selecciona la primera URL válida de una lista de keys candidatas.
-    
-    Args:
-        item: Dict del que extraer la URL
-        keys: Lista de keys candidatas (en orden de prioridad)
-        strict_mode: Si True, solo usa la PRIMERA key (no hace fallbacks)
-    """
-    # ✨ NUEVO: En modo estricto, solo intentamos la primera key
     if strict_mode:
         keys = keys[:1] if keys else []
     
@@ -155,16 +129,36 @@ def _pick_url(item: dict, keys: list[str], strict_mode: bool = False) -> str:
     return ""
 
 
+
+# ========================== NORMALIZACION: API -> cards ==========================
+
+# Busca la lista principal de items mirando el analisis de la coleccion principal 
 def _extract_main_items(parsed_data: Any, analysis_result: dict) -> list[dict]:
     collection_path = analysis_result.get("main_collection", {}).get("path")
+    
+    # Si no conocemos el path devolvemos None
     if collection_path is None:
         return []
+    
+    # Navegamos por la ruta buscando la lista
     node = get_by_path(parsed_data, collection_path)
     if not isinstance(node, list):
         return []
+    
     return [x for x in node if isinstance(x, dict)]
 
 
+"""
+Funcion: Normaliza los items para poder generar cards genericas
+Args:
+    parsed_data: Datos parseados de la API
+    analysis_result: Resultado del análisis
+    field_mapping: Mapping configurado por el usuario
+    limit: Número máximo de items a procesar
+    strict_mode: Si True, NO usa fallbacks automáticos (solo el mapping del usuario)
+Salida estándar:
+    title, description, image, link, raw, mapping_info
+"""
 def normalize_items(
     parsed_data: Any,
     analysis_result: dict,
@@ -172,44 +166,32 @@ def normalize_items(
     limit: int = 20,
     strict_mode: bool = False,
 ) -> list[dict]:
-    """
-    Normaliza items para poder renderizar cards genéricas.
-
-    Args:
-        parsed_data: Datos parseados de la API
-        analysis_result: Resultado del análisis
-        field_mapping: Mapping configurado por el usuario
-        limit: Número máximo de items a procesar
-        strict_mode: ✨ NUEVO - Si True, NO usa fallbacks automáticos (solo el mapping del usuario)
-
-    Salida estándar:
-      - title, description, image, link, raw, mapping_info
-    """
+    
+    # Recogo los items y los meto en la lista final
     raw_items = _extract_main_items(parsed_data, analysis_result)
     normalized: list[dict] = []
 
+    # Asigno las keys correspondientes a cada campo, si existen
     for idx, item in enumerate(raw_items[:limit], start=1):
-        # Keys seleccionadas en wizard (si existen)
         title_key = (field_mapping or {}).get("title", "") or ""
         description_key = (field_mapping or {}).get("description", "") or ""
         image_key = (field_mapping or {}).get("image", "") or ""
         link_key = (field_mapping or {}).get("link", "") or ""
 
-        # ✨ NUEVO: En modo estricto, SOLO usa las keys del mapping (sin fallbacks)
-        # En modo normal: usa fallbacks si el mapping está vacío
+        # En modo estricto, SOLO usa las keys del mapping (las q metio el user)
+        # En modo normal: Sugerencias del mapping
         if strict_mode:
-            # Solo usar lo que el usuario mapeó explícitamente
             title_candidates = [title_key] if title_key else []
             desc_candidates = [description_key] if description_key else []
             image_candidates = [image_key] if image_key else []
             link_candidates = [link_key] if link_key else []
         else:
-            # Fallbacks "con sentido" (incluso si mapping está incompleto)
             title_candidates = [k for k in [title_key, "title", "name", "headline", "label"] if k]
             desc_candidates = [k for k in [description_key, "description", "summary", "content", "text", "body", "excerpt"] if k]
             image_candidates = [k for k in [image_key, "image", "image_url", "thumbnail", "thumbnail_url", "thumb", "media.url", "media.image"] if k]
             link_candidates = [k for k in [link_key, "link", "url", "href", "permalink", "web_url"] if k]
 
+        # Seleccion final de los campos
         title = _pick_text(item, title_candidates, max_len=140, strict_mode=strict_mode)
         description = _pick_text(item, desc_candidates, max_len=520, strict_mode=strict_mode)
         image = _pick_url(item, image_candidates, strict_mode=strict_mode)
@@ -217,11 +199,10 @@ def normalize_items(
 
         # Si aún no hay title, inventa uno estable
         if not title:
-            # intenta id como fallback antes de Item #
             id_txt = _pick_text(item, ["id", "uuid", "identifier"], max_len=80)
             title = id_txt if id_txt else f"Item #{idx}"
 
-        # Construir información del mapping para mostrar en la card
+        # Construir info para mostrar en la card
         mapping_info = {}
         if title_key:
             mapping_info["title"] = title_key

@@ -1,8 +1,3 @@
-"""
-WebBuilder Views Package
-Organiza las vistas en módulos separados por funcionalidad
-"""
-
 # Autenticación
 from .auth import register
 

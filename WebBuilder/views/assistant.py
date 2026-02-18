@@ -132,6 +132,7 @@ def get_assistant(request):
     form = APIRequestForm()
     api_request_id = request.GET.get("api_request_id")
 
+    # Modo reabrir 
     if api_request_id:
         api_request = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
 
@@ -159,6 +160,7 @@ def get_assistant(request):
             saved_mapping=saved_mapping,
         )
 
+    # Modo vacio
     saved_mapping = get_mapping(request)
     return render_assistant(request, form=form, saved_mapping=saved_mapping)
 
@@ -313,7 +315,7 @@ def analyze_url(request):
     """
     Analiza una URL (descarga + parsea + analiza + guarda en BD)
 
-    ✨ MEJORAS:
+    MEJORAS:
     - Sistema de caché: Si la URL ya fue analizada recientemente (< 1h),
       usa los datos cacheados en vez de descargar de nuevo
     """
