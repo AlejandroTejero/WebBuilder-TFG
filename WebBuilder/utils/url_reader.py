@@ -12,6 +12,7 @@ DEFAULT_TIMEOUT = 8
 # Cabeceras por defecto para la petición
 DEFAULT_HEADERS = {"User-Agent": "WebBuilder/1.0"}
 
+
 # ========================== VALIDACION ==========================
 
 # Valida que la URL use http o https
@@ -20,8 +21,8 @@ def validate_url(api_url: str) -> None:
     if parsed_url.scheme not in ("http", "https"):
         raise ValueError("La URL debe empezar por http:// o https://.")
 
-# ========================== DESCARGA + TEXTO CRUDO -> CONTROLADO ==========================
 
+# ========================== DESCARGA + TEXTO CRUDO -> CONTROLADO ==========================
 
 # Validamos la url, decargamos contenido en raw, y 
 def fetch_url(api_url: str, *, timeout: int = DEFAULT_TIMEOUT, max_bytes: int = MAX_BYTES) -> tuple[str, str]:
@@ -71,6 +72,8 @@ def fetch_url(api_url: str, *, timeout: int = DEFAULT_TIMEOUT, max_bytes: int = 
         # Cerramos la conexion
         http_response.close()
 
+
+# ========================== PREVISUALIZACION ==========================
 
 # Devuelve una previsualización truncada del texto de los 600 primeros CARACTERES
 def make_preview(raw_text: str, max_chars: int = 600) -> str:

@@ -7,7 +7,7 @@ from django.http import HttpResponseNotAllowed
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache  # ✨ Sistema de caché de Django
+from django.core.cache import cache  # Sistema de caché de Django
 
 import hashlib
 
@@ -36,7 +36,7 @@ from ..utils.mapping import (
 )
 
 
-# ✨ Configuración de caché
+# Configuración de caché
 CACHE_TIMEOUT = 3600  # 1 hora en segundos
 CACHE_KEY_PREFIX = "api_analysis"
 
