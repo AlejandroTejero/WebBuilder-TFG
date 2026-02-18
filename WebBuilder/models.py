@@ -22,7 +22,7 @@ class APIRequest(models.Model):
     response_summary = models.TextField(blank=True, null=True)                              # Resumen del analisis
     error_message = models.TextField(blank=True, null=True)                                 # Mensaje tras el analisis
 
-    field_mapping = models.JSONField(blank=True, null=True)                                 # Estructura de campos guardados
+    field_mapping = models.JSONField(blank=True, null=True)                                 # Campos guardados en mapping
 
     # Representación en texto del objeto
     def __str__(self):
