@@ -1,317 +1,90 @@
 """
-Vistas del asistente (wizard de generación de webs)
-Maneja el flujo completo: análisis, mapping, preview
+Vistas del asistente (MVP - solo análisis)
+Flujo actual:
+- El usuario introduce una URL
+- Se descarga + parsea (JSON/XML)
+- Se analiza la estructura y se guarda en BD
+- Se muestra un resumen del análisis
+
+El mapping/intents/preview se implementarán con LLM en el siguiente paso.
 """
 
-from django.http import HttpResponseNotAllowed              # Para devolver 405 
-from django.shortcuts import render                         # Render del template
-from django.contrib import messages                         # Mensajes mostrados en el html
-from django.contrib.auth.decorators import login_required   # @login_required para la vista principal
-from django.core.cache import cache                         # Sistema de caché de Django
-import hashlib                                              # hash MD5 
+from __future__ import annotations
 
-from ..models import APIRequest
+import hashlib
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import render
+
 from ..forms import APIRequestForm
-from ..utils.url_reader import fetch_url
-from ..utils.parsers import parse_raw, summarize_data
-from ..utils.analysis import build_analysis, calculate_mapping_quality
-from ..utils.intents import (
-    get_profile,
-    roles_for_intent,
-    normalize_intent,
-    sections_for_intent,
-    role_ui,
-)
-from ..utils.mapping import (
-    read_mapping,
-    store_mapping,
-    get_mapping,
-    resolve_api_id,
-    save_mapping_to_db,
-    build_role_options,
-    validate_mapping,
-    get_intent,
-    store_intent,
-)
+from ..models import APIRequest
+from ..utils.ingest.url_reader import fetch_url
+from ..utils.ingest.parsers import parse_raw, summarize_data
+from ..utils.analysis import build_analysis
 
-# ============================== CONSTANTES DE CONFIG ==============================
 
-# Guarda datos en cache por 3600seg (1h)
-CACHE_TIMEOUT = 3600
-# Prefijo para no mezclar con otras keys en cache.
+# ============================== CONFIG ==============================
+
+CACHE_TIMEOUT = 3600  # 1h
 CACHE_KEY_PREFIX = "api_analysis"
 
-# ============================== CACHÉ: helpers ==============================
 
-# Construir la clave con la que se guarda la URL en cache, asi vemos si hay que analizarla de nuevo o no
 def _get_cache_key(api_url: str) -> str:
     url_hash = hashlib.md5(api_url.encode("utf-8")).hexdigest()
     return f"{CACHE_KEY_PREFIX}:{url_hash}"
 
 
-# ============================== HELPER DEL RENDER: IMPORTANTE ==============================
+# ============================== RENDER ==============================
 
-# Renderiza la página del asistente con contexto consistente
-# Evita que cada handler (GET, analyze, save_mapping, set_intent…) tenga que repetir todo el proceso de
-# construccion. mapping, analysis y render template
 def render_assistant(
     request,
     *,
-    form,
-    api_request=None,
-    analysis=None,
-    role_options=None,
-    saved_mapping=None,
-    template="WebBuilder/assistant.html",
+    form: APIRequestForm,
+    api_request: APIRequest | None = None,
+    analysis: dict | None = None,
+    template: str = "WebBuilder/assistant.html",
 ):
-
-    if saved_mapping is None:
-        saved_mapping = get_mapping(request)
-
-    mapping_intent = normalize_intent(get_intent(request))
-    intent_profile = get_profile(mapping_intent)
-
-    context = {
-        "form": form,
-        "saved_mapping": saved_mapping,
-        "mapping_intent": mapping_intent,
-        "intent_profile": intent_profile,
-    }
-
-    # Calcula calidad del mapping si hay datos (ELIMINAR)
-    if saved_mapping and analysis is not None:
-        mapping_quality = calculate_mapping_quality(saved_mapping, analysis)
-        context["mapping_quality"] = mapping_quality
+    context = {"form": form}
 
     if api_request is not None:
         context["api_request"] = api_request
     if analysis is not None:
         context["analysis"] = analysis
-    if role_options is not None:
-        context["role_options"] = role_options
 
     return render(request, template, context)
 
 
-# ============================== CONSTRUCTOR DE OPCIONES DEL WIZARD ==============================
+# ============================== GET ==============================
 
-# Construye role_options con orden segun tipo de web, secciones (required...) y frases explicativas
-def _build_role_options_for_ui(request, analysis: dict, mapping: dict) -> list[dict]:
-    intent_key = normalize_intent(get_intent(request))
-    # Coge los roles del intent correspondiente
-    ordered_roles = roles_for_intent(intent_key) or None
-
-    # Si no hay ordered_roles (custom), usa el orden por defecto del analysis
-    roles_for_ui = ordered_roles or (analysis.get("roles", []) or [])
-
-    # Ordena los roles en required, recommended...
-    role_sections = sections_for_intent(intent_key, roles_for_ui)
-    role_ui_map = {r: role_ui(r) for r in roles_for_ui}
-
-    # Retornamos el contenido ordenado y bien para el UI
-    return build_role_options(
-        analysis,
-        mapping,
-        roles=ordered_roles,
-        role_sections=role_sections,
-        role_ui_map=role_ui_map,
-    )
-
-
-# ============================== GET del asistente ==============================
-
-# Obtener informacion, dos modos principales (modo reabrir / modo vacio)
-# 1) Carga el parsed_data y construye el wizzard con los datos que habia en la DB
-# 2) Muestra el form vacio
 def get_assistant(request):
+    """
+    - Modo vacío: muestra formulario
+    - Modo reabrir: ?api_request_id=... carga desde BD y reconstruye analysis
+    """
     form = APIRequestForm()
     api_request_id = request.GET.get("api_request_id")
 
-    # 1) Modo reabrir 
-    if api_request_id:
-        api_request = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
+    if not api_request_id:
+        return render_assistant(request, form=form)
 
-        if not api_request:
-            messages.error(request, "No se encontró ese análisis en tu cuenta.")
-            return render_assistant(request, form=form)
+    api_request = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
+    if not api_request:
+        messages.error(request, "No se encontró ese análisis en tu cuenta.")
+        return render_assistant(request, form=form)
 
-        # Mapping: preferimos el guardado en BD; si no, sesión
-        saved_mapping = api_request.field_mapping or get_mapping(request)
+    analysis = None
+    if api_request.parsed_data:
+        analysis = build_analysis(api_request.parsed_data, raw_text=api_request.raw_data or "")
+        form = APIRequestForm(initial={"api_url": api_request.api_url})
 
-        analysis = None
-        role_options = []
-
-        if api_request.parsed_data:
-            analysis = build_analysis(api_request.parsed_data, raw_text=api_request.raw_data or "")
-            role_options = _build_role_options_for_ui(request, analysis, saved_mapping)
-            form = APIRequestForm(initial={"api_url": api_request.api_url})
-
-        return render_assistant(
-            request,
-            form=form,
-            api_request=api_request,
-            analysis=analysis,
-            role_options=role_options,
-            saved_mapping=saved_mapping,
-        )
-
-    # 2) Modo vacio
-    saved_mapping = get_mapping(request)
-    return render_assistant(request, form=form, saved_mapping=saved_mapping)
+    return render_assistant(request, form=form, api_request=api_request, analysis=analysis)
 
 
-# ============================== POST: set intent (tipo web) ==============================
+# ============================== POST: analizar URL (con caché) ==============================
 
-# Guarda el tipo de web selecionado o cambia los datos que ya existian en DB (NO LOS GUARDA EN DB, ESO 
-# LO HACE SAVE_MAPPING)
-# Recoge resolve_api_id y cambia el esquema de parsed_data
-def set_intent(request):
-    intent = normalize_intent(request.POST.get("intent"))
-    store_intent(request, intent)
-
-    api_request_id = resolve_api_id(
-        request,
-        post_api_request_id=request.POST.get("api_request_id"),
-    )
-
-    api_request_obj = None
-    analysis_result = None
-    role_select_options = []
-
-    if api_request_id:
-        api_request_obj = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
-        if api_request_obj and api_request_obj.parsed_data:
-            analysis_result = build_analysis(
-                api_request_obj.parsed_data,
-                raw_text=api_request_obj.raw_data or "",
-            )
-            role_select_options = _build_role_options_for_ui(
-                request,
-                analysis_result,
-                get_mapping(request),
-            )
-
-    form = APIRequestForm(initial={"api_url": api_request_obj.api_url if api_request_obj else ""})
-
-    messages.success(request, f"Tipo de web seleccionado: {get_profile(intent).label}")
-
-    return render_assistant(
-        request,
-        form=form,
-        api_request=api_request_obj,
-        analysis=analysis_result,
-        role_options=role_select_options,
-        saved_mapping=get_mapping(request),
-    )
-
-
-# ============================== POST: save mapping ==============================
-
-"""
-Guarda el mapping configurado (Lo lee del POST)
-Valida el mapping, lo guarda en sesión y en BD si es posible,
-y re-renderiza el asistente con los resultados
-"""
-def save_mapping(request):
-    field_mapping = read_mapping(request.POST)
-
-    analysis_for_validation = None
-    api_request_id = resolve_api_id(
-        request,
-        post_api_request_id=request.POST.get("api_request_id"),
-    )
-
-    api_request_for_validation = None
-    if api_request_id:
-        api_request_for_validation = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
-        if api_request_for_validation and api_request_for_validation.parsed_data:
-            analysis_for_validation = build_analysis(
-                api_request_for_validation.parsed_data,
-                raw_text=api_request_for_validation.raw_data or "",
-            )
-
-    validation = validate_mapping(
-        field_mapping,
-        analysis_result=analysis_for_validation,
-        required_roles=("title",),
-        prevent_duplicates_in=("title", "description", "subtitle", "content", "author"),
-        allow_duplicate_in=("id", "link", "date", "category", "tags"),
-    )
-
-    field_mapping = validation["cleaned"]
-    store_mapping(request, field_mapping)
-
-    if not validation["ok"]:
-        for msg in validation["errors"]:
-            messages.error(request, msg)
-
-        role_select_options = []
-        if analysis_for_validation:
-            role_select_options = _build_role_options_for_ui(
-                request,
-                analysis_for_validation,
-                field_mapping,
-            )
-
-        form = APIRequestForm(
-            initial={"api_url": api_request_for_validation.api_url if api_request_for_validation else ""}
-        )
-
-        return render_assistant(
-            request,
-            form=form,
-            api_request=api_request_for_validation,
-            analysis=analysis_for_validation,
-            role_options=role_select_options,
-            saved_mapping=field_mapping,
-        )
-
-    for msg in validation["warnings"]:
-        messages.warning(request, msg)
-
-    api_request_obj = save_mapping_to_db(
-        user=request.user,
-        api_request_id=api_request_id,
-        field_mapping=field_mapping,
-    )
-
-    if api_request_obj:
-        messages.success(request, "Mapping guardado en sesión y en base de datos.")
-    elif api_request_id:
-        messages.warning(request, "No se encontró el APIRequest. Mapping guardado solo en sesión.")
-    else:
-        messages.warning(request, "No llegó api_request_id ni hay last_api_request_id. Guardado solo en sesión.")
-
-    analysis_result = None
-    role_select_options = []
-
-    if api_request_obj and api_request_obj.parsed_data:
-        analysis_result = build_analysis(api_request_obj.parsed_data, raw_text=api_request_obj.raw_data or "")
-        role_select_options = _build_role_options_for_ui(
-            request,
-            analysis_result,
-            field_mapping,
-        )
-
-    form = APIRequestForm(initial={"api_url": api_request_obj.api_url if api_request_obj else ""})
-
-    return render_assistant(
-        request,
-        form=form,
-        api_request=api_request_obj,
-        analysis=analysis_result,
-        role_options=role_select_options,
-        saved_mapping=field_mapping,
-    )
-
-
-# ============================== POST: analizar URL (CON CACHÉ) ==============================
-
-"""
-Analiza una URL (descarga + parsea + analiza + guarda en BD)
-Sistema de caché: Si la URL ya fue analizada recientemente (< 1h),
-usa los datos cacheados en vez de descargar de nuevo
-"""
 def analyze_url(request):
     form = APIRequestForm(request.POST)
 
@@ -320,10 +93,10 @@ def analyze_url(request):
         return render_assistant(request, form=form)
 
     api_url = form.cleaned_data["api_url"]
-
     cache_key = _get_cache_key(api_url)
     cached_data = cache.get(cache_key)
 
+    # -------- Cache hit --------
     if cached_data:
         messages.info(
             request,
@@ -348,22 +121,14 @@ def analyze_url(request):
             raw_text=cached_data["raw_text"],
         )
 
-        saved_mapping = get_mapping(request)
-        role_select_options = _build_role_options_for_ui(
-            request,
-            analysis_result,
-            saved_mapping,
-        )
-
         return render_assistant(
             request,
             form=form,
             api_request=api_request_obj,
             analysis=analysis_result,
-            role_options=role_select_options,
-            saved_mapping=saved_mapping,
         )
 
+    # -------- Cache miss --------
     api_request_obj = APIRequest.objects.create(
         user=request.user,
         api_url=api_url,
@@ -398,13 +163,6 @@ def analyze_url(request):
 
         request.session["last_api_request_id"] = api_request_obj.id
 
-        saved_mapping = get_mapping(request)
-        role_select_options = _build_role_options_for_ui(
-            request,
-            analysis_result,
-            saved_mapping,
-        )
-
         messages.success(request, "URL descargada, parseada y analizada correctamente.")
 
         return render_assistant(
@@ -412,8 +170,6 @@ def analyze_url(request):
             form=form,
             api_request=api_request_obj,
             analysis=analysis_result,
-            role_options=role_select_options,
-            saved_mapping=saved_mapping,
         )
 
     except Exception as exc:
@@ -426,30 +182,14 @@ def analyze_url(request):
         return render_assistant(request, form=form)
 
 
-# ============================== Vista principal (POST + GET) ==============================
+# ============================== VISTA PRINCIPAL ==============================
 
-# Vista principal del asistente
 @login_required
 def assistant(request):
-
-    # 1) El usuario entra en la pagina
     if request.method == "GET":
         return get_assistant(request)
 
-    # 2) Pega la URL (no hay action asi q pasa a analyze_url)
     if request.method == "POST":
-        # Se envia el post con action vacio, por eso vamos a analyze
-        action = request.POST.get("action")
-
-        # 4) El user cambia el tipo de pagina
-        if action == "set_intent":
-            return set_intent(request)
-
-        # 5) Se guardan los cambios hechos
-        if action == "save_mapping":
-            return save_mapping(request)
-
-        # 3) Se analiza la URL valida o no
         return analyze_url(request)
 
     return HttpResponseNotAllowed(["GET", "POST"])

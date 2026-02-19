@@ -1,11 +1,7 @@
 from __future__ import annotations      # Usar todo como strings
-from .constants import ROLE_DEFS        # Catalogo de roles  
-from .helpers import (                  
-	_normalize_key, 
-    _is_url, 
-    _is_date,
-    _is_number,
-)
+from .constants import ROLE_DEFS
+from .helpers import _normalize_key, _is_url, _is_date, _is_number
+
 
 # ========================== SUGERIR MAPING POR PUNTUACION ==========================
 
@@ -141,94 +137,3 @@ def suggest_mapping_smart(items: list, role_defs: dict = ROLE_DEFS) -> dict:
             ]
     
     return suggestions
-
-
-# ========================== ELIMINAR ==========================
-
-# Sugiere items para cada select, las 5 mejores
-# Devuelve un dict con las mejores opciones
-def suggest_mapping(items: list, role_defs: dict = ROLE_DEFS) -> dict:
-    # Inicializa sugerencias vacías para todos los roles
-    suggestions = {role: [] for role in role_defs.keys()}
-    if not items or not isinstance(items, list):
-        return suggestions
-
-    # Filtra solo los elementos que son dict
-    dict_items = [x for x in items if isinstance(x, dict)]
-    if not dict_items:
-        return suggestions
-
-    # Cojo todas las keys del dict para analizar posibles candidatos
-    all_keys = set()
-    for obj in dict_items:
-        all_keys.update(obj.keys())
-
-    # Creo tabla para puntuar uno por uno
-    scores: dict[str, dict[str, int]] = {role: {} for role in role_defs.keys()}
-    sample_items = dict_items[:20]
-    for key in all_keys:
-        normalized_key = _normalize_key(key)
-        
-        str_count = 0
-        url_count = 0
-        date_count = 0
-        num_count = 0
-        list_count = 0
-
-        # Recorre la muestra
-        for obj in sample_items:
-            if key not in obj:
-                continue
-            value = obj.get(key)
-
-            # Cuenta strings y detecta URLs/fechas
-            if isinstance(value, str):
-                str_count += 1
-                if _is_url(value):
-                    url_count += 1
-                if _is_date(value):
-                    date_count += 1
-
-            # Cuenta números
-            if _is_number(value):
-                num_count += 1
-
-            # Cuenta listas
-            if isinstance(value, list):
-                list_count += 1
-
-        # Puntúa esta key para cada rol según hints y tipo
-        for role_name, meta in role_defs.items():
-            hints = meta["hints"]
-            kind = meta["kind"]
-
-            # Aplica score por coincidencias de nombre
-            for hint in hints:
-                normalized_hint = _normalize_key(hint)
-                # Si coincide exacto, score fuerte
-                if normalized_key == normalized_hint:
-                    scores[role_name][key] = scores[role_name].get(key, 0) + 6
-                # Si el hint está contenido, score medio
-                elif normalized_hint in normalized_key:
-                    scores[role_name][key] = scores[role_name].get(key, 0) + 3
-
-            # Aplica score por tipo observado
-            if kind == "url" and url_count >= 2:
-                scores[role_name][key] = scores[role_name].get(key, 0) + 4
-            if kind == "date" and date_count >= 2:
-                scores[role_name][key] = scores[role_name].get(key, 0) + 4
-            if kind == "number" and num_count >= 2:
-                scores[role_name][key] = scores[role_name].get(key, 0) + 4
-            if kind == "list" and list_count >= 2:
-                scores[role_name][key] = scores[role_name].get(key, 0) + 4
-            if kind == "text" and str_count >= 3:
-                scores[role_name][key] = scores[role_name].get(key, 0) + 1
-
-    # Construye top-5 por rol ordenando por score
-    for role_name in role_defs.keys():
-        ordered = sorted(scores[role_name].items(), key=lambda kv: kv[1], reverse=True)
-        # Guarda las top 5 keys sugeridas
-        suggestions[role_name] = [k for k, _ in ordered[:5]]
-
-    return suggestions
-

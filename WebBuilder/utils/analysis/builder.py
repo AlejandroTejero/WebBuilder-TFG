@@ -1,9 +1,10 @@
 from __future__ import annotations
-from ..parsers import detect_format
+
+from ..ingest.parsers import detect_format
 from .constants import ROLE_DEFS
 from .helpers import get_by_path, _path_display
 from .detection import find_main_items
-from .suggestions import suggest_mapping_smart
+from .suggestions_heuristic import suggest_mapping_smart
 
 """
 Construye el dict final de análisis para UI

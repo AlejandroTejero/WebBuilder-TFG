@@ -11,6 +11,8 @@ https://lmstudio.ai/
 https://github.com/cheahjs/free-llm-api-resources
 OpenRouter
 
+CSV
+ 
 Implementar un llm al q se le pase el cotnenido, por ejemplo 40 lineas, y el sea capaz de parsearlas y devolverme el contenido suficiente para poder crear poco a poco la app de django
 Quiza se podria adapatar a mis codigos y a mi forma de analizar, ver con que funciona mejor, si con ayuda de mi analisis o de forma independeiente
 
@@ -22,3 +24,8 @@ pero tambien probrar con el llm solo sin ayuda de mi contenido.
 Probar tbm que el usuario ponga una pequeña descripcion para que el llm ajuste un poco el futuro de la pagina a como el quiere
 
 Hacerme un esquema de lo que he hecho este primer mes, aunque haya cosas que no hayan servido, y apuntarme todo el contenido que investigo aunque no sirva, ya que me sirve para facilitarme la memoria
+
+Enalces importantes q mirar
+https://lmstudio.ai/
+https://github.com/cheahjs/free-llm-api-resources
+OpenRouter
