@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+# Import para el LLM
+import os
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -124,3 +128,9 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'login'
+
+
+# LLM
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
+LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+LLM_MODEL = os.getenv("LLM_MODEL", "liquid/lfm-2.5-1.2b-instruct:free")

@@ -12,6 +12,16 @@ from .models import APIRequest
 # - ModelForm: Django construye el formulario a partir del modelo y guarda en BD con form.save()
 class APIRequestForm(forms.ModelForm):
 
+    # Campo extra del formulario (NO pertenece al modelo) -> LLM
+    user_prompt = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "rows": 4,
+            "class": "form-control",  # opcional, para que se vea igual que api_url
+            "placeholder": "Describe qué web quieres y cómo la quieres..."
+        })
+    )
+
     # Meta define cómo se construye el formulario a partir del modelo
     class Meta:
 

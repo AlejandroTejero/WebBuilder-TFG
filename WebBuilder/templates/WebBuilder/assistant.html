@@ -52,6 +52,22 @@
               </p>
             </div>
 
+            <!-- ✅ Nuevo campo: Prompt del usuario (LLM) -->
+            <div class="wb-form-group">
+              <label class="wb-label" for="{{ form.user_prompt.id_for_label }}">
+                Prompt del usuario (opcional)
+              </label>
+              <div class="wb-input-wrapper">
+                {{ form.user_prompt }}
+                {% if form.user_prompt.errors %}
+                  <div class="wb-error">{{ form.user_prompt.errors }}</div>
+                {% endif %}
+              </div>
+              <p class="wb-hint">
+                Ejemplo: "Quiero un portfolio minimalista con 3 secciones (inicio, proyectos, contacto) y que muestre imágenes y fechas."
+              </p>
+            </div>
+
             <div class="wb-actions">
               <button type="submit" class="wb-btn wb-btn--primary">
                 Analizar
@@ -118,6 +134,15 @@
         </div>
       </div>
     </section>
+    {% endif %}
+
+    {% if llm_reply %}
+      <h3>Respuesta del LLM</h3>
+      <pre style="white-space: pre-wrap;">{{ llm_reply }}</pre>
+    {% endif %}
+
+    {% if llm_error %}
+      <div class="alert alert-danger">Error LLM: {{ llm_error }}</div>
     {% endif %}
 
   </main>
