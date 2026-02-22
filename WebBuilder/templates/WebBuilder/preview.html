@@ -1,10 +1,195 @@
 {% extends 'WebBuilder/base.html' %}
-{% load static %}
 
 {% block body_class %}preview{% endblock %}
 
 {% block content %}
+<div class="container py-4">
 
-<h1>Preview</h1>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="mb-1">Preview</h1>
+      <div class="text-muted">APIRequest #{{ api_request.id }} · {{ api_request.api_url }}</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="/asistente?api_request_id={{ api_request.id }}">Volver al asistente</a>
+    </div>
+  </div>
 
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title mb-2">Plan del LLM</h5>
+
+      <!-- Estado de aceptación + acciones -->
+      <div class="d-flex align-items-center gap-2 mb-2">
+        {% if api_request.plan_accepted %}
+          <span class="badge text-bg-success">Plan aceptado</span>
+        {% else %}
+          <span class="badge text-bg-warning">Plan no aceptado</span>
+        {% endif %}
+      </div>
+
+      <div class="d-flex gap-2 mb-3">
+        {% if not api_request.plan_accepted %}
+          <form method="post" class="m-0">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="accept_plan">
+            <button class="btn btn-success" type="submit">Aceptar plan</button>
+          </form>
+        {% endif %}
+
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div><strong>site_type:</strong> {{ plan.site_type }}</div>
+          {% if plan.site_type_custom %}
+            <div class="mt-1"><strong>custom:</strong> <span class="text-muted">{{ plan.site_type_custom }}</span></div>
+          {% endif %}
+          <div class="mt-2"><strong>pages:</strong>
+            {% for p in plan.pages %}
+              <span class="badge text-bg-light">{{ p }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="col-md-8">
+          <div class="mb-2"><strong>mapping:</strong></div>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge text-bg-light">title: {{ plan.mapping.title }}</span>
+            <span class="badge text-bg-light">content: {{ plan.mapping.content }}</span>
+            <span class="badge text-bg-light">image: {{ plan.mapping.image }}</span>
+            <span class="badge text-bg-light">date: {{ plan.mapping.date }}</span>
+          </div>
+          <div class="text-muted mt-2">main_collection_path: {{ main_path }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form method="post" class="card mb-4">
+    {% csrf_token %}
+    <div class="card-body">
+      <h5 class="card-title mb-3">Editar plan (site_type + mapping)</h5>
+
+      <input type="hidden" name="action" value="save_mapping">
+
+      <div class="row g-3 mb-2">
+        <div class="col-md-4">
+          <label class="form-label">site_type (normalizado)</label>
+          <select class="form-select" name="site_type">
+            <option value="blog" {% if plan.site_type == "blog" %}selected{% endif %}>blog</option>
+            <option value="portfolio" {% if plan.site_type == "portfolio" %}selected{% endif %}>portfolio</option>
+            <option value="catalog" {% if plan.site_type == "catalog" %}selected{% endif %}>catalog</option>
+            <option value="dashboard" {% if plan.site_type == "dashboard" %}selected{% endif %}>dashboard</option>
+            <option value="other" {% if plan.site_type == "other" %}selected{% endif %}>other</option>
+          </select>
+          <div class="form-text">Esto controla la plantilla que usará el generador.</div>
+        </div>
+
+        <div class="col-md-8">
+          <label class="form-label">site_type_custom (opcional)</label>
+          <input class="form-control"
+                 name="site_type_custom"
+                 placeholder="Ej: landing, ecommerce, wiki, directory..."
+                 value="{{ plan.site_type_custom|default:'' }}">
+          <div class="form-text">Texto libre como “hint”. Si lo dejas vacío, se borra.</div>
+        </div>
+      </div>
+
+      <hr class="my-3">
+
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">title</label>
+          <select class="form-select" name="map_title">
+            <option value="" {% if not plan.mapping.title %}selected{% endif %}>null</option>
+            {% for k in available_keys %}
+              <option value="{{ k }}" {% if plan.mapping.title == k %}selected{% endif %}>{{ k }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">content</label>
+          <select class="form-select" name="map_content">
+            <option value="" {% if not plan.mapping.content %}selected{% endif %}>null</option>
+            {% for k in available_keys %}
+              <option value="{{ k }}" {% if plan.mapping.content == k %}selected{% endif %}>{{ k }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">image</label>
+          <select class="form-select" name="map_image">
+            <option value="" {% if not plan.mapping.image %}selected{% endif %}>null</option>
+            {% for k in available_keys %}
+              <option value="{{ k }}" {% if plan.mapping.image == k %}selected{% endif %}>{{ k }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">date</label>
+          <select class="form-select" name="map_date">
+            <option value="" {% if not plan.mapping.date %}selected{% endif %}>null</option>
+            {% for k in available_keys %}
+              <option value="{{ k }}" {% if plan.mapping.date == k %}selected{% endif %}>{{ k }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Guardar cambios</button>
+        <a class="btn btn-outline-secondary" href="{% url 'preview' api_request.id %}">Reset</a>
+        <a class="btn btn-outline-secondary" href="/asistente?api_request_id={{ api_request.id }}">Volver</a>
+      </div>
+    </div>
+  </form>
+
+  {% if preview_items %}
+    <div class="row g-3">
+      {% for it in preview_items %}
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ it.title }}</h5>
+
+              {% if it.date %}
+                <div class="text-muted mb-2">{{ it.date }}</div>
+              {% endif %}
+
+              {% if it.image %}
+                <div class="small mb-2">
+                  <strong>image:</strong>
+                  <span class="text-muted">{{ it.image }}</span>
+                </div>
+              {% endif %}
+
+              {% if it.content %}
+                <p class="card-text">{{ it.content }}</p>
+              {% endif %}
+
+              {% if it.raw %}
+                <pre class="small text-muted" style="white-space: pre-wrap;">{{ it.raw }}</pre>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-warning">
+      No pude construir items de preview. Puede que el análisis no haya detectado una colección principal o que el dataset no sea una lista.
+    </div>
+  {% endif %}
+
+</div>
 {% endblock %}

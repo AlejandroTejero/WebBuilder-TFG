@@ -7,7 +7,12 @@ class LLMError(Exception):
     pass
 
 
-def chat_completion(user_text: str, system_text: str | None = None) -> str:
+def chat_completion(
+    user_text: str,
+    system_text: str | None = None,
+    *,
+    temperature: float = 0.2,
+) -> str:
     """
     Minimal OpenAI-compatible client for OpenRouter.
     Returns assistant text.
@@ -32,7 +37,7 @@ def chat_completion(user_text: str, system_text: str | None = None) -> str:
     payload = {
         "model": settings.LLM_MODEL,
         "messages": messages,
-        "temperature": 0.2,
+        "temperature": temperature,
     }
 
     try:

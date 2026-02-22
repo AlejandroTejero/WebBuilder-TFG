@@ -24,6 +24,8 @@ class APIRequest(models.Model):
 
     field_mapping = models.JSONField(blank=True, null=True)                                 # Campos guardados en mapping
 
+    plan_accepted = models.BooleanField(default=False)                                      # Aceptacion del mapping del llm
+
     # Representación en texto del objeto
     def __str__(self):
         return f"{self.api_url} ({self.user.username})"

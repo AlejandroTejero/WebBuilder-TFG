@@ -10,6 +10,5 @@ urlpatterns = [
     path("login", LoginView.as_view(next_page="home"), name="login"),
     path("registro", views.register, name="register"),
 
-    # Preview (placeholder por ahora)
     path("preview/<int:api_request_id>", views.preview, name="preview"),
 ]

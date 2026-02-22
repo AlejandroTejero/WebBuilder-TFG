@@ -136,15 +136,19 @@
     </section>
     {% endif %}
 
-    {% if llm_reply %}
-      <h3>Respuesta del LLM</h3>
-      <pre style="white-space: pre-wrap;">{{ llm_reply }}</pre>
-    {% endif %}
-
     {% if llm_error %}
       <div class="alert alert-danger">Error LLM: {{ llm_error }}</div>
     {% endif %}
 
+    {% if llm_plan_text %}
+      <h3>Plan del LLM (JSON)</h3>
+      <pre style="white-space: pre-wrap;">{{ llm_plan_text }}</pre>
+    {% endif %}
+
+    {% if api_request and api_request.field_mapping %}
+      <a class="btn btn-outline-secondary" href="{% url 'preview' api_request.id %}">Ver preview</a>
+    {% endif %}
+  
   </main>
 </div>
 {% endblock %}
