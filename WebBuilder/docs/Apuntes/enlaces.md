@@ -18,7 +18,7 @@ Buscar enlaces e implementar parseo
 # Enlaces aprendizaje n8n
 
 ## Video despliegue en DOCKER
-https://www.youtube.com/watch?v=oEfc5shhE6Q&utm_source=chatgpt.com
+https://www.youtube.com/watch?v=-eJHqN-Vwt8
 
 ## Video 1
 - n8n Beginner Course (2/9) – Introduction to APIs and Webhooks

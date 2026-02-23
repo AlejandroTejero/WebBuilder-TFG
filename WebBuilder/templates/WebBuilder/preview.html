@@ -39,12 +39,21 @@
           <form method="post" class="m-0">
             {% csrf_token %}
             <input type="hidden" name="action" value="accept_plan">
-            <button class="btn btn-success" type="submit">Aceptar plan</button>
+            <button class="btn btn-success" type="submit">Aceptar plan y publicar</button>
           </form>
+        {% else %}
+          {% if site_obj %}
+            <a class="btn btn-outline-primary" href="{% url 'site_home' site_obj.id %}">Ver sitio</a>
+          {% else %}
+            <form method="post" class="m-0">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="accept_plan">
+              <button class="btn btn-success" type="submit">Publicar</button>
+            </form>
+          {% endif %}
         {% endif %}
-
       </div>
-
+      
       <div class="row g-3">
         <div class="col-md-4">
           <div><strong>site_type:</strong> {{ plan.site_type }}</div>

@@ -18,6 +18,7 @@ from .history import history
 # Preview
 from .preview import preview
 
+from .sites import site_home, site_detail
 
 __all__ = [
     # Auth
@@ -37,4 +38,8 @@ __all__ = [
 
     # Preview
     "preview",
+	
+    # Site projects
+    "site_home",
+    "site_detail",
 ]

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
 
 
 # Modelo para cada peticion URL
@@ -29,3 +30,30 @@ class APIRequest(models.Model):
     # Representación en texto del objeto
     def __str__(self):
         return f"{self.api_url} ({self.user.username})"
+
+
+
+# Modelo que recoge todo lo que se creara en los proyectos de django con IA
+class GeneratedSite(models.Model):
+
+    project_source = models.OneToOneField(
+        APIRequest,
+        on_delete=models.CASCADE,
+        related_name="site",
+    )
+
+    plublic_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    # Snapshot del plan aceptado (para reproducibilidad)
+    accepted_plan = models.JSONField()
+
+    # Theme pack generado por IA (strings)
+    theme_templates = models.JSONField(default=dict, blank=True)
+    theme_css = models.TextField(blank=True, default="")
+    theme_prompt = models.TextField(blank=True, default="")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"GeneratedSite #{self.id} ({self.plublic_id})"

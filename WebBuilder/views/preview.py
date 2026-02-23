@@ -7,9 +7,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
-from ..models import APIRequest
+from ..models import APIRequest, GeneratedSite
 from ..utils.analysis import build_analysis
 from ..utils.analysis.helpers import get_by_path
+from ..utils.llm.themer import generate_site_theme
 
 
 def _to_text(value: Any, *, max_len: int = 180) -> str:
@@ -94,6 +95,13 @@ def preview(request, api_request_id: int):
         messages.error(request, "Este análisis no tiene datos parseados.")
         return redirect(f"/asistente?api_request_id={api_request.id}")
 
+    # Normalizar plan
+    if not isinstance(plan, dict):
+        plan = {}
+    plan.setdefault("mapping", {})
+    if not isinstance(plan["mapping"], dict):
+        plan["mapping"] = {}
+
     # Recalcular analysis para sacar main_path + available_keys
     analysis = build_analysis(api_request.parsed_data, raw_text=api_request.raw_data or "")
     main = analysis.get("main_collection") or {}
@@ -102,25 +110,19 @@ def preview(request, api_request_id: int):
     keys_info = analysis.get("keys") or {}
     available_keys = (keys_info.get("top") or [])[:30]
 
-    # Asegurar estructura del plan
-    if not isinstance(plan, dict):
-        plan = {}
-    plan.setdefault("mapping", {})
-    if not isinstance(plan["mapping"], dict):
-        plan["mapping"] = {}
+    # Items para preview + samples (los calculamos antes para poder usarlos en POST accept_plan)
+    items = []
+    if main_path is not None:
+        node = get_by_path(api_request.parsed_data, main_path)
+        if isinstance(node, list):
+            items = node[:12]
 
-    # ---------- POST: guardar plan (site_type + custom + mapping) ----------
+    # ---------- POST ----------
     if request.method == "POST":
         action = (request.POST.get("action") or "").strip().lower()
 
-        if action == "accept_plan":
-            api_request.plan_accepted = True
-            api_request.save(update_fields=["plan_accepted"])
-            messages.success(request, "Plan aceptado ✅ Ya puedes generar el sitio.")
-            return redirect("preview", api_request_id=api_request.id)
-
+        # Guardar cambios del plan
         if action == "save_mapping":
-            # 1) site_type normalizado + custom opcional
             selected_site_type = _normalize_site_type(request.POST.get("site_type"))
             custom_site_type = (request.POST.get("site_type_custom") or "").strip()
 
@@ -130,7 +132,6 @@ def preview(request, api_request_id: int):
             else:
                 plan.pop("site_type_custom", None)
 
-            # 2) mapping (keys o null)
             new_mapping = {
                 "title": _normalize_selected_key(request.POST.get("map_title"), available_keys),
                 "content": _normalize_selected_key(request.POST.get("map_content"), available_keys),
@@ -140,20 +141,81 @@ def preview(request, api_request_id: int):
             plan["mapping"] = new_mapping
 
             api_request.field_mapping = plan
-            api_request.save(update_fields=["field_mapping"])
 
-            messages.success(request, "Plan actualizado ✅")
+            # ✅ Importante: si cambias el plan, ya NO está aceptado
+            api_request.plan_accepted = False
+
+            api_request.save(update_fields=["field_mapping", "plan_accepted"])
+            messages.success(request, "Plan actualizado ✅ (vuelve a aceptar para publicar)")
             return redirect("preview", api_request_id=api_request.id)
 
+        # Aceptar plan + publicar (generar theme y crear GeneratedSite)
+        if action == "accept_plan":
+            api_request.plan_accepted = True
+            api_request.save(update_fields=["plan_accepted"])
+
+            mapping = (plan.get("mapping") or {}) if isinstance(plan, dict) else {}
+            pages = (plan.get("pages") or []) if isinstance(plan, dict) else []
+            site_type = (plan.get("site_type") or "other") if isinstance(plan, dict) else "other"
+            design_hint = (plan.get("site_type_custom") or "").strip() if isinstance(plan, dict) else ""
+
+            # sample items normalizados para pasar al LLM
+            sample_items = []
+            for idx, it in enumerate(items[:6]):
+                if not isinstance(it, dict):
+                    continue
+
+                def pick(field: str, max_len: int) -> str:
+                    key = mapping.get(field)
+                    return _to_text(it.get(key), max_len=max_len) if key else ""
+
+                sample_items.append(
+                    {
+                        "index": idx,
+                        "title": pick("title", 80),
+                        "content": pick("content", 180),
+                        "image": pick("image", 200),
+                        "date": pick("date", 60),
+                    }
+                )
+
+            # crear o recuperar site publicado
+            site, created = GeneratedSite.objects.get_or_create(
+                project_source=api_request,
+                defaults={"accepted_plan": plan},
+            )
+
+            plan_changed = site.accepted_plan != plan
+            if plan_changed:
+                site.accepted_plan = plan
+
+            # genera theme si no existe o si cambió el plan
+            if (not site.theme_templates) or plan_changed:
+                theme = generate_site_theme(
+                    site_title=design_hint or site_type,
+                    site_type=site_type,
+                    design_hint=design_hint,
+                    pages=pages,
+                    mapping=mapping,
+                    sample_items=sample_items,
+                    retries=1,
+                )
+                site.theme_templates = {
+                    "base_html": theme["base_html"],
+                    "home_html": theme["home_html"],
+                    "detail_html": theme["detail_html"],
+                }
+                site.theme_css = theme.get("css", "")
+                site.theme_prompt = design_hint
+
+            site.save()
+            messages.success(request, "Plan aceptado y sitio publicado ✅")
+            return redirect("site_home", site_id=site.id)
+
     # ---------- Construir items para preview ----------
-    items = []
-    if main_path is not None:
-        node = get_by_path(api_request.parsed_data, main_path)
-        if isinstance(node, list):
-            items = node[:12]
-
     preview_items = [normalize_item(it, plan) for it in items]
-
+    site_obj = getattr(api_request, "site", None)
+    
     return render(
         request,
         "WebBuilder/preview.html",
@@ -164,5 +226,6 @@ def preview(request, api_request_id: int):
             "main_path": main_path,
             "available_keys": available_keys,
             "preview_items": preview_items,
+            "site_obj": site_obj,
         },
     )
