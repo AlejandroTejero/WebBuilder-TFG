@@ -1,0 +1,257 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preview — {{ plan.site_title|default:"Sitio" }}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Barra superior ── */
+    #wb-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      background: #0f172a;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px;
+      z-index: 9999;
+      font-family: system-ui, sans-serif;
+      font-size: .875rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.5);
+    }
+    .wb-logo {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #f8fafc;
+      text-decoration: none;
+    }
+    .wb-sep { width: 1px; height: 24px; background: #334155; flex-shrink: 0; }
+    .wb-info { color: #94a3b8; font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+    .wb-spacer { flex: 1; }
+    .wb-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 6px;
+      font-size: .8rem; font-weight: 500;
+      text-decoration: none; white-space: nowrap;
+      cursor: pointer; border: none; transition: background .15s;
+    }
+    .wb-btn-ghost { background: transparent; color: #cbd5e1; border: 1px solid #334155; }
+    .wb-btn-ghost:hover { background: #1e293b; color: #f1f5f9; }
+    .wb-btn-primary { background: #2563eb; color: #fff; }
+    .wb-btn-primary:hover { background: #1d4ed8; }
+    .wb-btn-success { background: #16a34a; color: #fff; }
+    .wb-btn-success:hover { background: #15803d; }
+
+    /* ── Panel de rediseño ── */
+    #regen-panel {
+      display: none;
+      position: fixed;
+      top: 52px; left: 0; right: 0;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 14px 16px;
+      z-index: 9998;
+      font-family: system-ui, sans-serif;
+    }
+    #regen-panel.open { display: block; }
+    #regen-panel p { color: #94a3b8; font-size: .8rem; margin-bottom: 10px; }
+    .hint-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .hint-chip {
+      background: #0f172a; border: 1px solid #334155;
+      color: #94a3b8; border-radius: 20px;
+      padding: 3px 10px; font-size: .75rem; cursor: pointer;
+    }
+    .hint-chip:hover { border-color: #2563eb; color: #f1f5f9; }
+    .regen-row { display: flex; gap: 8px; }
+    #regen-input {
+      flex: 1; max-width: 600px;
+      background: #0f172a; border: 1px solid #475569;
+      border-radius: 6px; color: #f1f5f9;
+      padding: 8px 12px; font-size: .875rem; outline: none;
+    }
+    #regen-input:focus { border-color: #2563eb; }
+    #regen-input::placeholder { color: #475569; }
+
+    /* ── Loading ── */
+    #loading-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(15,23,42,.85);
+      z-index: 9997;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #f1f5f9; font-family: system-ui, sans-serif; gap: 14px;
+    }
+    #loading-overlay.show { display: flex; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid #334155; border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Flash ── */
+    #flash {
+      display: none; position: fixed;
+      bottom: 24px; right: 24px;
+      background: #16a34a; color: #fff;
+      padding: 10px 18px; border-radius: 8px;
+      font-family: system-ui; font-size: .875rem;
+      z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    }
+
+    /* ── Contenido del sitio ── */
+    #site-content {
+      margin-top: 52px;
+      min-height: calc(100vh - 52px);
+    }
+
+    /* ── Estado sin publicar ── */
+    #not-published {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: calc(100vh - 52px);
+      background: #0f172a; color: #94a3b8;
+      font-family: system-ui; gap: 16px; text-align: center; padding: 2rem;
+    }
+    #not-published svg { opacity: .3; }
+    #not-published h2 { color: #f1f5f9; font-size: 1.25rem; }
+    #not-published p { font-size: .9rem; max-width: 380px; }
+    .np-btn {
+      display: inline-block; padding: 10px 20px;
+      background: #2563eb; color: #fff; border-radius: 8px;
+      text-decoration: none; font-size: .9rem; margin-top: 8px;
+    }
+    .np-btn:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Barra WebBuilder ── -->
+  <div id="wb-bar">
+    <a class="wb-logo" href="{% url 'home' %}">⚡ WebBuilder</a>
+    <div class="wb-sep"></div>
+    <span class="wb-info">{{ plan.site_title|default:"Sin título" }}</span>
+    <span class="wb-info">· {{ plan.site_type|default:"" }}</span>
+
+    <div class="wb-spacer"></div>
+
+    {% if site %}
+      <button class="wb-btn wb-btn-ghost" id="btn-regen" type="button">
+        🎨 Cambiar diseño
+      </button>
+    {% endif %}
+
+    <a class="wb-btn wb-btn-ghost" href="{% url 'preview' api_request.id %}">
+      ← Editor
+    </a>
+  </div>
+
+  <!-- ── Panel rediseño ── -->
+  {% if site %}
+  <div id="regen-panel">
+    <p>Describe el estilo que quieres. El LLM regenerará el diseño manteniendo tus datos.</p>
+    <div class="hint-chips">
+      <span class="hint-chip">Más oscuro</span>
+      <span class="hint-chip">Minimalista blanco</span>
+      <span class="hint-chip">Estilo magazine</span>
+      <span class="hint-chip">Colores vivos</span>
+      <span class="hint-chip">Cards con sombra</span>
+      <span class="hint-chip">Tipografía grande</span>
+    </div>
+    <form method="post" action="{% url 'site_render_regen' api_request.id %}"
+          onsubmit="document.getElementById('loading-overlay').classList.add('show')">
+      {% csrf_token %}
+      <div class="regen-row">
+        <input type="text" id="regen-input" name="design_hint"
+               placeholder='Ej: "oscuro con acentos dorados", "minimalista con mucho espacio"...'
+               autocomplete="off">
+        <button class="wb-btn wb-btn-success" type="submit">✨ Regenerar</button>
+        <button class="wb-btn wb-btn-ghost" type="button" id="btn-cancel">Cancelar</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  <!-- ── Loading ── -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <span>Generando nuevo diseño con IA...</span>
+    <span style="color:#64748b;font-size:.8rem;">Esto puede tardar unos segundos</span>
+  </div>
+
+  <!-- ── Flash messages ── -->
+  {% if messages %}
+    <div id="flash">
+      {% for message in messages %}{{ message }}{% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- ── Contenido principal ── -->
+  {% if site %}
+    <div id="site-content">
+      {{ site_html|safe }}
+    </div>
+  {% else %}
+    <div id="not-published">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 9h18M9 21V9"/>
+      </svg>
+      <h2>Sitio no publicado</h2>
+      <p>El schema está listo pero aún no has generado el sitio.<br>
+         Vuelve al editor y pulsa "Aceptar y publicar".</p>
+      <a class="np-btn" href="{% url 'preview' api_request.id %}">
+        Ir al editor →
+      </a>
+    </div>
+  {% endif %}
+
+  <script>
+    // ── Toggle panel rediseño ────────────────────────────────────
+    const btnRegen  = document.getElementById('btn-regen');
+    const regenPanel = document.getElementById('regen-panel');
+    const btnCancel  = document.getElementById('btn-cancel');
+    const regenInput = document.getElementById('regen-input');
+
+    if (btnRegen) {
+      btnRegen.addEventListener('click', () => {
+        regenPanel.classList.toggle('open');
+        if (regenPanel.classList.contains('open')) regenInput?.focus();
+      });
+    }
+    if (btnCancel) {
+      btnCancel.addEventListener('click', () => regenPanel.classList.remove('open'));
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && regenPanel) regenPanel.classList.remove('open');
+    });
+
+    // Chips de hints
+    document.querySelectorAll('.hint-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (regenInput) regenInput.value = chip.textContent.trim();
+      });
+    });
+
+    // ── Flash message ────────────────────────────────────────────
+    const flash = document.getElementById('flash');
+    if (flash) {
+      flash.style.display = 'block';
+      setTimeout(() => {
+        flash.style.transition = 'opacity .5s';
+        flash.style.opacity = '0';
+        setTimeout(() => flash.style.display = 'none', 500);
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>

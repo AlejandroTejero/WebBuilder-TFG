@@ -6,7 +6,7 @@ Muestra el historial de análisis del usuario
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from ..models import APIRequest
+from ..models import APIRequest, GeneratedSite
 
 # Muestra del historial por usuario
 @login_required
@@ -16,8 +16,13 @@ def history(request):
         APIRequest.objects.filter(user=request.user).order_by("-date")
     )
 
-    # Hueco para "webs generadas"
-    generated_sites = []
+    # Webs generadas del usuario
+    generated_sites = (
+        GeneratedSite.objects
+        .filter(project_source__user=request.user)
+        .select_related("project_source")
+        .order_by("-created_at")
+    )
 
     return render(request, "WebBuilder/history.html", {
         "api_requests": api_requests,

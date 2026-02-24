@@ -4,42 +4,27 @@ from .auth import register
 # Páginas simples
 from .pages import home
 
-# Asistente (MVP: solo análisis)
-from .assistant import (
-    assistant,
-    get_assistant,
-    analyze_url,
-    render_assistant,
-)
+# Asistente
+from .assistant import assistant, get_assistant, analyze_url, render_assistant
 
 # Historial
 from .history import history
 
-# Preview
+# Preview (editor de schema)
 from .preview import preview
 
-from .sites import site_home, site_detail
+# Render a pantalla completa
+from .render import site_render, site_render_regen
 
 __all__ = [
-    # Auth
     "register",
-
-    # Pages
     "home",
-
-    # Assistant
     "assistant",
     "get_assistant",
     "analyze_url",
     "render_assistant",
-
-    # History
     "history",
-
-    # Preview
     "preview",
-	
-    # Site projects
-    "site_home",
-    "site_detail",
+    "site_render",
+    "site_render_regen",
 ]

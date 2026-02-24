@@ -1,10 +1,18 @@
 """
-Vistas del asistente (Fase 2 - análisis + plan JSON con LLM)
+Vistas del asistente — Fase 2: análisis + schema dinámico con LLM.
+
 Flujo:
-- El usuario introduce una URL + (opcional) un prompt
-- Se descarga + parsea (JSON/XML)
-- Se analiza la estructura y se guarda en BD
-- Si hay prompt: el LLM devuelve SOLO JSON (plan) validado y se guarda en BD
+  1. El usuario introduce una URL + (opcional) un prompt.
+  2. Se descarga y parsea (JSON/XML).
+  3. Se analiza la estructura (main_collection_path, available_keys).
+  4. El LLM devuelve un schema dinámico validado y se guarda en BD.
+
+Nuevo schema (field_mapping):
+  {
+    "site_type": str,
+    "site_title": str,
+    "fields": [{"key": str, "label": str}, ...]
+  }
 """
 
 from __future__ import annotations
@@ -28,7 +36,7 @@ from ..utils.analysis.helpers import get_by_path
 from ..utils.llm.client import LLMError
 from ..utils.llm.planner import generate_site_plan, PlanError
 
-# ============================== CONFIG ==============================
+# ────────────────────────── CONFIG ──────────────────────────────────
 
 CACHE_TIMEOUT = 3600  # 1h
 CACHE_KEY_PREFIX = "api_analysis"
@@ -39,7 +47,7 @@ def _get_cache_key(api_url: str) -> str:
     return f"{CACHE_KEY_PREFIX}:{url_hash}"
 
 
-# ============================== RENDER ==============================
+# ────────────────────────── RENDER ──────────────────────────────────
 
 def render_assistant(
     request,
@@ -53,7 +61,6 @@ def render_assistant(
     template: str = "WebBuilder/assistant.html",
 ):
     context = {"form": form}
-
     if api_request is not None:
         context["api_request"] = api_request
     if analysis is not None:
@@ -64,16 +71,15 @@ def render_assistant(
         context["llm_plan"] = llm_plan
     if llm_error is not None:
         context["llm_error"] = llm_error
-
     return render(request, template, context)
 
 
-# ============================== GET ==============================
+# ────────────────────────── GET ─────────────────────────────────────
 
 def get_assistant(request):
     """
-    - Modo vacío: muestra formulario
-    - Modo reabrir: ?api_request_id=... carga desde BD y reconstruye analysis
+    - Modo vacío: muestra formulario.
+    - Modo reabrir: ?api_request_id=... carga desde BD y reconstruye analysis.
     """
     form = APIRequestForm()
     api_request_id = request.GET.get("api_request_id")
@@ -105,12 +111,12 @@ def get_assistant(request):
     )
 
 
-# ============================== POST ==============================
+# ────────────────────────── POST ────────────────────────────────────
 
 @login_required
 def analyze_url(request):
     if request.method != "POST":
-        return redirect("assistant")  # en tus urls el name es "assistant"
+        return redirect("assistant")
 
     action = (request.POST.get("action") or "analyze").strip().lower()
     api_request_id = (request.POST.get("api_request_id") or "").strip()
@@ -123,7 +129,6 @@ def analyze_url(request):
         if isinstance(v, str):
             s = v.strip()
             return s if len(s) <= max_len else (s[: max_len - 3] + "...")
-        # dict/list/other -> string compacta
         try:
             s = json.dumps(v, ensure_ascii=False)
         except Exception:
@@ -131,9 +136,6 @@ def analyze_url(request):
         return s if len(s) <= max_len else (s[: max_len - 3] + "...")
 
     def _build_examples(parsed_payload: object, *, main_path: list | None, available_keys: list[str]) -> list[dict]:
-        """
-        Coge 1-3 items del array principal y recorta a keys frecuentes.
-        """
         if not main_path:
             return []
         items = get_by_path(parsed_payload, main_path)
@@ -154,14 +156,9 @@ def analyze_url(request):
         parsed_payload: object,
         user_prompt: str,
     ) -> tuple[dict | None, str | None]:
-        """
-        Genera el plan JSON validado y lo guarda en api_request.field_mapping.
-        """
-        user_prompt = user_prompt or ""
-        
+        """Genera el schema dinámico y lo guarda en api_request.field_mapping."""
         main = (analysis_result.get("main_collection") or {})
         keys = (analysis_result.get("keys") or {})
-        #available_keys = (keys.get("top") or [])
         available_keys = (keys.get("top") or [])[:30]
         main_path = main.get("path")
 
@@ -169,7 +166,7 @@ def analyze_url(request):
 
         try:
             plan = generate_site_plan(
-                user_prompt=user_prompt,
+                user_prompt=user_prompt or "",
                 available_keys=available_keys,
                 examples=examples,
                 main_collection_path=main_path,
@@ -177,7 +174,6 @@ def analyze_url(request):
             )
 
             api_request_obj.field_mapping = plan
-            # si tienes plan_accepted en el modelo, lo reseteamos al regenerar
             if hasattr(api_request_obj, "plan_accepted"):
                 api_request_obj.plan_accepted = False
                 api_request_obj.save(update_fields=["field_mapping", "plan_accepted"])
@@ -188,7 +184,7 @@ def analyze_url(request):
         except (PlanError, LLMError) as e:
             return None, str(e)
 
-    # ===================== Acciones sobre un análisis existente =====================
+    # ── Acciones sobre análisis existente ───────────────────────────
     if action in {"regenerate", "accept_plan"}:
         api_request_obj = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
         if not api_request_obj:
@@ -199,7 +195,6 @@ def analyze_url(request):
             if not api_request_obj.field_mapping:
                 messages.error(request, "Aún no hay un plan válido para aceptar.")
                 return redirect(f"/asistente?api_request_id={api_request_obj.id}")
-
             if hasattr(api_request_obj, "plan_accepted"):
                 api_request_obj.plan_accepted = True
                 api_request_obj.save(update_fields=["plan_accepted"])
@@ -219,7 +214,7 @@ def analyze_url(request):
         )
 
         if llm_plan is not None:
-            messages.success(request, "Plan regenerado ✅")
+            messages.success(request, "Schema regenerado ✅")
 
         form = APIRequestForm(initial={"api_url": api_request_obj.api_url, "user_prompt": user_prompt})
         return render_assistant(
@@ -232,7 +227,7 @@ def analyze_url(request):
             llm_error=llm_error,
         )
 
-    # ===================== Análisis (flujo normal) =====================
+    # ── Análisis normal ─────────────────────────────────────────────
     form = APIRequestForm(request.POST)
     if not form.is_valid():
         messages.error(request, "La URL no es válida (incluye http:// o https://).")
@@ -244,7 +239,7 @@ def analyze_url(request):
     cache_key = _get_cache_key(api_url)
     cached_data = cache.get(cache_key)
 
-    # -------- CACHE HIT --------
+    # ── CACHE HIT ───────────────────────────────────────────────────
     if cached_data:
         messages.info(request, "⚡ Análisis cargado desde caché (datos recientes).")
 
@@ -280,7 +275,7 @@ def analyze_url(request):
             llm_error=llm_error,
         )
 
-    # -------- CACHE MISS --------
+    # ── CACHE MISS ──────────────────────────────────────────────────
     api_request_obj = APIRequest.objects.create(
         user=request.user,
         api_url=api_url,
@@ -347,14 +342,12 @@ def analyze_url(request):
         )
 
 
-# ============================== VISTA PRINCIPAL ==============================
+# ────────────────────────── VISTA PRINCIPAL ─────────────────────────
 
 @login_required
 def assistant(request):
     if request.method == "GET":
         return get_assistant(request)
-
     if request.method == "POST":
         return analyze_url(request)
-
     return HttpResponseNotAllowed(["GET", "POST"])

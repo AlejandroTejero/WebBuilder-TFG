@@ -9,9 +9,10 @@ urlpatterns = [
     path("historial", views.history, name="history"),
     path("login", LoginView.as_view(next_page="home"), name="login"),
     path("registro", views.register, name="register"),
-    path("preview/<int:api_request_id>", views.preview, name="preview"),
 	
-    # Projects
-    path("sites/<int:site_id>/", views.site_home, name="site_home"),
-    path("sites/<int:site_id>/item/<int:item_index>/", views.site_detail, name="site_detail"),
+    path("preview/<int:api_request_id>", views.preview, name="preview"),
+    path("preview/<int:api_request_id>/render/", views.site_render, name="site_render"),
+    path("preview/<int:api_request_id>/render/regenerar/", views.site_render_regen, name="site_render_regen"),
+
+
 ]

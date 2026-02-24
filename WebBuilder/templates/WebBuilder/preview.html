@@ -1,49 +1,68 @@
 {% extends 'WebBuilder/base.html' %}
+{% load wb_extras %}
 
 {% block body_class %}preview{% endblock %}
 
 {% block content %}
 <div class="container py-4">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <!-- ── Cabecera ──────────────────────────────────────────────── -->
+  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
     <div>
-      <h1 class="mb-1">Preview</h1>
-      <div class="text-muted">APIRequest #{{ api_request.id }} · {{ api_request.api_url }}</div>
+      <h1 class="mb-1">Preview del Schema</h1>
+      <div class="text-muted small">APIRequest #{{ api_request.id }} · {{ api_request.api_url }}</div>
     </div>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-secondary" href="/asistente?api_request_id={{ api_request.id }}">Volver al asistente</a>
+    <div class="d-flex gap-2 flex-wrap">
+      <a class="btn btn-outline-secondary btn-sm" href="/asistente?api_request_id={{ api_request.id }}">
+        ← Volver al asistente
+      </a>
+      {% if site_obj %}
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'site_render' api_request.id %}">
+          Ver sitio publicado →
+        </a>
+      {% endif %}
     </div>
   </div>
 
   {% if messages %}
     {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
     {% endfor %}
   {% endif %}
 
-  <div class="card mb-4">
+  <!-- ── Estado del plan + acción publicar ────────────────────── -->
+  <div class="card mb-4 border-0 shadow-sm">
     <div class="card-body">
-      <h5 class="card-title mb-2">Plan del LLM</h5>
-
-      <!-- Estado de aceptación + acciones -->
-      <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="d-flex align-items-center gap-3 flex-wrap">
         {% if api_request.plan_accepted %}
-          <span class="badge text-bg-success">Plan aceptado</span>
+          <span class="badge text-bg-success fs-6">✅ Plan aceptado</span>
         {% else %}
-          <span class="badge text-bg-warning">Plan no aceptado</span>
+          <span class="badge text-bg-warning fs-6">⚠️ Plan pendiente de aceptación</span>
         {% endif %}
-      </div>
 
-      <div class="d-flex gap-2 mb-3">
         {% if not api_request.plan_accepted %}
           <form method="post" class="m-0">
             {% csrf_token %}
             <input type="hidden" name="action" value="accept_plan">
-            <button class="btn btn-success" type="submit">Aceptar plan y publicar</button>
+            <button class="btn btn-success" type="submit">
+              🚀 Aceptar y publicar sitio
+            </button>
           </form>
         {% else %}
           {% if site_obj %}
-            <a class="btn btn-outline-primary" href="{% url 'site_home' site_obj.id %}">Ver sitio</a>
+            <a class="btn btn-primary" href="{% url 'site_render' api_request.id %}">
+              Ver sitio →
+            </a>
+            <form method="post" class="m-0">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="accept_plan">
+              <button class="btn btn-outline-success" type="submit">
+                🔄 Regenerar tema
+              </button>
+            </form>
           {% else %}
             <form method="post" class="m-0">
               {% csrf_token %}
@@ -53,142 +72,143 @@
           {% endif %}
         {% endif %}
       </div>
-      
-      <div class="row g-3">
-        <div class="col-md-4">
-          <div><strong>site_type:</strong> {{ plan.site_type }}</div>
-          {% if plan.site_type_custom %}
-            <div class="mt-1"><strong>custom:</strong> <span class="text-muted">{{ plan.site_type_custom }}</span></div>
-          {% endif %}
-          <div class="mt-2"><strong>pages:</strong>
-            {% for p in plan.pages %}
-              <span class="badge text-bg-light">{{ p }}</span>
-            {% endfor %}
-          </div>
-        </div>
 
-        <div class="col-md-8">
-          <div class="mb-2"><strong>mapping:</strong></div>
-          <div class="d-flex flex-wrap gap-2">
-            <span class="badge text-bg-light">title: {{ plan.mapping.title }}</span>
-            <span class="badge text-bg-light">content: {{ plan.mapping.content }}</span>
-            <span class="badge text-bg-light">image: {{ plan.mapping.image }}</span>
-            <span class="badge text-bg-light">date: {{ plan.mapping.date }}</span>
-          </div>
-          <div class="text-muted mt-2">main_collection_path: {{ main_path }}</div>
+      <!-- Resumen rápido del schema actual -->
+      <div class="mt-3 pt-3 border-top d-flex gap-4 flex-wrap">
+        <div>
+          <span class="text-muted small">Site type</span><br>
+          <strong>{{ plan.site_type }}</strong>
+        </div>
+        <div>
+          <span class="text-muted small">Título del sitio</span><br>
+          <strong>{{ plan.site_title|default:"(sin título)" }}</strong>
+        </div>
+        <div>
+          <span class="text-muted small">Campos en schema</span><br>
+          <strong>{{ plan.fields|length }}</strong>
+        </div>
+        <div>
+          <span class="text-muted small">Ruta colección</span><br>
+          <code>{{ main_path }}</code>
         </div>
       </div>
     </div>
   </div>
 
-  <form method="post" class="card mb-4">
+  <!-- ── Editor del schema ─────────────────────────────────────── -->
+  <form method="post" class="card mb-4 border-0 shadow-sm" id="schema-form">
     {% csrf_token %}
     <div class="card-body">
-      <h5 class="card-title mb-3">Editar plan (site_type + mapping)</h5>
+      <h5 class="card-title mb-3">✏️ Editar schema</h5>
+      <input type="hidden" name="action" value="save_schema">
 
-      <input type="hidden" name="action" value="save_mapping">
-
-      <div class="row g-3 mb-2">
-        <div class="col-md-4">
-          <label class="form-label">site_type (normalizado)</label>
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Site type</label>
           <select class="form-select" name="site_type">
-            <option value="blog" {% if plan.site_type == "blog" %}selected{% endif %}>blog</option>
-            <option value="portfolio" {% if plan.site_type == "portfolio" %}selected{% endif %}>portfolio</option>
-            <option value="catalog" {% if plan.site_type == "catalog" %}selected{% endif %}>catalog</option>
-            <option value="dashboard" {% if plan.site_type == "dashboard" %}selected{% endif %}>dashboard</option>
-            <option value="other" {% if plan.site_type == "other" %}selected{% endif %}>other</option>
+            {% for st in "blog,portfolio,catalog,dashboard,other"|split:"," %}
+              <option value="{{ st }}" {% if plan.site_type == st %}selected{% endif %}>{{ st }}</option>
+            {% endfor %}
           </select>
-          <div class="form-text">Esto controla la plantilla que usará el generador.</div>
         </div>
-
-        <div class="col-md-8">
-          <label class="form-label">site_type_custom (opcional)</label>
+        <div class="col-md-9">
+          <label class="form-label fw-semibold">Título del sitio</label>
           <input class="form-control"
-                 name="site_type_custom"
-                 placeholder="Ej: landing, ecommerce, wiki, directory..."
-                 value="{{ plan.site_type_custom|default:'' }}">
-          <div class="form-text">Texto libre como “hint”. Si lo dejas vacío, se borra.</div>
+                 name="site_title"
+                 placeholder="Nombre descriptivo del sitio..."
+                 value="{{ plan.site_title|default:'' }}">
+          <div class="form-text">Este título lo usará el LLM para generar el diseño.</div>
         </div>
       </div>
 
-      <hr class="my-3">
+      <hr>
 
-      <div class="row g-3">
-        <div class="col-md-3">
-          <label class="form-label">title</label>
-          <select class="form-select" name="map_title">
-            <option value="" {% if not plan.mapping.title %}selected{% endif %}>null</option>
-            {% for k in available_keys %}
-              <option value="{{ k }}" {% if plan.mapping.title == k %}selected{% endif %}>{{ k }}</option>
-            {% endfor %}
-          </select>
-        </div>
+      <h6 class="mb-3">Campos del schema <span class="badge text-bg-secondary">{{ plan.fields|length }}</span></h6>
+      <p class="text-muted small mb-3">
+        Activa o desactiva campos y edita sus etiquetas. El orden en el que aparecen aquí es el orden
+        en que se mostrarán en el sitio. Solo se incluyen campos presentes en el dataset.
+      </p>
 
-        <div class="col-md-3">
-          <label class="form-label">content</label>
-          <select class="form-select" name="map_content">
-            <option value="" {% if not plan.mapping.content %}selected{% endif %}>null</option>
-            {% for k in available_keys %}
-              <option value="{{ k }}" {% if plan.mapping.content == k %}selected{% endif %}>{{ k }}</option>
-            {% endfor %}
-          </select>
-        </div>
+      <div id="fields-list">
+        {% for field in plan.fields %}
+          <div class="field-row d-flex align-items-center gap-2 mb-2 p-2 bg-light rounded" draggable="true">
+            <span class="drag-handle text-muted" style="cursor:grab;">⠿</span>
 
-        <div class="col-md-3">
-          <label class="form-label">image</label>
-          <select class="form-select" name="map_image">
-            <option value="" {% if not plan.mapping.image %}selected{% endif %}>null</option>
-            {% for k in available_keys %}
-              <option value="{{ k }}" {% if plan.mapping.image == k %}selected{% endif %}>{{ k }}</option>
-            {% endfor %}
-          </select>
-        </div>
+            <div class="form-check m-0">
+              <input class="form-check-input"
+                     type="checkbox"
+                     name="field_active_{{ forloop.counter0 }}"
+                     id="active_{{ forloop.counter0 }}"
+                     checked>
+            </div>
 
-        <div class="col-md-3">
-          <label class="form-label">date</label>
-          <select class="form-select" name="map_date">
-            <option value="" {% if not plan.mapping.date %}selected{% endif %}>null</option>
-            {% for k in available_keys %}
-              <option value="{{ k }}" {% if plan.mapping.date == k %}selected{% endif %}>{{ k }}</option>
-            {% endfor %}
-          </select>
-        </div>
+            <input type="hidden" name="field_key_{{ forloop.counter0 }}" value="{{ field.key }}">
+
+            <code class="text-primary flex-shrink-0" style="min-width:140px;">{{ field.key }}</code>
+
+            <input type="text"
+                   class="form-control form-control-sm"
+                   name="field_label_{{ forloop.counter0 }}"
+                   value="{{ field.label }}"
+                   placeholder="Etiqueta...">
+          </div>
+        {% empty %}
+          <div class="alert alert-warning">No hay campos en el schema. Regenera el análisis desde el asistente.</div>
+        {% endfor %}
       </div>
 
-      <div class="mt-3 d-flex gap-2">
+      <!-- Campos disponibles no incluidos aún -->
+      {% if unused_keys %}
+        <div class="mt-3">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="text-muted small fw-semibold">Añadir campos disponibles:</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            {% for k in unused_keys %}
+              <button type="button"
+                      class="btn btn-outline-secondary btn-sm add-field-btn"
+                      data-key="{{ k }}">
+                + {{ k }}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="mt-3">
         <button class="btn btn-primary" type="submit">Guardar cambios</button>
-        <a class="btn btn-outline-secondary" href="{% url 'preview' api_request.id %}">Reset</a>
-        <a class="btn btn-outline-secondary" href="/asistente?api_request_id={{ api_request.id }}">Volver</a>
+        <a class="btn btn-outline-secondary ms-2" href="{% url 'preview' api_request.id %}">Reset</a>
       </div>
     </div>
   </form>
 
+  <!-- ── Preview de items ──────────────────────────────────────── -->
   {% if preview_items %}
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Preview de datos <span class="badge text-bg-secondary">{{ preview_items|length }} items</span></h5>
+    </div>
+
     <div class="row g-3">
-      {% for it in preview_items %}
+      {% for item in preview_items %}
         <div class="col-md-4">
-          <div class="card h-100">
+          <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
-              <h5 class="card-title">{{ it.title }}</h5>
-
-              {% if it.date %}
-                <div class="text-muted mb-2">{{ it.date }}</div>
-              {% endif %}
-
-              {% if it.image %}
-                <div class="small mb-2">
-                  <strong>image:</strong>
-                  <span class="text-muted">{{ it.image }}</span>
-                </div>
-              {% endif %}
-
-              {% if it.content %}
-                <p class="card-text">{{ it.content }}</p>
-              {% endif %}
-
-              {% if it.raw %}
-                <pre class="small text-muted" style="white-space: pre-wrap;">{{ it.raw }}</pre>
-              {% endif %}
+              {% for field in plan.fields %}
+                {% with val=item|get_item:field.key %}
+                  {% if val %}
+                    <div class="mb-2">
+                      <span class="badge text-bg-light text-muted" style="font-size:.7rem;">
+                        {{ field.label }}
+                      </span>
+                      <div class="mt-1" style="font-size:.9rem; word-break:break-word;">
+                        {{ val }}
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              {% empty %}
+                <div class="text-muted small">No hay campos configurados.</div>
+              {% endfor %}
             </div>
           </div>
         </div>
@@ -196,9 +216,107 @@
     </div>
   {% else %}
     <div class="alert alert-warning">
-      No pude construir items de preview. Puede que el análisis no haya detectado una colección principal o que el dataset no sea una lista.
+      No pude construir items de preview. El dataset puede no tener una colección principal detectable.
     </div>
   {% endif %}
 
 </div>
+
+<style>
+  .field-row { user-select: none; }
+  .field-row.drag-over { border: 2px dashed #0d6efd; background: #e8f0fe !important; }
+  .drag-handle:hover { color: #333 !important; }
+</style>
+
+<script>
+// ── Drag & drop para reordenar campos ────────────────────────────────
+(function () {
+  const list = document.getElementById('fields-list');
+  if (!list) return;
+
+  let dragged = null;
+
+  list.addEventListener('dragstart', e => {
+    dragged = e.target.closest('.field-row');
+    if (dragged) dragged.style.opacity = '0.4';
+  });
+
+  list.addEventListener('dragend', e => {
+    if (dragged) dragged.style.opacity = '';
+    dragged = null;
+    list.querySelectorAll('.field-row').forEach(r => r.classList.remove('drag-over'));
+    _renumberFields();
+  });
+
+  list.addEventListener('dragover', e => {
+    e.preventDefault();
+    const target = e.target.closest('.field-row');
+    if (target && target !== dragged) {
+      list.querySelectorAll('.field-row').forEach(r => r.classList.remove('drag-over'));
+      target.classList.add('drag-over');
+    }
+  });
+
+  list.addEventListener('drop', e => {
+    e.preventDefault();
+    const target = e.target.closest('.field-row');
+    if (target && target !== dragged && dragged) {
+      const items = [...list.querySelectorAll('.field-row')];
+      const dragIdx = items.indexOf(dragged);
+      const targetIdx = items.indexOf(target);
+      if (dragIdx < targetIdx) {
+        target.after(dragged);
+      } else {
+        target.before(dragged);
+      }
+    }
+  });
+
+  function _renumberFields() {
+    list.querySelectorAll('.field-row').forEach((row, i) => {
+      row.querySelectorAll('[name]').forEach(el => {
+        el.name = el.name.replace(/_\d+$/, `_${i}`);
+      });
+      const chk = row.querySelector('.form-check-input');
+      if (chk) {
+        chk.id = `active_${i}`;
+        chk.name = `field_active_${i}`;
+      }
+      const lbl = row.querySelector('label.form-check-label');
+      if (lbl) lbl.htmlFor = `active_${i}`;
+    });
+  }
+})();
+
+// ── Añadir campo desde "no incluidos" ───────────────────────────────
+(function () {
+  const list   = document.getElementById('fields-list');
+  const form   = document.getElementById('schema-form');
+  if (!list || !form) return;
+
+  document.querySelectorAll('.add-field-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      const idx = list.querySelectorAll('.field-row').length;
+
+      const row = document.createElement('div');
+      row.className = 'field-row d-flex align-items-center gap-2 mb-2 p-2 bg-light rounded';
+      row.draggable = true;
+      row.innerHTML = `
+        <span class="drag-handle text-muted" style="cursor:grab;">⠿</span>
+        <div class="form-check m-0">
+          <input class="form-check-input" type="checkbox" name="field_active_${idx}" id="active_${idx}" checked>
+        </div>
+        <input type="hidden" name="field_key_${idx}" value="${key}">
+        <code class="text-primary flex-shrink-0" style="min-width:140px;">${key}</code>
+        <input type="text" class="form-control form-control-sm" name="field_label_${idx}" value="${key}" placeholder="Etiqueta...">
+      `;
+      list.appendChild(row);
+      btn.disabled = true;
+      btn.classList.replace('btn-outline-secondary', 'btn-secondary');
+    });
+  });
+})();
+</script>
+
 {% endblock %}

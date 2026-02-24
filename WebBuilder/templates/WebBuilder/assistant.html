@@ -140,12 +140,54 @@
       <div class="alert alert-danger">Error LLM: {{ llm_error }}</div>
     {% endif %}
 
-    {% if llm_plan_text %}
-      <h3>Plan del LLM (JSON)</h3>
-      <pre style="white-space: pre-wrap;">{{ llm_plan_text }}</pre>
-    {% endif %}
+    {% if llm_plan %}
+      <section class="wb-step" id="schemaResult">
+        <div class="wb-step__container">
+          <div class="wb-step__header">
+            <h2 class="wb-step__title">Schema generado por IA</h2>
+            <p class="wb-step__description">
+              El LLM analizó los datos y propuso este schema. Puedes ajustarlo en el preview.
+            </p>
+          </div>
+          <div class="wb-step__content">
 
-    {% if api_request and api_request.field_mapping %}
+            <div class="wb-analysis-card">
+              <div class="wb-analysis-row">
+                <span class="wb-analysis-row__label">Tipo de sitio</span>
+                <span class="wb-analysis-row__value">{{ llm_plan.site_type }}</span>
+              </div>
+              <div class="wb-analysis-row">
+                <span class="wb-analysis-row__label">Título sugerido</span>
+                <span class="wb-analysis-row__value">{{ llm_plan.site_title }}</span>
+              </div>
+              <div class="wb-analysis-row">
+                <span class="wb-analysis-row__label">Campos seleccionados</span>
+                <span class="wb-analysis-row__value">{{ llm_plan.fields|length }}</span>
+              </div>
+            </div>
+
+            {% if llm_plan.fields %}
+              <div class="mt-3">
+                <strong>Campos:</strong>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  {% for field in llm_plan.fields %}
+                    <span class="badge text-bg-light border">
+                      <code>{{ field.key }}</code> → {{ field.label }}
+                    </span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="wb-actions mt-3">
+              <a class="wb-btn wb-btn--primary" href="{% url 'preview' api_request.id %}">
+                Ajustar y publicar →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    {% elif api_request and api_request.field_mapping %}
       <a class="btn btn-outline-secondary" href="{% url 'preview' api_request.id %}">Ver preview</a>
     {% endif %}
   

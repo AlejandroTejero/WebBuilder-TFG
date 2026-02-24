@@ -1,3 +1,16 @@
+"""
+Themer — genera base_html, home_html, detail_html y css a partir del schema dinámico.
+
+Recibe el schema ya validado (site_type, site_title, fields) y genera
+templates Django adaptados a los campos reales del dataset.
+
+Variables disponibles en los templates generados:
+  home_html:   {{ site.id }}, {{ site.title }}, {{ site.type }}
+               {% for it in items %} → it.<key> para cada field del schema
+  detail_html: {{ item.<key> }} para cada field del schema
+  base_html:   {{ css }}, {{ content }}
+"""
+
 from __future__ import annotations
 
 import json
@@ -9,6 +22,8 @@ from .client import chat_completion, LLMError
 class ThemeError(Exception):
     pass
 
+
+# ─────────────────────────── helpers JSON ────────────────────────────
 
 def _strip_code_fences(text: str) -> str:
     t = (text or "").strip()
@@ -23,39 +38,36 @@ def _extract_json_object(text: str) -> str:
     if t.startswith("{") and t.endswith("}"):
         return t
     start = t.find("{")
-    end   = t.rfind("}")
+    end = t.rfind("}")
     if start == -1 or end == -1 or end <= start:
         raise ThemeError("No se encontró un objeto JSON en la respuesta del LLM.")
-    return t[start : end + 1]
+    return t[start: end + 1]
 
 
 def _repair_common_json(text: str) -> str:
     t = text.strip()
     t = re.sub(r",\s*([}\]])", r"\1", t)
-    t = t.replace(": True",  ": true")
-    t = t.replace(": False", ": false")
-    t = t.replace(": None",  ": null")
+    t = t.replace(": True", ": true").replace(": False", ": false").replace(": None", ": null")
     return t
 
+
+# ─────────────────────────── sanitización ────────────────────────────
 
 def _sanitize_template(s: str) -> str:
     """Elimina tags de herencia/includes que romperían el render inline."""
     if not s:
         return ""
-    s = re.sub(r"{%\s*extends\s+.*?%}",  "", s, flags=re.IGNORECASE | re.DOTALL)
-    s = re.sub(r"{%\s*include\s+.*?%}",  "", s, flags=re.IGNORECASE | re.DOTALL)
-    s = re.sub(r"{%\s*load\s+.*?%}",     "", s, flags=re.IGNORECASE | re.DOTALL)
-    s = re.sub(r"{%\s*block\s+.*?%}",    "", s, flags=re.IGNORECASE | re.DOTALL)
+    s = re.sub(r"{%\s*extends\s+.*?%}", "", s, flags=re.IGNORECASE | re.DOTALL)
+    s = re.sub(r"{%\s*include\s+.*?%}", "", s, flags=re.IGNORECASE | re.DOTALL)
+    s = re.sub(r"{%\s*load\s+.*?%}", "", s, flags=re.IGNORECASE | re.DOTALL)
+    s = re.sub(r"{%\s*block\s+.*?%}", "", s, flags=re.IGNORECASE | re.DOTALL)
     s = re.sub(r"{%\s*endblock\s*.*?%}", "", s, flags=re.IGNORECASE | re.DOTALL)
     return s.strip()
 
 
 def _ensure_base_placeholders(base_html: str) -> str:
-    """
-    Garantiza que base_html sea un documento HTML completo con
-    {{ css }} en <head> y {{ content }} en <body>.
-    """
-    s   = (base_html or "").strip()
+    """Garantiza que base_html sea HTML completo con {{ css }} y {{ content }}."""
+    s = (base_html or "").strip()
     low = s.lower()
 
     if "<html" not in low or "<body" not in low:
@@ -95,12 +107,33 @@ def _ensure_base_placeholders(base_html: str) -> str:
 
 
 def _validate_home_html(home_html: str) -> bool:
-    """Comprueba que home_html tenga un bucle for sobre items."""
     return bool(re.search(r'\{%\s*for\s+\w+\s+in\s+items', home_html))
 
 
-def _fallback_theme() -> dict:
+# ─────────────────────────── fallback ────────────────────────────────
+
+def _fallback_theme(fields: list[dict]) -> dict:
     """Tema mínimo funcional que siempre funciona si el LLM falla."""
+    # El primer campo actúa como título en el fallback
+    first_key = fields[0]["key"] if fields else "id"
+    first_label = fields[0]["label"] if fields else "ID"
+
+    # Construir filas de detalle para cada campo
+    detail_rows = "\n".join(
+        f'{{% if item.{f["key"]} %}}'
+        f'<div class="field-row"><span class="field-label">{f["label"]}</span>'
+        f'<span class="field-value">{{{{ item.{f["key"]} }}}}</span></div>'
+        f'{{% endif %}}'
+        for f in fields
+    )
+
+    home_rows = "\n".join(
+        f'{{% if it.{f["key"]} %}}'
+        f'<div><small>{f["label"]}:</small> {{{{ it.{f["key"]} }}}}</div>'
+        f'{{% endif %}}'
+        for f in fields[1:5]  # primeros 4 campos extra en la card
+    )
+
     return {
         "base_html": (
             '<!doctype html>\n'
@@ -119,43 +152,55 @@ def _fallback_theme() -> dict:
             '</html>'
         ),
         "home_html": (
-            '<h1>{{ site.title }}</h1>\n'
-            '<ul>\n'
-            '{% for it in items %}\n'
-            '  <li><a href="/sites/{{ site.id }}/item/{{ it.index }}/">{{ it.title }}</a></li>\n'
-            '{% endfor %}\n'
-            '</ul>'
+            f'<h1>{{{{ site.title }}}}</h1>\n'
+            f'<div class="grid">\n'
+            f'{{% for it in items %}}\n'
+            f'  <div class="card">\n'
+            f'    <a href="/sites/{{{{ site.id }}}}/item/{{{{ it.index }}}}/">\n'
+            f'      <h2>{{{{ it.{first_key} }}}}</h2>\n'
+            f'    </a>\n'
+            f'    {home_rows}\n'
+            f'  </div>\n'
+            f'{{% endfor %}}\n'
+            f'</div>'
         ),
         "detail_html": (
-            '<p><a href="/sites/{{ site.id }}/">← Volver</a></p>\n'
-            '<h1>{{ item.title }}</h1>\n'
-            '{% if item.date %}<div>{{ item.date }}</div>{% endif %}\n'
-            '{% if item.image %}<div><strong>image:</strong> {{ item.image }}</div>{% endif %}\n'
-            '{% if item.content %}<p>{{ item.content }}</p>{% endif %}'
+            f'<p><a href="/sites/{{{{ site.id }}}}/">← Volver</a></p>\n'
+            f'<h1>{{{{ item.{first_key} }}}}</h1>\n'
+            f'<div class="detail-fields">\n'
+            f'{detail_rows}\n'
+            f'</div>'
         ),
         "css": (
             '*, *::before, *::after { box-sizing: border-box; }\n'
-            'body { font-family: system-ui, sans-serif; margin: 0; padding: 0; }\n'
-            'a { color: inherit; }\n'
-            'h1 { margin-top: 0; }'
+            'body { font-family: system-ui, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }\n'
+            'main { padding: 2rem; }\n'
+            'h1 { margin-top: 0; }\n'
+            'a { color: #2563eb; text-decoration: none; }\n'
+            'a:hover { text-decoration: underline; }\n'
+            '.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 1rem; }\n'
+            '.card { background: #fff; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.1); }\n'
+            '.card h2 { font-size: 1rem; margin: 0 0 .5rem; }\n'
+            '.card small { color: #666; font-size: .8rem; }\n'
+            '.detail-fields { display: flex; flex-direction: column; gap: .5rem; margin-top: 1rem; }\n'
+            '.field-row { display: flex; gap: 1rem; padding: .4rem 0; border-bottom: 1px solid #eee; }\n'
+            '.field-label { font-weight: 600; min-width: 120px; color: #444; }\n'
+            '.field-value { color: #222; word-break: break-word; }\n'
         ),
     }
 
 
-def generate_site_theme(
+# ─────────────────────────── prompt ──────────────────────────────────
+
+def _build_theme_prompt(
     *,
     site_title: str,
     site_type: str,
     design_hint: str,
-    pages: list[str],
-    mapping: dict,
+    fields: list[dict],
     sample_items: list[dict],
-    retries: int = 1,
-) -> dict:
-    """
-    Genera base_html, home_html, detail_html y css usando el LLM.
-    Si el LLM falla o devuelve algo inservible, devuelve _fallback_theme().
-    """
+) -> tuple[str, str]:
+
     system = (
         "Eres un diseñador FRONTEND experto en templates Django. "
         "Devuelve SOLO un objeto JSON válido, sin Markdown ni texto extra. "
@@ -163,53 +208,75 @@ def generate_site_theme(
         "NUNCA uses sintaxis Python como items(), item.get(), item['key'] o f-strings."
     )
 
-    # Ejemplo concreto que el LLM puede copiar y adaptar
+    # Construir la lista de variables disponibles para el LLM
+    field_vars_home = ", ".join(f"it.{f['key']}" for f in fields)
+    field_vars_detail = ", ".join(f"item.{f['key']}" for f in fields)
+
+    # Ejemplo de home_html adaptado a los campos reales
+    first_key = fields[0]["key"] if fields else "id"
+    example_home_rows = "\n".join(
+        f'    {{% if it.{f["key"]} %}}<p><strong>{f["label"]}:</strong> {{{{ it.{f["key"]} }}}}</p>{{% endif %}}'
+        for f in fields[1:4]
+    )
     example_home = (
-        "<h1>{{ site.title }}</h1>\n"
-        "<div class=\"grid\">\n"
-        "{% for it in items %}\n"
-        "  <div class=\"card\">\n"
-        "    <a href=\"/sites/{{ site.id }}/item/{{ it.index }}/\">\n"
-        "      <h2>{{ it.title }}</h2>\n"
-        "    </a>\n"
-        "    {% if it.content %}<p>{{ it.content }}</p>{% endif %}\n"
-        "    {% if it.date %}<small>{{ it.date }}</small>{% endif %}\n"
-        "  </div>\n"
-        "{% endfor %}\n"
-        "</div>"
+        f'<h1>{{{{ site.title }}}}</h1>\n'
+        f'<div class="grid">\n'
+        f'{{% for it in items %}}\n'
+        f'  <div class="card">\n'
+        f'    <a href="/sites/{{{{ site.id }}}}/item/{{{{ it.index }}}}/">\n'
+        f'      <h2>{{{{ it.{first_key} }}}}</h2>\n'
+        f'    </a>\n'
+        f'{example_home_rows}\n'
+        f'  </div>\n'
+        f'{{% endfor %}}\n'
+        f'</div>'
     )
 
+    example_detail_rows = "\n".join(
+        f'{{% if item.{f["key"]} %}}'
+        f'<div class="field"><span class="label">{f["label"]}</span> <span>{{{{ item.{f["key"]} }}}}</span></div>'
+        f'{{% endif %}}'
+        for f in fields
+    )
     example_detail = (
-        "<p><a href=\"/sites/{{ site.id }}/\">← Volver</a></p>\n"
-        "<h1>{{ item.title }}</h1>\n"
-        "{% if item.date %}<p><small>{{ item.date }}</small></p>{% endif %}\n"
-        "{% if item.image %}<img src=\"{{ item.image }}\" alt=\"{{ item.title }}\">{% endif %}\n"
-        "{% if item.content %}<div>{{ item.content }}</div>{% endif %}"
+        f'<p><a href="/sites/{{{{ site.id }}}}/">← Volver</a></p>\n'
+        f'<h1>{{{{ item.{first_key} }}}}</h1>\n'
+        f'<div class="fields">\n'
+        f'{example_detail_rows}\n'
+        f'</div>'
     )
 
     rules = [
-        "Devuelve SOLO JSON válido (un único objeto con 4 keys: base_html, home_html, detail_html, css).",
+        "Devuelve SOLO JSON válido con 4 keys: base_html, home_html, detail_html, css.",
         "PROHIBIDO: {% extends %}, {% include %}, {% load %}, {% block %}.",
-        "OBLIGATORIO en home_html: usar {% for it in items %} ... {% endfor %} para iterar los items.",
-        "OBLIGATORIO en home_html: enlace a detalle con /sites/{{ site.id }}/item/{{ it.index }}/",
+        f"OBLIGATORIO en home_html: usar {{% for it in items %}} ... {{% endfor %}}.",
+        f"OBLIGATORIO en home_html: enlace a detalle con /sites/{{{{ site.id }}}}/item/{{{{ it.index }}}}/",
         "OBLIGATORIO en detail_html: enlace de vuelta con /sites/{{ site.id }}/",
-        "Variables en items: it.index, it.title, it.content, it.image, it.date (todos strings).",
-        "Variables en item (detalle): item.index, item.title, item.content, item.image, item.date.",
+        f"Variables en items (home): it.index, {field_vars_home}",
+        f"Variables en item (detalle): item.index, {field_vars_detail}",
         "base_html debe ser HTML completo (<!doctype html>...) con {{ css }} en <head> y {{ content }} en <body>.",
         "home_html y detail_html son FRAGMENTOS sin <html>/<head>/<body>.",
         "css es CSS puro sin tags <style>.",
         "NUNCA uses sintaxis Python: nada de items(), item.get('x'), item['x'], f-strings.",
+        "Diseña pensando en los datos reales. Si hay imágenes, muéstralas. Si hay precios, destácalos. Si hay fechas, fórmalas bien.",
+        "El diseño debe ser coherente con el site_type y el hint de diseño.",
+        "USA los fields definidos para construir el HTML. No inventes variables que no están en la lista.",
     ]
+
+    fields_info = json.dumps(
+        [{"key": f["key"], "label": f["label"]} for f in fields],
+        ensure_ascii=False, indent=2
+    )
 
     user_text = "\n".join([
         "HINT DE DISEÑO:",
         (design_hint or "").strip() or "(sin hint: diseño limpio y moderno)",
         "",
         "META DEL SITIO:",
-        json.dumps({"title": site_title, "site_type": site_type, "pages": pages}, ensure_ascii=False, indent=2),
+        json.dumps({"title": site_title, "site_type": site_type}, ensure_ascii=False, indent=2),
         "",
-        "MAPPING DE CAMPOS:",
-        json.dumps(mapping or {}, ensure_ascii=False, indent=2),
+        "SCHEMA DE CAMPOS (estos son los únicos campos disponibles en los items):",
+        fields_info,
         "",
         "ITEMS DE EJEMPLO (así llegan los datos al template):",
         json.dumps(sample_items[:4], ensure_ascii=False, indent=2),
@@ -226,15 +293,42 @@ def generate_site_theme(
         "CONTRATO JSON (devuelve EXACTAMENTE estas 4 keys):",
         json.dumps(
             {
-                "base_html":   "HTML completo con <!doctype html>, <style>{{ css }}</style> y {{ content }}",
-                "home_html":   "fragmento con {% for it in items %}...{% endfor %}",
-                "detail_html": "fragmento con {{ item.title }}, {{ item.content }}, etc.",
-                "css":         "CSS puro sin <style>",
+                "base_html": "HTML completo con <!doctype html>, <style>{{ css }}</style> y {{ content }}",
+                "home_html": f"fragmento con {{% for it in items %}}...{{% endfor %}}",
+                "detail_html": "fragmento con los campos del schema",
+                "css": "CSS puro sin <style>",
             },
-            ensure_ascii=False,
-            indent=2,
+            ensure_ascii=False, indent=2,
         ),
     ])
+
+    return system, user_text
+
+
+# ─────────────────────────── función pública ─────────────────────────
+
+def generate_site_theme(
+    *,
+    site_title: str,
+    site_type: str,
+    design_hint: str,
+    fields: list[dict],
+    sample_items: list[dict],
+    retries: int = 1,
+) -> dict:
+    """
+    Genera base_html, home_html, detail_html y css usando el LLM.
+
+    Recibe el schema dinámico (fields=[{key, label},...]) ya validado.
+    Si el LLM falla o devuelve algo inservible, devuelve _fallback_theme(fields).
+    """
+    system, user_text = _build_theme_prompt(
+        site_title=site_title,
+        site_type=site_type,
+        design_hint=design_hint,
+        fields=fields,
+        sample_items=sample_items,
+    )
 
     last_error = None
     for attempt in range(retries + 1):
@@ -258,7 +352,6 @@ def generate_site_theme(
             if not base_html or not home_html or not detail_html:
                 raise ThemeError("Faltan campos base_html / home_html / detail_html.")
 
-            # Validar que home_html tiene el bucle for obligatorio
             if not _validate_home_html(home_html):
                 raise ThemeError(
                     "home_html no contiene '{% for ... in items %}'. "
@@ -277,6 +370,6 @@ def generate_site_theme(
         except (LLMError, ThemeError, ValueError, json.JSONDecodeError) as e:
             last_error = f"{type(e).__name__}: {e}"
             if attempt >= retries:
-                return _fallback_theme()
+                return _fallback_theme(fields)
 
-    return _fallback_theme()
+    return _fallback_theme(fields)

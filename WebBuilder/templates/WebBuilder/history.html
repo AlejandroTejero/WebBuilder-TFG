@@ -86,19 +86,31 @@
         {% for w in generated_sites %}
           <div class="wb-suggestions__row">
             <div class="wb-suggestions__role">
-              <div><strong>{{ w.name }}</strong></div>
-              <div class="wb-muted" style="margin-top:4px;">{{ w.created_at|date:"Y-m-d H:i" }}</div>
+              <div>
+                <strong>{{ w.accepted_plan.site_title|default:w.accepted_plan.site_type|default:"Sitio" }}</strong>
+                <span class="wb-chip ms-2">{{ w.accepted_plan.site_type }}</span>
+              </div>
+              <div class="wb-muted" style="margin-top:4px;">
+                Desde: {{ w.project_source.api_url }}
+              </div>
+              <div class="wb-muted" style="margin-top:4px;">
+                {{ w.created_at|date:"Y-m-d H:i" }}
+                · {{ w.accepted_plan.fields|length }} campos
+              </div>
             </div>
             <div class="wb-suggestions__opts">
-              <a class="wb-btn wb-btn--secondary" href="#">
-                Abrir
+              <a class="wb-btn wb-btn--secondary" href="{% url 'site_render' w.project_source.id %}">
+                Ver sitio
+              </a>
+              <a class="wb-btn wb-btn--secondary" href="{% url 'preview' w.project_source.id %}">
+                Editar
               </a>
             </div>
           </div>
         {% endfor %}
       </div>
     {% else %}
-      <p class="wb-muted">Todavía no hay webs generadas (próximamente).</p>
+      <p class="wb-muted">Todavía no has publicado ningún sitio.</p>
     {% endif %}
   </section>
 
