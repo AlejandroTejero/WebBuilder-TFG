@@ -1,0 +1,266 @@
+/* ============================================================
+   HOME BACKGROUNDS — WebBuilder
+   PALETA: NEGRO & PLATA con toques MORADO
+   ============================================================ */
+
+
+/* ── Fondo global ── */
+.home-modern {
+    background: #0A0A0A;
+}
+
+
+/* ── Hero ── */
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-color: transparent;
+    background-image:
+        linear-gradient(rgba(156, 163, 175, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(156, 163, 175, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+    z-index: 0;
+}
+
+/*
+.hero-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 25% 35%, rgba(139, 92, 246, 0.10) 0%, transparent 65%),
+        radial-gradient(circle at 75% 65%, rgba(156, 163, 175, 0.06) 0%, transparent 65%);
+    animation: glowPulse 10s ease-in-out infinite;
+}
+*/
+
+.hero-bg::before {
+    display: none;
+}
+
+/* Hero badge */
+.hero-badge {
+    background: rgba(139, 92, 246, 0.08);
+    border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Botón primario */
+.hero-cta--primary {
+    background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    box-shadow: 0 8px 25px rgba(109, 40, 217, 0.3);
+}
+
+.hero-cta--primary:hover {
+    box-shadow: 0 12px 35px rgba(109, 40, 217, 0.45) !important;
+    border-color: rgba(167, 139, 250, 0.5) !important;
+}
+
+/* Botón ghost */
+.hero-cta--ghost {
+    background: linear-gradient(135deg, #18181B 0%, #27272A 100%);
+    border-color: rgba(156, 163, 175, 0.2) !important;
+}
+
+.hero-cta--ghost:hover {
+    border-color: rgba(156, 163, 175, 0.35) !important;
+}
+
+/* Badge sección */
+.section-badge {
+    background: rgba(156, 163, 175, 0.08);
+}
+
+.section-badge--purple {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.2) !important;
+    color: #c4b5fd !important;
+}
+
+.section-badge--orange {
+    background: rgba(251, 146, 60, 0.1);
+    border-color: rgba(251, 146, 60, 0.2) !important;
+    color: #fdba74 !important;
+}
+
+
+/* ── Steps ── */
+.step-card {
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(24, 24, 27, 0.95));
+}
+
+.step-card::before {
+    background: linear-gradient(90deg, #7c3aed 0%, #9CA3AF 50%, #7c3aed 100%);
+}
+
+.step-number {
+    background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+    box-shadow: 0 4px 15px rgba(109, 40, 217, 0.3);
+}
+
+
+/* ── Features ── */
+.feature-card {
+    background: rgba(20, 20, 20, 0.7);
+}
+
+.feature-card:hover {
+    background: rgba(20, 20, 20, 0.95);
+    border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+.feature-card--coming {
+    background: rgba(20, 20, 20, 0.5) !important;
+    border-color: rgba(251, 146, 60, 0.15) !important;
+    position: relative;
+}
+
+.feature-card--coming:hover {
+    border-color: rgba(251, 146, 60, 0.3) !important;
+}
+
+.feature-badge-coming {
+    display: inline-block;
+    padding: 2px 10px;
+    background: rgba(251, 146, 60, 0.15);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #fdba74;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.feature-icon {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(107, 114, 128, 0.12));
+}
+
+
+/* ── Sección alternativa (fondo ligeramente diferente) ── */
+.section--alt {
+    background: linear-gradient(180deg, rgba(139, 92, 246, 0.03) 0%, transparent 100%);
+}
+
+
+/* ── AI Cards ── */
+.ai-card {
+    background: rgba(20, 20, 20, 0.7);
+}
+
+.ai-card:hover {
+    background: rgba(20, 20, 20, 0.95);
+    border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+.ai-card__icon--blue {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1));
+}
+
+.ai-card__icon--purple {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(109, 40, 217, 0.1));
+}
+
+.ai-tag {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.2) !important;
+    color: #c4b5fd;
+}
+
+
+/* ── Transform showcase ── */
+.transform-showcase {
+    background: rgba(15, 15, 20, 0.8);
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.transform-box--input {
+    background: rgba(10, 10, 15, 0.9);
+    border-color: rgba(156, 163, 175, 0.1) !important;
+}
+
+.transform-box--schema {
+    background: rgba(10, 10, 15, 0.9);
+    border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+.transform-box--output {
+    background: rgba(10, 10, 15, 0.9);
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+.transform-arrow__line {
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.3), rgba(156, 163, 175, 0.3));
+}
+
+
+/* ── n8n Section ── */
+.n8n-node--source {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+.n8n-node--n8n {
+    background: rgba(251, 146, 60, 0.1);
+    border-color: rgba(251, 146, 60, 0.3) !important;
+}
+
+.n8n-node--wb {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+.n8n-node--output {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+
+/* ── FAQ ── */
+.faq-item {
+    background: rgba(20, 20, 20, 0.7);
+}
+
+.faq-item:hover {
+    border-color: rgba(156, 163, 175, 0.25);
+}
+
+
+/* ── CTA Final ── */
+.cta-section {
+    background: linear-gradient(135deg,
+        rgba(139, 92, 246, 0.06) 0%,
+        rgba(107, 114, 128, 0.04) 100%
+    );
+}
+
+.cta-title {
+    background: linear-gradient(135deg, #FFFFFF 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cta-button {
+    background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    box-shadow: 0 8px 25px rgba(109, 40, 217, 0.3);
+}
+
+.cta-button:hover {
+    box-shadow: 0 12px 35px rgba(109, 40, 217, 0.45) !important;
+}
+
+
+/* ── Animaciones ── */
+@keyframes gridMove {
+    0%   { background-position: 0 0; }
+    100% { background-position: 50px 50px; }
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 0.8; }
+}

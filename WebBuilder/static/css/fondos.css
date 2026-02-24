@@ -1,43 +1,30 @@
-/* =============================== Fondo Inicio =============================== */
+/* =============================== Fondo global oscuro =============================== */
 
-.inicio {
-  --page-bg:
-    radial-gradient(1800px 1200px at 15% 10%, #bfdbfe, transparent 75%),
-    radial-gradient(1100px 700px at 85% 25%, #bfdbfe, transparent 80%),
-    linear-gradient(135deg, #f1f5f9, #e0f2fe, #bfdbfe);
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: #0A0A0A;
+  pointer-events: none;
 }
 
 /* =============================== Fondo Asistente =============================== */
-
-.asistente {
-  --page-bg:
-    radial-gradient(1800px 1200px at 15% 10%, #bfdbfe, transparent 75%),
-    radial-gradient(1100px 700px at 85% 25%, #bfdbfe, transparent 80%),
-    linear-gradient(135deg, #f1f5f9, #e0f2fe, #bfdbfe);
+.procesos {
+  background: #0A0A0A;
 }
 
 /* =============================== Fondo Historial =============================== */
-
 .historial {
-  --page-bg:
-    radial-gradient(1800px 1200px at 15% 10%, #bfdbfe, transparent 75%),
-    radial-gradient(1100px 700px at 85% 25%, #bfdbfe, transparent 80%),
-    linear-gradient(135deg, #f1f5f9, #e0f2fe, #bfdbfe);
+  background: #0A0A0A;
+}
+
+/* =============================== Fondo Preview =============================== */
+.preview {
+  background: #0A0A0A;
 }
 
 /* =============================== Fondo Login / Register =============================== */
-
-.login {
-  --page-bg:
-    radial-gradient(1800px 1200px at 15% 10%, #bfdbfe, transparent 75%),
-    radial-gradient(1100px 700px at 85% 25%, #bfdbfe, transparent 80%),
-    linear-gradient(135deg, #f1f5f9, #e0f2fe, #bfdbfe);
-}
-
+.login,
 .register {
-  --page-bg:
-    radial-gradient(1800px 1200px at 15% 10%, #bfdbfe, transparent 75%),
-    radial-gradient(1100px 700px at 85% 25%, #bfdbfe, transparent 80%),
-    linear-gradient(135deg, #f1f5f9, #e0f2fe, #bfdbfe);
+  background: #0A0A0A;
 }
-
