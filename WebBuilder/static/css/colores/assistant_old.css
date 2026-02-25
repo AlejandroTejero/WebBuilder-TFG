@@ -1,0 +1,295 @@
+/* =========================
+   WebBuilder - Asistente (MVP: solo análisis)
+   ========================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #141414;
+  --bg-tertiary: #1a1a1a;
+
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-muted: #6a6a6a;
+
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #60a5fa;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.12);
+
+  --navbar-height: 64px;
+}
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+}
+
+/* ==================== LAYOUT ==================== */
+
+.wb-assistant {
+  min-height: calc(100vh - var(--navbar-height));
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+.wb-main {
+  padding: 3rem;
+  min-height: calc(100vh - var(--navbar-height));
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .wb-main {
+    padding: 1.5rem;
+  }
+}
+
+/* ==================== MENSAJES ==================== */
+
+.wb-messages {
+  margin-bottom: 2rem;
+}
+
+.wb-message {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  background: var(--bg-secondary);
+}
+
+.wb-message--success {
+  border-color: #4ade80;
+  color: #86efac;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.wb-message--error {
+  border-color: #ef4444;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.wb-message--warning {
+  border-color: #fb923c;
+  color: #fdba74;
+  background: rgba(251, 146, 60, 0.1);
+}
+
+.wb-message--info {
+  border-color: var(--accent-blue);
+  color: #93c5fd;
+  background: rgba(74, 158, 255, 0.1);
+}
+
+/* ==================== SECCIONES (STEP) ==================== */
+
+.wb-step {
+  animation: fadeIn 0.4s ease;
+}
+
+.wb-step__container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.wb-step__header {
+  margin-bottom: 2rem;
+}
+
+.wb-step__title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wb-step__description {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 800px;
+}
+
+@media (max-width: 768px) {
+  .wb-step__title {
+    font-size: 1.5rem;
+  }
+}
+
+/* ==================== FORMULARIO ==================== */
+
+.wb-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.wb-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.wb-input-wrapper input[type="url"],
+.wb-input-wrapper input[type="text"] {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.wb-input-wrapper input:hover {
+  border-color: var(--border-medium);
+}
+
+.wb-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.wb-hint {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.wb-error {
+  margin-top: 0.5rem;
+  color: #ff6b6b;
+  font-size: 0.875rem;
+}
+
+/* ==================== BOTONES ==================== */
+
+.wb-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.wb-btn {
+  padding: 0.875rem 2rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.wb-btn--primary {
+  background: var(--accent-blue);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.wb-btn--primary:hover {
+  background: var(--accent-blue-hover);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.wb-btn--secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.wb-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-medium);
+}
+
+/* ==================== RESULTADO ANÁLISIS ==================== */
+
+.wb-analysis-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-top: 1rem;
+}
+
+.wb-analysis-card__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--text-primary);
+}
+
+.wb-analysis-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wb-analysis-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 1rem;
+}
+
+.wb-analysis-row:last-child {
+  border-bottom: none;
+}
+
+.wb-analysis-row__label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.wb-analysis-row__value {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* ==================== ANIMACIONES ==================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

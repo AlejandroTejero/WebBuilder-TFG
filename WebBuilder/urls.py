@@ -14,5 +14,4 @@ urlpatterns = [
     path("preview/<int:api_request_id>/render/", views.site_render, name="site_render"),
     path("preview/<int:api_request_id>/render/regenerar/", views.site_render_regen, name="site_render_regen"),
 
-
 ]

@@ -557,14 +557,6 @@ body {
 
 /* ==================== PREVENIR OVERLAP ==================== */
 
-/* 
-  Cualquier elemento con position: fixed o absolute 
-  que no sea la navbar debe estar debajo
-*/
-body > *:not(.wb-navbar) {
-  z-index: auto;
-}
-
 /* La navbar siempre en la capa superior */
 .wb-navbar {
   z-index: 1000 !important;

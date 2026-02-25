@@ -1,0 +1,964 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block body_class %}procesos{% endblock %}
+
+{% block content %}
+<div class="asst-layout">
+
+  <!-- ═══════════════════════════════════════════════
+       PANEL IZQUIERDO — Stepper fijo
+  ════════════════════════════════════════════════ -->
+  <aside class="asst-sidebar">
+    <div class="asst-sidebar__inner">
+
+      <div class="asst-brand">
+        <span class="asst-brand__icon">⚡</span>
+        <span class="asst-brand__text">Asistente</span>
+      </div>
+
+      <nav class="asst-steps">
+
+        <!-- Paso 1 -->
+        <div class="asst-step {% if not analysis %}asst-step--active{% else %}asst-step--done{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot">
+              {% if analysis %}<span class="asst-step__check">✓</span>{% else %}<span>1</span>{% endif %}
+            </div>
+            <div class="asst-step__line"></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Introducir URL</div>
+            <div class="asst-step__desc">API pública en JSON o XML</div>
+          </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="asst-step {% if analysis and not llm_plan %}asst-step--active{% elif llm_plan %}asst-step--done{% else %}asst-step--pending{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot">
+              {% if llm_plan %}<span class="asst-step__check">✓</span>{% else %}<span>2</span>{% endif %}
+            </div>
+            <div class="asst-step__line"></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Análisis IA</div>
+            <div class="asst-step__desc">Schema generado automáticamente</div>
+          </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="asst-step {% if llm_plan %}asst-step--active{% else %}asst-step--pending{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot"><span>3</span></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Revisar y publicar</div>
+            <div class="asst-step__desc">Ajusta campos y genera el sitio</div>
+          </div>
+        </div>
+
+      </nav>
+
+      {% if api_request %}
+      <div class="asst-meta">
+        <div class="asst-meta__label">Análisis activo</div>
+        <div class="asst-meta__url">{{ api_request.api_url|truncatechars:45 }}</div>
+        <div class="asst-meta__status asst-meta__status--{{ api_request.status }}">
+          {% if api_request.status == "processed" %}✓ Procesado
+          {% elif api_request.status == "error" %}✗ Error
+          {% else %}⏳ Pendiente{% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <a href="{% url 'history' %}" class="asst-history-link">
+        <span>📋</span> Ver historial
+      </a>
+
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════
+       PANEL DERECHO — Dos columnas
+  ════════════════════════════════════════════════ -->
+  <main class="asst-content">
+
+    {% if messages %}
+      <div class="asst-alerts">
+        {% for message in messages %}
+          <div class="asst-alert asst-alert--{{ message.tags }}">
+            <span class="asst-alert__icon">
+              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}⚠{% else %}ℹ{% endif %}
+            </span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="asst-columns">
+
+      <!-- ╔══════════════════════════════╗
+           ║  COLUMNA IZQUIERDA           ║
+           ║  · Formulario URL + prompt   ║
+           ║  · Dataset analizado         ║
+           ╚══════════════════════════════╝ -->
+      <div class="asst-col asst-col--left">
+
+        <!-- BLOQUE 1: Formulario URL -->
+        <section class="asst-card" id="block-url">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge">Paso 1</div>
+            <h2 class="asst-card__title">Introduce la URL de la API</h2>
+            <p class="asst-card__subtitle">Soporta JSON y XML. La IA analizará la estructura y generará el schema automáticamente.</p>
+          </div>
+
+          <form method="post" class="asst-form" id="form-analyze">
+            {% csrf_token %}
+
+            <div class="asst-field">
+              <label class="asst-label" for="{{ form.api_url.id_for_label }}">URL de la API</label>
+              <div class="asst-input-group">
+                <span class="asst-input-icon">🔗</span>
+                {{ form.api_url }}
+              </div>
+              {% if form.api_url.errors %}
+                <div class="asst-field-error">{{ form.api_url.errors }}</div>
+              {% endif %}
+              <div class="asst-examples">
+                <span class="asst-examples__label">Prueba con:</span>
+                <button type="button" class="asst-example-chip" onclick="fillUrl('https://jsonplaceholder.typicode.com/posts')">JSONPlaceholder Posts</button>
+                <button type="button" class="asst-example-chip" onclick="fillUrl('https://www.w3schools.com/xml/plant_catalog.xml')">Plant Catalog XML</button>
+              </div>
+            </div>
+
+            <div class="asst-field">
+              <label class="asst-label" for="{{ form.user_prompt.id_for_label }}">
+                Describe el sitio que quieres
+                <span class="asst-label__optional">opcional</span>
+              </label>
+              {{ form.user_prompt }}
+              <p class="asst-hint">Ej: «Quiero un catálogo de productos con imágenes y precios destacados en estilo oscuro»</p>
+            </div>
+
+            {% if api_request %}
+              <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
+            {% endif %}
+
+            <div class="asst-form-footer">
+              <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze" onclick="showLoading()">
+                Analizar URL
+              </button>
+              {% if api_request and llm_plan %}
+                <button type="submit" class="asst-btn asst-btn--ghost" name="action" value="regenerate" onclick="showLoading()">
+                  🔄 Regenerar schema
+                </button>
+              {% endif %}
+            </div>
+
+          </form>
+        </section>
+
+        <!-- BLOQUE 2: Dataset analizado -->
+        {% if analysis %}
+        <section class="asst-card asst-card--result" id="block-analysis">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge asst-card__step-badge--done">Paso 2 — Completado</div>
+            <h2 class="asst-card__title">Dataset analizado</h2>
+          </div>
+
+          <div class="asst-analysis-grid">
+            {% if analysis.main_collection.found %}
+              <div class="asst-stat">
+                <div class="asst-stat__value">{{ analysis.main_collection.count }}</div>
+                <div class="asst-stat__label">Items encontrados</div>
+              </div>
+              <div class="asst-stat">
+                <div class="asst-stat__value">{{ analysis.keys.top|length|default:"—" }}</div>
+                <div class="asst-stat__label">Campos disponibles</div>
+              </div>
+              {% if analysis.main_collection.path %}
+              <div class="asst-stat asst-stat--wide">
+                <div class="asst-stat__value asst-stat__value--mono">{{ analysis.main_collection.path }}</div>
+                <div class="asst-stat__label">Ruta colección principal</div>
+              </div>
+              {% endif %}
+            {% else %}
+              <div class="asst-stat asst-stat--wide">
+                <div class="asst-stat__value asst-stat__value--muted">{{ analysis.message|default:"No se encontraron items" }}</div>
+                <div class="asst-stat__label">Estado</div>
+              </div>
+            {% endif %}
+            {% if api_request.response_summary %}
+              <div class="asst-stat asst-stat--wide">
+                <div class="asst-stat__value asst-stat__value--sm">{{ api_request.response_summary }}</div>
+                <div class="asst-stat__label">Resumen</div>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+        {% endif %}
+
+      </div><!-- /col-left -->
+
+      <!-- ╔══════════════════════════════╗
+           ║  COLUMNA DERECHA             ║
+           ║  · Schema generado           ║
+           ║  · Muestra de datos          ║
+           ╚══════════════════════════════╝ -->
+      <div class="asst-col asst-col--right">
+
+        <!-- BLOQUE 3: Error LLM -->
+        {% if llm_error %}
+        <section class="asst-card asst-card--error">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge asst-card__step-badge--error">Error IA</div>
+            <h2 class="asst-card__title">No se pudo generar el schema</h2>
+            <p class="asst-card__subtitle">{{ llm_error }}</p>
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- BLOQUE 4: Schema generado (placeholder si no hay) -->
+        {% if llm_plan %}
+        <section class="asst-card asst-card--schema" id="block-schema">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge asst-card__step-badge--ai">✦ IA</div>
+            <h2 class="asst-card__title">Schema generado</h2>
+            <p class="asst-card__subtitle">La IA analizó tu dataset y propuso este schema. Puedes ajustarlo campo a campo en el editor.</p>
+          </div>
+
+          <div class="asst-schema-overview">
+            <div class="asst-schema-meta">
+              <div class="asst-meta-pill">
+                <span class="asst-meta-pill__icon">🏷</span>
+                <span class="asst-meta-pill__label">Tipo</span>
+                <span class="asst-meta-pill__value">{{ llm_plan.site_type }}</span>
+              </div>
+              <div class="asst-meta-pill">
+                <span class="asst-meta-pill__icon">📝</span>
+                <span class="asst-meta-pill__label">Título</span>
+                <span class="asst-meta-pill__value">{{ llm_plan.site_title }}</span>
+              </div>
+              <div class="asst-meta-pill">
+                <span class="asst-meta-pill__icon">⚙</span>
+                <span class="asst-meta-pill__label">Campos</span>
+                <span class="asst-meta-pill__value">{{ llm_plan.fields|length }}</span>
+              </div>
+            </div>
+
+            {% if llm_plan.fields %}
+            <div class="asst-fields-list">
+              {% for field in llm_plan.fields %}
+                <div class="asst-field-chip">
+                  <code class="asst-field-chip__key">{{ field.key }}</code>
+                  <span class="asst-field-chip__arrow">→</span>
+                  <span class="asst-field-chip__label">{{ field.label }}</span>
+                </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="asst-card__actions">
+            <a href="{% url 'preview' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
+              Ajustar y publicar →
+            </a>
+            <a href="{% url 'preview' api_request.id %}" class="asst-btn asst-btn--ghost">
+              Ver preview de datos
+            </a>
+          </div>
+        </section>
+
+        {% else %}
+        <!-- Estado vacío columna derecha: aún no hay schema -->
+        <section class="asst-card asst-card--empty" id="block-schema-empty">
+          <div class="asst-empty-state">
+            <div class="asst-empty-state__icon">✦</div>
+            <div class="asst-empty-state__title">Aquí aparecerá el schema</div>
+            <div class="asst-empty-state__desc">Introduce una URL y la IA generará automáticamente el schema de campos para tu sitio.</div>
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- BLOQUE 5: Muestra de datos -->
+        {% if preview_items %}
+        {% load wb_extras %}
+        <section class="asst-card asst-card--preview" id="block-preview">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge asst-card__step-badge--preview">👁 Vista previa</div>
+            <h2 class="asst-card__title">Muestra de datos</h2>
+            <p class="asst-card__subtitle">3 items de tu dataset con los campos seleccionados por la IA.</p>
+          </div>
+
+          <div class="asst-preview-grid">
+            {% for item in preview_items %}
+              <div class="asst-preview-card">
+                <div class="asst-preview-card__index">#{{ forloop.counter }}</div>
+                {% for field in llm_plan.fields %}
+                  {% with val=item|get_item:field.key %}
+                    {% if val %}
+                      <div class="asst-preview-field">
+                        <span class="asst-preview-field__label">{{ field.label }}</span>
+                        <span class="asst-preview-field__value">{{ val|truncatechars:120 }}</span>
+                      </div>
+                    {% endif %}
+                  {% endwith %}
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="asst-preview-footer">
+            <a href="{% url 'preview' api_request.id %}" class="asst-btn asst-btn--ghost asst-btn--sm">
+              Ver todos los items →
+            </a>
+          </div>
+        </section>
+        {% endif %}
+
+      </div><!-- /col-right -->
+
+    </div><!-- /asst-columns -->
+
+  </main>
+</div>
+
+<!-- Loading overlay -->
+<div class="asst-loading" id="loading-overlay">
+  <div class="asst-loading__box">
+    <div class="asst-loading__spinner"></div>
+    <div class="asst-loading__title">Analizando URL...</div>
+    <div class="asst-loading__sub">La IA está procesando los datos</div>
+    <div class="asst-loading__steps">
+      <div class="asst-loading__step" id="ls-1">⬇ Descargando datos</div>
+      <div class="asst-loading__step" id="ls-2">🔍 Detectando estructura</div>
+      <div class="asst-loading__step" id="ls-3">✦ Generando schema con IA</div>
+    </div>
+  </div>
+</div>
+
+<style>
+.asst-layout {
+  display: flex;
+  min-height: calc(100vh - 64px);
+  background: #090909;
+  font-family: 'Outfit', system-ui, sans-serif;
+}
+
+/* ── SIDEBAR ── */
+.asst-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: #0e0e0e;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+.asst-sidebar__inner {
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  height: 100%;
+}
+.asst-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #fff;
+}
+.asst-brand__icon { font-size: 1.2rem; }
+
+.asst-steps { display: flex; flex-direction: column; }
+
+.asst-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  opacity: 0.3;
+  transition: opacity 0.3s;
+}
+.asst-step--active  { opacity: 1; }
+.asst-step--done    { opacity: 0.65; }
+.asst-step--pending { opacity: 0.25; }
+
+.asst-step__track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+.asst-step__dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #555;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+.asst-step--active .asst-step__dot {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: rgba(59,130,246,0.1);
+  box-shadow: 0 0 14px rgba(59,130,246,0.2);
+}
+.asst-step--done .asst-step__dot {
+  border-color: #22c55e;
+  color: #22c55e;
+  background: rgba(34,197,94,0.1);
+}
+.asst-step__check { font-size: 0.85rem; }
+.asst-step__line {
+  width: 1.5px;
+  min-height: 26px;
+  background: rgba(255,255,255,0.07);
+  margin: 3px 0;
+}
+.asst-step__info  { padding-top: 3px; }
+.asst-step__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+.asst-step--active .asst-step__label { color: #f1f5f9; }
+.asst-step__desc  { font-size: 0.72rem; color: #334155; margin-top: 2px; }
+.asst-step--active .asst-step__desc { color: #475569; }
+
+.asst-meta {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+.asst-meta__label {
+  color: #334155;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.asst-meta__url { color: #64748b; font-size: 0.72rem; word-break: break-all; margin-bottom: 0.5rem; }
+.asst-meta__status {
+  display: inline-flex;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.asst-meta__status--processed { background: rgba(34,197,94,0.1); color: #4ade80; }
+.asst-meta__status--error     { background: rgba(239,68,68,0.1);  color: #f87171; }
+.asst-meta__status--pending   { background: rgba(251,146,60,0.1); color: #fb923c; }
+
+.asst-history-link {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #334155;
+  text-decoration: none;
+  padding: 0.5rem 0;
+  transition: color 0.2s;
+}
+.asst-history-link:hover { color: #64748b; }
+
+/* ── CONTENIDO ── */
+.asst-content {
+  flex: 1;
+  padding: 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.asst-alerts { display: flex; flex-direction: column; gap: 0.5rem; }
+.asst-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  border-left: 3px solid;
+  animation: slideIn 0.3s ease;
+}
+.asst-alert--success  { background: rgba(34,197,94,0.07);  border-color: #22c55e; color: #86efac; }
+.asst-alert--error    { background: rgba(239,68,68,0.07);  border-color: #ef4444; color: #fca5a5; }
+.asst-alert--warning  { background: rgba(251,146,60,0.07); border-color: #fb923c; color: #fdba74; }
+.asst-alert--info     { background: rgba(59,130,246,0.07); border-color: #3b82f6; color: #93c5fd; }
+.asst-alert__icon     { flex-shrink: 0; margin-top: 1px; }
+
+/* ── CARDS ── */
+.asst-card {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 2rem;
+  animation: fadeUp 0.35s ease;
+}
+.asst-card--result { border-color: rgba(59,130,246,0.12); }
+.asst-card--schema { border-color: rgba(139,92,246,0.2); background: linear-gradient(135deg, #0f1621 0%, #100d1a 100%); }
+.asst-card--error  { border-color: rgba(239,68,68,0.2); background: #110d0d; }
+
+.asst-card__header { margin-bottom: 1.5rem; }
+
+.asst-card__step-badge {
+  display: inline-flex;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 0.65rem;
+  background: rgba(255,255,255,0.05);
+  color: #475569;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.asst-card__step-badge--done  { background: rgba(34,197,94,0.08);  color: #4ade80; border-color: rgba(34,197,94,0.18); }
+.asst-card__step-badge--ai    { background: rgba(139,92,246,0.08); color: #a78bfa; border-color: rgba(139,92,246,0.2);  }
+.asst-card__step-badge--error { background: rgba(239,68,68,0.08);  color: #f87171; border-color: rgba(239,68,68,0.18); }
+
+.asst-card__title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+}
+.asst-card__subtitle { font-size: 0.88rem; color: #475569; line-height: 1.55; }
+
+/* ── FORM ── */
+.asst-form { display: flex; flex-direction: column; gap: 1.2rem; }
+.asst-field { display: flex; flex-direction: column; gap: 0.4rem; }
+.asst-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.asst-label__optional {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #334155;
+  background: rgba(255,255,255,0.03);
+  padding: 1px 7px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.asst-input-group { position: relative; display: flex; align-items: center; }
+.asst-input-icon {
+  position: absolute;
+  left: 13px;
+  font-size: 0.95rem;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.asst-input-group input[type="url"],
+.asst-input-group input[type="text"] {
+  width: 100%;
+  padding: 0.825rem 1rem 0.825rem 2.75rem;
+  background: #0c0c0c;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 0.93rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.asst-input-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+}
+.asst-form textarea.form-control {
+  width: 100%;
+  padding: 0.825rem 1rem;
+  background: #0c0c0c;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 85px;
+  transition: border-color 0.2s;
+}
+.asst-form textarea.form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+}
+.asst-examples {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+.asst-examples__label { font-size: 0.72rem; color: #334155; }
+.asst-example-chip {
+  font-size: 0.71rem;
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.02);
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.asst-example-chip:hover { border-color: #3b82f6; color: #93c5fd; background: rgba(59,130,246,0.05); }
+.asst-hint { font-size: 0.76rem; color: #334155; font-style: italic; }
+.asst-field-error { font-size: 0.78rem; color: #f87171; }
+.asst-form-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ── BOTONES ── */
+.asst-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.asst-btn--primary {
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.2);
+}
+.asst-btn--primary:hover { background: #2563eb; box-shadow: 0 6px 20px rgba(59,130,246,0.3); transform: translateY(-1px); }
+.asst-btn--ghost {
+  background: transparent;
+  color: #475569;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.asst-btn--ghost:hover { background: rgba(255,255,255,0.03); color: #64748b; }
+.asst-btn--lg { padding: 0.85rem 1.85rem; font-size: 0.93rem; }
+
+/* ── STATS ── */
+.asst-analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.85rem;
+}
+.asst-stat {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 1rem;
+}
+.asst-stat--wide { grid-column: 1 / -1; }
+.asst-stat__value {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 0.2rem;
+}
+.asst-stat__value--mono { font-family: monospace; font-size: 0.82rem; word-break: break-all; }
+.asst-stat__value--muted { color: #475569; font-size: 0.88rem; }
+.asst-stat__value--sm   { font-size: 0.82rem; }
+.asst-stat__label { font-size: 0.72rem; color: #334155; }
+
+/* ── SCHEMA ── */
+.asst-schema-overview { display: flex; flex-direction: column; gap: 1.2rem; }
+.asst-schema-meta { display: flex; gap: 0.65rem; flex-wrap: wrap; }
+.asst-meta-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(139,92,246,0.07);
+  border: 1px solid rgba(139,92,246,0.15);
+  border-radius: 20px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+}
+.asst-meta-pill__icon { font-size: 0.85rem; }
+.asst-meta-pill__label { color: #7c3aed; }
+.asst-meta-pill__value { color: #c4b5fd; font-weight: 600; }
+
+.asst-fields-list { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.asst-field-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+}
+.asst-field-chip__key   { color: #60a5fa; font-family: monospace; font-size: 0.75rem; }
+.asst-field-chip__arrow { color: #1e293b; }
+.asst-field-chip__label { color: #64748b; }
+
+.asst-card__actions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ── LOADING ── */
+.asst-loading {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(9,9,9,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.asst-loading.active { display: flex; }
+.asst-loading__box {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px;
+  padding: 2.25rem 2.75rem;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+.asst-loading__spinner {
+  width: 42px;
+  height: 42px;
+  border: 3px solid rgba(59,130,246,0.15);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.asst-loading__title  { font-size: 1.05rem; font-weight: 600; color: #f1f5f9; }
+.asst-loading__sub    { font-size: 0.8rem; color: #334155; }
+.asst-loading__steps  { display: flex; flex-direction: column; gap: 0.35rem; width: 100%; margin-top: 0.4rem; }
+.asst-loading__step {
+  font-size: 0.77rem;
+  color: #1e293b;
+  padding: 0.35rem 0.7rem;
+  border-radius: 7px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.03);
+  text-align: left;
+  transition: all 0.4s;
+}
+.asst-loading__step.active { color: #93c5fd; background: rgba(59,130,246,0.07); border-color: rgba(59,130,246,0.12); }
+.asst-loading__step.done   { color: #4ade80; background: rgba(34,197,94,0.05);  border-color: rgba(34,197,94,0.1); }
+
+/* ── PREVIEW CARDS ── */
+.asst-card--preview { border-color: rgba(255,255,255,0.07); }
+
+.asst-card__step-badge--preview {
+  background: rgba(251,191,36,0.08);
+  color: #fbbf24;
+  border-color: rgba(251,191,36,0.18);
+}
+
+.asst-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .asst-preview-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .asst-preview-grid { grid-template-columns: 1fr; }
+}
+
+.asst-preview-card {
+  background: #0c0c0c;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s;
+}
+.asst-preview-card:hover { border-color: rgba(255,255,255,0.13); }
+
+.asst-preview-card__index {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.1rem;
+}
+
+.asst-preview-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.asst-preview-field__label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.asst-preview-field__value {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.asst-preview-footer {
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.asst-btn--sm {
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+}
+
+/* ── ANIMACIONES ── */
+@keyframes fadeUp  { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes spin    { to { transform: rotate(360deg); } }
+
+/* ── DOS COLUMNAS ── */
+.asst-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+.asst-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Estado vacío columna derecha */
+.asst-card--empty {
+  border: 1px dashed rgba(255,255,255,0.07);
+  background: transparent;
+}
+
+.asst-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.5rem 1rem;
+  gap: 0.75rem;
+}
+
+.asst-empty-state__icon {
+  font-size: 2rem;
+  opacity: 0.12;
+  line-height: 1;
+}
+
+.asst-empty-state__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.asst-empty-state__desc {
+  font-size: 0.8rem;
+  color: #1e293b;
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+/* Preview grid en columna (1 columna, no 3) */
+.asst-col--right .asst-preview-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .asst-columns { grid-template-columns: 1fr; }
+  .asst-col--right .asst-preview-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .asst-layout     { flex-direction: column; }
+  .asst-sidebar    { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .asst-sidebar__inner { padding: 1.25rem; flex-direction: row; flex-wrap: wrap; gap: 1rem; }
+  .asst-steps      { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
+  .asst-step__line { display: none; }
+  .asst-step       { flex-direction: row; align-items: center; gap: 0.5rem; padding: 0.3rem 0.5rem; opacity: 1; }
+  .asst-step--pending { opacity: 0.4; }
+  .asst-meta, .asst-history-link { display: none; }
+  .asst-content    { padding: 1.25rem; }
+  .asst-columns    { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+function fillUrl(url) {
+  const input = document.querySelector('#form-analyze input[type="url"]');
+  if (input) { input.value = url; input.focus(); }
+}
+
+function showLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  const steps = ['ls-1', 'ls-2', 'ls-3'].map(id => document.getElementById(id));
+  steps.forEach((step, i) => {
+    setTimeout(() => {
+      if (i > 0 && steps[i-1]) { steps[i-1].classList.remove('active'); steps[i-1].classList.add('done'); }
+      if (step) step.classList.add('active');
+    }, i * 2400);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const target = document.getElementById('block-schema') || document.getElementById('block-analysis');
+  if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
+});
+</script>
+
+{% endblock %}

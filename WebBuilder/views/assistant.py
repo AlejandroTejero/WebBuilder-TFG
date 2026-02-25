@@ -49,6 +49,57 @@ def _get_cache_key(api_url: str) -> str:
 
 # ────────────────────────── RENDER ──────────────────────────────────
 
+def _build_preview_items(
+    parsed_data: object,
+    analysis: dict | None,
+    plan: dict | None,
+    *,
+    max_items: int = 3,
+) -> list[dict]:
+    """
+    Extrae hasta max_items items del dataset normalizados con los fields del plan.
+    Devuelve lista de dicts {key: str_value, ...} listos para el template.
+    """
+    if not parsed_data or not plan:
+        return []
+
+    fields = plan.get("fields") or []
+    if not fields:
+        return []
+
+    main = (analysis or {}).get("main_collection") or {}
+    main_path = main.get("path")
+    if main_path is None:
+        return []
+
+    raw_items = get_by_path(parsed_data, main_path)
+    if not isinstance(raw_items, list):
+        return []
+
+    result = []
+    for raw in raw_items[:max_items]:
+        if not isinstance(raw, dict):
+            continue
+        item: dict = {}
+        for field in fields:
+            key = field.get("key", "")
+            val = raw.get(key)
+            if val is None:
+                continue
+            if isinstance(val, (int, float, bool)):
+                item[key] = str(val)
+            elif isinstance(val, str):
+                item[key] = val.strip()
+            else:
+                try:
+                    item[key] = json.dumps(val, ensure_ascii=False)
+                except Exception:
+                    item[key] = str(val)
+        result.append(item)
+
+    return result
+
+
 def render_assistant(
     request,
     *,
@@ -71,6 +122,15 @@ def render_assistant(
         context["llm_plan"] = llm_plan
     if llm_error is not None:
         context["llm_error"] = llm_error
+
+    # Preview items: solo se calculan si hay datos y plan
+    if api_request is not None and llm_plan is not None:
+        context["preview_items"] = _build_preview_items(
+            api_request.parsed_data,
+            analysis,
+            llm_plan,
+        )
+
     return render(request, template, context)
 
 
