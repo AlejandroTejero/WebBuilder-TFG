@@ -214,9 +214,10 @@
   border-radius: 20px;
   margin-bottom: 0.65rem;
   background: rgba(255,255,255,0.05);
-  color: #475569;
+  color: #4781cc;
   border: 1px solid rgba(255,255,255,0.07);
 }
+
 .asst-card__step-badge--done    { background: rgba(34,197,94,0.08);   color: #4ade80; border-color: rgba(34,197,94,0.18);   }
 .asst-card__step-badge--ai      { background: rgba(139,92,246,0.08);  color: #a78bfa; border-color: rgba(139,92,246,0.2);   }
 .asst-card__step-badge--error   { background: rgba(239,68,68,0.08);   color: #f87171; border-color: rgba(239,68,68,0.18);   }
@@ -229,7 +230,7 @@
   margin-bottom: 0.35rem;
   letter-spacing: -0.02em;
 }
-.asst-card__subtitle { font-size: 0.88rem; color: #475569; line-height: 1.55; }
+.asst-card__subtitle { font-size: 0.88rem; color: #85a2c7; line-height: 1.55; }
 
 .asst-card__actions {
   display: flex;
@@ -261,7 +262,7 @@
 .asst-label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #64748b;
+  color: #85a2c7;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -269,7 +270,7 @@
 .asst-label__optional {
   font-size: 0.68rem;
   font-weight: 400;
-  color: #334155;
+  color: #85a2c7;
   background: rgba(255,255,255,0.03);
   padding: 1px 7px;
   border-radius: 10px;
@@ -328,7 +329,7 @@
   flex-wrap: wrap;
   margin-top: 0.25rem;
 }
-.asst-examples__label { font-size: 0.72rem; color: #334155; }
+.asst-examples__label { font-size: 0.72rem; color: #85a2c7; }
 .asst-example-chip {
   font-size: 0.71rem;
   padding: 2px 9px;
@@ -342,7 +343,7 @@
 }
 .asst-example-chip:hover { border-color: #3b82f6; color: #93c5fd; background: rgba(59,130,246,0.05); }
 
-.asst-hint        { font-size: 0.76rem; color: #334155; font-style: italic; }
+.asst-hint        { font-size: 0.8rem; color: #85a2c7; font-style: italic; }
 .asst-field-error { font-size: 0.78rem; color: #f87171; }
 
 .asst-form-footer {
