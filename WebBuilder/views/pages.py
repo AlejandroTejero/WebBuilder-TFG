@@ -1,13 +1,27 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-# Render de algunas vistas
+from ..models import APIRequest, GeneratedSite
+
 
 def home(request):
-
     try:
-        # Devuelve la plantilla de home
-        return render(request, "WebBuilder/home.html")
+        context = {}
+
+        if request.user.is_authenticated:
+            context["recent_requests"] = (
+                APIRequest.objects
+                .filter(user=request.user)
+                .order_by("-date")[:3]
+            )
+            context["recent_sites"] = (
+                GeneratedSite.objects
+                .filter(project_source__user=request.user)
+                .select_related("project_source")
+                .order_by("-created_at")[:3]
+            )
+
+        return render(request, "WebBuilder/home.html", context)
+
     except Exception as exc:
-        # Captura errores inesperados y devuelve mensaje
         return HttpResponse(f"Error al procesar: {exc}")

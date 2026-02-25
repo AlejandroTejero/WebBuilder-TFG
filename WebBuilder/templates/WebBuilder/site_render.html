@@ -148,7 +148,7 @@
       </button>
     {% endif %}
 
-    <a class="wb-btn wb-btn-ghost" href="{% url 'preview' api_request.id %}">
+    <a class="wb-btn wb-btn-ghost" href="{% url 'edit' api_request.id %}">
       ← Editor
     </a>
   </div>
@@ -208,7 +208,7 @@
       <h2>Sitio no publicado</h2>
       <p>El schema está listo pero aún no has generado el sitio.<br>
          Vuelve al editor y pulsa "Aceptar y publicar".</p>
-      <a class="np-btn" href="{% url 'preview' api_request.id %}">
+      <a class="np-btn" href="{% url 'edit' api_request.id %}">
         Ir al editor →
       </a>
     </div>

@@ -1,0 +1,289 @@
+/* =============================================================
+   WebBuilder — Editor de schema (edit.css)
+   Extiende assistant.css con los estilos específicos del editor.
+   ============================================================= */
+
+/* ── META STATS EN SIDEBAR ── */
+.edit-meta-stats {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+.edit-meta-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+.edit-meta-stat__value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+.edit-meta-stat__label {
+  font-size: 0.7rem;
+  color: #334155;
+}
+
+/* ── ESTADO PUBLICACIÓN EN SIDEBAR ── */
+.edit-publish-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid;
+}
+.edit-publish-status--pending   { background: rgba(251,146,60,0.05);  border-color: rgba(251,146,60,0.15); }
+.edit-publish-status--published { background: rgba(34,197,94,0.05);   border-color: rgba(34,197,94,0.15);  }
+
+.edit-publish-status__icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.edit-publish-status--pending   .edit-publish-status__icon { color: #fb923c; }
+.edit-publish-status--published .edit-publish-status__icon { color: #4ade80; }
+
+.edit-publish-status__title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+.edit-publish-status__desc {
+  font-size: 0.72rem;
+  color: #334155;
+  margin-top: 2px;
+}
+.edit-publish-status__link {
+  font-size: 0.72rem;
+  color: #4ade80;
+  text-decoration: none;
+  margin-top: 2px;
+  display: block;
+}
+.edit-publish-status__link:hover { color: #86efac; }
+
+/* ── CARDS ESPECÍFICAS ── */
+.edit-card--publish {
+  border-color: rgba(59,130,246,0.15);
+}
+
+/* ── META ROW (tipo + título) ── */
+.edit-meta-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0.75rem;
+  align-items: end;
+}
+.edit-select {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  background: #0c0c0c;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 0.88rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 2rem;
+}
+.edit-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+}
+.edit-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #0c0c0c;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.edit-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+}
+
+/* ── CAMPOS HEADER ── */
+.edit-fields-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.edit-fields-count {
+  font-size: 0.72rem;
+  color: #334155;
+  font-weight: 600;
+}
+
+/* ── LISTA DE CAMPOS ── */
+.edit-fields-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.edit-fields-empty {
+  font-size: 0.82rem;
+  color: #334155;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+/* ── FILA DE CAMPO ── */
+.edit-field-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.75rem;
+  background: #0c0c0c;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+.edit-field-row:hover { border-color: rgba(255,255,255,0.1); }
+.edit-field-row.drag-over {
+  border-color: #3b82f6;
+  background: rgba(59,130,246,0.06);
+}
+.edit-field-row.dragging { opacity: 0.4; }
+
+.edit-field-row__handle {
+  color: #1e293b;
+  cursor: grab;
+  font-size: 1rem;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.edit-field-row:hover .edit-field-row__handle { color: #475569; }
+.edit-field-row__handle:active { cursor: grabbing; }
+
+.edit-field-row__check { flex-shrink: 0; }
+.edit-checkbox {
+  width: 14px;
+  height: 14px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.edit-field-row__key {
+  color: #60a5fa;
+  font-family: monospace;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  min-width: 100px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edit-field-row__label {
+  flex: 1;
+  padding: 0.3rem 0.6rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-family: inherit;
+  transition: all 0.15s;
+  min-width: 0;
+}
+.edit-field-row__label:hover {
+  border-color: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+}
+.edit-field-row__label:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: rgba(59,130,246,0.05);
+  color: #f1f5f9;
+}
+
+/* ── CAMPOS NO INCLUIDOS ── */
+.edit-unused-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed rgba(255,255,255,0.07);
+  border-radius: 10px;
+}
+.edit-unused-keys__label {
+  font-size: 0.72rem;
+  color: #334155;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.edit-unused-keys__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.edit-key-chip {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.edit-key-chip:hover {
+  border-color: #3b82f6;
+  color: #93c5fd;
+  background: rgba(59,130,246,0.06);
+}
+.edit-key-chip:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── PREVIEW LISTA (columna derecha) ── */
+.edit-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.edit-preview-item {
+  background: #0c0c0c;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s;
+}
+.edit-preview-item:hover { border-color: rgba(255,255,255,0.1); }
+.edit-preview-item__index {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.1rem;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .edit-meta-row { grid-template-columns: 1fr; }
+}

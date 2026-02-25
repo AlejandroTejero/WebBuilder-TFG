@@ -10,8 +10,7 @@ urlpatterns = [
     path("login", LoginView.as_view(next_page="home"), name="login"),
     path("registro", views.register, name="register"),
 	
-    path("preview/<int:api_request_id>", views.preview, name="preview"),
-    path("preview/<int:api_request_id>/render/", views.site_render, name="site_render"),
-    path("preview/<int:api_request_id>/render/regenerar/", views.site_render_regen, name="site_render_regen"),
-
+    path("edit/<int:api_request_id>", views.edit, name="edit"),
+    path("edit/<int:api_request_id>/render/", views.site_render, name="site_render"),
+    path("edit/<int:api_request_id>/render/regenerar/", views.site_render_regen, name="site_render_regen"),
 ]

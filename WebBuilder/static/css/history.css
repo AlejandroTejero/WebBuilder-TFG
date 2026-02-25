@@ -1,0 +1,186 @@
+/* =============================================================
+   WebBuilder — Historial (history.css)
+   Extiende assistant.css con los estilos específicos del historial.
+   ============================================================= */
+
+/* ── STATS SIDEBAR ── */
+.hist-sidebar-stats {
+  display: flex;
+  gap: 1.25rem;
+}
+.hist-sidebar-stat__value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1;
+}
+.hist-sidebar-stat__label {
+  font-size: 0.7rem;
+  color: #334155;
+  margin-top: 3px;
+}
+
+/* ── SECCIÓN LINKS SIDEBAR ── */
+.hist-sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.hist-sidebar-link {
+  font-size: 0.82rem;
+  color: #475569;
+  text-decoration: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+.hist-sidebar-link:hover {
+  color: #94a3b8;
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.06);
+}
+
+/* ── CABECERA DE SECCIÓN ── */
+.hist-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.hist-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.2rem;
+}
+.hist-section-desc {
+  font-size: 0.82rem;
+  color: #334155;
+}
+.hist-count-badge {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-top: 2px;
+}
+
+/* ── GRID DE CARDS ── */
+.hist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* ── CARD ── */
+.hist-card {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: border-color 0.2s, transform 0.2s;
+  animation: fadeUp 0.35s ease;
+}
+.hist-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+}
+.hist-card--done  { border-color: rgba(139,92,246,0.15); }
+.hist-card--error { border-color: rgba(239,68,68,0.15); background: #110d0d; }
+.hist-card--site  { border-color: rgba(59,130,246,0.15); }
+
+/* ── CABECERA CARD ── */
+.hist-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.hist-card__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.hist-card__status-dot--ok      { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+.hist-card__status-dot--error   { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+.hist-card__status-dot--pending { background: #fb923c; box-shadow: 0 0 6px rgba(251,146,60,0.4); }
+
+.hist-card__id {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #334155;
+}
+.hist-card__date {
+  font-size: 0.7rem;
+  color: #1e293b;
+  margin-left: auto;
+}
+.hist-card__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
+}
+.hist-card__url {
+  font-size: 0.75rem;
+  color: #475569;
+  word-break: break-all;
+  line-height: 1.4;
+  font-family: monospace;
+}
+.hist-card__summary {
+  font-size: 0.78rem;
+  color: #334155;
+  line-height: 1.45;
+}
+
+/* ── PILLS ── */
+.hist-card__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.1rem;
+}
+.hist-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.04);
+  color: #475569;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.hist-pill--green  { background: rgba(34,197,94,0.08);  color: #4ade80; border-color: rgba(34,197,94,0.18);  }
+.hist-pill--red    { background: rgba(239,68,68,0.08);  color: #f87171; border-color: rgba(239,68,68,0.18);  }
+.hist-pill--orange { background: rgba(251,146,60,0.08); color: #fb923c; border-color: rgba(251,146,60,0.18); }
+.hist-pill--purple { background: rgba(139,92,246,0.08); color: #a78bfa; border-color: rgba(139,92,246,0.18); }
+.hist-pill--blue   { background: rgba(59,130,246,0.08); color: #60a5fa; border-color: rgba(59,130,246,0.18); }
+
+/* ── ACCIONES CARD ── */
+.hist-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  flex-wrap: wrap;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hist-grid { grid-template-columns: 1fr; }
+  .hist-sidebar-stats { flex-direction: row; }
+}

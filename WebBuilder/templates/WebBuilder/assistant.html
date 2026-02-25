@@ -266,10 +266,10 @@
           </div>
 
           <div class="asst-card__actions">
-            <a href="{% url 'preview' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
+            <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
               Ajustar y publicar →
             </a>
-            <a href="{% url 'preview' api_request.id %}" class="asst-btn asst-btn--ghost">
+            <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--ghost">
               Ver preview de datos
             </a>
           </div>
@@ -315,7 +315,7 @@
           </div>
 
           <div class="asst-preview-footer">
-            <a href="{% url 'preview' api_request.id %}" class="asst-btn asst-btn--ghost asst-btn--sm">
+            <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--ghost asst-btn--sm">
               Ver todos los items →
             </a>
           </div>

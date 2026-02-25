@@ -1,9 +1,131 @@
-{% extends 'WebBuilder/base.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crear cuenta — WebBuilder</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body class="auth-page">
 
-{% block body_class %}register{% endblock %}
+  <div class="auth-layout">
 
-{% block content %}
+    <!-- ── PANEL IZQUIERDO — Branding ── -->
+    <div class="auth-brand">
+      <div class="auth-brand__inner">
 
+        <div class="auth-brand__logo">
+          <span class="auth-brand__icon">⚡</span>
+          <span class="auth-brand__name">WebBuilder</span>
+        </div>
 
-{% endblock %}
+        <div class="auth-brand__headline">
+          <h1>Empieza a construir<br>con IA hoy</h1>
+          <p>Crea tu cuenta gratis y genera tu primera web en minutos.</p>
+        </div>
+
+        <div class="auth-brand__steps">
+          <div class="auth-step">
+            <div class="auth-step__num">1</div>
+            <span>Crea tu cuenta en segundos</span>
+          </div>
+          <div class="auth-step">
+            <div class="auth-step__num">2</div>
+            <span>Pega cualquier URL de API pública</span>
+          </div>
+          <div class="auth-step">
+            <div class="auth-step__num">3</div>
+            <span>Descarga tu proyecto Django listo</span>
+          </div>
+        </div>
+
+        <div class="auth-brand__grid"></div>
+
+      </div>
+    </div>
+
+    <!-- ── PANEL DERECHO — Formulario ── -->
+    <div class="auth-form-panel">
+      <div class="auth-form-box">
+
+        <div class="auth-form-header">
+          <div class="auth-form-badge">Registro gratuito</div>
+          <h2 class="auth-form-title">Crear cuenta</h2>
+          <p class="auth-form-subtitle">Solo necesitas un usuario y contraseña</p>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="auth-error">
+            {% for err in form.non_field_errors %}
+              <div>{{ err }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="post" class="auth-form" novalidate>
+          {% csrf_token %}
+
+          <!-- Username -->
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.username.id_for_label }}">Usuario</label>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">👤</span>
+              {{ form.username }}
+            </div>
+            {% if form.username.errors %}
+              <div class="auth-field-error">{{ form.username.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Password 1 -->
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.password1.id_for_label }}">Contraseña</label>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">🔒</span>
+              {{ form.password1 }}
+            </div>
+            {% if form.password1.errors %}
+              <div class="auth-field-error">{{ form.password1.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Password 2 -->
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.password2.id_for_label }}">Repite la contraseña</label>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">🔒</span>
+              {{ form.password2 }}
+            </div>
+            {% if form.password2.errors %}
+              <div class="auth-field-error">{{ form.password2.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Hint de requisitos de contraseña -->
+          <div class="auth-hint">
+            Mínimo 8 caracteres. No puede ser solo numérica ni demasiado común.
+          </div>
+
+          <button type="submit" class="auth-submit">
+            Crear cuenta →
+          </button>
+
+        </form>
+
+        <div class="auth-form-footer">
+          <span>¿Ya tienes cuenta?</span>
+          <a href="{% url 'login' %}">Iniciar sesión →</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

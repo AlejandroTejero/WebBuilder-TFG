@@ -2,72 +2,113 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Iniciar sesión — WebBuilder</title>
-
-  <!-- Icono opcional -->
   <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
-
-  <!-- Fuente opcional (puedes quitarla si no la necesitas) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <!-- Estilos del login (estilo Uiverse adaptado) -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
+
 </head>
-<body class="login-page">
+<body class="auth-page">
 
-  <div class="login-container">
-    <h3>Sign In</h3>
-    <p class="sub">Inicia sesión para continuar</p>
+  <div class="auth-layout">
 
-    {# Errores globales (p.ej. credenciales inválidas) #}
-    {% if form.non_field_errors %}
-      <div class="error-message">
-        {% for err in form.non_field_errors %}
-          <div>{{ err }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
+    <!-- ── PANEL IZQUIERDO — Branding ── -->
+    <div class="auth-brand">
+      <div class="auth-brand__inner">
 
-    <form action="{% url 'login' %}" method="post" class="form" novalidate>
-      {% csrf_token %}
+        <div class="auth-brand__logo">
+          <span class="auth-brand__icon">⚡</span>
+          <span class="auth-brand__name">WebBuilder</span>
+        </div>
 
-      <div class="field">
-        {{ form.username.label_tag }}
-        {{ form.username }}
-        {% if form.username.errors %}
-          <div class="error-message">{{ form.username.errors.0 }}</div>
-        {% endif %}
-      </div>
+        <div class="auth-brand__headline">
+          <h1>De una URL a una<br>web completa</h1>
+          <p>La IA analiza tu API, genera el schema y diseña el sitio. Sin código.</p>
+        </div>
 
-      <div class="field">
-        {{ form.password.label_tag }}
-        {{ form.password }}
-        {% if form.password.errors %}
-          <div class="error-message">{{ form.password.errors.0 }}</div>
-        {% endif %}
-      </div>
+        <div class="auth-brand__steps">
+          <div class="auth-step">
+            <div class="auth-step__num">1</div>
+            <span>Introduce la URL de tu API</span>
+          </div>
+          <div class="auth-step">
+            <div class="auth-step__num">2</div>
+            <span>La IA genera el schema automáticamente</span>
+          </div>
+          <div class="auth-step">
+            <div class="auth-step__num">3</div>
+            <span>Publica o descarga tu proyecto Django</span>
+          </div>
+        </div>
 
-      <span class="forgot-password">
-        <a href="{% url 'history' %}">¿Olvidaste tu contraseña?</a>
-      </span>
+        <!-- Grid decorativo -->
+        <div class="auth-brand__grid"></div>
 
-      <input class="login-button" type="submit" value="Iniciar sesión">
-    </form>
-
-    <div class="social-account-container">
-      <span class="title">O inicia sesión con</span>
-      <div class="social-accounts">
-        <!-- De momento redirige a historial, cuando actives Google OAuth cambiamos esta URL -->
-        <a class="social-button google" href="{% url 'history' %}" aria-label="Iniciar sesión con Google (próximamente)">
-          <svg class="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512" aria-hidden="true" focusable="false">
-            <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
-          </svg>
-        </a>
       </div>
     </div>
 
-    <p>¿No tienes cu
+    <!-- ── PANEL DERECHO — Formulario ── -->
+    <div class="auth-form-panel">
+      <div class="auth-form-box">
+
+        <div class="auth-form-header">
+          <div class="auth-form-badge">Bienvenido de vuelta</div>
+          <h2 class="auth-form-title">Iniciar sesión</h2>
+          <p class="auth-form-subtitle">Accede a tus proyectos y análisis guardados</p>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="auth-error">
+            {% for err in form.non_field_errors %}
+              <div>{{ err }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form action="{% url 'login' %}" method="post" class="auth-form" novalidate>
+          {% csrf_token %}
+
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.username.id_for_label }}">Usuario</label>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">👤</span>
+              {{ form.username }}
+            </div>
+            {% if form.username.errors %}
+              <div class="auth-field-error">{{ form.username.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="{{ form.password.id_for_label }}">Contraseña</label>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">🔒</span>
+              {{ form.password }}
+            </div>
+            {% if form.password.errors %}
+              <div class="auth-field-error">{{ form.password.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="auth-submit">
+            Entrar →
+          </button>
+
+        </form>
+
+        <div class="auth-form-footer">
+          <span>¿No tienes cuenta?</span>
+          <a href="{% url 'register' %}">Regístrate gratis →</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
