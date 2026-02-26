@@ -18,6 +18,10 @@
   --navbar-height: 64px;
 }
 
+body {
+  background: #0A0A0A;
+}
+
 /* ==================== NAVBAR PRINCIPAL ==================== */
 
 .wb-navbar {
@@ -281,6 +285,7 @@
   white-space: nowrap;
 }
 
+/*
 .wb-nav-btn--secondary {
   background-color: transparent;
   color: var(--navbar-text);
@@ -290,6 +295,21 @@
 .wb-nav-btn--secondary:hover {
   background-color: var(--navbar-hover-bg);
   border-color: rgba(255, 255, 255, 0.15);
+}
+*/
+
+.wb-nav-btn--secondary {
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+  color: #ffffff;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 15px rgba(109, 40, 217, 0.3);
+}
+
+.wb-nav-btn--secondary:hover {
+  background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow: 0 6px 20px rgba(109, 40, 217, 0.45);
+  transform: translateY(-1px);
 }
 
 .wb-nav-btn--primary {

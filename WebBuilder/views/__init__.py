@@ -1,15 +1,9 @@
-# Autenticación
 from .auth import register
-# Páginas simples
 from .pages import home
-# Asistente
 from .assistant import assistant
-# Historial
 from .history import history
-# Editor de schema
 from .edit import edit
-# Render a pantalla completa
-from .render import site_render, site_render_regen
+from .render import site_render, site_render_detail, site_render_regen
 
 __all__ = [
     "register",
@@ -18,5 +12,6 @@ __all__ = [
     "history",
     "edit",
     "site_render",
+    "site_render_detail",
     "site_render_regen",
 ]

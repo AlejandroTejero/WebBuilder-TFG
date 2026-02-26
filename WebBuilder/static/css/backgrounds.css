@@ -4,10 +4,12 @@
    ============================================================ */
 
 
-/* ── Fondo global ── */
-.home-modern {
+/*
+.home {
     background: #0A0A0A;
 }
+{% block body_class %}home{% endblock %}
+*/
 
 
 /* ── Hero ── */

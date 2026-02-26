@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2&xzt^3*dhzwlnj*bwd0izlz*vvkd15j1_e3jxqs9lcf3o^)u1'
+SECRET_KEY = os.getenv("SECRET_KEY", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -127,10 +127,14 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Directo al login si no esta logueado
 LOGIN_URL = 'login'
-
+# Vuelta al home si no tiene next page
+LOGIN_REDIRECT_URL = 'home'
+# Manda al login tras un logout
+LOGOUT_REDIRECT_URL = 'login'
 
 # LLM
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
-LLM_MODEL = os.getenv("LLM_MODEL", "liquid/lfm-2.5-1.2b-instruct:free")
+LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")

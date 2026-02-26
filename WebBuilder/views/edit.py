@@ -22,6 +22,7 @@ from typing import Any
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from ..models import APIRequest, GeneratedSite
 from ..utils.analysis import build_analysis
@@ -94,12 +95,12 @@ def edit(request, api_request_id: int):
     plan = api_request.field_mapping
     if not plan:
         messages.error(request, "Este análisis no tiene schema del LLM todavía.")
-        return redirect(f"/asistente?api_request_id={api_request.id}")
+        return redirect(reverse("assistant") + f"?api_request_id={api_request.id}")
 
     if not api_request.parsed_data:
         messages.error(request, "Este análisis no tiene datos parseados.")
-        return redirect(f"/asistente?api_request_id={api_request.id}")
-
+        return redirect(reverse("assistant") + f"?api_request_id={api_request.id}")
+    
     # Normalizar plan (compatibilidad con schema antiguo y nuevo)
     if not isinstance(plan, dict):
         plan = {}
@@ -221,7 +222,6 @@ def edit(request, api_request_id: int):
 
             site.save()
             messages.success(request, "Plan aceptado y sitio publicado ✅")
-            #return redirect("site_home", site_id=site.id)
             return redirect("site_render", api_request_id=api_request.id)
 
     # ──────────────── GET — construir contexto ────────────────────────

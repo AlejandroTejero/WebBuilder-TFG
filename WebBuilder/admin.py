@@ -230,7 +230,7 @@ class GeneratedSiteAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Origen", {
-            "fields": ("project_source", "plublic_id", "created_at", "updated_at"),
+            "fields": ("project_source", "public_id", "created_at", "updated_at"),
         }),
         ("Plan aceptado", {
             "fields": ("site_title", "site_type_badge", "fields_count", "accepted_plan_pretty"),
@@ -245,7 +245,7 @@ class GeneratedSiteAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = (
-        "plublic_id", "created_at", "updated_at",
+        "public_id", "created_at", "updated_at",
         "site_title", "site_type_badge", "fields_count", "has_theme_badge", "owner",
         "accepted_plan_pretty", "theme_css_pretty", "theme_templates_pretty",
         "view_link", "edit_link",

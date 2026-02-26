@@ -1,0 +1,30 @@
+/* =============================== Fondo global oscuro =============================== */
+
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: #0A0A0A;
+  pointer-events: none;
+}
+
+/* =============================== Fondo Asistente =============================== */
+.procesos {
+  background: #0A0A0A;
+}
+
+/* =============================== Fondo Historial =============================== */
+.historial {
+  background: #0A0A0A;
+}
+
+/* =============================== Fondo Preview =============================== */
+.preview {
+  background: #0A0A0A;
+}
+
+/* =============================== Fondo Login / Register =============================== */
+.login,
+.register {
+  background: #0A0A0A;
+}

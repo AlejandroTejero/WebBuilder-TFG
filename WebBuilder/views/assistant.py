@@ -25,6 +25,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from ..forms import APIRequestForm
 from ..models import APIRequest
@@ -136,6 +137,7 @@ def render_assistant(
 
 # ────────────────────────── GET ─────────────────────────────────────
 
+@login_required
 def get_assistant(request):
     """
     - Modo vacío: muestra formulario.
@@ -254,12 +256,13 @@ def analyze_url(request):
         if action == "accept_plan":
             if not api_request_obj.field_mapping:
                 messages.error(request, "Aún no hay un plan válido para aceptar.")
-                return redirect(f"/asistente?api_request_id={api_request_obj.id}")
+                return redirect(reverse("assistant") + f"?api_request_id={api_request_obj.id}")
+            
             if hasattr(api_request_obj, "plan_accepted"):
                 api_request_obj.plan_accepted = True
                 api_request_obj.save(update_fields=["plan_accepted"])
             messages.success(request, "Plan aceptado ✅")
-            return redirect(f"/asistente?api_request_id={api_request_obj.id}")
+            return redirect(reverse("assistant") + f"?api_request_id={api_request_obj.id}")
 
         # action == regenerate
         form = APIRequestForm(request.POST)

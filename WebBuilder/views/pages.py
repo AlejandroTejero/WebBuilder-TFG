@@ -1,7 +1,10 @@
+import logging
+
 from django.shortcuts import render
-from django.http import HttpResponse
 
 from ..models import APIRequest, GeneratedSite
+
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -24,4 +27,5 @@ def home(request):
         return render(request, "WebBuilder/home.html", context)
 
     except Exception as exc:
-        return HttpResponse(f"Error al procesar: {exc}")
+        logger.exception("Error en home: %s", exc)
+        return render(request, "WebBuilder/home.html", {})

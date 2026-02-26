@@ -156,7 +156,7 @@ def _fallback_theme(fields: list[dict]) -> dict:
             f'<div class="grid">\n'
             f'{{% for it in items %}}\n'
             f'  <div class="card">\n'
-            f'    <a href="/sites/{{{{ site.id }}}}/item/{{{{ it.index }}}}/">\n'
+            f'    <a href="/edit/{{{{ site.id }}}}/render/{{{{ it.index }}}}/">\n'
             f'      <h2>{{{{ it.{first_key} }}}}</h2>\n'
             f'    </a>\n'
             f'    {home_rows}\n'
@@ -165,7 +165,7 @@ def _fallback_theme(fields: list[dict]) -> dict:
             f'</div>'
         ),
         "detail_html": (
-            f'<p><a href="/sites/{{{{ site.id }}}}/">← Volver</a></p>\n'
+            f'<p><a href="/edit/{{{{ site.id }}}}/render/">← Volver</a></p>\n'
             f'<h1>{{{{ item.{first_key} }}}}</h1>\n'
             f'<div class="detail-fields">\n'
             f'{detail_rows}\n'
@@ -223,7 +223,7 @@ def _build_theme_prompt(
         f'<div class="grid">\n'
         f'{{% for it in items %}}\n'
         f'  <div class="card">\n'
-        f'    <a href="/sites/{{{{ site.id }}}}/item/{{{{ it.index }}}}/">\n'
+        f'    <a href="/edit/{{{{ site.id }}}}/render/{{{{ it.index }}}}/">\n'
         f'      <h2>{{{{ it.{first_key} }}}}</h2>\n'
         f'    </a>\n'
         f'{example_home_rows}\n'
@@ -239,7 +239,7 @@ def _build_theme_prompt(
         for f in fields
     )
     example_detail = (
-        f'<p><a href="/sites/{{{{ site.id }}}}/">← Volver</a></p>\n'
+        f'<p><a href="/edit/{{{{ site.id }}}}/render/">← Volver</a></p>\n'
         f'<h1>{{{{ item.{first_key} }}}}</h1>\n'
         f'<div class="fields">\n'
         f'{example_detail_rows}\n'
@@ -250,8 +250,8 @@ def _build_theme_prompt(
         "Devuelve SOLO JSON válido con 4 keys: base_html, home_html, detail_html, css.",
         "PROHIBIDO: {% extends %}, {% include %}, {% load %}, {% block %}.",
         f"OBLIGATORIO en home_html: usar {{% for it in items %}} ... {{% endfor %}}.",
-        f"OBLIGATORIO en home_html: enlace a detalle con /sites/{{{{ site.id }}}}/item/{{{{ it.index }}}}/",
-        "OBLIGATORIO en detail_html: enlace de vuelta con /sites/{{ site.id }}/",
+        f"OBLIGATORIO en home_html: enlace a detalle con /edit/{{{{ site.id }}}}/render/{{{{ it.index }}}}/",
+        "OBLIGATORIO en detail_html: enlace de vuelta con /edit/{{ site.id }}/render/",
         f"Variables en items (home): it.index, {field_vars_home}",
         f"Variables en item (detalle): item.index, {field_vars_detail}",
         "base_html debe ser HTML completo (<!doctype html>...) con {{ css }} en <head> y {{ content }} en <body>.",

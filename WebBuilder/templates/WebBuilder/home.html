@@ -1,8 +1,6 @@
 {% extends 'WebBuilder/base.html' %}
 {% load static %}
 
-{% block body_class %}home-modern{% endblock %}
-
 {% block content %}
 
 <!-- ════════════════════════════════════════════
@@ -59,7 +57,6 @@
     <div class="personal-header">
       <div class="personal-header__left">
         <div class="personal-greeting">
-          <span class="personal-greeting__wave">👋</span>
           <span>Bienvenido de vuelta, <strong>{{ user.username }}</strong></span>
         </div>
         <p class="personal-header__desc">Tus proyectos más recientes</p>

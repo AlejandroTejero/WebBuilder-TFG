@@ -42,7 +42,7 @@ class GeneratedSite(models.Model):
         related_name="site",
     )
 
-    plublic_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     # Snapshot del plan aceptado (para reproducibilidad)
     accepted_plan = models.JSONField()
@@ -56,4 +56,4 @@ class GeneratedSite(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"GeneratedSite #{self.id} ({self.plublic_id})"
+        return f"GeneratedSite #{self.id} ({self.public_id})"
