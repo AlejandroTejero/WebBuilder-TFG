@@ -137,11 +137,31 @@
                 <div class="wb-dropdown-title">Configuración</div>
               </div>
             </a>
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="wb-dropdown-item" style="width:100%; background:none; border:none; cursor:pointer; text-align:left; font:inherit; color:inherit; display:block;">
+                <div class="wb-dropdown-content">
+                  <div class="wb-dropdown-title">Cerrar Sesión</div>
+                </div>
+              </button>
+            </form>
+            <!--
+            <a href="{% url 'history' %}" class="wb-dropdown-item">
+              <div class="wb-dropdown-content">
+                <div class="wb-dropdown-title">Mis Proyectos</div>
+              </div>
+            </a>
+            <a href="#" class="wb-dropdown-item">
+              <div class="wb-dropdown-content">
+                <div class="wb-dropdown-title">Configuración</div>
+              </div>
+            </a>
             <a href="{% url 'login' %}" class="wb-dropdown-item">
               <div class="wb-dropdown-content">
                 <div class="wb-dropdown-title">Cerrar Sesión</div>
               </div>
             </a>
+            -->
           </div>
         </div>
       {% else %}
