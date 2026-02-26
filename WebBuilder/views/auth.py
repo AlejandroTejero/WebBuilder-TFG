@@ -6,7 +6,7 @@ import requests
 from ..forms import RegisterForm
 
 
-N8N_WEBHOOK_REGISTRO = "TU_URL_WEBHOOK_REGISTRO"
+N8N_WEBHOOK_REGISTRO = "http://localhost:5678/webhook-test/WebBuilder-Register"
 N8N_WEBHOOK_LOGIN    = "TU_URL_WEBHOOK_LOGIN"
 
 
