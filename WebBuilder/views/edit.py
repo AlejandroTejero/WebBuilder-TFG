@@ -16,7 +16,6 @@ En preview el usuario puede:
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 from django.contrib import messages
@@ -28,44 +27,15 @@ from ..models import APIRequest, GeneratedSite
 from ..utils.analysis import build_analysis
 from ..utils.analysis.helpers import get_by_path
 from ..utils.llm.themer import generate_site_theme
+from .helpers import _get_fields_from_plan, _normalize_item
 
 
 # ────────────────────────── helpers ─────────────────────────────────
-
-def _to_text(value: Any, *, max_len: int = 180) -> str:
-    if value is None:
-        return ""
-    if isinstance(value, (int, float, bool)):
-        return str(value)
-    if isinstance(value, str):
-        s = value.strip()
-    else:
-        try:
-            s = json.dumps(value, ensure_ascii=False)
-        except Exception:
-            s = str(value)
-    return s if len(s) <= max_len else s[: max_len - 3] + "..."
-
 
 def _normalize_site_type(value: str | None) -> str:
     allowed = {"blog", "portfolio", "catalog", "dashboard", "other"}
     v = (value or "").strip().lower()
     return v if v in allowed else "other"
-
-
-def _normalize_item(raw_item: Any, fields: list[dict], *, index: int) -> dict:
-    """
-    Convierte un item del dataset en un dict plano con las keys del schema.
-    Cada campo del schema se convierte en item[key] = valor (truncado).
-    Siempre se incluye 'index'.
-    """
-    result: dict[str, Any] = {"index": index}
-    if not isinstance(raw_item, dict):
-        return result
-    for field in fields:
-        key = field["key"]
-        result[key] = _to_text(raw_item.get(key), max_len=300)
-    return result
 
 
 def _get_available_keys_from_analysis(api_request: APIRequest) -> list[str]:
@@ -100,7 +70,7 @@ def edit(request, api_request_id: int):
     if not api_request.parsed_data:
         messages.error(request, "Este análisis no tiene datos parseados.")
         return redirect(reverse("assistant") + f"?api_request_id={api_request.id}")
-    
+
     # Normalizar plan (compatibilidad con schema antiguo y nuevo)
     if not isinstance(plan, dict):
         plan = {}
@@ -179,7 +149,7 @@ def edit(request, api_request_id: int):
 
         # ── Aceptar plan y publicar ─────────────────────────────────
         if action == "accept_plan":
-            fields = plan.get("fields") or []
+            fields = _get_fields_from_plan(plan)
             site_type = plan.get("site_type") or "other"
             site_title = plan.get("site_title") or site_type
 
@@ -225,7 +195,7 @@ def edit(request, api_request_id: int):
             return redirect("site_render", api_request_id=api_request.id)
 
     # ──────────────── GET — construir contexto ────────────────────────
-    fields = plan.get("fields") or []
+    fields = _get_fields_from_plan(plan)
     preview_items = [_normalize_item(it, fields, index=idx) for idx, it in enumerate(items)]
     site_obj = getattr(api_request, "site", None)
 

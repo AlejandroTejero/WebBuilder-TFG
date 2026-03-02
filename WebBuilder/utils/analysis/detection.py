@@ -165,5 +165,5 @@ def find_main_items(parsed_data: object) -> dict:
         "path": best["path"],
         "count": best["count"],
         "sample_keys": sample_keys[:25],
-        "top_keys": top_keys[:10],
+        "top_keys": top_keys[:40],
     }

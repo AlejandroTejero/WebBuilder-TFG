@@ -1,0 +1,161 @@
+# WebBuilder — Descripción Completa del Proyecto
+
+## ¿Qué es WebBuilder?
+
+WebBuilder es una aplicación web desarrollada en Django que permite a cualquier usuario generar un sitio web Django completo, funcional e independiente a partir de una URL de API pública y un prompt en lenguaje natural. El usuario describe qué tipo de sitio quiere, WebBuilder analiza los datos de la API, un LLM genera todos los archivos necesarios del proyecto, y el resultado es un sitio Django listo para ejecutarse con los datos reales del usuario.
+
+---
+
+## Flujo completo de la aplicación
+
+### Paso 1 — El usuario introduce una URL de API y un prompt
+El usuario accede a WebBuilder, introduce una URL que devuelve datos en formato JSON o XML (por ejemplo una API de productos, artículos, plantas, películas, etc.) y escribe un prompt en lenguaje natural describiendo el sitio que quiere. Ejemplo: "Quiero una tienda online de plantas exóticas, con estilo elegante y botánico, que tenga una portada atractiva, un catálogo de plantas y una página de detalle para cada una."
+
+### Paso 2 — Análisis del dataset
+WebBuilder descarga y parsea los datos de la URL. Un sistema de análisis propio (sin LLM) detecta automáticamente:
+- El formato de los datos (JSON o XML)
+- La colección principal de items (la lista de productos, artículos, etc.)
+- Todas las keys disponibles en los items (nombre, precio, imagen, descripción, etc.)
+- Ejemplos de valores reales para que el LLM entienda qué contiene cada campo
+
+### Paso 3 — El LLM genera el schema del sitio (Planner)
+Con el análisis del dataset y el prompt del usuario, un LLM genera un schema dinámico que define:
+- El tipo de sitio (catalog, blog, portfolio, dashboard, other)
+- El título del sitio
+- Los campos del dataset que se van a usar y cómo se van a llamar visualmente
+
+El usuario puede revisar y editar este schema antes de continuar.
+
+### Paso 4 — El LLM genera el proyecto Django completo (Generator)
+Este es el núcleo del sistema. A partir del schema validado y el prompt del usuario, el sistema genera todos los archivos de un proyecto Django independiente. La generación sigue un modelo híbrido:
+
+**Archivos fijos (esqueleto base, no interviene el LLM):**
+- `manage.py`
+- `settings.py` (con SQLite, apps instaladas, rutas de templates y static)
+- `wsgi.py` y `asgi.py`
+- `Dockerfile` y `docker-compose.yml` para el despliegue
+- `requirements.txt`
+- Estructura de carpetas del proyecto
+
+Estos archivos son siempre iguales salvo el nombre del proyecto. No tiene sentido gastar tokens en ellos.
+
+**Archivos generados por el LLM (con esqueleto base como guía):**
+- `models.py` — el LLM define los modelos Django según la estructura del dataset. Cada campo del schema se convierte en un campo del modelo con el tipo correcto (CharField, TextField, URLField, DecimalField, etc.)
+- `urls.py` — el LLM define las rutas del sitio según las páginas que va a crear
+- `views.py` — el LLM genera las views necesarias para cada página
+- `admin.py` — registro de los modelos en el admin de Django
+- Templates HTML — uno por página, con diseño adaptado al prompt del usuario, usando Tailwind CSS via CDN
+- Archivos CSS y JS adicionales si el diseño lo requiere
+
+**Script de carga de datos (generado completamente por el LLM):**
+- Un management command de Django (`load_data.py`) que lee los datos reales de la API y los inserta en la base de datos SQLite via los modelos generados. Este archivo depende 100% del dataset concreto, por lo que el LLM lo genera entero.
+
+### Paso 5 — Estructura de páginas
+El sitio generado no es un simple visor de datos. Es un sitio web completo con múltiples páginas. El LLM decide qué páginas crear según el dataset y el prompt, pero siempre siguiendo una guía base mínima:
+
+**Páginas mínimas siempre presentes:**
+- **Portada / Home** — página de entrada con hero section, presentación del sitio y llamada a la acción. El contenido y diseño dependen del prompt del usuario.
+- **Página de listado** — muestra todos los items del dataset (productos, artículos, proyectos...) con un diseño en grid o lista según el tipo de sitio.
+- **Página de detalle** — muestra toda la información de un item individual.
+
+**Páginas adicionales que el LLM puede añadir según el contexto:**
+- Página "Sobre nosotros" o "About" si el prompt lo sugiere
+- Página de contacto
+- Páginas de categoría o filtrado si el dataset tiene categorías
+- Página de búsqueda
+- Cualquier otra página que el LLM considere relevante para el tipo de sitio
+
+### Paso 6 — Preview via Docker y n8n
+Una vez generado el proyecto, WebBuilder envía todos los archivos a n8n mediante un webhook. N8n ejecuta automáticamente:
+1. Crea una carpeta con el proyecto generado
+2. Levanta un container Docker con el proyecto Django
+3. Ejecuta las migrations (`python manage.py migrate`)
+4. Ejecuta el management command de carga de datos (`python manage.py load_data`)
+5. Levanta el servidor Django
+6. Devuelve a WebBuilder la URL del preview (por ejemplo `preview-abc123.tudominio.com`)
+
+WebBuilder muestra esa URL al usuario en un iframe o como enlace para que visite el sitio real, 100% funcional, con sus datos reales.
+
+### Paso 7 — Confirmación y exportación
+El usuario navega por el preview. Si le gusta, pulsa "Exportar" y n8n entrega el proyecto como un archivo ZIP descargable o lo despliega en un servidor definitivo. Si no le gusta, puede volver a WebBuilder, modificar el prompt o el schema, y regenerar.
+
+---
+
+## Arquitectura técnica de WebBuilder
+
+### Stack
+- **Backend:** Django (Python)
+- **Base de datos WebBuilder:** SQLite (desarrollo)
+- **LLM:** Claude Sonnet o GPT-4o via API (modelos potentes necesarios para generación de código coherente entre archivos)
+- **Automatización y despliegue:** n8n + Docker
+- **CSS en los sitios generados:** Tailwind CSS via CDN
+
+### Modelos de base de datos de WebBuilder
+- `APIRequest` — registra cada análisis de URL realizado por un usuario (URL, datos parseados, schema generado, estado)
+- `GeneratedSite` — registra cada proyecto Django generado (archivos, schema aceptado, URL de preview, estado)
+
+### Módulos principales
+```
+WebBuilder/
+  utils/
+    ingest/
+      url_reader.py      — descarga la URL
+      parsers.py         — parsea JSON/XML
+    analysis/
+      builder.py         — construye el análisis del dataset
+      detection.py       — detecta la colección principal de items
+    llm/
+      client.py          — cliente HTTP para la API del LLM
+      llm_utils.py       — utilidades compartidas (parseo JSON del LLM)
+      planner.py         — genera el schema del sitio (Paso 3)
+      generator.py       — genera el proyecto Django completo (Paso 4) ← NUEVO
+      templates/         — esqueletos base de cada archivo ← NUEVO
+        settings.tpl
+        models.tpl
+        views.tpl
+        urls.tpl
+        ...
+    exporter/
+      packager.py        — empaqueta los archivos en ZIP ← NUEVO
+      n8n_client.py      — envía el proyecto a n8n via webhook ← NUEVO
+  views/
+    assistant.py         — vista del asistente (Pasos 1-3)
+    edit.py              — vista de edición del schema (Paso 3)
+    generator.py         — vista de generación y preview (Pasos 4-6) ← NUEVO
+    export.py            — vista de exportación (Paso 7) ← NUEVO
+```
+
+---
+
+## Lo que aporta el desarrollador vs lo que aporta el LLM
+
+### Desarrollado manualmente (aportación propia del TFG):
+- Sistema de análisis automático del dataset (detección de colecciones, scoring, extracción de keys)
+- Sistema anti-alucinación del planner (validación de que las keys del LLM existen en el dataset real)
+- Esqueletos base de todos los archivos del proyecto Django generado
+- Lógica de ensamblado de archivos (combinar esqueleto + output del LLM de forma coherente)
+- Sistema de caché de análisis de URLs
+- Integración con n8n para automatización del preview
+- Toda la interfaz de WebBuilder
+
+### Generado por el LLM (con guía del sistema):
+- Los modelos Django específicos para cada dataset
+- Las views y urls adaptadas a las páginas decididas
+- Los templates HTML con diseño adaptado al prompt
+- El script de carga de datos
+- Las páginas adicionales según el contexto
+
+---
+
+## Estado actual del proyecto
+
+El sistema tiene ya implementado y funcionando:
+- Descarga y parseo de URLs (JSON y XML)
+- Análisis automático del dataset
+- Generación del schema via LLM con sistema anti-alucinación
+- Vista de edición del schema
+- Generación de templates Django básicos (listado + detalle)
+- Sistema de usuarios con login/registro
+- Historial de análisis
+
+Lo que queda por construir es el **generador de proyectos Django completos** (Paso 4), la **integración con n8n** (Pasos 6 y 7), y la **mejora del sistema de páginas** para pasar de un visor de datos a un sitio web real con múltiples páginas.

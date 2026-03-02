@@ -7,7 +7,7 @@ Vistas de render a pantalla completa.
 """
 
 from __future__ import annotations
-import json
+
 import re
 from typing import Any
 
@@ -21,40 +21,10 @@ from ..models import APIRequest, GeneratedSite
 from ..utils.analysis import build_analysis
 from ..utils.analysis.helpers import get_by_path
 from ..utils.llm.themer import generate_site_theme
+from .helpers import _get_fields_from_plan, _normalize_item
 
 
 # ────────────────────────── helpers ─────────────────────────────────
-
-def _to_text(value: Any, *, max_len: int = 400) -> str:
-    if value is None:
-        return ""
-    if isinstance(value, (int, float, bool)):
-        return str(value)
-    if isinstance(value, str):
-        s = value.strip()
-    else:
-        try:
-            s = json.dumps(value, ensure_ascii=False)
-        except Exception:
-            s = str(value)
-    return s if len(s) <= max_len else s[: max_len - 3] + "..."
-
-
-def _get_fields_from_plan(plan: dict) -> list[dict]:
-    if not isinstance(plan, dict):
-        return []
-    return plan.get("fields") or []
-
-
-def _normalize_item(raw_item: Any, fields: list[dict], *, index: int, max_len: int = 400) -> dict:
-    result: dict[str, Any] = {"index": index}
-    if not isinstance(raw_item, dict):
-        return result
-    for field in fields:
-        key = field["key"]
-        result[key] = _to_text(raw_item.get(key), max_len=max_len)
-    return result
-
 
 def _get_main_items(api_request: APIRequest) -> list[Any]:
     analysis  = build_analysis(api_request.parsed_data, raw_text=api_request.raw_data or "")
@@ -69,8 +39,8 @@ def _get_main_items(api_request: APIRequest) -> list[Any]:
 def _fix_template(s: str) -> str:
     if not s:
         return s
-    s = re.sub(r'(\w+)\.get\(["\']([\w.]+)["\']\)', r'\1.\2', s)
-    s = re.sub(r'(\w+)\[["\']([\w.]+)["\']\]', r'\1.\2', s)
+    s = re.sub(r'(\w+)\.get\(["\']([\\w.]+)["\']\)', r'\1.\2', s)
+    s = re.sub(r'(\w+)\[["\']([\\w.]+)["\']\]', r'\1.\2', s)
     s = re.sub(r'(\w+)\(["\'][^"\']*["\']\)', r'\1', s)
     s = re.sub(r'(\w+)\(\s*\)', r'\1', s)
     return s

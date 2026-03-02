@@ -103,7 +103,7 @@ def build_analysis(parsed_data: object, raw_text: str | None = None) -> dict:
         # Info de colección principal
         "main_collection": main_collection,
         # Keys agregadas
-        "keys": {"all": all_keys, "top": top_keys_only[:10]},
+        "keys": {"all": all_keys, "top": top_keys_only[:40]},
         # Lista de roles disponibles
         "roles": list(ROLE_DEFS.keys()),
         # Sugerencias por rol

@@ -26,6 +26,8 @@ from django.core.cache import cache
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils import timezone
+from datetime import timedelta
 
 from ..forms import APIRequestForm
 from ..models import APIRequest
@@ -221,7 +223,7 @@ def analyze_url(request):
         """Genera el schema dinámico y lo guarda en api_request.field_mapping."""
         main = (analysis_result.get("main_collection") or {})
         keys = (analysis_result.get("keys") or {})
-        available_keys = (keys.get("top") or [])[:30]
+        available_keys = (keys.get("all") or [])[:50]
         main_path = main.get("path")
 
         examples = _build_examples(parsed_payload, main_path=main_path, available_keys=available_keys)
@@ -306,15 +308,24 @@ def analyze_url(request):
     if cached_data:
         messages.info(request, "⚡ Análisis cargado desde caché (datos recientes).")
 
-        api_request_obj = APIRequest.objects.create(
-            user=request.user,
-            api_url=api_url,
-            raw_data=cached_data["raw_text"],
-            parsed_data=cached_data["parsed_payload"],
-            response_summary=cached_data["response_summary"],
-            status="processed",
-            error_message="",
+        one_hour_ago = timezone.now() - timedelta(hours=1)
+        api_request_obj = (
+            APIRequest.objects
+            .filter(user=request.user, api_url=api_url, date__gte=one_hour_ago)
+            .order_by("-date")
+            .first()
         )
+
+        if not api_request_obj:
+            api_request_obj = APIRequest.objects.create(
+                user=request.user,
+                api_url=api_url,
+                raw_data=cached_data["raw_text"],
+                parsed_data=cached_data["parsed_payload"],
+                response_summary=cached_data["response_summary"],
+                status="processed",
+                error_message="",
+            )
 
         analysis_result = build_analysis(
             cached_data["parsed_payload"],

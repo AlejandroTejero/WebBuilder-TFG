@@ -20,11 +20,11 @@ Reglas anti-alucinación:
 
 from __future__ import annotations
 
-import json
 import re
 from typing import Any
 
 from .client import chat_completion, LLMError
+from .llm_utils import safe_dumps, parse_llm_json
 
 
 ALLOWED_SITE_TYPES = ("blog", "portfolio", "catalog", "dashboard", "other")
@@ -39,43 +39,6 @@ BANNED_KEY_TOKENS = {
 
 class PlanError(Exception):
     """Error irrecuperable generando/parseando el plan."""
-
-
-# ─────────────────────────── helpers JSON ────────────────────────────
-
-def _safe_dumps(obj: Any, *, indent: int | None = None) -> str:
-    try:
-        return json.dumps(obj, ensure_ascii=False, indent=indent)
-    except Exception:
-        return str(obj)
-
-
-def _strip_code_fences(text: str) -> str:
-    t = (text or "").strip()
-    if t.startswith("```"):
-        t = re.sub(r"^```[a-zA-Z0-9_-]*\s*", "", t)
-        t = re.sub(r"\s*```$", "", t)
-    return t.strip()
-
-
-def _extract_json_object(text: str) -> str:
-    t = _strip_code_fences(text)
-    if t.startswith("{") and t.endswith("}"):
-        return t
-    start = t.find("{")
-    end = t.rfind("}")
-    if start == -1 or end == -1 or end <= start:
-        raise PlanError("No se encontró un objeto JSON en la respuesta del LLM.")
-    return t[start: end + 1]
-
-
-def _repair_common_json(text: str) -> str:
-    t = text.strip()
-    t = re.sub(r",\s*([}\]])", r"\1", t)
-    t = t.replace(": True", ": true").replace(": False", ": false").replace(": None", ": null")
-    if "'" in t and '"' not in t:
-        t = t.replace("'", '"')
-    return t
 
 
 # ─────────────────────────── normalización ───────────────────────────
@@ -144,23 +107,18 @@ def _validate_and_normalize_schema(raw: Any, *, available_keys: list[str]) -> di
 
         key = key.strip()
 
-        # Rechazar tokens del contexto
         if key.lower() in BANNED_KEY_TOKENS:
             continue
 
-        # Rechazar si parece un valor, no una clave
         if _looks_like_value_not_key(key):
             continue
 
-        # Anti-alucinación: DEBE estar en available_keys
         if key not in available_set:
-            # Intento case-insensitive como última gracia
             matched = next((k for k in available_keys if k.lower() == key.lower()), None)
             if not matched:
-                continue  # descartado definitivamente
+                continue
             key = matched
 
-        # Evitar duplicados
         if key in seen_keys:
             continue
         seen_keys.add(key)
@@ -237,7 +195,7 @@ def _build_prompt(
         user_prompt.strip() or "(sin prompt: decide tú lo mejor según el dataset)",
         "",
         "CONTRATO_JSON (devuelve exactamente esta estructura):",
-        _safe_dumps(contract, indent=2),
+        safe_dumps(contract, indent=2),
         "",
         "REGLAS OBLIGATORIAS:",
         "\n".join(f"- {r}" for r in rules),
@@ -245,10 +203,10 @@ def _build_prompt(
         f"main_collection_path (solo contexto, NO es una key válida): {main_collection_path}",
         "",
         "available_keys (SOLO estas strings son válidas para el campo 'key' en fields):",
-        _safe_dumps(available_keys),
+        safe_dumps(available_keys),
         "",
         "examples (1-3 items del dataset, para entender qué valores contiene cada key):",
-        _safe_dumps(examples, indent=2),
+        safe_dumps(examples, indent=2),
     ]
 
     if retry_hint:
@@ -300,12 +258,7 @@ def generate_site_plan(
             return _validate_and_normalize_schema({}, available_keys=available_keys)
 
         try:
-            json_text = _extract_json_object(raw)
-            try:
-                parsed = json.loads(json_text)
-            except json.JSONDecodeError:
-                parsed = json.loads(_repair_common_json(json_text))
-
+            parsed = parse_llm_json(raw, exc_class=PlanError)
             return _validate_and_normalize_schema(parsed, available_keys=available_keys)
 
         except Exception as exc:
