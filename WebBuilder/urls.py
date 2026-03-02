@@ -14,8 +14,9 @@ urlpatterns = [
     path("registro", views.register, name="register"),
 	
     path("edit/<int:api_request_id>", views.edit, name="edit"),
-    path("edit/<int:api_request_id>/render/", views.site_render, name="site_render"),
-    path("edit/<int:api_request_id>/render/<int:item_index>/", views.site_render_detail, name="site_render_detail"),
-    path("edit/<int:api_request_id>/render/regenerar/", views.site_render_regen, name="site_render_regen"),
+	path("site/<int:api_request_id>", views.site_render, name="site_render"),
+
+    path("site/<int:api_request_id>/generate/", views.site_generate, name="site_generate"),
+    path("site/<int:api_request_id>/download/", views.site_download_zip, name="site_download_zip"),
 
 ]

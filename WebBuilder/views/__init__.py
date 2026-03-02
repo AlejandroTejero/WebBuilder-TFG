@@ -3,7 +3,7 @@ from .pages import home
 from .assistant import assistant
 from .history import history
 from .edit import edit
-from .render import site_render, site_render_detail, site_render_regen
+from .site import site_render, site_generate, site_download_zip
 
 __all__ = [
     "register",
@@ -12,6 +12,6 @@ __all__ = [
     "history",
     "edit",
     "site_render",
-    "site_render_detail",
-    "site_render_regen",
+	"site_generate",
+	"site_download_zip"
 ]

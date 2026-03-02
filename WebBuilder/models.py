@@ -33,8 +33,14 @@ class APIRequest(models.Model):
 
 
 
-# Modelo que recoge todo lo que se creara en los proyectos de django con IA
 class GeneratedSite(models.Model):
+
+    STATUS_CHOICES = [
+        ("pending",    "Pendiente"),
+        ("generating", "Generando"),
+        ("ready",      "Listo"),
+        ("error",      "Error"),
+    ]
 
     project_source = models.OneToOneField(
         APIRequest,
@@ -47,13 +53,24 @@ class GeneratedSite(models.Model):
     # Snapshot del plan aceptado (para reproducibilidad)
     accepted_plan = models.JSONField()
 
-    # Theme pack generado por IA (strings)
-    theme_templates = models.JSONField(default=dict, blank=True)
-    theme_css = models.TextField(blank=True, default="")
-    theme_prompt = models.TextField(blank=True, default="")
+    # Archivos del proyecto generado {ruta: contenido}
+    project_files = models.JSONField(default=dict, blank=True)
 
+    # Nombre del proyecto Django generado (slug del título)
+    project_name = models.SlugField(max_length=80, blank=True, default="")
+
+    # URL del preview levantado por n8n
+    preview_url = models.URLField(blank=True, null=True)
+
+    # Estado de la generación
+    generation_status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+    )
+    generation_error = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"GeneratedSite #{self.id} ({self.public_id})"
+        return f"GeneratedSite #{self.id} — {self.project_name} ({self.public_id})"

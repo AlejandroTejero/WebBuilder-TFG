@@ -26,7 +26,6 @@ from django.urls import reverse
 from ..models import APIRequest, GeneratedSite
 from ..utils.analysis import build_analysis
 from ..utils.analysis.helpers import get_by_path
-from ..utils.llm.themer import generate_site_theme
 from .helpers import _get_fields_from_plan, _normalize_item
 
 
@@ -156,7 +155,8 @@ def edit(request, api_request_id: int):
             api_request.plan_accepted = True
             api_request.save(update_fields=["plan_accepted"])
 
-            # Sample items normalizados para pasar al LLM themer
+            # Sample items normalizados (de momento los seguimos calculando
+            # por si luego los reutilizas para el generator)
             sample_items = [
                 _normalize_item(it, fields, index=idx)
                 for idx, it in enumerate(items[:6])
@@ -168,30 +168,35 @@ def edit(request, api_request_id: int):
                 defaults={"accepted_plan": plan},
             )
 
-            plan_changed = site.accepted_plan != plan
+            plan_changed = (site.accepted_plan != plan)
             if plan_changed:
                 site.accepted_plan = plan
 
-            # Generar tema si no existe o si cambió el plan
-            if (not site.theme_templates) or plan_changed:
-                theme = generate_site_theme(
-                    site_title=site_title,
-                    site_type=site_type,
-                    design_hint=site_title,
-                    fields=fields,
-                    sample_items=sample_items,
-                    retries=1,
-                )
-                site.theme_templates = {
-                    "base_html":   theme["base_html"],
-                    "home_html":   theme["home_html"],
-                    "detail_html": theme["detail_html"],
-                }
-                site.theme_css = theme.get("css", "")
-                site.theme_prompt = site_title
+            # Preparar estado para generación del proyecto (reemplaza el "themer")
+            # - project_name: slug usable para carpeta/proyecto
+            # - generation_status: pending para que un botón / job lo genere después
+            from django.utils.text import slugify
+
+            site.project_name = (slugify(site_title)[:80] or "generated_site")
+            site.generation_status = "pending"
+            site.generation_error = ""
+            site.preview_url = None
+
+            # Si el plan cambió, normalmente también invalidas los archivos previos
+            if plan_changed:
+                site.project_files = {}
+
+            # (Opcional) guardar ejemplos normalizados dentro del plan aceptado
+            # para que el generator los tenga a mano sin recalcular.
+            # Si no lo quieres, borra este bloque.
+            if isinstance(site.accepted_plan, dict):
+                ap = dict(site.accepted_plan)
+                ap.setdefault("_meta", {})
+                ap["_meta"]["sample_items"] = sample_items
+                site.accepted_plan = ap
 
             site.save()
-            messages.success(request, "Plan aceptado y sitio publicado ✅")
+            messages.success(request, "Plan aceptado. Listo para generar el proyecto ✅")
             return redirect("site_render", api_request_id=api_request.id)
 
     # ──────────────── GET — construir contexto ────────────────────────

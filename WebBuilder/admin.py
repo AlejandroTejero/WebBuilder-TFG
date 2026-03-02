@@ -204,54 +204,44 @@ class APIRequestAdmin(admin.ModelAdmin):
 # GeneratedSite
 # ══════════════════════════════════════════════════════════════════
 
+# WebBuilder/admin.py
 @admin.register(GeneratedSite)
 class GeneratedSiteAdmin(admin.ModelAdmin):
-
     list_display = (
         "id",
         "site_title",
         "site_type_badge",
         "owner",
-        "fields_count",
-        "has_theme_badge",
+        "generation_status_badge",
+        "project_name",
+        "project_files_count",
+        "preview_link",
         "created_at",
         "updated_at",
-        "view_link",
         "edit_link",
     )
 
-    list_filter   = ("created_at",)
-    search_fields = ("project_source__api_url", "project_source__user__username", "theme_prompt")
+    list_filter   = ("generation_status", "created_at")
+    search_fields = ("project_name", "project_source__api_url", "project_source__user__username")
     ordering      = ("-created_at",)
     list_select_related = ("project_source", "project_source__user")
-    list_per_page = 40
-    date_hierarchy = "created_at"
-    actions = ["clear_theme"]
+    actions = ["reset_generation"]
 
     fieldsets = (
-        ("Origen", {
-            "fields": ("project_source", "public_id", "created_at", "updated_at"),
-        }),
-        ("Plan aceptado", {
-            "fields": ("site_title", "site_type_badge", "fields_count", "accepted_plan_pretty"),
-        }),
-        ("Tema generado", {
-            "fields": ("theme_prompt", "has_theme_badge", "theme_css_pretty"),
-        }),
-        ("Templates HTML", {
-            "classes": ("collapse",),
-            "fields": ("theme_templates_pretty",),
-        }),
+        ("Origen", {"fields": ("project_source", "public_id", "created_at", "updated_at")}),
+        ("Plan aceptado", {"fields": ("site_title", "site_type_badge", "accepted_plan_pretty")}),
+        ("Generación", {"fields": ("generation_status", "project_name", "preview_url", "generation_error")}),
+        ("Archivos", {"classes": ("collapse",), "fields": ("project_files_pretty",)}),
     )
 
     readonly_fields = (
         "public_id", "created_at", "updated_at",
-        "site_title", "site_type_badge", "fields_count", "has_theme_badge", "owner",
-        "accepted_plan_pretty", "theme_css_pretty", "theme_templates_pretty",
-        "view_link", "edit_link",
+        "site_title", "site_type_badge", "owner",
+        "accepted_plan_pretty", "project_files_pretty",
+        "generation_status_badge", "project_files_count", "preview_link", "edit_link",
     )
 
-    exclude = ("accepted_plan", "theme_templates", "theme_css")
+    exclude = ("accepted_plan", "project_files")
 
     @admin.display(description="Título")
     def site_title(self, obj):
@@ -261,57 +251,82 @@ class GeneratedSiteAdmin(admin.ModelAdmin):
     @admin.display(description="Tipo")
     def site_type_badge(self, obj):
         plan = obj.accepted_plan or {}
-        t = plan.get("site_type") or "other"
-        color = {"catalog": "blue", "blog": "green", "portfolio": "purple", "dashboard": "orange"}.get(t, "gray")
-        return _badge(t, color)
+        st = plan.get("site_type") or "other"
+        # si tienes helper _badge(), úsalo; si no, devuelvo texto
+        try:
+            return _badge(st, "gray")
+        except Exception:
+            return st
 
-    @admin.display(description="Usuario")
+    @admin.display(description="Owner")
     def owner(self, obj):
-        return obj.project_source.user.username
+        user = getattr(obj.project_source, "user", None)
+        return getattr(user, "username", None) or "—"
 
-    @admin.display(description="Campos")
-    def fields_count(self, obj):
-        return f"{len((obj.accepted_plan or {}).get('fields') or [])} campos"
-
-    @admin.display(description="Tema")
-    def has_theme_badge(self, obj):
-        if obj.theme_templates:
-            return _badge(f"✓ {len(obj.theme_templates)} templates", "green")
-        return _badge("sin tema", "red")
-
-    @admin.display(description="Ver sitio")
-    def view_link(self, obj):
-        try:
-            url = reverse("site_render", args=[obj.project_source.id])
-            return format_html("<a href='{}' target='_blank'>Ver →</a>", url)
-        except Exception:
-            return "-"
-
-    @admin.display(description="Editor")
+    @admin.display(description="Editar")
     def edit_link(self, obj):
-        try:
-            url = reverse("edit", args=[obj.project_source.id])
-            return format_html("<a href='{}' target='_blank'>Editar →</a>", url)
-        except Exception:
-            return "-"
+        # link a la pantalla de edición del propio objeto en admin
+        url = reverse("admin:WebBuilder_generatedsite_change", args=[obj.pk])
+        return format_html("<a href='{}'>Editar</a>", url)
+
+    @admin.display(description="Estado")
+    def generation_status_badge(self, obj):
+        color = {"ready": "green", "error": "red", "generating": "orange", "pending": "gray"}.get(obj.generation_status, "gray")
+        return _badge(obj.generation_status, color)
+
+    @admin.display(description="Archivos")
+    def project_files_count(self, obj):
+        return len(obj.project_files or {})
+
+    @admin.display(description="Preview")
+    def preview_link(self, obj):
+        if obj.preview_url:
+            return format_html("<a href='{}' target='_blank'>Abrir →</a>", obj.preview_url)
+        return "—"
 
     @admin.display(description="Plan aceptado")
     def accepted_plan_pretty(self, obj):
         return _pre(_pretty_json(obj.accepted_plan)) if obj.accepted_plan else "—"
 
-    @admin.display(description="Theme CSS")
-    def theme_css_pretty(self, obj):
-        return _pre(_truncate(obj.theme_css or "", 6000)) if obj.theme_css else "—"
+    @admin.display(description="Archivos (JSON)")
+    def project_files_pretty(self, obj):
+        return _pre(_pretty_json(obj.project_files)) if obj.project_files else "—"
 
-    @admin.display(description="Templates HTML")
-    def theme_templates_pretty(self, obj):
-        return _pre(_pretty_json(obj.theme_templates)) if obj.theme_templates else "—"
+    @admin.action(description="Resetear generación")
+    def reset_generation(self, request, queryset):
+        updated = queryset.update(
+            generation_status="pending",
+            generation_error="",
+            preview_url=None,
+            project_files={},
+        )
+        self.message_user(request, f"Reseteados {updated} sitios.")
 
-    @admin.action(description="Limpiar tema (forzar regeneración)")
-    def clear_theme(self, request, queryset):
-        updated = queryset.update(theme_templates={}, theme_css="", theme_prompt="")
-        self.message_user(request, f"Tema limpiado en {updated} sitios.")
+    @admin.display(description="Título")
+    def site_title(self, obj):
+        plan = obj.accepted_plan or {}
+        return plan.get("site_title") or plan.get("site_type") or "—"
 
+    @admin.display(description="Tipo")
+    def site_type_badge(self, obj):
+        plan = obj.accepted_plan or {}
+        st = plan.get("site_type") or "other"
+        # si ya tienes _badge(), úsalo; si no, devuelve st tal cual
+        try:
+            return _badge(st, "gray")
+        except Exception:
+            return st
+
+    @admin.display(description="Owner")
+    def owner(self, obj):
+        # project_source es APIRequest
+        user = getattr(obj.project_source, "user", None)
+        return getattr(user, "username", None) or "—"
+
+    @admin.display(description="Editar")
+    def edit_link(self, obj):
+        url = reverse("admin:WebBuilder_generatedsite_change", args=[obj.pk])
+        return format_html("<a href='{}'>Editar</a>", url)
 
 # ══════════════════════════════════════════════════════════════════
 # User — extender con info de proyectos
