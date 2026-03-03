@@ -88,11 +88,13 @@ def prompt_models(*, fields, sample_items, site_title):
         "  Decimal/precio → DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)",
         "  Fecha → DateField(null=True, blank=True)",
         "  Booleano → BooleanField(null=True, blank=True)",
+        "  OBJETO ANIDADO (dict con subkeys) → CharField(max_length=500, blank=True) guardando solo el valor mas representativo como string.",
         "Todos los campos opcionales (blank=True / null=True).",
         "Añade created_at = models.DateTimeField(auto_now_add=True).",
         "__str__ devuelve el campo más representativo.",
         "Nombres de campo en snake_case. NO uses 'id' como nombre.",
         "Solo importa 'from django.db import models'.",
+        "NUNCA uses JSONField para ningún campo.",
     ]
     user_text = "\n".join([
         f"SITIO: {site_title}",
@@ -202,6 +204,7 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
         "USA {% if item.campo %} para campos opcionales.",
         "El diseño debe adaptarse al site_type y al prompt del usuario.",
         "Nombres de campo: usa los 'key' del schema directamente como atributos del modelo.",
+        "CRITICO: todos los campos del modelo son strings o tipos simples, NUNCA objetos. No uses item.campo.subcampo.",
     ]
 
     user_text = "\n".join([
@@ -231,11 +234,15 @@ def prompt_load_data(*, fields, sample_items, api_url):
         "import requests",
         f"El comando hace GET a '{api_url}'.",
         "Parsea el JSON y encuentra la lista principal de items (puede estar anidada).",
-        "Para cada item: Item.objects.get_or_create() con los campos del schema.",
-        "Limpia valores: precios con $ → Decimal, fechas → parsear, enteros → int().",
-        "Si falla la conversión → None (no romper el comando).",
+        "CRITICO: usa get_or_create separando campos en defaults:",
+        "Item.objects.get_or_create(campo_id=valor, defaults={'campo1': val1, 'campo2': val2})",
+        "Si no hay campo único identificador, usa update_or_create o simplemente create().",
+        "Si un campo del dataset es un OBJETO ANIDADO (dict), extrae solo el valor más representativo como string.",
+        "  Ejemplo: rating = {'rate': 4.5, 'count': 120} → guardar str(item['rating']['rate'])",
+        "Limpia valores: precios → Decimal(str(valor).replace('$','').strip()), el precio puede venir como float o como string con '$', usa siempre str() primero para evitar errores. Fechas → parsear, enteros → int().",        "Si falla la conversión → None (no romper el comando).",
         "Informa del progreso con self.stdout.write().",
         "try/except general para no romper si la API falla.",
+        "Clase 'Command(BaseCommand)', help descriptivo.",
         "Clase 'Command(BaseCommand)', help descriptivo.",
     ]
     user_text = "\n".join([

@@ -233,7 +233,7 @@ def _app_urls(pages: list[dict], app: str = "siteapp") -> str:
 
 def _llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) -> str:
     try:
-        time.sleep(10)
+        time.sleep(1)
         return chat_completion(
             user_text=user_text,
             system_text=system,
