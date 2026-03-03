@@ -6,8 +6,8 @@ import requests
 from ..forms import RegisterForm
 
 
-N8N_WEBHOOK_REGISTRO = "http://localhost:5678/webhook-test/WebBuilder-Register"
-N8N_WEBHOOK_LOGIN    = "TU_URL_WEBHOOK_LOGIN"
+N8N_WEBHOOK_REGISTRO = "http://localhost:5678/webhook/WebBuilder-Register"
+N8N_WEBHOOK_LOGIN    = "http://localhost:5678/webhook/WebBuilder-Login"
 
 
 def _llamar_webhook(url: str, datos: dict) -> None:
@@ -41,10 +41,19 @@ class WebBuilderLoginView(LoginView):
 
     def form_valid(self, form):
         user = form.get_user()
+        request = self.request
+
+        ip = (
+            request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip()
+            or request.META.get("REMOTE_ADDR", "desconocida")
+        )
 
         _llamar_webhook(N8N_WEBHOOK_LOGIN, {
             "username": user.username,
             "email":    user.email,
+            "ip":       ip,
+            "dispositivo": request.META.get("HTTP_USER_AGENT", "desconocido"),
+            "hora":     __import__("datetime").datetime.now().strftime("%d/%m/%Y %H:%M"),
         })
 
         return super().form_valid(form)
