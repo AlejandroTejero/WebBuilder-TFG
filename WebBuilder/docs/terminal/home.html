@@ -1,0 +1,598 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-inner">
+
+    <!-- Columna izquierda: texto centrado -->
+    <div class="hero-content">
+
+      <div class="hero-badge">
+        ✦ Inteligencia Artificial + Automatización
+      </div>
+
+      <h1 class="hero-title">
+        De una URL a un<br>proyecto Django completo
+      </h1>
+
+      <p class="hero-subtitle">
+        Conecta cualquier API pública, deja que la IA analice los datos,
+        genera el diseño y descarga un proyecto Django listo para ejecutar.
+        Sin escribir una sola línea de código.
+      </p>
+
+      <div class="hero-actions">
+        <a href="{% url 'assistant' %}" class="hero-cta hero-cta--primary">
+          Empezar ahora
+          <span class="cta-arrow">→</span>
+        </a>
+        <a href="#how-it-works" class="hero-cta hero-cta--ghost">
+          Ver cómo funciona
+        </a>
+      </div>
+
+      <div class="hero-trust">
+        <span class="hero-trust-item">🤖 IA genera el schema automáticamente</span>
+        <span class="hero-trust-item">👁 Preview real antes de descargar</span>
+        <span class="hero-trust-item">⚡ Automatizable con n8n</span>
+      </div>
+
+    </div>
+
+    <!-- Columna derecha: terminal -->
+    <div class="hero-terminal-col">
+      <div class="mockup-terminal">
+        <div class="mockup-terminal__bar">
+          <span class="mockup-dot mockup-dot--red"></span>
+          <span class="mockup-dot mockup-dot--yellow"></span>
+          <span class="mockup-dot mockup-dot--green"></span>
+          <span class="mockup-terminal__title">WebBuilder — generando proyecto...</span>
+        </div>
+        <div class="mockup-terminal__body">
+          <div class="mockup-terminal__scroll" id="terminal-scroll"></div>
+          <span class="mockup-terminal__cursor">▋</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ════════════════════════════════════════════
+     BLOQUE PERSONAL — solo si autenticado
+════════════════════════════════════════════ -->
+{% if user.is_authenticated %}
+<section class="personal-section">
+  <div class="home-container">
+
+    <div class="personal-header">
+      <div class="personal-header__left">
+        <div class="personal-greeting">
+          <span>Bienvenido de vuelta, <strong>{{ user.username }}</strong></span>
+        </div>
+        <p class="personal-header__desc">Tus proyectos más recientes</p>
+      </div>
+      <div class="personal-header__right">
+        <a href="{% url 'assistant' %}" class="personal-new-btn">
+          + Nuevo análisis
+        </a>
+        <a href="{% url 'history' %}" class="personal-all-link">
+          Ver todo →
+        </a>
+      </div>
+    </div>
+
+    <div class="personal-grid">
+
+      <!-- Análisis recientes -->
+      <div class="personal-col">
+        <div class="personal-col__label">
+          <span class="personal-col__icon">📊</span>
+          Análisis recientes
+        </div>
+
+        {% if recent_requests %}
+          <div class="personal-items">
+            {% for r in recent_requests %}
+              <a href="{% url 'assistant' %}?api_request_id={{ r.id }}"
+                 class="personal-item {% if r.status == 'error' %}personal-item--error{% elif r.field_mapping %}personal-item--schema{% endif %}">
+                <div class="personal-item__dot
+                  {% if r.status == 'processed' %}personal-item__dot--ok
+                  {% elif r.status == 'error' %}personal-item__dot--error
+                  {% else %}personal-item__dot--pending{% endif %}">
+                </div>
+                <div class="personal-item__info">
+                  <div class="personal-item__url">{{ r.api_url|truncatechars:50 }}</div>
+                  <div class="personal-item__meta">
+                    {{ r.date|date:"d M · H:i" }}
+                    {% if r.field_mapping %}
+                      <span class="personal-item__tag personal-item__tag--purple">✦ schema</span>
+                    {% endif %}
+                    {% if r.plan_accepted %}
+                      <span class="personal-item__tag personal-item__tag--blue">publicado</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <span class="personal-item__arrow">→</span>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="personal-empty">
+            <span class="personal-empty__icon">📊</span>
+            <span>Sin análisis todavía</span>
+            <a href="{% url 'assistant' %}" class="personal-empty__link">Crear el primero →</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Separador vertical -->
+      <div class="personal-divider"></div>
+
+      <!-- Sitios publicados -->
+      <div class="personal-col">
+        <div class="personal-col__label">
+          <span class="personal-col__icon">🌐</span>
+          Sitios publicados
+        </div>
+
+        {% if recent_sites %}
+          <div class="personal-items">
+            {% for w in recent_sites %}
+              <a href="{% url 'site_render' w.project_source.id %}"
+                 class="personal-item personal-item--site">
+                <div class="personal-item__site-icon">🌐</div>
+                <div class="personal-item__info">
+                  <div class="personal-item__url">
+                    {{ w.accepted_plan.site_title|default:w.accepted_plan.site_type|default:"Sitio sin título" }}
+                  </div>
+                  <div class="personal-item__meta">
+                    {{ w.created_at|date:"d M · H:i" }}
+                    <span class="personal-item__tag personal-item__tag--purple">{{ w.accepted_plan.site_type|default:"other" }}</span>
+                    <span class="personal-item__tag">{{ w.accepted_plan.fields|length }} campos</span>
+                  </div>
+                </div>
+                <span class="personal-item__arrow">→</span>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="personal-empty">
+            <span class="personal-empty__icon">🌐</span>
+            <span>Sin sitios publicados</span>
+            <a href="{% url 'assistant' %}" class="personal-empty__link">Generar el primero →</a>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+  </div>
+</section>
+{% endif %}
+
+<!-- ════════════════════════════════════════════
+     CÓMO FUNCIONA
+════════════════════════════════════════════ -->
+<section class="section" id="how-it-works">
+  <div class="home-container">
+
+    <div class="section-header">
+      <div class="section-badge">Proceso</div>
+      <h2 class="section-title">Cómo Funciona</h2>
+      <p class="section-subtitle">
+        Cuatro pasos para pasar de datos crudos a una web funcional
+      </p>
+    </div>
+
+    <div class="steps-grid">
+
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3 class="step-title">Introduce tu API</h3>
+        <p class="step-description">
+          Pega la URL de cualquier API que devuelva JSON o XML.
+          WebBuilder la descarga, la parsea y detecta automáticamente
+          su estructura interna.
+        </p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3 class="step-title">La IA genera el schema</h3>
+        <p class="step-description">
+          Un LLM analiza los campos disponibles y decide cuáles mostrar,
+          en qué orden y con qué etiquetas. Tú puedes ajustarlo
+          campo a campo en el editor visual.
+        </p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3 class="step-title">Diseño generado por IA</h3>
+        <p class="step-description">
+          Otro LLM genera el HTML y CSS adaptado a tus datos reales.
+          Puedes regenerar el diseño tantas veces como quieras
+          con un simple hint de estilo.
+        </p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3 class="step-title">Descarga el proyecto</h3>
+        <p class="step-description">
+          Obtendrás un proyecto Django completo con models, views,
+          templates y datos pre-cargados. Listo para ejecutar
+          y desplegar en cualquier servidor.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     IA — CÓMO TRABAJA
+════════════════════════════════════════════ -->
+<section class="section section--alt" id="ai-section">
+  <div class="home-container">
+
+    <div class="section-header">
+      <div class="section-badge section-badge--purple">Inteligencia Artificial</div>
+      <h2 class="section-title">La IA que trabaja por ti</h2>
+      <p class="section-subtitle">
+        Dos modelos especializados colaboran para entender tus datos
+        y construir la web perfecta para ellos
+      </p>
+    </div>
+
+    <div class="ai-grid">
+
+      <div class="ai-card">
+        <div class="ai-card__icon ai-card__icon--blue">🧠</div>
+        <div class="ai-card__content">
+          <h3 class="ai-card__title">Planner — Entiende los datos</h3>
+          <p class="ai-card__desc">
+            Analiza los campos del dataset y decide cuáles son relevantes
+            para mostrar al usuario. Genera un schema dinámico libre:
+            no hay campos fijos, el modelo elige qué mostrar según
+            el contexto real de los datos.
+          </p>
+          <div class="ai-card__tags">
+            <span class="ai-tag">Schema dinámico</span>
+            <span class="ai-tag">Anti-alucinación</span>
+            <span class="ai-tag">Validación en backend</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-card">
+        <div class="ai-card__icon ai-card__icon--purple">🎨</div>
+        <div class="ai-card__content">
+          <h3 class="ai-card__title">Themer — Diseña la web</h3>
+          <p class="ai-card__desc">
+            Recibe el schema validado y genera templates Django reales:
+            HTML semántico, CSS adaptado al tipo de contenido e ítems
+            de ejemplo. El diseño se puede regenerar con un hint
+            de estilo en cualquier momento.
+          </p>
+          <div class="ai-card__tags">
+            <span class="ai-tag">Templates Django</span>
+            <span class="ai-tag">CSS adaptativo</span>
+            <span class="ai-tag">Regeneración libre</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Transform showcase -->
+    <div class="transform-showcase">
+      <div class="transform-col">
+        <div class="transform-label">Entrada</div>
+        <div class="transform-box transform-box--input">
+          <div class="transform-line"><span class="t-key">"COMMON"</span><span class="t-sep">:</span><span class="t-val">"Bloodroot"</span></div>
+          <div class="transform-line"><span class="t-key">"BOTANICAL"</span><span class="t-sep">:</span><span class="t-val">"Sanguinaria"</span></div>
+          <div class="transform-line"><span class="t-key">"ZONE"</span><span class="t-sep">:</span><span class="t-val">"4"</span></div>
+          <div class="transform-line"><span class="t-key">"LIGHT"</span><span class="t-sep">:</span><span class="t-val">"Sunny"</span></div>
+          <div class="transform-line"><span class="t-key">"PRICE"</span><span class="t-sep">:</span><span class="t-val">"$2.44"</span></div>
+        </div>
+      </div>
+
+      <div class="transform-arrow">
+        <div class="transform-arrow__line"></div>
+        <div class="transform-arrow__label">IA genera</div>
+      </div>
+
+      <div class="transform-col">
+        <div class="transform-label">Schema</div>
+        <div class="transform-box transform-box--schema">
+          <div class="schema-field"><span class="schema-key">COMMON</span><span class="schema-sep">→</span><span class="schema-label">Nombre común</span></div>
+          <div class="schema-field"><span class="schema-key">BOTANICAL</span><span class="schema-sep">→</span><span class="schema-label">Nombre botánico</span></div>
+          <div class="schema-field"><span class="schema-key">ZONE</span><span class="schema-sep">→</span><span class="schema-label">Zona de cultivo</span></div>
+          <div class="schema-field"><span class="schema-key">PRICE</span><span class="schema-sep">→</span><span class="schema-label">Precio</span></div>
+        </div>
+      </div>
+
+      <div class="transform-arrow">
+        <div class="transform-arrow__line"></div>
+        <div class="transform-arrow__label">Themer genera</div>
+      </div>
+
+      <div class="transform-col">
+        <div class="transform-label">Resultado</div>
+        <div class="transform-box transform-box--output">
+          <div class="mock-card">
+            <div class="mock-card__title">Bloodroot</div>
+            <div class="mock-card__row"><span class="mock-label">Nombre botánico</span><span class="mock-val">Sanguinaria</span></div>
+            <div class="mock-card__row"><span class="mock-label">Zona</span><span class="mock-val">4</span></div>
+            <div class="mock-card__price">$2.44</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     CARACTERÍSTICAS
+════════════════════════════════════════════ -->
+<section class="section">
+  <div class="home-container">
+
+    <div class="section-header">
+      <div class="section-badge">Características</div>
+      <h2 class="section-title">Todo lo que Necesitas</h2>
+      <p class="section-subtitle">
+        Herramientas potentes para crear webs profesionales sin esfuerzo
+      </p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3 class="feature-title">Detección automática</h3>
+        <p class="feature-description">
+          Analiza JSON y XML, detecta la colección principal,
+          identifica los campos disponibles y los presenta listos para usar.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3 class="feature-title">Schema dinámico con IA</h3>
+        <p class="feature-description">
+          El LLM elige libremente qué campos mostrar y en qué orden.
+          No hay roles fijos. Validación anti-alucinación en backend.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3 class="feature-title">Diseño regenerable</h3>
+        <p class="feature-description">
+          Regenera el diseño cuantas veces quieras con un simple hint:
+          "más oscuro", "estilo magazine", "minimalista blanco"...
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">👁</div>
+        <h3 class="feature-title">Preview fiel</h3>
+        <p class="feature-description">
+          El preview que ves es exactamente lo que descargarás.
+          Mismo HTML, mismo CSS, mismos datos reales del dataset.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h3 class="feature-title">Proyecto descargable</h3>
+        <p class="feature-description">
+          Descarga un proyecto Django completo con models, views,
+          templates y datos pre-cargados. Listo para ejecutar.
+        </p>
+      </div>
+
+      <div class="feature-card feature-card--coming">
+        <div class="feature-badge-coming">Próximamente</div>
+        <div class="feature-icon">⚡</div>
+        <h3 class="feature-title">Automatización con n8n</h3>
+        <p class="feature-description">
+          Conecta WebBuilder con n8n para automatizar la generación
+          de webs desde cualquier flujo de trabajo. APIs, webhooks,
+          bases de datos, hojas de cálculo...
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     N8N
+════════════════════════════════════════════ -->
+<section class="section section--alt" id="n8n-section">
+  <div class="home-container">
+
+    <div class="section-header">
+      <div class="section-badge section-badge--orange">Roadmap</div>
+      <h2 class="section-title">Automatización con n8n</h2>
+      <p class="section-subtitle">
+        La próxima evolución de WebBuilder: generación automática
+        de webs desde cualquier fuente de datos
+      </p>
+    </div>
+
+    <div class="n8n-layout">
+
+      <div class="n8n-description">
+        <p class="n8n-text">
+          n8n es una plataforma de automatización de flujos de trabajo
+          de código abierto. La integración con WebBuilder permitirá
+          que cualquier evento externo (un nuevo registro en una BD,
+          una hoja de cálculo actualizada, un webhook de cualquier servicio)
+          dispare automáticamente la generación de una web.
+        </p>
+
+        <div class="n8n-usecases">
+          <div class="n8n-usecase">
+            <span class="n8n-usecase__icon">📊</span>
+            <div>
+              <strong>Google Sheets → Web</strong>
+              <span>Cada vez que se actualice una hoja, regenera la web automáticamente</span>
+            </div>
+          </div>
+          <div class="n8n-usecase">
+            <span class="n8n-usecase__icon">🗄️</span>
+            <div>
+              <strong>Base de datos → Web</strong>
+              <span>Conecta cualquier BD y genera webs dinámicas en tiempo real</span>
+            </div>
+          </div>
+          <div class="n8n-usecase">
+            <span class="n8n-usecase__icon">🔗</span>
+            <div>
+              <strong>Webhook → Web</strong>
+              <span>Cualquier servicio externo puede disparar la generación</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="n8n-flow">
+        <div class="n8n-node n8n-node--source"><span class="n8n-node__icon">📡</span><span class="n8n-node__label">Fuente de datos</span></div>
+        <div class="n8n-connector">↓</div>
+        <div class="n8n-node n8n-node--n8n"><span class="n8n-node__icon">⚡</span><span class="n8n-node__label">n8n</span></div>
+        <div class="n8n-connector">↓</div>
+        <div class="n8n-node n8n-node--wb"><span class="n8n-node__icon">🤖</span><span class="n8n-node__label">WebBuilder API</span></div>
+        <div class="n8n-connector">↓</div>
+        <div class="n8n-node n8n-node--output"><span class="n8n-node__icon">🌐</span><span class="n8n-node__label">Web generada</span></div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     FAQ
+════════════════════════════════════════════ -->
+<section class="section">
+  <div class="home-container">
+
+    <div class="section-header">
+      <div class="section-badge">FAQ</div>
+      <h2 class="section-title">Preguntas Frecuentes</h2>
+    </div>
+
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Qué tipo de APIs puedo usar?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Cualquier API pública que devuelva JSON o XML. El sistema detecta
+            automáticamente el formato y la estructura. Puedes usar APIs REST,
+            feeds XML, exports de datos, etc.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Cómo funciona la IA exactamente?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Usamos dos modelos LLM via OpenRouter. El primero (Planner) analiza
+            los campos del dataset y genera un schema dinámico. El segundo (Themer)
+            recibe ese schema y genera el HTML y CSS adaptado. Ambos tienen
+            validación en backend para evitar alucinaciones.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Puedo cambiar el diseño después de generarlo?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Sí, puedes regenerar el diseño tantas veces como quieras desde
+            el editor. Solo escribe un hint de estilo ("más oscuro",
+            "estilo magazine", "minimalista") y la IA genera un nuevo diseño
+            manteniendo tus datos y schema intactos.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Qué contiene el proyecto que descargo?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Un proyecto Django completo con manage.py, settings.py, models.py
+            con los campos de tu schema, views.py, urls.py y los templates
+            generados por la IA. Los datos de la API vienen pre-cargados
+            en la base de datos.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          ¿Cuándo estará disponible la integración con n8n?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            La integración con n8n está en el roadmap del proyecto.
+            El objetivo es exponer una API REST de WebBuilder que n8n
+            pueda llamar desde cualquier flujo de trabajo, permitiendo
+            la generación automática de webs desde cualquier fuente de datos.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     CTA FINAL
+════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="home-container">
+    <h2 class="cta-title">¿Listo para probarlo?</h2>
+    <p class="cta-description">Solo necesitas una URL. La IA hace el resto.</p>
+    <a href="{% url 'assistant' %}" class="cta-button">
+      Empezar ahora →
+    </a>
+  </div>
+</section>
+
+<script src="{% static 'js/home.js' %}"></script>
+
+{% endblock %}
