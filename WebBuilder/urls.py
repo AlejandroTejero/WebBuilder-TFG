@@ -19,4 +19,6 @@ urlpatterns = [
     path("site/<int:api_request_id>/generate/", views.site_generate, name="site_generate"),
     path("site/<int:api_request_id>/download/", views.site_download_zip, name="site_download_zip"),
     path("site/<int:api_request_id>/status/", views.site_status, name="site_status"),
+	
+    path("site/<int:api_request_id>/deploy/", views.site_deploy, name="site_deploy"),
 ]

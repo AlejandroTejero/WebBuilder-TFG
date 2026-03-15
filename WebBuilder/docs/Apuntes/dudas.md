@@ -1,4 +1,0 @@
-- Pasar algunas memorias de ejemplo para tomar apuntes un poco mas estructurados
-- Q base de datos me recomienda y q me resuma lo q dijo en la otra charla
-- Enlazar base de datos con n8n ya para poder guardas las pruebas ahi, o eso es lo ultimo ya cuando este todo bien.
-- Organizar assistat.html haciendolo con includes para ver bien y saber que partes tocar y no tener tantas lineas

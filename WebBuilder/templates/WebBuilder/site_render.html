@@ -56,6 +56,16 @@
             </span>
           {% endif %}
 
+          <!-- Desplegar en Docker via n8n -->
+          {% if site.generation_status == "ready" %}
+            <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;" id="deploy-form">
+              {% csrf_token %}
+              <button class="asst-btn asst-btn--primary" type="submit" id="deploy-btn">
+                Desplegar preview
+              </button>
+            </form>
+          {% endif %}
+
           <!-- Preview (si existe) -->
           {% if site.preview_url %}
             <a class="asst-btn asst-btn--ghost" href="{{ site.preview_url }}" target="_blank" rel="noopener">
