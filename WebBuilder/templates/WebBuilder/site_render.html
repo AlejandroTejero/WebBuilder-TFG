@@ -4,7 +4,7 @@
 {% block content %}
 <div class="asst-layout">
 
-  <!-- Sidebar (estilo asistente) -->
+  <!-- Sidebar -->
   <aside class="asst-sidebar">
     <div class="asst-sidebar__inner">
 
@@ -24,7 +24,7 @@
 
         <div style="display:flex; gap: .6rem; flex-wrap: wrap;">
           <div class="asst-meta-pill">
-            <span class="asst-meta-pill__label">Estado</span>
+            <span class="asst-meta-pill__label">Generación</span>
             <span class="asst-meta-pill__value">{{ site.generation_status }}</span>
           </div>
 
@@ -34,9 +34,16 @@
               {% if site.project_files %}{{ site.project_files|length }}{% else %}0{% endif %}
             </span>
           </div>
+
+          <!-- Pill de estado del despliegue (se actualiza dinámicamente) -->
+          <div class="asst-meta-pill" id="deploy-status-pill" style="{% if site.deploy_status == 'idle' %}display:none;{% endif %}">
+            <span class="asst-meta-pill__label">Despliegue</span>
+            <span class="asst-meta-pill__value" id="deploy-status-value">{{ site.deploy_status }}</span>
+          </div>
         </div>
 
         <div class="asst-card__actions" style="margin-top: 1.1rem; padding-top: 1.1rem;">
+
           <!-- Generar -->
           <form method="post" action="{% url 'site_generate' api_request.id %}" style="margin:0;">
             {% csrf_token %}
@@ -45,7 +52,7 @@
             </button>
           </form>
 
-          <!-- Descargar ZIP (solo si hay archivos) -->
+          <!-- Descargar ZIP -->
           {% if site.project_files %}
             <a class="asst-btn asst-btn--ghost" href="{% url 'site_download_zip' api_request.id %}">
               Descargar ZIP
@@ -56,22 +63,32 @@
             </span>
           {% endif %}
 
-          <!-- Desplegar en Docker via n8n -->
+          <!-- Desplegar -->
           {% if site.generation_status == "ready" %}
-            <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;" id="deploy-form">
-              {% csrf_token %}
-              <button class="asst-btn asst-btn--primary" type="submit" id="deploy-btn">
-                Desplegar preview
-              </button>
-            </form>
+            {% if site.deploy_status == "deploying" %}
+              <!-- Mientras despliega: botón desactivado -->
+              <span class="asst-btn asst-btn--primary" style="opacity:.5; cursor:not-allowed;" id="deploy-btn-disabled">
+                Desplegando…
+              </span>
+            {% else %}
+              <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;" id="deploy-form">
+                {% csrf_token %}
+                <button class="asst-btn asst-btn--primary" type="submit" id="deploy-btn">
+                  {% if site.deploy_status == "done" %}Re-desplegar{% else %}Desplegar preview{% endif %}
+                </button>
+              </form>
+            {% endif %}
           {% endif %}
 
           <!-- Preview (si existe) -->
           {% if site.preview_url %}
-            <a class="asst-btn asst-btn--ghost" href="{{ site.preview_url }}" target="_blank" rel="noopener">
+            <a class="asst-btn asst-btn--ghost" href="{{ site.preview_url }}" target="_blank" rel="noopener" id="preview-link">
               Abrir preview →
             </a>
+          {% else %}
+            <a class="asst-btn asst-btn--ghost" href="#" target="_blank" rel="noopener" id="preview-link" style="display:none;"></a>
           {% endif %}
+
         </div>
       </div>
 
@@ -84,6 +101,15 @@
           </div>
         </div>
       {% endif %}
+
+      <!-- Alerta de error de despliegue (se muestra/oculta dinámicamente) -->
+      <div class="asst-alert asst-alert--error" id="deploy-error-alert" style="display:none;">
+        <div class="asst-alert__icon">!</div>
+        <div>
+          <div style="font-weight:700; margin-bottom:.15rem;">Error de despliegue</div>
+          <div style="opacity:.95;" id="deploy-error-msg">{{ site.deploy_error }}</div>
+        </div>
+      </div>
 
     </div>
   </aside>
@@ -101,19 +127,14 @@
         </div>
       </div>
 
-      <!-- Resumen rápido del plan -->
       <div style="display:flex; gap:.6rem; flex-wrap: wrap; margin-bottom: 1rem;">
         <div class="asst-meta-pill">
           <span class="asst-meta-pill__label">Tipo</span>
-          <span class="asst-meta-pill__value">
-            {{ site.accepted_plan.site_type|default:"other" }}
-          </span>
+          <span class="asst-meta-pill__value">{{ site.accepted_plan.site_type|default:"other" }}</span>
         </div>
         <div class="asst-meta-pill">
           <span class="asst-meta-pill__label">Título</span>
-          <span class="asst-meta-pill__value">
-            {{ site.accepted_plan.site_title|default:site.accepted_plan.site_type|default:"other" }}
-          </span>
+          <span class="asst-meta-pill__value">{{ site.accepted_plan.site_title|default:site.accepted_plan.site_type|default:"other" }}</span>
         </div>
         {% if site.accepted_plan.fields %}
         <div class="asst-meta-pill">
@@ -152,7 +173,7 @@
         </ul>
       {% else %}
         <div class="asst-card asst-card--empty" style="padding: 1.25rem;">
-          Aún no hay archivos generados. Pulsa <b>“Generar proyecto”</b>.
+          Aún no hay archivos generados. Pulsa <b>"Generar proyecto"</b>.
         </div>
       {% endif %}
     </section>
@@ -160,11 +181,14 @@
   </main>
 </div>
 
-<!-- Loading overlay generación -->
+
+<!-- ═══════════════════════════════════════════════════════
+     OVERLAY: GENERACIÓN
+════════════════════════════════════════════════════════════ -->
 <div class="asst-loading" id="gen-loading-overlay">
   <div class="asst-loading__box">
     <div class="asst-loading__spinner"></div>
-    <div class="asst-loading__title">Generando proyecto...</div>
+    <div class="asst-loading__title">Generando proyecto…</div>
     <div class="asst-loading__sub">El LLM está escribiendo el código</div>
     <div class="asst-loading__steps">
       <div class="asst-loading__step" id="gs-1">Diseñando páginas</div>
@@ -177,54 +201,234 @@
   </div>
 </div>
 
+
+<!-- ═══════════════════════════════════════════════════════
+     OVERLAY: DESPLIEGUE
+════════════════════════════════════════════════════════════ -->
+<div class="asst-loading" id="deploy-loading-overlay">
+  <div class="asst-loading__box" style="max-width: 420px;">
+    <div class="asst-loading__spinner"></div>
+    <div class="asst-loading__title" id="deploy-overlay-title">Desplegando proyecto…</div>
+    <div class="asst-loading__sub">n8n está orquestando el contenedor Docker</div>
+
+    <div class="asst-loading__steps">
+      <div class="asst-loading__step" id="ds-zip">
+        <span class="ds-icon">📦</span> Preparando ZIP del proyecto
+      </div>
+      <div class="asst-loading__step" id="ds-unzip">
+        <span class="ds-icon">📂</span> Descomprimiendo en n8n
+      </div>
+      <div class="asst-loading__step" id="ds-build">
+        <span class="ds-icon">🔨</span> Construyendo imagen Docker
+      </div>
+      <div class="asst-loading__step" id="ds-run">
+        <span class="ds-icon">🚀</span> Arrancando contenedor
+      </div>
+      <div class="asst-loading__step" id="ds-done">
+        <span class="ds-icon">✅</span> ¡Listo!
+      </div>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div style="width:100%; background:rgba(255,255,255,0.06); border-radius:99px; height:4px; margin-top:.5rem; overflow:hidden;">
+      <div id="deploy-progress-bar"
+           style="height:100%; width:0%; background: linear-gradient(90deg,#3b82f6,#8b5cf6);
+                  border-radius:99px; transition: width 0.6s ease;"></div>
+    </div>
+    <div id="deploy-progress-label" style="font-size:.75rem; color:#475569; margin-top:.25rem;">0%</div>
+
+    <!-- Tiempo transcurrido -->
+    <div id="deploy-elapsed" style="font-size:.72rem; color:#334155; margin-top:.1rem;">00:00</div>
+  </div>
+</div>
+
+
 <script>
 (function () {
-  const overlay = document.getElementById('gen-loading-overlay');
-  const steps = ['gs-1','gs-2','gs-3','gs-4','gs-5','gs-6'].map(id => document.getElementById(id));
-  const STATUS_URL = "{% url 'site_status' api_request.id %}";
-  const CURRENT_STATUS = "{{ site.generation_status }}";
+  /* ─────────────────────────────────────────────
+     OVERLAY DE GENERACIÓN (sin cambios)
+  ───────────────────────────────────────────── */
+  const genOverlay   = document.getElementById('gen-loading-overlay');
+  const genStepIds   = ['gs-1','gs-2','gs-3','gs-4','gs-5','gs-6'];
+  const genSteps     = genStepIds.map(id => document.getElementById(id));
+  const GEN_STATUS_URL = "{% url 'site_status' api_request.id %}";
+  const CURRENT_GEN_STATUS = "{{ site.generation_status }}";
 
-  // Si al cargar la página ya está generando (recarga tras submit), arrancar polling
-  if (CURRENT_STATUS === 'generating') {
-    showOverlay();
-    startPolling();
+  if (CURRENT_GEN_STATUS === 'generating') {
+    showGenOverlay();
+    startGenPolling();
   }
 
-  // Al pulsar Generar, mostrar overlay inmediatamente
-  const form = document.querySelector('form[action*="generate"]');
-  if (form) {
-    form.addEventListener('submit', () => {
-      showOverlay();
-    });
+  const genForm = document.querySelector('form[action*="generate"]');
+  if (genForm) {
+    genForm.addEventListener('submit', () => showGenOverlay());
   }
 
-  function showOverlay() {
-    overlay.classList.add('active');
-    steps.forEach((step, i) => {
+  function showGenOverlay() {
+    genOverlay.classList.add('active');
+    genSteps.forEach((step, i) => {
       setTimeout(() => {
-        if (i > 0 && steps[i - 1]) {
-          steps[i - 1].classList.remove('active');
-          steps[i - 1].classList.add('done');
+        if (i > 0 && genSteps[i - 1]) {
+          genSteps[i - 1].classList.remove('active');
+          genSteps[i - 1].classList.add('done');
         }
         if (step) step.classList.add('active');
       }, i * 8000);
     });
   }
 
-  function startPolling() {
+  function startGenPolling() {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(STATUS_URL);
+        const res  = await fetch(GEN_STATUS_URL);
         const data = await res.json();
         if (data.status === 'ready' || data.status === 'error') {
           clearInterval(interval);
           window.location.reload();
         }
-      } catch (e) {
-        // error de red, reintentar en el siguiente tick
-      }
+      } catch (_) { /* red — reintentar */ }
     }, 4000);
   }
+
+
+  /* ─────────────────────────────────────────────
+     OVERLAY DE DESPLIEGUE
+  ───────────────────────────────────────────── */
+  const deployOverlay   = document.getElementById('deploy-loading-overlay');
+  const DEPLOY_STATUS_URL = "{% url 'site_deploy_status' api_request.id %}";
+  const CURRENT_DEPLOY_STATUS = "{{ site.deploy_status }}";
+
+  // Pasos del despliegue con tiempos estimados (ms desde el inicio)
+  const DEPLOY_STEPS = [
+    { id: 'ds-zip',   label: 'Preparando ZIP',          at:    0, progress: 10 },
+    { id: 'ds-unzip', label: 'Descomprimiendo en n8n',  at: 5000, progress: 30 },
+    { id: 'ds-build', label: 'Construyendo imagen',     at:15000, progress: 55 },
+    { id: 'ds-run',   label: 'Arrancando contenedor',   at:90000, progress: 85 },
+    { id: 'ds-done',  label: '¡Listo!',                 at:    0, progress:100 }, // se activa al terminar
+  ];
+
+  const progressBar   = document.getElementById('deploy-progress-bar');
+  const progressLabel = document.getElementById('deploy-progress-label');
+  const elapsedEl     = document.getElementById('deploy-elapsed');
+  let deployTimer = null;
+  let deployStart = null;
+  let stepTimers  = [];
+
+  // Si al cargar la página ya estaba desplegando (recarga tras submit), arrancar
+  if (CURRENT_DEPLOY_STATUS === 'deploying') {
+    showDeployOverlay();
+    startDeployPolling();
+  }
+
+  // Al pulsar "Desplegar", mostrar overlay antes del submit
+  const deployForm = document.getElementById('deploy-form');
+  if (deployForm) {
+    deployForm.addEventListener('submit', () => {
+      showDeployOverlay();
+    });
+  }
+
+  function showDeployOverlay() {
+    deployOverlay.classList.add('active');
+    deployStart = Date.now();
+
+    // Activar pasos secuencialmente según tiempos estimados
+    DEPLOY_STEPS.slice(0, -1).forEach((step, i) => {
+      const el = document.getElementById(step.id);
+      const timer = setTimeout(() => {
+        // Marcar el anterior como done
+        if (i > 0) {
+          const prevEl = document.getElementById(DEPLOY_STEPS[i - 1].id);
+          if (prevEl) { prevEl.classList.remove('active'); prevEl.classList.add('done'); }
+        }
+        if (el) el.classList.add('active');
+        setProgress(step.progress);
+      }, step.at);
+      stepTimers.push(timer);
+    });
+
+    // Temporizador de tiempo transcurrido
+    deployTimer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - deployStart) / 1000);
+      const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      const ss = String(elapsed % 60).padStart(2, '0');
+      if (elapsedEl) elapsedEl.textContent = `${mm}:${ss}`;
+    }, 1000);
+  }
+
+  function setProgress(pct) {
+    if (progressBar)   progressBar.style.width = pct + '%';
+    if (progressLabel) progressLabel.textContent = pct + '%';
+  }
+
+  function finishDeployOverlay(success, previewUrl, errorMsg) {
+    // Limpiar timers
+    stepTimers.forEach(t => clearTimeout(t));
+    clearInterval(deployTimer);
+
+    if (success) {
+      // Marcar todos los pasos como done y mostrar el último
+      DEPLOY_STEPS.slice(0, -1).forEach(step => {
+        const el = document.getElementById(step.id);
+        if (el) { el.classList.remove('active'); el.classList.add('done'); }
+      });
+      const doneEl = document.getElementById('ds-done');
+      if (doneEl) doneEl.classList.add('active');
+      setProgress(100);
+
+      const titleEl = document.getElementById('deploy-overlay-title');
+      if (titleEl) titleEl.textContent = '¡Desplegado con éxito!';
+
+      // Esperar 1.5 s y recargar (o redirigir al preview)
+      setTimeout(() => {
+        deployOverlay.classList.remove('active');
+        window.location.reload();
+      }, 1800);
+
+    } else {
+      // Error: cerrar overlay y mostrar alerta
+      deployOverlay.classList.remove('active');
+      const alertEl  = document.getElementById('deploy-error-alert');
+      const msgEl    = document.getElementById('deploy-error-msg');
+      const pillEl   = document.getElementById('deploy-status-pill');
+      const valueEl  = document.getElementById('deploy-status-value');
+      if (msgEl)   msgEl.textContent   = errorMsg || 'Error desconocido.';
+      if (alertEl) alertEl.style.display = 'flex';
+      if (pillEl)  pillEl.style.display  = '';
+      if (valueEl) valueEl.textContent   = 'error';
+    }
+  }
+
+  function startDeployPolling() {
+    const interval = setInterval(async () => {
+      try {
+        const res  = await fetch(DEPLOY_STATUS_URL);
+        const data = await res.json();
+
+        if (data.deploy_status === 'done') {
+          clearInterval(interval);
+          // Actualizar pill y enlace de preview sin recargar aún
+          const pillEl   = document.getElementById('deploy-status-pill');
+          const valueEl  = document.getElementById('deploy-status-value');
+          const linkEl   = document.getElementById('preview-link');
+          if (pillEl)  pillEl.style.display  = '';
+          if (valueEl) valueEl.textContent   = 'done';
+          if (linkEl && data.preview_url) {
+            linkEl.href          = data.preview_url;
+            linkEl.style.display = '';
+          }
+          finishDeployOverlay(true, data.preview_url);
+        }
+
+        if (data.deploy_status === 'error') {
+          clearInterval(interval);
+          finishDeployOverlay(false, '', data.deploy_error);
+        }
+
+      } catch (_) { /* error de red — reintentar */ }
+    }, 3000);
+  }
+
 })();
 </script>
 {% endblock %}

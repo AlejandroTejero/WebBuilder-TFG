@@ -31,6 +31,17 @@
 
 <body class="{% block body_class %}{% endblock %}">
   {% include 'WebBuilder/navbar.html' %}
+
+  {% if messages %}
+    <div style="position:fixed; top:1rem; right:1rem; z-index:9999;">
+      {% for message in messages %}
+        <div style="background:#1e293b; border:1px solid {% if message.tags == 'error' %}#ef4444{% else %}#22c55e{% endif %}; color:white; padding:.75rem 1.25rem; border-radius:8px; margin-bottom:.5rem; font-size:.9rem;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  
   <main>
 
     {% block content %}{% endblock %}

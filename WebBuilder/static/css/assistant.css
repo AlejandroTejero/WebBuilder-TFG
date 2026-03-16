@@ -564,3 +564,34 @@
   .asst-content        { padding: 1.25rem; }
   .asst-columns        { grid-template-columns: 1fr; }
 }
+
+/* ════════════════════════════════════════════════════════
+   OVERLAY DE DESPLIEGUE — pasos con icono + barra de progreso
+════════════════════════════════════════════════════════ */
+
+/* Reutiliza .asst-loading / .asst-loading__box del overlay de generación */
+
+/* Icono inline en cada paso de despliegue */
+.asst-loading__step .ds-icon {
+  margin-right: .4rem;
+  font-size: .9rem;
+  display: inline-block;
+  width: 1.1rem;
+  text-align: center;
+}
+
+/* Estado "pulsando" — anima suavemente el paso activo */
+.asst-loading__step.active .ds-icon {
+  animation: ds-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ds-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: .6; transform: scale(1.15); }
+}
+
+/* Alerta de error de despliegue en el sidebar */
+#deploy-error-alert {
+  display: none;
+  margin-top: .75rem;
+}

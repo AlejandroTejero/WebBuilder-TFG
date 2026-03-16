@@ -200,6 +200,87 @@ def _fixed_files(project: str, app: str = "siteapp") -> dict[str, str]:
     return files
 
 
+def _generate_initial_migration(models_code: str, app: str = "siteapp") -> str:
+    """
+    Genera un 0001_initial.py básico parseando los campos del models.py generado.
+    Soporta CharField, TextField, IntegerField, FloatField, BooleanField,
+    DateTimeField, URLField, EmailField, DecimalField.
+    Siempre añade id AutoField y created_at DateTimeField si no están presentes.
+    """
+    import re
+
+    field_type_map = {
+        "CharField":      "models.CharField",
+        "TextField":      "models.TextField",
+        "IntegerField":   "models.IntegerField",
+        "FloatField":     "models.FloatField",
+        "BooleanField":   "models.BooleanField",
+        "DateTimeField":  "models.DateTimeField",
+        "URLField":       "models.URLField",
+        "EmailField":     "models.EmailField",
+        "DecimalField":   "models.DecimalField",
+        "PositiveIntegerField": "models.PositiveIntegerField",
+    }
+
+    # Extraer líneas de campos del models.py
+    field_lines = []
+    in_model = False
+    for line in models_code.splitlines():
+        stripped = line.strip()
+        if re.match(r"class \w+\(models\.Model\)", stripped):
+            in_model = True
+            continue
+        if in_model:
+            # Detectar fin de clase
+            if stripped and not stripped.startswith("#") and not stripped.startswith("def") \
+               and not stripped.startswith("class") and "=" in stripped:
+                # Es una línea de campo
+                field_match = re.match(r"(\w+)\s*=\s*models\.(\w+)\((.*)\)", stripped)
+                if field_match:
+                    fname, ftype, fargs = field_match.groups()
+                    if fname in ("id",):
+                        continue
+                    if ftype in field_type_map:
+                        field_lines.append((fname, ftype, fargs))
+            elif stripped.startswith("class ") and in_model:
+                break
+
+    # Construir las líneas de campos para la migración
+    migration_fields = [
+        "                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),",
+    ]
+    for fname, ftype, fargs in field_lines:
+        migration_fields.append(f"                ('{fname}', models.{ftype}({fargs})),")
+
+    # Asegurar created_at si no está
+    has_created_at = any(f[0] == "created_at" for f in field_lines)
+    if not has_created_at:
+        migration_fields.append(
+            "                ('created_at', models.DateTimeField(auto_now_add=True)),"
+        )
+
+    fields_str = "\n".join(migration_fields)
+
+    return f"""from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = []
+
+    operations = [
+        migrations.CreateModel(
+            name='Item',
+            fields=[
+{fields_str}
+            ],
+        ),
+    ]
+"""
+
+
 def _app_urls(pages: list[dict], app: str = "siteapp") -> str:
     """Genera urls.py de la app a partir de las páginas decididas por el LLM."""
     lines = [
@@ -399,6 +480,10 @@ def generate_project_files(site) -> dict[str, str]:
         models_code = _fallback_models(fields)
 
     files[f"{project}/{app}/models.py"] = models_code
+
+    # Generar migración inicial a partir del models.py
+    files[f"{project}/{app}/migrations/__init__.py"] = ""
+    files[f"{project}/{app}/migrations/0001_initial.py"] = _generate_initial_migration(models_code, app)
 
     # ── PASO 3: views.py ─────────────────────────────────────────────────────
     logger.info("[generator] Paso 3: views.py")
