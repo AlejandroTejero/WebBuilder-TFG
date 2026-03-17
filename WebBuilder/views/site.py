@@ -2,12 +2,13 @@ import io
 import os
 import threading
 import zipfile
+import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 
 from ..models import APIRequest, GeneratedSite
 from ..utils.generator.project_generator import generate_project_files
@@ -227,3 +228,32 @@ def site_deploy_status(request, api_request_id: int):
         "deploy_error":  site.deploy_error or "",
         "preview_url":   site.preview_url or "",
     })
+
+
+# Modificar el codigo hecho por el llm
+@login_required
+@require_POST  # Evita que alguien entre en cualquier peticion
+def site_update_file(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"ok": False, "error": "JSON inválido"}, status=400)
+
+    path    = data.get("path", "").strip()
+    content = data.get("content", "")
+
+    if not path:
+        return JsonResponse({"ok": False, "error": "path vacío"}, status=400)
+
+    files = site.project_files or {}
+    if path not in files:
+        return JsonResponse({"ok": False, "error": "Ruta no encontrada"}, status=404)
+
+    files[path] = content
+    site.project_files = files
+    site.save(update_fields=["project_files"])
+
+    return JsonResponse({"ok": True})

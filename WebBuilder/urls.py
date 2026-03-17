@@ -22,4 +22,6 @@ urlpatterns = [
 	
     path("site/<int:api_request_id>/deploy/", views.site_deploy, name="site_deploy"),
     path("site/<int:api_request_id>/deploy-status/", views.site_deploy_status, name="site_deploy_status"),
+	
+    path("site/<int:api_request_id>/update-file/", views.site_update_file, name="site_update_file"),
 ]

@@ -10,6 +10,7 @@ from .site import (
     site_status,
     site_deploy,
     site_deploy_status,
+	site_update_file
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "site_status",
     "site_deploy",
     "site_deploy_status",
+	"site_update_file",
 ]
