@@ -222,7 +222,7 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
 
 # ── 6) LOAD_DATA.PY ──────────────────────────────────────────────────────────
 
-def prompt_load_data(*, fields, sample_items, api_url):
+def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None):
     mapping = "\n".join(
         f"  dataset['{f['key']}'] → Item.{f['key']}"
         for f in fields[:10]
@@ -239,12 +239,20 @@ def prompt_load_data(*, fields, sample_items, api_url):
         "Si no hay campo único identificador, usa update_or_create o simplemente create().",
         "Si un campo del dataset es un OBJETO ANIDADO (dict), extrae solo el valor más representativo como string.",
         "  Ejemplo: rating = {'rate': 4.5, 'count': 120} → guardar str(item['rating']['rate'])",
-        "Limpia valores: precios → Decimal(str(valor).replace('$','').strip()), el precio puede venir como float o como string con '$', usa siempre str() primero para evitar errores. Fechas → parsear, enteros → int().",        "Si falla la conversión → None (no romper el comando).",
+        "Limpia valores: precios → Decimal(str(valor).replace('$','').strip()), el precio puede venir como float o como string con '$', usa siempre str() primero para evitar errores. Fechas → parsear, enteros → int().",
+        "Si falla la conversión → None (no romper el comando).",
         "Informa del progreso con self.stdout.write().",
         "try/except general para no romper si la API falla.",
         "Clase 'Command(BaseCommand)', help descriptivo.",
-        "Clase 'Command(BaseCommand)', help descriptivo.",
     ]
+
+    if main_collection_path:
+        path_str = " -> ".join(str(p) for p in main_collection_path)
+        rules.append(
+            f"RUTA EXACTA de la colección en el JSON: {path_str}. "
+            f"Accede navegando esa ruta desde la raíz del JSON."
+        )
+
     user_text = "\n".join([
         f"API URL: {api_url}",
         "", "MAPPING KEY → CAMPO MODELO:", mapping,

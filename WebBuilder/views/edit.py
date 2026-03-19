@@ -193,6 +193,7 @@ def edit(request, api_request_id: int):
                 ap = dict(site.accepted_plan)
                 ap.setdefault("_meta", {})
                 ap["_meta"]["sample_items"] = sample_items
+                ap["_meta"]["main_collection_path"] = main_path
                 site.accepted_plan = ap
 
             site.save()

@@ -164,6 +164,9 @@ def _fixed_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "#!/bin/sh\n"
         "set -e\n"
         "\n"
+        "echo '--- Generando migraciones ---'\n"
+        "python manage.py makemigrations siteapp --noinput\n"
+        "\n"
         "echo '--- Aplicando migraciones ---'\n"
         "python manage.py migrate --noinput\n"
         "\n"
@@ -171,7 +174,7 @@ def _fixed_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "python manage.py load_data\n"
         "\n"
         "echo '--- Arrancando servidor ---'\n"
-        "gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 120 "
+        f"gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 120 "
         f"{project}.wsgi:application\n"
     )
 
@@ -439,6 +442,7 @@ def generate_project_files(site) -> dict[str, str]:
     plan         = site.accepted_plan or {}
     fields       = plan.get("fields") or []
     sample_items = (plan.get("_meta") or {}).get("sample_items") or []
+    main_path    = (plan.get("_meta") or {}).get("main_collection_path")
     site_type    = plan.get("site_type") or "other"
     site_title   = plan.get("site_title") or "Mi Sitio"
     user_prompt  = plan.get("user_prompt") or ""
@@ -541,6 +545,7 @@ def generate_project_files(site) -> dict[str, str]:
         fields=fields,
         sample_items=sample_items,
         api_url=api_url,
+        main_collection_path=main_path,
     )
     load_data_code = _llm_call(system, user_text, "load_data")
     if not load_data_code.strip():

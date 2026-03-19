@@ -22,7 +22,10 @@ N8N_DEPLOY_WEBHOOK = getattr(settings, "N8N_DEPLOY_WEBHOOK", "http://localhost:5
 
 # Carpeta local compartida con n8n (montada en /files dentro del contenedor)
 # Configurada en .env como N8N_LOCAL_FILES_PATH
-N8N_LOCAL_FILES_PATH = getattr(settings, "N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
+#N8N_LOCAL_FILES_PATH = getattr(settings, "N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
+
+# PRUEBA DE CAMBIO DE CARPETA A TMP
+N8N_LOCAL_FILES_PATH = getattr(settings, "N8N_LOCAL_FILES_PATH", "/tmp/webbuilder-deploys")
 
 
 # ---------------------------------------------------------------------------

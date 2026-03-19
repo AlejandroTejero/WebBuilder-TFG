@@ -141,5 +141,9 @@ LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
 
 # n8n
 N8N_DEPLOY_WEBHOOK = os.getenv("N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webhook/webbuilder-deploy")
-# n8n (zips en local)
-N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
+
+# nEjecuccion de pruebas en mi carpeta files (alejandro)
+#N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
+
+# Si alguien no tiene configurado el .en, se ejecutan en su tmp
+N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/tmp/webbuilder-deploys")
