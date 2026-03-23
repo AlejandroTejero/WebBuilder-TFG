@@ -41,7 +41,7 @@ def chat_completion(
     }
 
     try:
-        resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=30)
+        resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=90)
     except requests.RequestException as e:
         raise LLMError(f"Error de red llamando al LLM: {e}") from e
 

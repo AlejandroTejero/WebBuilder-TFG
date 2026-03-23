@@ -132,13 +132,34 @@
 
             <div class="asst-field">
               <label class="asst-label" for="{{ form.user_prompt.id_for_label }}">
-                Describe el tipo de web que quieres, cuanto mas detalle mejor.
+                Describe el tipo de web que quieres, cuanto más detalle mejor.
                 <span class="asst-label__optional">opcional</span>
               </label>
               {{ form.user_prompt }}
-                <p class="asst-hint">Ej: «Quiero un catálogo de productos en modo oscuro, con grid de tarjetas, buscador y filtros por categoría/precio; cada tarjeta con imagen, nombre, precio destacado y botón “Ver detalle”.»</p>
-            </div>
 
+              <!-- Ejemplos de prompts clickables -->
+              <div class="asst-examples" style="margin-top: 10px;">
+                <span class="asst-examples__label">Ejemplos:</span>
+                <button type="button" class="asst-example-chip"
+                  onclick="fillPrompt('Catálogo minimalista en blanco y negro, grid de 3 columnas, imagen grande, precio destacado en negro y botón de ver detalle.')">
+                  🛍 Tienda
+                </button>
+                <button type="button" class="asst-example-chip"
+                  onclick="fillPrompt('Blog estilo periódico, tipografía grande, columnas de texto, colores sobrios en gris y blanco, fecha y categoría visibles.')">
+                  📰 Blog
+                </button>
+                <button type="button" class="asst-example-chip"
+                  onclick="fillPrompt('Portfolio moderno con fondo negro, tarjetas con efecto hover, imagen a pantalla completa y título en verde neón.')">
+                  💼 Portfolio
+                </button>
+                <button type="button" class="asst-example-chip"
+                  onclick="fillPrompt('Dashboard con tablas de datos, gráficos simples, colores azul y gris, diseño compacto y profesional.')">
+                  📊 Dashboard
+                </button>
+              </div>
+
+              <p class="asst-hint">Cuanto más detallas colores, layout y estilo, mejor será el resultado.</p>
+            </div>
             {% if api_request %}
               <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
             {% endif %}

@@ -28,6 +28,10 @@ from ..llm.generator_prompts import (
     prompt_load_data,
 )
 
+from ..llm.field_extractor import extract_model_fields
+from ..llm.consistency_checker import check_consistency
+from ..llm.enrich_prompt import enrich_user_prompt
+
 logger = logging.getLogger(__name__)
 
 
@@ -338,6 +342,27 @@ def _llm_json_call(system: str, user_text: str, label: str) -> dict:
         logger.error(f"[generator] JSON parse falló en '{label}': {e}")
         return {}
 
+def _llm_call_logged(system: str, user_text: str, label: str, 
+                     temperature: float, site=None) -> str:
+    """Wrapper que llama al LLM y guarda el log si site está disponible."""
+    result = _llm_call(system, user_text, label, temperature)
+
+    if site is not None:
+        try:
+            from ..models import GenerationLog
+            from django.conf import settings
+            GenerationLog.objects.create(
+                site=site,
+                step=label,
+                llm_model=settings.LLM_MODEL,
+                system_prompt=system[:2000],
+                user_prompt=user_text[:2000],
+                raw_output=result[:5000],
+            )
+        except Exception:
+            pass  # El log nunca puede romper la generación
+
+    return result
 
 # ──────────────────────────────────────────────────────────────────────────────
 # FALLBACKS SI EL LLM FALLA
@@ -423,6 +448,75 @@ def _fallback_views(pages: list[dict]) -> str:
             ]
     return "\n".join(lines)
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Regenerar errores llm 
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _regenerate_with_errors(
+    files, issues, pages, fields, site_type, site_title,
+    user_prompt, real_fields, real_url_names, project, app,
+    site=None
+):
+    """Regenera los archivos con errores pasando el contexto al LLM."""
+
+    error_context = "\n".join(f" - {e}" for e in issues)
+
+    # ── Regenerar views.py si tiene errores ─────────────────────────
+    views_errors = [e for e in issues if "views.py" in e]
+    if views_errors:
+        logger.info("[generator] Regenerando views.py con correcciones...")
+        system, user_text = prompt_views(
+            fields=fields,
+            site_type=site_type,
+            site_title=site_title,
+            user_prompt=user_prompt,
+            pages=pages,
+            real_fields=real_fields,
+        )
+        user_text += (
+            f"\n\nCORRECCIÓN OBLIGATORIA — tu views.py anterior tenía estos errores:\n"
+            f"{error_context}\n"
+            f"Los campos reales del modelo son: {real_fields}\n"
+            f"Corrige views.py usando SOLO esos campos."
+        )
+        new_views = _llm_call_logged(system, user_text, "views_retry", temperature=0.05, site=site)
+        if new_views.strip():
+            files[f"{project}/{app}/views.py"] = new_views
+            logger.info("[generator] views.py regenerado ✅")
+
+    # ── Regenerar templates con errores ─────────────────────────────
+    for page in pages:
+        template_path = f"{project}/{app}/templates/{page['template']}"
+        template_errors = [e for e in issues if page["template"] in e]
+        if not template_errors:
+            continue
+
+        logger.info(f"[generator] Regenerando template '{page['name']}' con correcciones...")
+        template_error_context = "\n".join(f" - {e}" for e in template_errors)
+        system, user_text = prompt_template(
+            page=page,
+            fields=fields,
+            sample_items=(fields or []),
+            site_type=site_type,
+            site_title=site_title,
+            user_prompt=user_prompt,
+            all_pages=pages,
+            real_fields=real_fields,
+            real_url_names=real_url_names,
+        )
+        user_text += (
+            f"\n\nCORRECCIÓN OBLIGATORIA — tu template anterior tenía estos errores:\n"
+            f"{template_error_context}\n"
+            f"Los campos reales del modelo son: {real_fields}\n"
+            f"Corrige el template usando SOLO esos campos y URLs."
+        )
+        new_html = _llm_call_logged(system, user_text, f"template_{page['name']}_retry", temperature=0.4, site=site)
+        if new_html.strip():
+            files[template_path] = new_html
+            logger.info(f"[generator] Template '{page['name']}' regenerado ✅")
+
+    return files
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # FUNCIÓN PRINCIPAL
@@ -448,6 +542,15 @@ def generate_project_files(site) -> dict[str, str]:
     user_prompt  = plan.get("user_prompt") or ""
     api_url      = site.project_source.api_url
 
+    # Enriquecer el prompt del usuario con contexto del dataset
+    enriched_prompt = enrich_user_prompt(
+        user_prompt=user_prompt,
+        site_type=site_type,
+        fields=fields,
+        sample_items=sample_items,
+    )
+    logger.info(f"[generator] Prompt enriquecido: {enriched_prompt[:100]}...")
+
     project = slugify(site.project_name or site_title).replace("-", "_") or "generated_site"
     app     = "siteapp"
 
@@ -458,7 +561,7 @@ def generate_project_files(site) -> dict[str, str]:
     system, user_text = prompt_pages_structure(
         site_type=site_type,
         site_title=site_title,
-        user_prompt=user_prompt,
+        user_prompt=enriched_prompt,
         fields=fields,
         sample_items=sample_items,
     )
@@ -479,11 +582,15 @@ def generate_project_files(site) -> dict[str, str]:
         sample_items=sample_items,
         site_title=site_title,
     )
-    models_code = _llm_call(system, user_text, "models")
+    models_code = _llm_call_logged(system, user_text, "models", temperature=0.05, site=site)
     if not models_code.strip():
         models_code = _fallback_models(fields)
 
     files[f"{project}/{app}/models.py"] = models_code
+
+    # Extraer nombres reales de campos para usarlos en prompts siguientes
+    real_fields = extract_model_fields(models_code)  # ← añadir esto
+    logger.info(f"[generator] Campos reales extraídos: {real_fields}")  # ← y esto
 
     # Generar migración inicial a partir del models.py
     files[f"{project}/{app}/migrations/__init__.py"] = ""
@@ -495,10 +602,11 @@ def generate_project_files(site) -> dict[str, str]:
         fields=fields,
         site_type=site_type,
         site_title=site_title,
-        user_prompt=user_prompt,
+        user_prompt=enriched_prompt,
         pages=pages,
+        real_fields=real_fields,
     )
-    views_code = _llm_call(system, user_text, "views")
+    views_code = _llm_call_logged(system, user_text, "views", temperature=0.05, site=site)
     if not views_code.strip():
         views_code = _fallback_views(pages)
 
@@ -507,15 +615,19 @@ def generate_project_files(site) -> dict[str, str]:
     # urls.py de la app (generado en Python, no por el LLM)
     files[f"{project}/{app}/urls.py"] = _app_urls(pages, app)
 
+    # Extraer nombres reales de URLs para pasarlos a los prompts de templates
+    real_url_names = {page["name"]: page["view_name"] for page in pages}
+    logger.info(f"[generator] URLs reales: {real_url_names}")
+
     # ── PASO 4: base.html ────────────────────────────────────────────────────
     logger.info("[generator] Paso 4: base.html")
     system, user_text = prompt_base_template(
         site_title=site_title,
         site_type=site_type,
-        user_prompt=user_prompt,
+        user_prompt=enriched_prompt,
         all_pages=pages,
     )
-    base_html = _llm_call(system, user_text, "base.html")
+    base_html = _llm_call_logged(system, user_text, "base.html", temperature=0.1, site=site)
     if not base_html.strip():
         base_html = _minimal_base_html(site_title, pages)
 
@@ -530,10 +642,12 @@ def generate_project_files(site) -> dict[str, str]:
             sample_items=sample_items,
             site_type=site_type,
             site_title=site_title,
-            user_prompt=user_prompt,
+            user_prompt=enriched_prompt,
             all_pages=pages,
+            real_fields=real_fields,
+            real_url_names=real_url_names,
         )
-        html = _llm_call(system, user_text, f"template_{page['name']}")
+        html = _llm_call_logged(system, user_text, f"template_{page['name']}", temperature=0.4, site=site)
         if not html.strip():
             html = _minimal_template(page)
 
@@ -546,8 +660,9 @@ def generate_project_files(site) -> dict[str, str]:
         sample_items=sample_items,
         api_url=api_url,
         main_collection_path=main_path,
+        real_fields=real_fields,
     )
-    load_data_code = _llm_call(system, user_text, "load_data")
+    load_data_code = _llm_call_logged(system, user_text, "load_data", temperature=0.05, site=site)
     if not load_data_code.strip():
         load_data_code = _fallback_load_data(fields, api_url)
 
@@ -557,9 +672,33 @@ def generate_project_files(site) -> dict[str, str]:
     logger.info("[generator] Paso 7: archivos fijos")
     files.update(_fixed_files(project, app))
 
+    # ── PASO 8: Validación de consistencia y autocorrección ─────────────────
+    logger.info("[generator] Paso 8: validando consistencia entre archivos")
+    issues = check_consistency(files)
+    if issues:
+        logger.warning(f"[generator] {len(issues)} inconsistencias detectadas:")
+        for issue in issues:
+            logger.warning(f"  - {issue}")
+        logger.info("[generator] Intentando autocorrección...")
+        files = _regenerate_with_errors(
+            files=files,
+            issues=issues,
+            pages=pages,
+            fields=fields,
+            site_type=site_type,
+            site_title=site_title,
+            user_prompt=enriched_prompt,
+            real_fields=real_fields,
+            real_url_names=real_url_names,
+            project=project,
+            app=app,
+            site=site,
+        )
+    else:
+        logger.info("[generator] Sin inconsistencias detectadas ✅")
+        
     logger.info(f"[generator] Completado: {len(files)} archivos generados")
     return files
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 # FALLBACKS HTML MÍNIMOS

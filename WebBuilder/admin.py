@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import APIRequest, GeneratedSite
+from .models import APIRequest, GeneratedSite, GenerationLog
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -362,3 +362,4 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(GenerationLog)

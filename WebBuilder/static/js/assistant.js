@@ -15,6 +15,14 @@ function fillUrl(url) {
   }
 }
 
+function fillPrompt(text) {
+  const textarea = document.querySelector('#form-analyze textarea');
+  if (textarea) {
+    textarea.value = text;
+    textarea.focus();
+  }
+}
+
 /**
  * Muestra el overlay de carga y anima los pasos secuencialmente.
  * Se llama desde el onclick del botón de submit.

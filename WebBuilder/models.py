@@ -89,3 +89,22 @@ class GeneratedSite(models.Model):
 
     def __str__(self):
         return f"GeneratedSite #{self.id} — {self.project_name} ({self.public_id})"
+
+
+class GenerationLog(models.Model):
+    site = models.ForeignKey(
+        GeneratedSite,
+        on_delete=models.CASCADE,
+        related_name='generation_logs'
+    )
+    step = models.CharField(max_length=50)          # 'models', 'views', 'template_home'...
+    llm_model = models.CharField(max_length=100)    # 'llama-3.3-70b-instruct:free'
+    system_prompt = models.TextField(blank=True)
+    user_prompt = models.TextField(blank=True)
+    raw_output = models.TextField(blank=True)
+    consistency_errors = models.JSONField(default=list)
+    had_retry = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.step} — {self.llm_model} ({self.created_at:%Y-%m-%d %H:%M})'

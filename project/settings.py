@@ -29,8 +29,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# No vacio, asi si cambiamos DEBUG = False para el despliegue, seguira funcionando en local.
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -145,5 +145,29 @@ N8N_DEPLOY_WEBHOOK = os.getenv("N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webh
 # nEjecuccion de pruebas en mi carpeta files (alejandro)
 #N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
 
-# Si alguien no tiene configurado el .en, se ejecutan en su tmp
 N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/tmp/webbuilder-deploys")
+
+# Si alguien no tiene configurado el .en, se ejecutan en su tmp
+#N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "direccion default")
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

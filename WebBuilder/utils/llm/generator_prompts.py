@@ -14,6 +14,7 @@ Archivos fijos (NO genera el LLM):
 from __future__ import annotations
 import json
 
+from .template_examples import get_example
 
 def _fields_info(fields):
     return json.dumps(fields, ensure_ascii=False, indent=2)
@@ -108,7 +109,7 @@ def prompt_models(*, fields, sample_items, site_title):
 
 # ── 3) VIEWS.PY ──────────────────────────────────────────────────────────────
 
-def prompt_views(*, fields, site_type, site_title, user_prompt, pages):
+def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fields=None):
     fields_list = ", ".join(f["key"] for f in fields)
     rules = [
         "Genera SOLO el contenido de views.py. Sin Markdown.",
@@ -121,6 +122,11 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages):
         "Cada view pasa 'site_title' al contexto.",
         "Sin autenticación, sin formularios complejos.",
     ]
+
+    if real_fields:
+        rules.append(f"CAMPOS EXACTOS del modelo Item (úsalos tal cual): {real_fields}")
+        rules.append("NUNCA uses un nombre de campo que no esté en esa lista.")
+
     user_text = "\n".join([
         f"SITIO: {site_title}  |  TIPO: {site_type}",
         f"PROMPT: {user_prompt or '(sin prompt)'}",
@@ -144,21 +150,27 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
         "Genera SOLO el HTML de base.html. Sin Markdown.",
         "Incluye <script src='https://cdn.tailwindcss.com'></script> en <head>.",
         "Incluye Inter font de Google Fonts en <head>.",
-        "DISEÑO Dark & Sharp:",
-        "  - body: bg-gray-950 text-gray-100 font-sans",
-        "  - navbar: bg-gray-900 border-b border-gray-800",
-        "  - acento: text-green-400",
+        "COLORES: usa los colores indicados en el prompt del usuario.",
+        "Si no hay indicación, usa fondo oscuro bg-gray-950 con texto claro.",
         "Navbar: site_title a la izquierda, links de nav a la derecha.",
         "Links del navbar usan {% url 'view_name' %}.",
         "{% block content %}{% endblock %} dentro de <main class='max-w-7xl mx-auto px-6 py-10'>.",
         "Footer minimalista con el nombre del sitio.",
         "NO uses JavaScript propio.",
     ]
+    
     user_text = "\n".join([
         f"SITIO: {site_title}  |  TIPO: {site_type}",
-        f"PROMPT: {user_prompt or '(sin prompt)'}",
+        "",
+        "═══ INSTRUCCIÓN PRINCIPAL DEL USUARIO (prioridad máxima) ═══",
+        f"{user_prompt or '(sin instrucciones — usa tu criterio según el dataset)'}",
+        "═══════════════════════════════════════════════════════════",
+        "",
+        "IMPORTANTE: El estilo visual del sitio debe reflejar",
+        "fielmente la instrucción del usuario.",
+        "",
         "", "PÁGINAS PARA EL NAVBAR:", nav_info,
-        "", "REGLAS:", "\n".join(f"- {r}" for r in rules),
+        "", "REGLAS TÉCNICAS:", "\n".join(f"- {r}" for r in rules),
         "", "Genera base.html ahora:",
     ])
     return _base_system(), user_text
@@ -166,7 +178,7 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
 
 # ── 5) TEMPLATE POR PÁGINA ───────────────────────────────────────────────────
 
-def prompt_template(*, page, fields, sample_items, site_type, site_title, user_prompt, all_pages):
+def prompt_template(*, page, fields, sample_items, site_type, site_title, user_prompt, all_pages,  real_fields=None, real_url_names=None):
     is_list   = page.get("is_list", False)
     is_detail = page.get("is_detail", False)
 
@@ -198,8 +210,9 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
         "Genera SOLO el HTML del template. Sin Markdown.",
         "USA {% extends 'base.html' %} y {% block content %}...{% endblock %}.",
         "USA Tailwind CSS (CDN ya en base.html). Sin <style> extenso.",
-        "DISEÑO Dark & Sharp: cards bg-gray-900, bordes border-gray-800, acento text-green-400.",
-        "Hover en cards: hover:border-green-400 hover:shadow-lg transition-all.",
+        "DISEÑO: sigue el estilo indicado en el prompt del usuario para colores y estética.",
+        "Si no hay indicación de colores, usa un diseño oscuro moderno.",
+        "Hover en cards: añade transición suave hover:shadow-lg transition-all.",
         context_hint,
         "USA {% if item.campo %} para campos opcionales.",
         "El diseño debe adaptarse al site_type y al prompt del usuario.",
@@ -207,22 +220,60 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
         "CRITICO: todos los campos del modelo son strings o tipos simples, NUNCA objetos. No uses item.campo.subcampo.",
     ]
 
+    if real_fields:
+        rules.append(f"CAMPOS EXACTOS del modelo Item: {real_fields}")
+        rules.append("En los templates usa item.<campo> SOLO con campos de esa lista.")
+        rules.append("NUNCA uses item.campo.subcampo — todos son strings simples.")
+
+    if real_url_names:
+        detail_page = next((n for n, v in real_url_names.items()
+                           if any(p.get("is_detail") and p["name"] == n
+                                  for p in all_pages)), None)
+        
+        url_rules = "NOMBRES EXACTOS de las URLs para usar en {% url %}:\n"
+        for name, view_name in real_url_names.items():
+            url_rules += f"  - {{% url '{view_name}' %}}\n"
+        if detail_page:
+            url_rules += f"  - Para detalle con pk: {{% url '{real_url_names[detail_page]}' item.pk %}}\n"
+
+        rules.append(url_rules)
+        rules.append("NUNCA inventes nombres de URL que no estén en esa lista.")
+
     user_text = "\n".join([
         f"SITIO: {site_title}  |  TIPO: {site_type}",
-        f"PROMPT: {user_prompt or '(sin prompt)'}",
+        "",
+        "═══ INSTRUCCIÓN PRINCIPAL DEL USUARIO (prioridad máxima) ═══",
+        f"{user_prompt or '(sin instrucciones — usa tu criterio según el dataset)'}",
+        "═══════════════════════════════════════════════════════════",
+        "",
+        "IMPORTANTE: El diseño, estilo, colores y estructura deben",
+        "reflejar fielmente la instrucción del usuario de arriba.",
+        "Si pide minimalista → minimalista. Si pide colorido → colorido.",
+        "Si pide oscuro → oscuro. La instrucción del usuario manda.",
+        "",
         f"PÁGINA: {page['name']} — {page['description']}",
         "", "NAVEGACIÓN:", nav_links,
         "", "CAMPOS:", _fields_info(fields),
         "", "DATOS DE EJEMPLO:", _samples_info(sample_items, 3),
-        "", "REGLAS:", "\n".join(f"- {r}" for r in rules),
+        "", "REGLAS TÉCNICAS:", "\n".join(f"- {r}" for r in rules),
         f"", f"Genera el template '{page['name']}' ahora:",
     ])
+
+    # Añadir ejemplo few-shot si existe para este tipo
+    page_kind = 'list' if is_list else ('detail' if is_detail else 'home')
+    example_html = get_example(site_type, page_kind)
+
+    if example_html:
+        user_text += "\n\nEJEMPLO DE REFERENCIA (úsalo como inspiración estructural):"
+        user_text += example_html
+        user_text += "\n(Adapta el diseño libremente. USA los campos reales, NO los del ejemplo. NO copies esto tal cual.)"
+
     return _base_system(), user_text
 
 
 # ── 6) LOAD_DATA.PY ──────────────────────────────────────────────────────────
 
-def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None):
+def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None, real_fields=None):
     mapping = "\n".join(
         f"  dataset['{f['key']}'] → Item.{f['key']}"
         for f in fields[:10]
@@ -245,6 +296,10 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
         "try/except general para no romper si la API falla.",
         "Clase 'Command(BaseCommand)', help descriptivo.",
     ]
+
+    if real_fields:
+        rules.append(f"CAMPOS EXACTOS del modelo Item: {real_fields}")
+        rules.append("El mapeo debe ser: raw_item['api_key'] → item_field para CADA campo.")
 
     if main_collection_path:
         path_str = " -> ".join(str(p) for p in main_collection_path)

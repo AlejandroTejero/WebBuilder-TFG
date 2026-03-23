@@ -14,7 +14,7 @@ from .constants import (
 
 # ========================== SCORING: penalizaciones / nombres ==========================
 
-# Penalizacion por paths complejos ELIMINAR
+# Penalizacion por paths complejos
 def _path_penalty(path: list) -> float:
 
     idxs = sum(1 for p in path if isinstance(p, int))
@@ -33,7 +33,7 @@ def _last_key_name(path: list) -> str:
 
 # ========================== SCORING: lista candidata ==========================
 
-# Calcula score de calidad para una lista como colección de items. ELIMINAR
+# Calcula score de calidad para una lista como colección de items.
 def _score_list(node: list, path: list) -> float:
     n = len(node)
     if n == 0:
@@ -105,7 +105,7 @@ def _score_list(node: list, path: list) -> float:
 
 # ========================== TRAVERSAL: búsqueda recursiva ==========================
 
-# Recorre recursivamente la estructura buscando listas candidatas. ELIMINAR
+# Recorre recursivamente la estructura buscando listas candidatas.
 def _walk_collect_best(node: object, path: list, best: dict) -> None:
     if isinstance(node, list):
         s = _score_list(node, path)
