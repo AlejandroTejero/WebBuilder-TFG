@@ -17,6 +17,8 @@ import requests as http_requests
 from django.conf import settings
 
 
+# ELIMINAR, YA ESTA EN SETTINGS ------------------------
+
 # URL del webhook de n8n — configurada en .env como N8N_DEPLOY_WEBHOOK
 N8N_DEPLOY_WEBHOOK = getattr(settings, "N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webhook/webbuilder-deploy")
 
@@ -27,6 +29,7 @@ N8N_DEPLOY_WEBHOOK = getattr(settings, "N8N_DEPLOY_WEBHOOK", "http://localhost:5
 # PRUEBA DE CAMBIO DE CARPETA A TMP
 N8N_LOCAL_FILES_PATH = getattr(settings, "N8N_LOCAL_FILES_PATH", "/tmp/webbuilder-deploys")
 
+# -------------------------------
 
 # ---------------------------------------------------------------------------
 # Generación (sin cambios respecto al original)

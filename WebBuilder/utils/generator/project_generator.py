@@ -206,6 +206,7 @@ def _fixed_files(project: str, app: str = "siteapp") -> dict[str, str]:
 
     return files
 
+# ELIMINAR, LAS MIGRACIONES YA SE GENERAN CON LLM ----------------------------------------------
 
 def _generate_initial_migration(models_code: str, app: str = "siteapp") -> str:
     """
@@ -695,7 +696,7 @@ def generate_project_files(site) -> dict[str, str]:
             site=site,
         )
     else:
-        logger.info("[generator] Sin inconsistencias detectadas ✅")
+        logger.info("[generator] Sin inconsistencias detectadas")
         
     logger.info(f"[generator] Completado: {len(files)} archivos generados")
     return files

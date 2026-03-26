@@ -24,7 +24,7 @@ def validate_url(api_url: str) -> None:
 
 # ========================== DESCARGA + TEXTO CRUDO -> CONTROLADO ==========================
 
-# Validamos la url, decargamos contenido en raw, y 
+# Validamos la url, decargamos contenido en raw
 def fetch_url(api_url: str, *, timeout: int = DEFAULT_TIMEOUT, max_bytes: int = MAX_BYTES) -> tuple[str, str]:
     validate_url(api_url)
 

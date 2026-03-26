@@ -223,9 +223,9 @@ def analyze_url(request):
         """Genera el schema dinámico y lo guarda en api_request.field_mapping."""
         main = (analysis_result.get("main_collection") or {})
         keys = (analysis_result.get("keys") or {})
+        
         available_keys = (keys.get("all") or [])[:50]
         main_path = main.get("path")
-
         examples = _build_examples(parsed_payload, main_path=main_path, available_keys=available_keys)
 
         try:

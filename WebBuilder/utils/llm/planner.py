@@ -221,7 +221,7 @@ def _build_prompt(
     return system, "\n".join(user_parts)
 
 
-# ─────────────────────────── función pública ─────────────────────────
+# ─────────────────────────── funcion principal ─────────────────────────
 
 def generate_site_plan(
     *,

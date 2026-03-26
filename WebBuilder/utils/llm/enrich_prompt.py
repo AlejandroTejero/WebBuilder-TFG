@@ -4,6 +4,8 @@ Si el prompt es vago, añade información útil para que el LLM genere mejor.
 """
 
 
+# FALTA MUCHO POR MEJORAR, ES MUY LIMITADO, SOLO BUSCO PALABRAS COMO KEY PHOTO ETC.
+
 def enrich_user_prompt(
     user_prompt: str,
     site_type: str,

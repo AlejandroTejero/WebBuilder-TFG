@@ -3,7 +3,7 @@ llm_utils.py — Utilidades compartidas para los módulos LLM (planner y themer)
 
 Contiene:
   - Helpers para parseo y reparación de JSON generado por el LLM.
-  - Nada específico de negocio: solo utilidades genéricas de texto/JSON.
+  - Solo utilidades genéricas de texto/JSON.
 """
 
 from __future__ import annotations
