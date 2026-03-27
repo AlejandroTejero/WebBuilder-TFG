@@ -144,9 +144,8 @@ N8N_DEPLOY_WEBHOOK = os.getenv("N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webh
 N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
 
 #n8n login
-N8N_WEBHOOK_REGISTRO = "http://localhost:5678/webhook/WebBuilder-Register"
-N8N_WEBHOOK_LOGIN    = "http://localhost:5678/webhook/WebBuilder-Login"
-
+N8N_WEBHOOK_REGISTRO = os.getenv("N8N_WEBHOOK_REGISTRO", "http://localhost:5678/webhook/WebBuilder-Register")
+N8N_WEBHOOK_LOGIN    = os.getenv("N8N_WEBHOOK_LOGIN",    "http://localhost:5678/webhook/WebBuilder-Login")
 
 # Logging
 LOGGING = {

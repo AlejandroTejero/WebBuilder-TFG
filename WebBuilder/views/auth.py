@@ -4,10 +4,7 @@ from django.contrib.auth.views import LoginView
 import requests
 
 from ..forms import RegisterForm
-
-
-N8N_WEBHOOK_REGISTRO = "http://localhost:5678/webhook/WebBuilder-Register"
-N8N_WEBHOOK_LOGIN    = "http://localhost:5678/webhook/WebBuilder-Login"
+from django.conf import settings
 
 
 def _llamar_webhook(url: str, datos: dict) -> None:
@@ -24,7 +21,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
 
-            _llamar_webhook(N8N_WEBHOOK_REGISTRO, {
+            _llamar_webhook(settings.N8N_WEBHOOK_REGISTRO, {
                 "username": user.username,
                 "email":    user.email,
             })
@@ -48,7 +45,7 @@ class WebBuilderLoginView(LoginView):
             or request.META.get("REMOTE_ADDR", "desconocida")
         )
 
-        _llamar_webhook(N8N_WEBHOOK_LOGIN, {
+        _llamar_webhook(settings.N8N_WEBHOOK_LOGIN, {
             "username": user.username,
             "email":    user.email,
             "ip":       ip,

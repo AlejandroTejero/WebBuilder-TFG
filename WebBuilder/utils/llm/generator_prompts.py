@@ -25,8 +25,12 @@ def _samples_info(sample_items, n=4):
 def _base_system():
     return (
         "Eres un desarrollador Django senior experto en Python y Tailwind CSS. "
-        "Devuelves SOLO código puro, sin explicaciones, sin Markdown, sin bloques ```. "
-        "El código debe ser correcto, limpio y funcionar sin modificaciones."
+        "REGLA ABSOLUTA: devuelves ÚNICAMENTE código puro, sin ningún tipo de Markdown. "
+        "PROHIBIDO escribir ``` en cualquier parte de tu respuesta. "
+        "PROHIBIDO escribir ```python, ```html, ```django o cualquier variante. "
+        "Tu respuesta empieza DIRECTAMENTE con la primera línea de código, sin preámbulo. "
+        "Tu respuesta termina DIRECTAMENTE con la última línea de código, sin explicación. "
+        "Si añades bloques Markdown el código fallará en producción. No los añadas."
     )
 
 
@@ -79,7 +83,8 @@ def prompt_pages_structure(*, site_type, site_title, user_prompt, fields, sample
 
 def prompt_models(*, fields, sample_items, site_title):
     rules = [
-        "Genera SOLO el contenido de models.py. Sin Markdown.",
+        "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con 'from django.db import models'. Sin nada antes.",
+        "CRÍTICO: PROHIBIDO usar ```, ```python o cualquier bloque Markdown. Código puro.",
         "Un modelo llamado 'Item' con los campos del schema.",
         "Infiere el tipo Django correcto con los ejemplos:",
         "  URL/imagen → URLField(blank=True)",
@@ -112,8 +117,8 @@ def prompt_models(*, fields, sample_items, site_title):
 def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fields=None):
     fields_list = ", ".join(f["key"] for f in fields)
     rules = [
-        "Genera SOLO el contenido de views.py. Sin Markdown.",
-        "Importa: from django.shortcuts import render, get_object_or_404",
+        "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con 'from django.shortcuts import render, get_object_or_404'. Sin nada antes.",
+        "CRÍTICO: PROHIBIDO usar ```, ```python o cualquier bloque Markdown. Código puro.",
         "Importa: from .models import Item",
         "Una view por cada página en PÁGINAS.",
         "La view de listado: items = Item.objects.all().order_by('-id')",
@@ -147,7 +152,8 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
         ensure_ascii=False,
     )
     rules = [
-        "Genera SOLO el HTML de base.html. Sin Markdown.",
+        "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con '<!doctype html>'. Sin nada antes.",
+        "CRÍTICO: PROHIBIDO usar ```, ```html o cualquier bloque Markdown. HTML puro.",
         "Incluye <script src='https://cdn.tailwindcss.com'></script> en <head>.",
         "Incluye Inter font de Google Fonts en <head>.",
         "COLORES: usa los colores indicados en el prompt del usuario.",
@@ -207,7 +213,8 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
         )
 
     rules = [
-        "Genera SOLO el HTML del template. Sin Markdown.",
+        "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con {% extends 'base.html' %}. Sin nada antes.",
+        "CRÍTICO: PROHIBIDO usar ```, ```html o cualquier bloque Markdown. HTML puro.",
         "USA {% extends 'base.html' %} y {% block content %}...{% endblock %}.",
         "USA Tailwind CSS (CDN ya en base.html). Sin <style> extenso.",
         "DISEÑO: sigue el estilo indicado en el prompt del usuario para colores y estética.",
@@ -279,8 +286,8 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
         for f in fields[:10]
     )
     rules = [
-        "Genera SOLO el management command load_data.py. Sin Markdown.",
-        "from django.core.management.base import BaseCommand",
+        "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con 'from django.core.management.base import BaseCommand'. Sin nada antes.",
+        "CRÍTICO: PROHIBIDO usar ```, ```python o cualquier bloque Markdown. Código puro.",
         "from siteapp.models import Item",
         "import requests",
         f"El comando hace GET a '{api_url}'.",

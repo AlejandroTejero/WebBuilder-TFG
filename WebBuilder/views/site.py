@@ -16,12 +16,6 @@ from ..utils.generator.project_generator import generate_project_files
 import requests as http_requests
 from django.conf import settings
 
-
-# Lineas 146 159
-N8N_DEPLOY_WEBHOOK = getattr(settings, "N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webhook/webbuilder-deploy")
-N8N_LOCAL_FILES_PATH = getattr(settings, "N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
-
-
 # ---------------------------------------------------------------------------
 # Generación (sin cambios respecto al original)
 # ---------------------------------------------------------------------------
@@ -144,7 +138,7 @@ def _run_deploy(site_id: int):
     buf.seek(0)
 
     # 2. Guardar en disco compartido con n8n
-    deploy_dir = os.path.join(N8N_LOCAL_FILES_PATH, "deploys", project_name)
+    deploy_dir = os.path.join(settings.N8N_LOCAL_FILES_PATH, "deploys", project_name)
     zip_path = os.path.join(deploy_dir, zip_filename)
     try:
         os.makedirs(deploy_dir, exist_ok=True)
@@ -157,7 +151,7 @@ def _run_deploy(site_id: int):
     # 3. Llamar al webhook de n8n (bloqueante en el hilo secundario)
     try:
         response = http_requests.post(
-            N8N_DEPLOY_WEBHOOK,
+            settings.N8N_DEPLOY_WEBHOOK,
             json={
                 "project_name": project_name,
                 "site_id": str(site.pk),

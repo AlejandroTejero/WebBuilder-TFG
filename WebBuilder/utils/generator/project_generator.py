@@ -520,6 +520,31 @@ def _regenerate_with_errors(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# LIMPIEZA DE RESPUESTAS LLM
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _strip_markdown_fences(code: str) -> str:
+    """
+    Limpieza definitiva de fences Markdown.
+    Estrategia: eliminar cualquier línea que sea únicamente un fence (```xxx),
+    sin tocar el código real. Funciona independientemente de dónde ponga
+    el LLM los fences.
+    """
+    import re
+    code = code.strip()
+
+    # Primero intentar extraer el interior de un bloque completo
+    match = re.search(r"```(?:\w+)?\n(.*?)```", code, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+
+    # Si no hay bloque completo, eliminar línea a línea cualquier fence
+    lines = code.splitlines()
+    clean = [line for line in lines if not re.match(r"^\s*```", line)]
+    return "\n".join(clean).strip()
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # FUNCIÓN PRINCIPAL
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -587,7 +612,7 @@ def generate_project_files(site) -> dict[str, str]:
     if not models_code.strip():
         models_code = _fallback_models(fields)
 
-    files[f"{project}/{app}/models.py"] = models_code
+    files[f"{project}/{app}/models.py"] = _strip_markdown_fences(models_code)
 
     # Extraer nombres reales de campos para usarlos en prompts siguientes
     real_fields = extract_model_fields(models_code)  # ← añadir esto
@@ -611,7 +636,7 @@ def generate_project_files(site) -> dict[str, str]:
     if not views_code.strip():
         views_code = _fallback_views(pages)
 
-    files[f"{project}/{app}/views.py"] = views_code
+    files[f"{project}/{app}/views.py"] = _strip_markdown_fences(views_code)
 
     # urls.py de la app (generado en Python, no por el LLM)
     files[f"{project}/{app}/urls.py"] = _app_urls(pages, app)
@@ -652,7 +677,7 @@ def generate_project_files(site) -> dict[str, str]:
         if not html.strip():
             html = _minimal_template(page)
 
-        files[f"{project}/{app}/templates/{page['template']}"] = html
+        files[f"{project}/{app}/templates/{page['template']}"] = _strip_markdown_fences(html)
 
     # ── PASO 6: load_data.py ─────────────────────────────────────────────────
     logger.info("[generator] Paso 6: load_data.py")
@@ -667,7 +692,7 @@ def generate_project_files(site) -> dict[str, str]:
     if not load_data_code.strip():
         load_data_code = _fallback_load_data(fields, api_url)
 
-    files[f"{project}/{app}/management/commands/load_data.py"] = load_data_code
+    files[f"{project}/{app}/management/commands/load_data.py"] = _strip_markdown_fences(load_data_code)
 
     # ── PASO 7: archivos fijos ───────────────────────────────────────────────
     logger.info("[generator] Paso 7: archivos fijos")
