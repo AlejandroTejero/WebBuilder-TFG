@@ -139,16 +139,14 @@ LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
 
-# n8n
+# n8n deploy
 N8N_DEPLOY_WEBHOOK = os.getenv("N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webhook/webbuilder-deploy")
+N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
 
-# nEjecuccion de pruebas en mi carpeta files (alejandro)
-#N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
+#n8n login
+N8N_WEBHOOK_REGISTRO = "http://localhost:5678/webhook/WebBuilder-Register"
+N8N_WEBHOOK_LOGIN    = "http://localhost:5678/webhook/WebBuilder-Login"
 
-N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/tmp/webbuilder-deploys")
-
-# Si alguien no tiene configurado el .en, se ejecutan en su tmp
-#N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "direccion default")
 
 # Logging
 LOGGING = {

@@ -17,19 +17,10 @@ import requests as http_requests
 from django.conf import settings
 
 
-# ELIMINAR, YA ESTA EN SETTINGS ------------------------
-
-# URL del webhook de n8n — configurada en .env como N8N_DEPLOY_WEBHOOK
+# Lineas 146 159
 N8N_DEPLOY_WEBHOOK = getattr(settings, "N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webhook/webbuilder-deploy")
+N8N_LOCAL_FILES_PATH = getattr(settings, "N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
 
-# Carpeta local compartida con n8n (montada en /files dentro del contenedor)
-# Configurada en .env como N8N_LOCAL_FILES_PATH
-#N8N_LOCAL_FILES_PATH = getattr(settings, "N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
-
-# PRUEBA DE CAMBIO DE CARPETA A TMP
-N8N_LOCAL_FILES_PATH = getattr(settings, "N8N_LOCAL_FILES_PATH", "/tmp/webbuilder-deploys")
-
-# -------------------------------
 
 # ---------------------------------------------------------------------------
 # Generación (sin cambios respecto al original)
