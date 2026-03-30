@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebBuilder — Secciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0e0e10;
+  --bg-2:      #131315;
+  --bg-3:      #1a1a1c;
+  --bg-4:      #1f1f22;
+  --border:    rgba(255,255,255,0.07);
+  --border-md: rgba(255,255,255,0.12);
+  --t1:        rgba(255,255,255,0.90);
+  --t2:        rgba(255,255,255,0.55);
+  --t3:        rgba(255,255,255,0.28);
+  --t4:        rgba(255,255,255,0.10);
+  --mono:      'Geist Mono', monospace;
+  --max:       1100px;
+}
+
+html { background: var(--bg); color: var(--t1); font-family: 'Geist', system-ui, sans-serif; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+/* ── SHARED ── */
+.container { max-width: var(--max); margin: 0 auto; padding: 0 40px; }
+.section { padding: 120px 0; border-top: 1px solid var(--border); }
+
+.section-eyebrow {
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--t3); font-family: var(--mono); margin-bottom: 16px;
+}
+.section-title {
+  font-size: clamp(28px, 3.5vw, 44px); font-weight: 600;
+  letter-spacing: -0.03em; color: #fff; line-height: 1.08;
+  margin-bottom: 14px;
+}
+.section-title .muted { color: rgba(255,255,255,0.22); font-weight: 300; }
+.section-sub {
+  font-size: 14px; color: var(--t3); line-height: 1.7;
+  max-width: 460px; font-weight: 300;
+}
+
+/* ══════════════════════════════════════
+   SECCIÓN 1 — EJEMPLOS CARRUSEL
+══════════════════════════════════════ */
+#examples { padding: 120px 0; border-top: 1px solid var(--border); }
+#examples .header { margin-bottom: 52px; }
+
+.carousel-wrap {
+  overflow: hidden;
+  position: relative;
+  margin: 0 -40px;
+  padding: 0 40px;
+}
+.carousel-wrap::before,
+.carousel-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+.carousel-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+.carousel-wrap::after  { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+
+.carousel-track {
+  display: flex;
+  gap: 14px;
+  width: max-content;
+  animation: carouselScroll 32s linear infinite;
+}
+.carousel-wrap:hover .carousel-track { animation-play-state: paused; }
+
+@keyframes carouselScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 7px)); }
+}
+
+.example-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .18s, transform .18s;
+  width: 240px;
+  flex-shrink: 0;
+}
+.example-card:hover { border-color: var(--border-md); transform: translateY(-3px); }
+
+.example-thumb {
+  width: 100%; height: 260px;
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Thumbnails con color más vivo */
+.thumb-weather  { background: #071428; display: flex; align-items: center; justify-content: center; }
+.thumb-countries{ background: #071a0d; display: flex; align-items: center; justify-content: center; }
+.thumb-pokemon  { background: #1e0808; display: flex; align-items: center; justify-content: center; }
+.thumb-crypto   { background: #181200; display: flex; align-items: center; justify-content: center; }
+.thumb-news     { background: #0a0818; display: flex; align-items: center; justify-content: center; }
+.thumb-space    { background: #050e1c; display: flex; align-items: center; justify-content: center; }
+
+/* Fake UI inside thumbnails */
+.fake-ui {
+  width: 88%; height: 84%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 5px;
+  padding: 11px;
+  display: flex; flex-direction: column; gap: 7px;
+}
+.fake-topbar {
+  height: 8px; border-radius: 2px;
+  background: rgba(255,255,255,0.07);
+  width: 60%;
+}
+.fake-row { display: flex; gap: 5px; }
+.fake-block { border-radius: 3px; background: rgba(255,255,255,0.06); }
+.fake-stat {
+  flex: 1; height: 34px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+}
+.fake-stat span { font-size: 9px; font-family: var(--mono); color: rgba(255,255,255,0.22); }
+.fake-chart {
+  flex: 1; height: 44px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.07);
+  overflow: hidden; position: relative;
+}
+.fake-chart-line { position: absolute; bottom: 6px; left: 4px; right: 4px; height: 22px; }
+
+/* color accents — más saltones */
+.thumb-weather .fake-stat:first-child  { border-color: rgba(56,148,255,0.45); background: rgba(56,148,255,0.07); }
+.thumb-weather .fake-stat:first-child span { color: #60a5fa; }
+.thumb-countries .fake-stat:first-child { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
+.thumb-countries .fake-stat:first-child span { color: #34d399; }
+.thumb-pokemon .fake-stat:first-child  { border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.07); }
+.thumb-pokemon .fake-stat:first-child span { color: #f87171; }
+.thumb-crypto .fake-stat:first-child   { border-color: rgba(251,191,36,0.45);  background: rgba(251,191,36,0.07); }
+.thumb-crypto .fake-stat:first-child span { color: #fbbf24; }
+.thumb-news .fake-stat:first-child     { border-color: rgba(192,132,252,0.45); background: rgba(192,132,252,0.07); }
+.thumb-news .fake-stat:first-child span { color: #c084fc; }
+.thumb-space .fake-stat:first-child    { border-color: rgba(34,211,238,0.45);  background: rgba(34,211,238,0.07); }
+.thumb-space .fake-stat:first-child span { color: #22d3ee; }
+
+.example-info { padding: 14px 16px; }
+.example-name { font-size: 13px; font-weight: 500; color: var(--t1); margin-bottom: 4px; letter-spacing: -0.01em; }
+.example-api  { font-size: 10px; font-family: var(--mono); color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 10px; }
+.example-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.example-tag  { font-size: 10px; font-family: var(--mono); padding: 2px 7px; border-radius: 3px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+
+/* ══════════════════════════════════════
+   SECCIÓN 2 — CÓMO FUNCIONA + FLUJO N8N
+══════════════════════════════════════ */
+#how {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.how-left { position: sticky; top: 80px; }
+.how-steps { margin-top: 52px; }
+
+.how-step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 16px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.how-step:last-child { border-bottom: 1px solid var(--border); }
+.how-step:hover { opacity: .8; }
+.how-step.active .step-num { color: var(--t1); }
+.how-step.active .step-title { color: #fff; }
+
+.step-num {
+  font-size: 11px; font-family: var(--mono); color: var(--t4);
+  padding-top: 2px; font-weight: 500;
+}
+.step-title {
+  font-size: 14px; font-weight: 500; color: var(--t2);
+  margin-bottom: 4px; letter-spacing: -0.01em;
+  transition: color .15s;
+}
+.step-desc { font-size: 13px; color: var(--t3); line-height: 1.65; font-weight: 300; }
+
+/* N8N Flow diagram */
+.how-right { padding-top: 8px; }
+
+.flow-diagram {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 28px 24px;
+  position: relative;
+}
+
+.flow-label {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--t4); font-family: var(--mono); margin-bottom: 24px;
+  display: flex; align-items: center; gap: 8px;
+}
+.flow-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Flow tabs */
+.flow-tabs {
+  display: flex; gap: 4px; margin-bottom: 24px;
+}
+.flow-tab {
+  font-size: 11px; font-family: var(--mono);
+  padding: 5px 12px; border-radius: 4px;
+  cursor: pointer; transition: all .12s;
+  color: var(--t3); background: none;
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+.flow-tab:hover { color: var(--t2); }
+.flow-tab.active {
+  color: var(--t1);
+  background: var(--bg-3);
+  border-color: var(--border-md);
+}
+
+.flow-content { display: none; }
+.flow-content.active { display: block; }
+
+/* Nodes */
+.flow-nodes {
+  display: flex; flex-direction: column; gap: 0;
+  position: relative;
+}
+
+.flow-node {
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 14px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+  transition: border-color .12s;
+}
+.flow-node:hover { border-color: var(--border-md); }
+
+.flow-connector {
+  width: 1px; height: 20px;
+  background: var(--border-md);
+  margin-left: 27px; /* center under icon */
+  position: relative;
+}
+.flow-connector::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: -3px;
+  width: 7px; height: 7px;
+  border-right: 1px solid var(--border-md);
+  border-bottom: 1px solid var(--border-md);
+  transform: rotate(45deg);
+}
+
+.node-icon {
+  width: 28px; height: 28px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 13px;
+}
+.node-info { flex: 1; min-width: 0; }
+.node-name {
+  font-size: 12px; font-weight: 500; color: var(--t1);
+  margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.node-detail { font-size: 10px; color: var(--t3); font-family: var(--mono); }
+.node-badge {
+  font-size: 9px; font-family: var(--mono); padding: 2px 7px;
+  border-radius: 3px; flex-shrink: 0; white-space: nowrap;
+}
+
+/* node colors */
+.ni-webhook { background: rgba(56,189,248,0.1); }
+.ni-code    { background: rgba(167,139,250,0.1); }
+.ni-docker  { background: rgba(96,165,250,0.1); }
+.ni-email   { background: rgba(74,222,128,0.1); }
+.ni-respond { background: rgba(251,191,36,0.1); }
+
+.nb-trigger { background: rgba(56,189,248,0.08); color: rgba(56,189,248,0.6); }
+.nb-code    { background: rgba(167,139,250,0.08); color: rgba(167,139,250,0.6); }
+.nb-docker  { background: rgba(96,165,250,0.08); color: rgba(96,165,250,0.6); }
+.nb-email   { background: rgba(74,222,128,0.08); color: rgba(74,222,128,0.6); }
+.nb-ok      { background: rgba(251,191,36,0.08); color: rgba(251,191,36,0.6); }
+
+/* ══════════════════════════════════════
+   SECCIÓN 3 — LLMs
+══════════════════════════════════════ */
+#llms { padding: 120px 0; border-top: 1px solid var(--border); }
+#llms .header { margin-bottom: 52px; }
+
+.llm-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-2);
+}
+
+.llm-list {
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+
+.llm-list-label {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--t4); font-family: var(--mono);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.llm-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 13px 16px;
+  cursor: pointer; transition: background .12s;
+  border-bottom: 1px solid var(--border);
+  border-left: 2px solid transparent;
+  user-select: none;
+}
+.llm-item:last-child { border-bottom: none; }
+.llm-item:hover { background: rgba(255,255,255,0.03); }
+.llm-item.active {
+  background: rgba(255,255,255,0.04);
+  border-left-color: rgba(255,255,255,0.25);
+}
+
+.llm-logo {
+  width: 28px; height: 28px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-3);
+}
+.llm-item-info { flex: 1; min-width: 0; }
+.llm-item-name { font-size: 12px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.llm-item-provider { font-size: 10px; color: var(--t3); font-family: var(--mono); }
+.llm-item-arrow { font-size: 11px; color: var(--t4); flex-shrink: 0; }
+
+/* LLM Detail panel */
+.llm-detail {
+  display: none; flex-direction: column;
+  padding: 28px 32px;
+}
+.llm-detail.active { display: flex; }
+
+.llm-detail-head {
+  display: flex; align-items: flex-start; gap: 16px;
+  margin-bottom: 28px; padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.llm-detail-logo {
+  width: 44px; height: 44px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-3);
+}
+.llm-detail-name { font-size: 22px; font-weight: 600; color: #fff; letter-spacing: -0.02em; margin-bottom: 4px; }
+.llm-detail-model { font-size: 11px; font-family: var(--mono); color: var(--t3); }
+
+.llm-detail-tags { display: flex; gap: 6px; margin-top: 8px; }
+.llm-tag {
+  font-size: 10px; font-family: var(--mono); padding: 3px 8px; border-radius: 3px;
+}
+.tag-speed   { background: rgba(251,191,36,0.08); color: rgba(251,191,36,0.6); }
+.tag-quality { background: rgba(74,222,128,0.08); color: rgba(74,222,128,0.6); }
+.tag-code    { background: rgba(96,165,250,0.08); color: rgba(96,165,250,0.6); }
+.tag-free    { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+.tag-reason  { background: rgba(167,139,250,0.08); color: rgba(167,139,250,0.6); }
+
+.llm-section-title {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--t4); font-family: var(--mono); margin-bottom: 10px;
+}
+
+.llm-overview {
+  font-size: 13px; color: var(--t2); line-height: 1.7;
+  margin-bottom: 24px; font-weight: 300;
+}
+
+.llm-specs-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-bottom: 24px;
+}
+.llm-spec {
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: 5px; padding: 10px 12px;
+}
+.llm-spec-label { font-size: 10px; color: var(--t3); font-family: var(--mono); margin-bottom: 4px; }
+.llm-spec-value { font-size: 13px; font-weight: 500; color: var(--t1); }
+
+.llm-pros-cons {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.llm-pros, .llm-cons {
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: 5px; padding: 12px 14px;
+}
+.llm-pros-title, .llm-cons-title {
+  font-size: 10px; font-family: var(--mono); margin-bottom: 10px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.llm-pros-title { color: rgba(74,222,128,0.6); }
+.llm-cons-title { color: rgba(248,113,113,0.5); }
+.llm-point {
+  font-size: 12px; color: var(--t2); margin-bottom: 6px;
+  display: flex; gap: 7px; align-items: flex-start; line-height: 1.5;
+}
+.llm-point:last-child { margin-bottom: 0; }
+.point-dot { flex-shrink: 0; margin-top: 5px; width: 4px; height: 4px; border-radius: 50%; }
+.dot-pro { background: rgba(74,222,128,0.5); }
+.dot-con { background: rgba(248,113,113,0.4); }
+
+/* Custom AI card */
+.llm-custom {
+  border-top: 1px solid var(--border);
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 11px;
+  cursor: pointer; transition: background .12s;
+  border-left: 2px solid transparent;
+  user-select: none;
+}
+.llm-custom:hover { background: rgba(255,255,255,0.03); }
+.llm-custom.active {
+  background: rgba(255,255,255,0.04);
+  border-left-color: rgba(255,255,255,0.25);
+}
+.llm-custom-icon {
+  width: 28px; height: 28px; border-radius: 5px;
+  border: 1px dashed rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+
+/* Custom detail */
+.llm-custom-detail {
+  display: none; flex-direction: column;
+  padding: 28px 32px;
+}
+.llm-custom-detail.active { display: flex; }
+.custom-input-wrap { margin-bottom: 14px; }
+.custom-label {
+  font-size: 10px; color: var(--t3); font-family: var(--mono);
+  letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px;
+}
+.custom-input {
+  width: 100%; background: var(--bg-3); border: 1px solid var(--border-md);
+  border-radius: 5px; padding: 9px 12px; font-size: 11px; font-family: var(--mono);
+  color: var(--t1); outline: none; transition: border-color .12s;
+  font-family: inherit;
+}
+.custom-input:focus { border-color: rgba(255,255,255,0.22); }
+.custom-input::placeholder { color: var(--t4); }
+.custom-save {
+  font-size: 12px; font-weight: 500; background: rgba(255,255,255,0.88);
+  color: #0e0e10; padding: 8px 18px; border-radius: 5px; cursor: pointer;
+  border: none; font-family: inherit; transition: opacity .12s; margin-top: 8px;
+}
+.custom-save:hover { opacity: .85; }
+.custom-note { font-size: 12px; color: var(--t3); line-height: 1.65; margin-bottom: 20px; font-weight: 300; }
+
+/* ══════════════════════════════════════
+   SECCIÓN 4 — MÉTRICAS
+══════════════════════════════════════ */
+#metrics {
+  padding: 60px 0;
+  border-top: 1px solid var(--border);
+}
+.metrics-row {
+  display: flex; align-items: center; gap: 0;
+  justify-content: space-between;
+}
+.metric-item {
+  flex: 1; text-align: center;
+  padding: 0 24px;
+  border-right: 1px solid var(--border);
+}
+.metric-item:last-child { border-right: none; }
+.metric-value {
+  font-size: 32px; font-weight: 600; color: #fff;
+  letter-spacing: -0.04em; margin-bottom: 4px;
+  font-family: var(--mono);
+}
+.metric-label { font-size: 11px; color: var(--t3); font-family: var(--mono); }
+
+/* ══════════════════════════════════════
+   SECCIÓN 5 — CTA FINAL
+══════════════════════════════════════ */
+#cta {
+  padding: 120px 0 80px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+#cta .cta-title {
+  font-size: clamp(32px, 4vw, 52px); font-weight: 600;
+  letter-spacing: -0.03em; color: #fff; margin-bottom: 16px;
+}
+#cta .cta-title .muted { color: rgba(255,255,255,0.22); font-weight: 300; }
+#cta .cta-sub { font-size: 14px; color: var(--t3); margin-bottom: 36px; font-weight: 300; }
+.cta-btn {
+  font-size: 13px; font-weight: 500; background: #fff; color: #0e0e10;
+  padding: 11px 28px; border-radius: 6px; cursor: pointer; border: none;
+  font-family: inherit; transition: opacity .15s; letter-spacing: -0.01em;
+  display: inline-block;
+}
+.cta-btn:hover { opacity: .86; }
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 100%;
+}
+.footer-left { font-size: 12px; color: var(--t3); font-family: var(--mono); }
+.footer-links { display: flex; gap: 20px; }
+.footer-link { font-size: 12px; color: var(--t3); text-decoration: none; transition: color .15s; }
+.footer-link:hover { color: var(--t2); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SECCIÓN 1 — EJEMPLOS
+══════════════════════════════════════ -->
+<section id="examples">
+  <div class="container">
+    <div class="header">
+      <div class="section-eyebrow">Ejemplos</div>
+      <h2 class="section-title">Lo que puedes <span class="muted">construir</span></h2>
+      <p class="section-sub">Proyectos Django generados a partir de APIs públicas. Listos para ejecutar.</p>
+    </div>
+
+    <div class="carousel-wrap">
+      <div class="carousel-track" id="carousel">
+
+        <!-- Set 1 -->
+        <div class="example-card">
+          <div class="example-thumb thumb-weather">
+            <div class="fake-ui">
+              <div class="fake-topbar"></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>22°C</span></div>
+                <div class="fake-stat"><span>Madrid</span></div>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:30px;"></div></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>Humidity</span></div>
+                <div class="fake-stat"><span>Wind</span></div>
+                <div class="fake-stat"><span>UV</span></div>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:60%;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">Weather Dashboard</div>
+            <div class="example-api">api.openweathermap.org/data/2.5/weather</div>
+            <div class="example-tags"><span class="example-tag">dashboard</span><span class="example-tag">6 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-countries">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:40%"></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>195</span></div>
+                <div class="fake-stat"><span>países</span></div>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:16px;"></div></div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:16px;"></div></div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:16px;"></div></div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">Countries Explorer</div>
+            <div class="example-api">restcountries.com/v3.1/all</div>
+            <div class="example-tags"><span class="example-tag">explorer</span><span class="example-tag">4 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-pokemon">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:50%"></div>
+              <div class="fake-row">
+                <div class="fake-block" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.06);flex-shrink:0;"></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:5px;justify-content:center;">
+                  <div class="fake-block" style="height:8px;width:70%;"></div>
+                  <div class="fake-block" style="height:6px;width:40%;"></div>
+                </div>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:8px;border-radius:4px;background:rgba(248,113,113,0.15);"></div></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>Lv.35</span></div>
+                <div class="fake-stat"><span>Fire</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">Pokédex App</div>
+            <div class="example-api">pokeapi.co/api/v2/pokemon</div>
+            <div class="example-tags"><span class="example-tag">listado</span><span class="example-tag">5 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-crypto">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:55%"></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>BTC</span></div>
+                <div class="fake-stat"><span>$94k</span></div>
+              </div>
+              <div class="fake-chart">
+                <svg class="fake-chart-line" viewBox="0 0 100 20" preserveAspectRatio="none">
+                  <polyline points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.5"/>
+                  <polygon points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2 100,20 0,20" fill="rgba(251,191,36,0.06)"/>
+                </svg>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:10px;"></div></div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">Crypto Tracker</div>
+            <div class="example-api">api.coingecko.com/api/v3/coins/markets</div>
+            <div class="example-tags"><span class="example-tag">tracker</span><span class="example-tag">7 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-news">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:30%"></div>
+              <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <div class="fake-block" style="width:36px;height:28px;flex-shrink:0;background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.2);border-radius:3px;"></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                    <div class="fake-block" style="height:7px;width:90%;"></div>
+                    <div class="fake-block" style="height:5px;width:60%;"></div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <div class="fake-block" style="width:36px;height:28px;flex-shrink:0;border-radius:3px;"></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                    <div class="fake-block" style="height:7px;width:80%;"></div>
+                    <div class="fake-block" style="height:5px;width:50%;"></div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <div class="fake-block" style="width:36px;height:28px;flex-shrink:0;border-radius:3px;"></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                    <div class="fake-block" style="height:7px;width:70%;"></div>
+                    <div class="fake-block" style="height:5px;width:40%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">News Feed</div>
+            <div class="example-api">newsapi.org/v2/top-headlines</div>
+            <div class="example-tags"><span class="example-tag">feed</span><span class="example-tag">5 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-space">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:45%"></div>
+              <div class="fake-row">
+                <div class="fake-stat" style="border-color:rgba(34,211,238,0.4);background:rgba(34,211,238,0.07)"><span style="color:#22d3ee">ISS</span></div>
+                <div class="fake-stat" style="border-color:rgba(34,211,238,0.2)"><span>Live</span></div>
+              </div>
+              <div class="fake-row">
+                <div class="fake-block" style="width:100%;height:50px;border-radius:3px;background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.15);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">ISS Tracker</div>
+            <div class="example-api">api.open-notify.org/iss-now.json</div>
+            <div class="example-tags"><span class="example-tag">tracker</span><span class="example-tag">3 campos</span></div>
+          </div>
+        </div>
+
+        <!-- Set 2 — duplicado para loop seamless -->
+        <div class="example-card">
+          <div class="example-thumb thumb-weather">
+            <div class="fake-ui">
+              <div class="fake-topbar"></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>22°C</span></div>
+                <div class="fake-stat"><span>Madrid</span></div>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:30px;"></div></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>Humidity</span></div>
+                <div class="fake-stat"><span>Wind</span></div>
+                <div class="fake-stat"><span>UV</span></div>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:60%;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">Weather Dashboard</div>
+            <div class="example-api">api.openweathermap.org/data/2.5/weather</div>
+            <div class="example-tags"><span class="example-tag">dashboard</span><span class="example-tag">6 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-countries">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:40%"></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>195</span></div>
+                <div class="fake-stat"><span>países</span></div>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:16px;"></div></div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:16px;"></div></div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:16px;"></div></div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">Countries Explorer</div>
+            <div class="example-api">restcountries.com/v3.1/all</div>
+            <div class="example-tags"><span class="example-tag">explorer</span><span class="example-tag">4 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-pokemon">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:50%"></div>
+              <div class="fake-row">
+                <div class="fake-block" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.06);flex-shrink:0;"></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:5px;justify-content:center;">
+                  <div class="fake-block" style="height:8px;width:70%;"></div>
+                  <div class="fake-block" style="height:6px;width:40%;"></div>
+                </div>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:8px;border-radius:4px;background:rgba(248,113,113,0.15);"></div></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>Lv.35</span></div>
+                <div class="fake-stat"><span>Fire</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">Pokédex App</div>
+            <div class="example-api">pokeapi.co/api/v2/pokemon</div>
+            <div class="example-tags"><span class="example-tag">listado</span><span class="example-tag">5 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-crypto">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:55%"></div>
+              <div class="fake-row">
+                <div class="fake-stat"><span>BTC</span></div>
+                <div class="fake-stat"><span>$94k</span></div>
+              </div>
+              <div class="fake-chart">
+                <svg class="fake-chart-line" viewBox="0 0 100 20" preserveAspectRatio="none">
+                  <polyline points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.5"/>
+                  <polygon points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2 100,20 0,20" fill="rgba(251,191,36,0.06)"/>
+                </svg>
+              </div>
+              <div class="fake-row"><div class="fake-block" style="width:100%;height:10px;"></div></div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">Crypto Tracker</div>
+            <div class="example-api">api.coingecko.com/api/v3/coins/markets</div>
+            <div class="example-tags"><span class="example-tag">tracker</span><span class="example-tag">7 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-news">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:30%"></div>
+              <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <div class="fake-block" style="width:36px;height:28px;flex-shrink:0;background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.2);border-radius:3px;"></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                    <div class="fake-block" style="height:7px;width:90%;"></div>
+                    <div class="fake-block" style="height:5px;width:60%;"></div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <div class="fake-block" style="width:36px;height:28px;flex-shrink:0;border-radius:3px;"></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                    <div class="fake-block" style="height:7px;width:80%;"></div>
+                    <div class="fake-block" style="height:5px;width:50%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">News Feed</div>
+            <div class="example-api">newsapi.org/v2/top-headlines</div>
+            <div class="example-tags"><span class="example-tag">feed</span><span class="example-tag">5 campos</span></div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-thumb thumb-space">
+            <div class="fake-ui">
+              <div class="fake-topbar" style="width:45%"></div>
+              <div class="fake-row">
+                <div class="fake-stat" style="border-color:rgba(34,211,238,0.4);background:rgba(34,211,238,0.07)"><span style="color:#22d3ee">ISS</span></div>
+                <div class="fake-stat" style="border-color:rgba(34,211,238,0.2)"><span>Live</span></div>
+              </div>
+              <div class="fake-row">
+                <div class="fake-block" style="width:100%;height:50px;border-radius:3px;background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.15);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="example-info">
+            <div class="example-name">ISS Tracker</div>
+            <div class="example-api">api.open-notify.org/iss-now.json</div>
+            <div class="example-tags"><span class="example-tag">tracker</span><span class="example-tag">3 campos</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECCIÓN 2 — CÓMO FUNCIONA
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div id="how">
+
+      <div class="how-left">
+        <div class="section-eyebrow">Proceso</div>
+        <h2 class="section-title">Cómo <span class="muted">funciona</span></h2>
+        <p class="section-sub">Cuatro pasos entre tu fuente de datos y un proyecto Django listo para ejecutar.</p>
+
+        <div class="how-steps">
+          <div class="how-step active" onclick="setStep(0)">
+            <span class="step-num">01</span>
+            <div>
+              <div class="step-title">Conecta tu fuente</div>
+              <div class="step-desc">Pega una URL de API pública o arrastra un archivo JSON, CSV o XML. WebBuilder lo descarga y parsea automáticamente.</div>
+            </div>
+          </div>
+          <div class="how-step" onclick="setStep(1)">
+            <span class="step-num">02</span>
+            <div>
+              <div class="step-title">La IA analiza el schema</div>
+              <div class="step-desc">El LLM seleccionado detecta los campos, infiere tipos y decide cuáles mostrar. Tú ajustas campo a campo antes de continuar.</div>
+            </div>
+          </div>
+          <div class="how-step" onclick="setStep(2)">
+            <span class="step-num">03</span>
+            <div>
+              <div class="step-title">Genera el proyecto</div>
+              <div class="step-desc">WebBuilder genera el proyecto Django completo: modelos, vistas, templates y CSS adaptados al tipo de datos detectado.</div>
+            </div>
+          </div>
+          <div class="how-step" onclick="setStep(3)">
+            <span class="step-num">04</span>
+            <div>
+              <div class="step-title">Despliega con n8n</div>
+              <div class="step-desc">El flujo automatizado de n8n empaqueta el proyecto, construye la imagen Docker y lo despliega en un puerto disponible.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- N8N Flow -->
+      <div class="how-right">
+        <div class="flow-diagram">
+          <div class="flow-label">Flujos n8n automatizados</div>
+
+          <div class="flow-tabs">
+            <button class="flow-tab active" onclick="switchFlow('deploy')">Deploy</button>
+            <button class="flow-tab" onclick="switchFlow('login')">Login</button>
+            <button class="flow-tab" onclick="switchFlow('register')">Register</button>
+          </div>
+
+          <!-- Deploy flow -->
+          <div class="flow-content active" id="flow-deploy">
+            <div class="flow-nodes">
+              <div class="flow-node">
+                <div class="node-icon ni-webhook">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(56,189,248,0.8)" stroke-width="1.2"/><path d="M7 4v3l2 1.5" stroke="rgba(56,189,248,0.8)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Webhook</div><div class="node-detail">POST /webbuilder-deploy</div></div>
+                <span class="node-badge nb-trigger">trigger</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-code">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 5L2 7l2 2M10 5l2 2-2 2M8 3l-2 8" stroke="rgba(167,139,250,0.8)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Descomprimir Zip</div><div class="node-detail">unzip → /files/deploys/{project}</div></div>
+                <span class="node-badge nb-code">code</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-docker">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="3" height="3" rx="0.5" stroke="rgba(96,165,250,0.8)" stroke-width="1.1"/><rect x="5" y="5" width="3" height="3" rx="0.5" stroke="rgba(96,165,250,0.8)" stroke-width="1.1"/><rect x="5" y="1" width="3" height="3" rx="0.5" stroke="rgba(96,165,250,0.8)" stroke-width="1.1"/><path d="M9 6.5c.5-1 2-1 2.5 0 .3.6 0 1.5-.8 2H2.5C1 8.5 1 7 2 6.5" stroke="rgba(96,165,250,0.8)" stroke-width="1.1" stroke-linecap="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Restablecer Contenedor</div><div class="node-detail">docker stop · docker rm</div></div>
+                <span class="node-badge nb-docker">docker</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-code">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="rgba(167,139,250,0.8)" stroke-width="1.2"/><path d="M7 2v1.5M7 10.5V12M2 7h1.5M10.5 7H12" stroke="rgba(167,139,250,0.8)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Elegir Puerto</div><div class="node-detail">Escanea puertos 8100–8999</div></div>
+                <span class="node-badge nb-code">code</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-docker">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="3" height="3" rx="0.5" stroke="rgba(96,165,250,0.8)" stroke-width="1.1"/><rect x="5" y="5" width="3" height="3" rx="0.5" stroke="rgba(96,165,250,0.8)" stroke-width="1.1"/><rect x="5" y="1" width="3" height="3" rx="0.5" stroke="rgba(96,165,250,0.8)" stroke-width="1.1"/><path d="M9 6.5c.5-1 2-1 2.5 0 .3.6 0 1.5-.8 2H2.5C1 8.5 1 7 2 6.5" stroke="rgba(96,165,250,0.8)" stroke-width="1.1" stroke-linecap="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Docker Build</div><div class="node-detail">docker build -t {name}:latest</div></div>
+                <span class="node-badge nb-docker">docker</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-docker">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 3l7 4-7 4V3z" stroke="rgba(96,165,250,0.8)" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Docker Run</div><div class="node-detail">docker run -p {port}:8000</div></div>
+                <span class="node-badge nb-docker">docker</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-code">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="rgba(167,139,250,0.8)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Verificar Docker</div><div class="node-detail">Espera 4s · comprueba estado</div></div>
+                <span class="node-badge nb-code">code</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-respond">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="rgba(251,191,36,0.8)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Respond to Webhook</div><div class="node-detail">→ preview_url · container · port</div></div>
+                <span class="node-badge nb-ok">response</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Login flow -->
+          <div class="flow-content" id="flow-login">
+            <div class="flow-nodes">
+              <div class="flow-node">
+                <div class="node-icon ni-webhook">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(56,189,248,0.8)" stroke-width="1.2"/><path d="M7 4v3l2 1.5" stroke="rgba(56,189,248,0.8)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Webhook</div><div class="node-detail">POST /WebBuilder-Login</div></div>
+                <span class="node-badge nb-trigger">trigger</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-email">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8" rx="1" stroke="rgba(74,222,128,0.8)" stroke-width="1.2"/><path d="M1.5 5l5.5 3.5L12.5 5" stroke="rgba(74,222,128,0.8)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Send Email — Login</div><div class="node-detail">Notifica IP · hora · dispositivo</div></div>
+                <span class="node-badge nb-email">email</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Register flow -->
+          <div class="flow-content" id="flow-register">
+            <div class="flow-nodes">
+              <div class="flow-node">
+                <div class="node-icon ni-webhook">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(56,189,248,0.8)" stroke-width="1.2"/><path d="M7 4v3l2 1.5" stroke="rgba(56,189,248,0.8)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Webhook</div><div class="node-detail">POST /WebBuilder-Register</div></div>
+                <span class="node-badge nb-trigger">trigger</span>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-node">
+                <div class="node-icon ni-email">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8" rx="1" stroke="rgba(74,222,128,0.8)" stroke-width="1.2"/><path d="M1.5 5l5.5 3.5L12.5 5" stroke="rgba(74,222,128,0.8)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="node-info"><div class="node-name">Send Email — Bienvenida</div><div class="node-detail">Correo de bienvenida al usuario</div></div>
+                <span class="node-badge nb-email">email</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECCIÓN 3 — LLMs
+══════════════════════════════════════ -->
+<section id="llms">
+  <div class="container">
+    <div class="header">
+      <div class="section-eyebrow">Modelos</div>
+      <h2 class="section-title">Elige tu <span class="muted">modelo de IA</span></h2>
+      <p class="section-sub">Selecciona el LLM que genera tu proyecto. Cada modelo tiene sus fortalezas.</p>
+    </div>
+
+    <div class="llm-layout">
+
+      <!-- List -->
+      <div class="llm-list">
+        <div class="llm-list-label">Modelos disponibles</div>
+
+        <div class="llm-item active" onclick="selectLLM(this,'llm-gpt4o')">
+          <div class="llm-logo" style="background:rgba(16,163,127,0.12);border-color:rgba(16,163,127,0.25);color:#10a37f;font-family:var(--mono);font-size:10px;font-weight:600;">GPT</div>
+          <div class="llm-item-info">
+            <div class="llm-item-name">GPT-4o</div>
+            <div class="llm-item-provider">OpenAI</div>
+          </div>
+          <span class="llm-item-arrow">›</span>
+        </div>
+
+        <div class="llm-item" onclick="selectLLM(this,'llm-claude')">
+          <div class="llm-logo" style="background:rgba(205,130,82,0.12);border-color:rgba(205,130,82,0.25);color:#cd8252;font-family:var(--mono);font-size:10px;font-weight:600;">ANT</div>
+          <div class="llm-item-info">
+            <div class="llm-item-name">Claude Sonnet 4</div>
+            <div class="llm-item-provider">Anthropic</div>
+          </div>
+          <span class="llm-item-arrow">›</span>
+        </div>
+
+        <div class="llm-item" onclick="selectLLM(this,'llm-llama')">
+          <div class="llm-logo" style="background:rgba(96,165,250,0.12);border-color:rgba(96,165,250,0.25);color:#60a5fa;font-family:var(--mono);font-size:10px;font-weight:600;">LLM</div>
+          <div class="llm-item-info">
+            <div class="llm-item-name">Llama 3.3 70B</div>
+            <div class="llm-item-provider">Meta · Groq</div>
+          </div>
+          <span class="llm-item-arrow">›</span>
+        </div>
+
+        <div class="llm-item" onclick="selectLLM(this,'llm-gemini')">
+          <div class="llm-logo" style="background:rgba(66,133,244,0.12);border-color:rgba(66,133,244,0.25);color:#4285f4;font-family:var(--mono);font-size:10px;font-weight:600;">GEM</div>
+          <div class="llm-item-info">
+            <div class="llm-item-name">Gemini 2.5 Pro</div>
+            <div class="llm-item-provider">Google</div>
+          </div>
+          <span class="llm-item-arrow">›</span>
+        </div>
+
+        <div class="llm-item" onclick="selectLLM(this,'llm-qwen')">
+          <div class="llm-logo" style="background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.25);color:#fbbf24;font-family:var(--mono);font-size:10px;font-weight:600;">QWN</div>
+          <div class="llm-item-info">
+            <div class="llm-item-name">Qwen3 32B</div>
+            <div class="llm-item-provider">Alibaba · Groq</div>
+          </div>
+          <span class="llm-item-arrow">›</span>
+        </div>
+
+        <!-- Custom separador -->
+        <div style="padding: 10px 16px 6px; border-top: 1px solid var(--border);">
+          <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--t4);font-family:var(--mono);">Personalizado</div>
+        </div>
+
+        <div class="llm-custom" onclick="selectLLM(this,'llm-custom')">
+          <div class="llm-custom-icon" style="border-color:rgba(255,255,255,0.2);color:var(--t2);font-family:var(--mono);font-size:10px;font-weight:600;">API</div>
+          <div class="llm-item-info">
+            <div class="llm-item-name" style="font-size:12px;color:var(--t1);">Conecta tu modelo</div>
+            <div class="llm-item-provider">OpenRouter · Groq · Ollama</div>
+          </div>
+          <span class="llm-item-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- Detail panels -->
+
+      <div class="llm-detail active" id="llm-gpt4o">
+        <div class="llm-detail-head">
+          <div class="llm-detail-logo">🤖</div>
+          <div>
+            <div class="llm-detail-name">GPT-4o</div>
+            <div class="llm-detail-model">gpt-4o · OpenAI</div>
+            <div class="llm-detail-tags">
+              <span class="llm-tag tag-quality">alta calidad</span>
+              <span class="llm-tag tag-code">código</span>
+              <span class="llm-tag tag-speed">rápido</span>
+            </div>
+          </div>
+        </div>
+        <div class="llm-section-title">Descripción</div>
+        <p class="llm-overview">El modelo más equilibrado de OpenAI. Destaca en generación de código estructurado, comprensión de schemas complejos y seguimiento de instrucciones detalladas. Ideal para proyectos donde la calidad del template generado es prioritaria.</p>
+        <div class="llm-section-title" style="margin-bottom:10px;">Especificaciones</div>
+        <div class="llm-specs-grid">
+          <div class="llm-spec"><div class="llm-spec-label">Contexto</div><div class="llm-spec-value">128K tokens</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Velocidad</div><div class="llm-spec-value">Alta</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Proveedor</div><div class="llm-spec-value">OpenAI API</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Coste</div><div class="llm-spec-value">De pago</div></div>
+        </div>
+        <div class="llm-pros-cons">
+          <div class="llm-pros">
+            <div class="llm-pros-title">Puntos fuertes</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Excelente generación de HTML/CSS</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Muy buen seguimiento de instrucciones</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Comprende schemas complejos</div>
+          </div>
+          <div class="llm-cons">
+            <div class="llm-cons-title">Limitaciones</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Requiere API key de pago</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Latencia mayor que modelos locales</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="llm-detail" id="llm-claude">
+        <div class="llm-detail-head">
+          <div class="llm-detail-logo">◆</div>
+          <div>
+            <div class="llm-detail-name">Claude Sonnet 4</div>
+            <div class="llm-detail-model">claude-sonnet-4 · Anthropic</div>
+            <div class="llm-detail-tags">
+              <span class="llm-tag tag-reason">razonamiento</span>
+              <span class="llm-tag tag-code">código</span>
+              <span class="llm-tag tag-quality">preciso</span>
+            </div>
+          </div>
+        </div>
+        <div class="llm-section-title">Descripción</div>
+        <p class="llm-overview">El modelo más preciso para tareas de análisis estructurado. Destaca especialmente en comprensión de APIs, inferencia de tipos de datos y generación de código Python/Django limpio. Su capacidad de razonamiento lo hace ideal para schemas ambiguos.</p>
+        <div class="llm-section-title" style="margin-bottom:10px;">Especificaciones</div>
+        <div class="llm-specs-grid">
+          <div class="llm-spec"><div class="llm-spec-label">Contexto</div><div class="llm-spec-value">200K tokens</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Velocidad</div><div class="llm-spec-value">Media-Alta</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Proveedor</div><div class="llm-spec-value">Anthropic API</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Coste</div><div class="llm-spec-value">De pago</div></div>
+        </div>
+        <div class="llm-pros-cons">
+          <div class="llm-pros">
+            <div class="llm-pros-title">Puntos fuertes</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Mejor razonamiento en schemas complejos</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Código Python muy limpio y estructurado</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Contexto muy amplio</div>
+          </div>
+          <div class="llm-cons">
+            <div class="llm-cons-title">Limitaciones</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Algo más lento que GPT-4o</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Requiere API key de pago</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="llm-detail" id="llm-llama">
+        <div class="llm-detail-head">
+          <div class="llm-detail-logo">🦙</div>
+          <div>
+            <div class="llm-detail-name">Llama 3.3 70B</div>
+            <div class="llm-detail-model">llama-3.3-70b-versatile · Meta via Groq</div>
+            <div class="llm-detail-tags">
+              <span class="llm-tag tag-free">gratuito</span>
+              <span class="llm-tag tag-speed">muy rápido</span>
+              <span class="llm-tag tag-code">open source</span>
+            </div>
+          </div>
+        </div>
+        <div class="llm-section-title">Descripción</div>
+        <p class="llm-overview">El mejor modelo open source disponible a día de hoy. Servido a través de Groq con latencias muy bajas. Ideal cuando se quiere una solución completamente gratuita sin sacrificar demasiada calidad en la generación de código.</p>
+        <div class="llm-section-title" style="margin-bottom:10px;">Especificaciones</div>
+        <div class="llm-specs-grid">
+          <div class="llm-spec"><div class="llm-spec-label">Contexto</div><div class="llm-spec-value">128K tokens</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Velocidad</div><div class="llm-spec-value">Muy alta</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Proveedor</div><div class="llm-spec-value">Groq (free tier)</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Coste</div><div class="llm-spec-value">Gratuito</div></div>
+        </div>
+        <div class="llm-pros-cons">
+          <div class="llm-pros">
+            <div class="llm-pros-title">Puntos fuertes</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Completamente gratuito vía Groq</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Latencia extremadamente baja</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Open source y auditable</div>
+          </div>
+          <div class="llm-cons">
+            <div class="llm-cons-title">Limitaciones</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Algo inferior en código Django específico</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Rate limits en tier gratuito</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="llm-detail" id="llm-gemini">
+        <div class="llm-detail-head">
+          <div class="llm-detail-logo">✦</div>
+          <div>
+            <div class="llm-detail-name">Gemini 2.5 Pro</div>
+            <div class="llm-detail-model">gemini-2.5-pro · Google</div>
+            <div class="llm-detail-tags">
+              <span class="llm-tag tag-reason">razonamiento</span>
+              <span class="llm-tag tag-quality">multimodal</span>
+            </div>
+          </div>
+        </div>
+        <div class="llm-section-title">Descripción</div>
+        <p class="llm-overview">El modelo más potente de Google con capacidades de razonamiento extendido. Su ventana de contexto gigante lo hace ideal para analizar APIs con estructuras de respuesta muy largas o archivos de datos grandes sin necesidad de truncarlos.</p>
+        <div class="llm-section-title" style="margin-bottom:10px;">Especificaciones</div>
+        <div class="llm-specs-grid">
+          <div class="llm-spec"><div class="llm-spec-label">Contexto</div><div class="llm-spec-value">1M tokens</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Velocidad</div><div class="llm-spec-value">Media</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Proveedor</div><div class="llm-spec-value">Google AI</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Coste</div><div class="llm-spec-value">Freemium</div></div>
+        </div>
+        <div class="llm-pros-cons">
+          <div class="llm-pros">
+            <div class="llm-pros-title">Puntos fuertes</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Contexto de 1 millón de tokens</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Ideal para datasets muy grandes</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Tier gratuito generoso</div>
+          </div>
+          <div class="llm-cons">
+            <div class="llm-cons-title">Limitaciones</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Menos preciso en Django específico</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Velocidad inferior a Groq</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="llm-detail" id="llm-qwen">
+        <div class="llm-detail-head">
+          <div class="llm-detail-logo">🔷</div>
+          <div>
+            <div class="llm-detail-name">Qwen3 32B</div>
+            <div class="llm-detail-model">qwen/qwen3-32b · Alibaba via Groq</div>
+            <div class="llm-detail-tags">
+              <span class="llm-tag tag-free">gratuito</span>
+              <span class="llm-tag tag-reason">thinking</span>
+              <span class="llm-tag tag-speed">rápido</span>
+            </div>
+          </div>
+        </div>
+        <div class="llm-section-title">Descripción</div>
+        <p class="llm-overview">El modelo más sorprendente de la lista por su relación calidad/coste. Con modo thinking activado, razona paso a paso antes de generar el código, lo que resulta en templates Django más coherentes. Completamente gratuito vía Groq.</p>
+        <div class="llm-section-title" style="margin-bottom:10px;">Especificaciones</div>
+        <div class="llm-specs-grid">
+          <div class="llm-spec"><div class="llm-spec-label">Contexto</div><div class="llm-spec-value">32K tokens</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Velocidad</div><div class="llm-spec-value">Alta</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Proveedor</div><div class="llm-spec-value">Groq (free tier)</div></div>
+          <div class="llm-spec"><div class="llm-spec-label">Coste</div><div class="llm-spec-value">Gratuito</div></div>
+        </div>
+        <div class="llm-pros-cons">
+          <div class="llm-pros">
+            <div class="llm-pros-title">Puntos fuertes</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Modo thinking para razonamiento profundo</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Gratuito y rápido vía Groq</div>
+            <div class="llm-point"><span class="point-dot dot-pro"></span>Excelente relación calidad/coste</div>
+          </div>
+          <div class="llm-cons">
+            <div class="llm-cons-title">Limitaciones</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Contexto más limitado que los demás</div>
+            <div class="llm-point"><span class="point-dot dot-con"></span>Menos documentación en español</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="llm-custom-detail" id="llm-custom">
+        <div class="llm-detail-head" style="margin-bottom:20px;padding-bottom:20px;">
+          <div class="llm-detail-logo" style="border-style:dashed;font-family:var(--mono);font-size:13px;color:var(--t2);font-weight:600;">API</div>
+          <div>
+            <div class="llm-detail-name">Conecta tu modelo</div>
+            <div class="llm-detail-model">Compatible con OpenRouter y Groq</div>
+            <div class="llm-detail-tags">
+              <span class="llm-tag tag-free">OpenRouter</span>
+              <span class="llm-tag tag-code">Groq</span>
+              <span class="llm-tag" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);">Ollama</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="custom-note">WebBuilder es compatible con cualquier API que siga el formato de OpenAI. Pega tu clave de OpenRouter o Groq y elige el modelo que quieras usar entre los disponibles en tu cuenta.</p>
+
+        <!-- Provider tabs -->
+        <div style="display:flex;gap:4px;margin-bottom:18px;">
+          <button class="flow-tab active" id="prov-openrouter" onclick="switchProvider('openrouter')" style="font-size:11px;">OpenRouter</button>
+          <button class="flow-tab" id="prov-groq" onclick="switchProvider('groq')" style="font-size:11px;">Groq</button>
+          <button class="flow-tab" id="prov-ollama" onclick="switchProvider('ollama')" style="font-size:11px;">Ollama / Local</button>
+        </div>
+
+        <!-- OpenRouter fields -->
+        <div id="fields-openrouter">
+          <div class="custom-input-wrap">
+            <div class="custom-label">API Key <span style="color:rgba(248,113,113,0.6)">*</span></div>
+            <input class="custom-input" type="password" placeholder="sk-or-v1-...">
+          </div>
+          <div class="custom-input-wrap">
+            <div class="custom-label">Modelo <span style="color:rgba(248,113,113,0.6)">*</span></div>
+            <input class="custom-input" type="text" placeholder="meta-llama/llama-3.3-70b-instruct">
+          </div>
+          <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:16px;">
+            Endpoint: https://openrouter.ai/api/v1 · <a href="https://openrouter.ai/models" style="color:rgba(96,165,250,0.6);text-decoration:none;">ver modelos disponibles →</a>
+          </div>
+        </div>
+
+        <!-- Groq fields -->
+        <div id="fields-groq" style="display:none;">
+          <div class="custom-input-wrap">
+            <div class="custom-label">API Key <span style="color:rgba(248,113,113,0.6)">*</span></div>
+            <input class="custom-input" type="password" placeholder="gsk_...">
+          </div>
+          <div class="custom-input-wrap">
+            <div class="custom-label">Modelo <span style="color:rgba(248,113,113,0.6)">*</span></div>
+            <input class="custom-input" type="text" placeholder="llama-3.3-70b-versatile">
+          </div>
+          <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:16px;">
+            Endpoint: https://api.groq.com/openai/v1 · <a href="https://console.groq.com/docs/models" style="color:rgba(96,165,250,0.6);text-decoration:none;">ver modelos →</a>
+          </div>
+        </div>
+
+        <!-- Ollama fields -->
+        <div id="fields-ollama" style="display:none;">
+          <div class="custom-input-wrap">
+            <div class="custom-label">URL del servidor <span style="color:rgba(248,113,113,0.6)">*</span></div>
+            <input class="custom-input" type="text" placeholder="http://localhost:11434">
+          </div>
+          <div class="custom-input-wrap">
+            <div class="custom-label">Modelo <span style="color:rgba(248,113,113,0.6)">*</span></div>
+            <input class="custom-input" type="text" placeholder="llama3.2, mistral, phi4, gemma3...">
+          </div>
+          <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:16px;">
+            Sin API key · compatible con cualquier modelo instalado localmente
+          </div>
+        </div>
+
+        <button class="custom-save">Guardar y usar este modelo →</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECCIÓN 4 — MÉTRICAS
+══════════════════════════════════════ -->
+<section id="metrics">
+  <div class="container">
+    <div class="metrics-row">
+      <div class="metric-item">
+        <div class="metric-value">5+</div>
+        <div class="metric-label">modelos de IA</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">&lt;30s</div>
+        <div class="metric-label">tiempo de generación</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">3</div>
+        <div class="metric-label">flujos n8n automatizados</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">Django 5</div>
+        <div class="metric-label">framework de salida</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">100%</div>
+        <div class="metric-label">proyectos ejecutables</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECCIÓN 5 — CTA FINAL
+══════════════════════════════════════ -->
+<section id="cta">
+  <div class="container">
+    <h2 class="cta-title">Empieza con <span class="muted">tu primera API</span></h2>
+    <p class="cta-sub">Sin configuración. Sin código. Solo una URL.</p>
+    <button class="cta-btn">Empezar ahora →</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-left">WebBuilder · TFG 2025</span>
+  <div class="footer-links">
+    <a class="footer-link" href="#">Documentación</a>
+    <a class="footer-link" href="#">GitHub</a>
+    <a class="footer-link" href="#">Ejemplos</a>
+  </div>
+</footer>
+
+<script>
+// ── Provider tabs ──
+function switchProvider(id) {
+  ['openrouter','groq','ollama'].forEach(p => {
+    document.getElementById('prov-'+p)?.classList.remove('active');
+    const f = document.getElementById('fields-'+p);
+    if (f) f.style.display = 'none';
+  });
+  document.getElementById('prov-'+id)?.classList.add('active');
+  const fields = document.getElementById('fields-'+id);
+  if (fields) fields.style.display = 'block';
+}
+
+// ── Steps ──
+function setStep(i) {
+  document.querySelectorAll('.how-step').forEach((s,j) => {
+    s.classList.toggle('active', i === j);
+  });
+}
+
+// ── N8N flows ──
+function switchFlow(id) {
+  document.querySelectorAll('.flow-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.flow-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('flow-' + id).classList.add('active');
+}
+
+// ── LLM selection ──
+function selectLLM(el, panelId) {
+  document.querySelectorAll('.llm-item, .llm-custom').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.llm-detail, .llm-custom-detail').forEach(d => {
+    d.classList.remove('active');
+    d.style.display = 'none';
+  });
+  el.classList.add('active');
+  const panel = document.getElementById(panelId);
+  if (panel) {
+    panel.style.display = 'flex';
+    panel.classList.add('active');
+  }
+}
+
+// init LLM display
+document.querySelectorAll('.llm-detail, .llm-custom-detail').forEach(d => {
+  if (!d.classList.contains('active')) d.style.display = 'none';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,845 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="wb-home">
+
+  <!-- HERO -->
+  <section class="wb-hero">
+    <div class="wb-hero-copy">
+      <div class="wb-eyebrow">Generación con IA · Django · APIs públicas</div>
+      <h1 class="wb-hero-title">
+        Convierte <span class="muted">datos crudos</span><br>
+        en un proyecto Django <span class="muted">real</span>
+      </h1>
+      <p class="wb-hero-sub">
+        Pega una URL o arrastra un archivo. WebBuilder analiza la estructura,
+        propone el mapping y genera una base Django lista para seguir iterando.
+      </p>
+      <div class="wb-hero-actions">
+        <a href="{% url 'assistant' %}" class="wb-cta-primary">Empezar ahora</a>
+        <a href="#how-section" class="wb-cta-link">
+          Ver cómo funciona
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="wb-frame-wrap">
+      <div class="wb-frame">
+
+        <div class="wb-vsc-titlebar">
+          <div class="wb-vsc-menu-icons">
+            <span class="wb-vsc-menu-icon">File</span>
+            <span class="wb-vsc-menu-icon">Edit</span>
+            <span class="wb-vsc-menu-icon">View</span>
+            <span class="wb-vsc-menu-icon">Run</span>
+          </div>
+          <span class="wb-vsc-title-text">WebBuilder — asistente de análisis</span>
+        </div>
+
+        <div class="wb-vsc-tabs">
+          <div class="wb-vsc-tab active" data-tab="weather" onclick="switchTab(this,'weather')">weather.py</div>
+          <div class="wb-vsc-tab" data-tab="pokemon" onclick="switchTab(this,'pokemon')">pokemon.py</div>
+          <div class="wb-vsc-tab" data-tab="countries" onclick="switchTab(this,'countries')">countries.py</div>
+          <div class="wb-vsc-tab" data-tab="posts" onclick="switchTab(this,'posts')">posts.py</div>
+          <div class="wb-vsc-tab" data-tab="sites" onclick="switchTab(this,'sites')">sites/</div>
+          <div class="wb-vsc-tab" data-tab="new" onclick="switchTab(this,'new')">
+            <span style="font-size:11px;color:var(--wb-t4)">+</span>
+            nuevo
+          </div>
+        </div>
+
+        <div class="wb-frame-layout">
+
+          <div class="wb-sidebar">
+            <div class="wb-sidebar-section">
+              <div class="wb-sidebar-group-header">
+                <span>Análisis</span>
+                <span class="wb-sg-arrow">▼</span>
+              </div>
+
+              <div class="wb-sidebar-item active" id="sb-weather" onclick="switchTab(document.querySelector('.wb-vsc-tab[data-tab=&quot;weather&quot;]'),'weather')">
+                <span class="wb-si-color-dot" style="background:var(--wb-ic-weather)"></span>
+                <span class="wb-si-label">openweathermap</span>
+                <span class="wb-si-meta">2h</span>
+              </div>
+
+              <div class="wb-sidebar-item" id="sb-pokemon" onclick="switchTab(document.querySelector('.wb-vsc-tab[data-tab=&quot;pokemon&quot;]'),'pokemon')">
+                <span class="wb-si-color-dot" style="background:var(--wb-ic-pokemon)"></span>
+                <span class="wb-si-label">pokeapi</span>
+                <span class="wb-si-meta">1d</span>
+              </div>
+
+              <div class="wb-sidebar-item" id="sb-countries" onclick="switchTab(document.querySelector('.wb-vsc-tab[data-tab=&quot;countries&quot;]'),'countries')">
+                <span class="wb-si-color-dot" style="background:var(--wb-ic-countries)"></span>
+                <span class="wb-si-label">restcountries</span>
+                <span class="wb-si-meta">3d</span>
+              </div>
+
+              <div class="wb-sidebar-item" id="sb-posts" onclick="switchTab(document.querySelector('.wb-vsc-tab[data-tab=&quot;posts&quot;]'),'posts')">
+                <span class="wb-si-color-dot" style="background:var(--wb-ic-posts)"></span>
+                <span class="wb-si-label">jsonplaceholder</span>
+                <span class="wb-si-meta">1w</span>
+              </div>
+            </div>
+
+            <div class="wb-sidebar-section">
+              <div class="wb-sidebar-group-header">
+                <span>Generados</span>
+                <span class="wb-sg-arrow">▼</span>
+              </div>
+
+              <div class="wb-sidebar-item" id="sb-sites" onclick="switchTab(document.querySelector('.wb-vsc-tab[data-tab=&quot;sites&quot;]'),'sites')">
+                <span class="wb-si-color-dot" style="background:var(--wb-ic-site)"></span>
+                <span class="wb-si-label">Weather Dashboard</span>
+              </div>
+              <div class="wb-sidebar-item" onclick="switchTab(document.querySelector('.wb-vsc-tab[data-tab=&quot;sites&quot;]'),'sites')">
+                <span class="wb-si-color-dot" style="background:var(--wb-ic-site)"></span>
+                <span class="wb-si-label">Countries Explorer</span>
+              </div>
+              <div class="wb-sidebar-item" onclick="switchTab(document.querySelector('.wb-vsc-tab[data-tab=&quot;sites&quot;]'),'sites')">
+                <span class="wb-si-color-dot" style="background:var(--wb-ic-site);opacity:.5"></span>
+                <span class="wb-si-label">Pokédex App</span>
+              </div>
+            </div>
+
+            <div class="wb-sidebar-section">
+              <div class="wb-sidebar-group-header">
+                <span>Workspace</span>
+                <span class="wb-sg-arrow">▼</span>
+              </div>
+
+              <div class="wb-sidebar-item" id="sb-new" onclick="switchTab(document.querySelector('.wb-vsc-tab[data-tab=&quot;new&quot;]'),'new')">
+                <span style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M5 1v8M1 5h8" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <span class="wb-si-label">Nuevo análisis</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="wb-main-panel">
+
+            <div class="wb-panel-view active" id="panel-weather">
+              <div class="wb-panel-head">
+                <div class="wb-panel-head-top">
+                  <div>
+                    <div class="wb-panel-title">openweathermap · weather</div>
+                    <div class="wb-panel-meta">api.openweathermap.org · hace 2 horas</div>
+                  </div>
+                  <span class="wb-status-badge wb-s-ok">procesado</span>
+                </div>
+                <div class="wb-url-row">
+                  <span class="wb-url-method">GET</span>
+                  <span class="wb-url-text">https://api.openweathermap.org/data/2.5/weather?q=Madrid&amp;appid=…</span>
+                  <span class="wb-url-ok">200 OK</span>
+                </div>
+              </div>
+              <div class="wb-panel-body">
+                <div class="wb-section-label">Campos detectados — <span id="wc-count">6</span> de 8 seleccionados</div>
+                <div class="wb-fields-grid">
+                  <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name</div><div class="wb-field-desc">Nombre ciudad</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">main.temp</div><div class="wb-field-desc">Temperatura</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">main.humidity</div><div class="wb-field-desc">Humedad</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">weather[0].description</div><div class="wb-field-desc">Descripción</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">wind</div><div class="wb-field-desc">Datos de viento</div></div><span class="wb-field-type wb-t-obj">object</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">visibility</div><div class="wb-field-desc">Visibilidad</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                  <div class="wb-field-card" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">sys.country</div><div class="wb-field-desc">País</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">coord</div><div class="wb-field-desc">Coordenadas</div></div><span class="wb-field-type wb-t-obj">object</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wb-panel-view" id="panel-pokemon">
+              <div class="wb-panel-head">
+                <div class="wb-panel-head-top">
+                  <div>
+                    <div class="wb-panel-title">pokeapi · pokemon</div>
+                    <div class="wb-panel-meta">pokeapi.co · hace 1 día</div>
+                  </div>
+                  <span class="wb-status-badge wb-s-pub">publicado</span>
+                </div>
+                <div class="wb-url-row">
+                  <span class="wb-url-method">GET</span>
+                  <span class="wb-url-text">https://pokeapi.co/api/v2/pokemon/pikachu</span>
+                  <span class="wb-url-ok">200 OK</span>
+                </div>
+              </div>
+              <div class="wb-panel-body">
+                <div class="wb-section-label">Campos detectados — <span id="pc-count">5</span> de 7 seleccionados</div>
+                <div class="wb-fields-grid">
+                  <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name</div><div class="wb-field-desc">Nombre</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">base_experience</div><div class="wb-field-desc">Exp. base</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">types</div><div class="wb-field-desc">Tipos</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">stats</div><div class="wb-field-desc">Estadísticas</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">sprites.front_default</div><div class="wb-field-desc">Imagen</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">abilities</div><div class="wb-field-desc">Habilidades</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                  <div class="wb-field-card" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">moves</div><div class="wb-field-desc">Movimientos</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wb-panel-view" id="panel-countries">
+              <div class="wb-panel-head">
+                <div class="wb-panel-head-top">
+                  <div>
+                    <div class="wb-panel-title">restcountries · all</div>
+                    <div class="wb-panel-meta">restcountries.com · hace 3 días</div>
+                  </div>
+                  <span class="wb-status-badge wb-s-pend">pendiente</span>
+                </div>
+                <div class="wb-url-row">
+                  <span class="wb-url-method">GET</span>
+                  <span class="wb-url-text">https://restcountries.com/v3.1/all?fields=name,capital,population,flags</span>
+                  <span class="wb-url-ok">200 OK</span>
+                </div>
+              </div>
+              <div class="wb-panel-body">
+                <div class="wb-section-label">Campos detectados — <span id="cc-count">4</span> de 6 seleccionados</div>
+                <div class="wb-fields-grid">
+                  <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name.common</div><div class="wb-field-desc">Nombre país</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">capital</div><div class="wb-field-desc">Capital</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">population</div><div class="wb-field-desc">Población</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">flags.svg</div><div class="wb-field-desc">Bandera</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">region</div><div class="wb-field-desc">Región</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">languages</div><div class="wb-field-desc">Idiomas</div></div><span class="wb-field-type wb-t-obj">object</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wb-panel-view" id="panel-posts">
+              <div class="wb-panel-head">
+                <div class="wb-panel-head-top">
+                  <div>
+                    <div class="wb-panel-title">jsonplaceholder · posts</div>
+                    <div class="wb-panel-meta">jsonplaceholder.typicode.com · hace 1 semana</div>
+                  </div>
+                  <span class="wb-status-badge wb-s-ok">procesado</span>
+                </div>
+                <div class="wb-url-row">
+                  <span class="wb-url-method">GET</span>
+                  <span class="wb-url-text">https://jsonplaceholder.typicode.com/posts</span>
+                  <span class="wb-url-ok">200 OK</span>
+                </div>
+              </div>
+              <div class="wb-panel-body">
+                <div class="wb-section-label">Campos detectados — <span id="poc-count">3</span> de 4 seleccionados</div>
+                <div class="wb-fields-grid">
+                  <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">title</div><div class="wb-field-desc">Título</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">body</div><div class="wb-field-desc">Contenido</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                  <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">userId</div><div class="wb-field-desc">ID usuario</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                  <div class="wb-field-card" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">id</div><div class="wb-field-desc">Identificador</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wb-panel-view" id="panel-sites">
+              <div class="wb-panel-head">
+                <div class="wb-panel-head-top">
+                  <div>
+                    <div class="wb-panel-title">sitios generados</div>
+                    <div class="wb-panel-meta">3 proyectos Django · listos para descargar</div>
+                  </div>
+                </div>
+              </div>
+              <div class="wb-panel-body">
+                <div class="wb-section-label">Proyectos generados</div>
+                <div class="wb-sites-list">
+                  <div class="wb-site-card">
+                    <div class="wb-site-thumb"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="1" width="14" height="10" rx="1" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><rect x="2" y="2" width="12" height="2" rx="0.5" fill="rgba(96,165,250,0.15)"/><rect x="2" y="5.5" width="5" height="1" rx="0.5" fill="rgba(255,255,255,0.06)"/><rect x="2" y="7.5" width="8" height="1" rx="0.5" fill="rgba(255,255,255,0.04)"/></svg></div>
+                    <div class="wb-site-info"><div class="wb-site-name">Weather Dashboard</div><div class="wb-site-meta">openweathermap · 6 campos · hace 2h</div></div>
+                    <span class="wb-site-tag">dashboard</span>
+                  </div>
+                  <div class="wb-site-card">
+                    <div class="wb-site-thumb"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="1" width="14" height="10" rx="1" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><rect x="2" y="2" width="3" height="4" rx="0.5" fill="rgba(74,222,128,0.12)"/><rect x="6" y="2" width="3" height="4" rx="0.5" fill="rgba(74,222,128,0.12)"/><rect x="10" y="2" width="3" height="4" rx="0.5" fill="rgba(74,222,128,0.12)"/></svg></div>
+                    <div class="wb-site-info"><div class="wb-site-name">Countries Explorer</div><div class="wb-site-meta">restcountries · 4 campos · hace 3d</div></div>
+                    <span class="wb-site-tag">explorer</span>
+                  </div>
+                  <div class="wb-site-card">
+                    <div class="wb-site-thumb"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="1" width="14" height="10" rx="1" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="4.5" cy="5.5" r="2" stroke="rgba(248,113,113,0.2)" stroke-width="1"/><rect x="8" y="3.5" width="6" height="1" rx="0.5" fill="rgba(255,255,255,0.06)"/><rect x="8" y="5.5" width="4" height="1" rx="0.5" fill="rgba(255,255,255,0.04)"/></svg></div>
+                    <div class="wb-site-info"><div class="wb-site-name">Pokédex App</div><div class="wb-site-meta">pokeapi · 5 campos · hace 1d</div></div>
+                    <span class="wb-site-tag">listado</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wb-panel-view" id="panel-new">
+              <div class="wb-new-panel">
+                <div class="wb-new-input-wrap">
+                  <div class="wb-new-label">URL de la API</div>
+                  <div style="display:flex;gap:6px;">
+                    <input class="wb-new-input" id="new-url" type="text" placeholder="https://api.example.com/v1/data" style="flex:1;">
+                    <button class="wb-btn-generate wb-btn-small" onclick="goAnalyze()">Analizar →</button>
+                  </div>
+                </div>
+
+                <div class="wb-upload-box">
+                  <div class="wb-upload-sep">
+                    <div class="line"></div>
+                    <span>o adjunta un archivo</span>
+                    <div class="line"></div>
+                  </div>
+
+                  <div id="drop-zone" class="wb-drop-zone"
+                       ondragover="handleDragOver(event)"
+                       ondragleave="handleDragLeave(event)"
+                       ondrop="handleDrop(event)"
+                       onclick="document.getElementById('file-input').click()">
+                    <div class="wb-drop-icon">📂</div>
+                    <div class="wb-drop-title">Arrastra un archivo JSON, CSV o XML</div>
+                    <div class="wb-drop-sub">o haz click para seleccionar</div>
+                    <div id="drop-filename" class="wb-drop-filename"></div>
+                  </div>
+                  <input type="file" id="file-input" accept=".json,.csv,.xml" style="display:none;" onchange="handleFileSelect(event)">
+                </div>
+
+                <div class="wb-new-suggestions">
+                  <div class="wb-new-sugg-label">Sugerencias rápidas</div>
+                  <div class="wb-new-sugg" onclick="fillAndGo('https://api.openweathermap.org/data/2.5/weather?q=Madrid')">
+                    <span>🌧</span>
+                    <span class="wb-new-sugg-url">api.openweathermap.org/data/2.5/weather</span>
+                    <span class="wb-new-sugg-type">meteorología</span>
+                  </div>
+                  <div class="wb-new-sugg" onclick="fillAndGo('https://pokeapi.co/api/v2/pokemon/ditto')">
+                    <span>⚡</span>
+                    <span class="wb-new-sugg-url">pokeapi.co/api/v2/pokemon</span>
+                    <span class="wb-new-sugg-type">listado</span>
+                  </div>
+                  <div class="wb-new-sugg" onclick="fillAndGo('https://restcountries.com/v3.1/all')">
+                    <span>🌍</span>
+                    <span class="wb-new-sugg-url">restcountries.com/v3.1/all</span>
+                    <span class="wb-new-sugg-type">explorer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="wb-frame-bottom" id="bot-weather">
+          <span class="wb-bottom-info">Detectado: <span>Dashboard meteorológico</span> · <span>6 campos</span> · listo para generar</span>
+          <a href="{% url 'assistant' %}" class="wb-btn-generate">Generar sitio →</a>
+        </div>
+        <div class="wb-frame-bottom" id="bot-pokemon" style="display:none">
+          <span class="wb-bottom-info">Detectado: <span>Pokédex / listado</span> · <span>5 campos</span> · <span style="color:rgba(52,211,153,.6)">publicado</span></span>
+          <a href="{% url 'history' %}" class="wb-btn-generate">Ver sitio →</a>
+        </div>
+        <div class="wb-frame-bottom" id="bot-countries" style="display:none">
+          <span class="wb-bottom-info">Detectado: <span>Countries explorer</span> · <span>4 campos</span> · <span style="color:rgba(245,158,11,.55)">pendiente de confirmar</span></span>
+          <a href="{% url 'assistant' %}" class="wb-btn-generate">Generar sitio →</a>
+        </div>
+        <div class="wb-frame-bottom" id="bot-posts" style="display:none">
+          <span class="wb-bottom-info">Detectado: <span>Blog / posts</span> · <span>3 campos</span> · listo para generar</span>
+          <a href="{% url 'assistant' %}" class="wb-btn-generate">Generar sitio →</a>
+        </div>
+        <div class="wb-frame-bottom" id="bot-sites" style="display:none">
+          <span class="wb-bottom-info"><span>3 proyectos</span> Django generados · listos para descargar</span>
+          <a href="{% url 'history' %}" class="wb-btn-generate">Ver historial →</a>
+        </div>
+        <div class="wb-frame-bottom" id="bot-new" style="display:none">
+          <span class="wb-bottom-info">Introduce una URL o arrastra un archivo para comenzar</span>
+          <button class="wb-btn-generate" onclick="goAnalyze()">Analizar →</button>
+        </div>
+
+        <div class="wb-vsc-statusbar">
+          <span class="wb-sb-item"><span class="wb-sb-dot" style="background:rgba(52,211,153,.6)"></span>main</span>
+          <span class="wb-sb-item">Python 3.12</span>
+          <span class="wb-sb-item">Django 5.0</span>
+          <span class="wb-sb-item wb-sb-item-right">WebBuilder v1.0</span>
+        </div>
+
+      </div>
+      <div class="wb-frame-fade"></div>
+    </div>
+  </section>
+
+  <!-- EJEMPLOS -->
+  <section id="examples" class="wb-section">
+    <div class="wb-container">
+      <div class="wb-header">
+        <div class="wb-section-eyebrow">Ejemplos</div>
+        <h2 class="wb-section-title">Lo que puedes <span class="muted">construir</span></h2>
+        <p class="wb-section-sub">Proyectos Django generados a partir de APIs públicas. Listos para ejecutar.</p>
+      </div>
+
+      <div class="wb-carousel-wrap">
+        <div class="wb-carousel-track">
+
+          {% for item in "123456123456" %}
+          {% if forloop.counter == 1 or forloop.counter == 7 %}
+          <div class="wb-example-card">
+            <div class="wb-example-thumb wb-thumb-weather">
+              <div class="wb-fake-ui">
+                <div class="wb-fake-topbar"></div>
+                <div class="wb-fake-row">
+                  <div class="wb-fake-stat"><span>22°C</span></div>
+                  <div class="wb-fake-stat"><span>Madrid</span></div>
+                </div>
+                <div class="wb-fake-row"><div class="wb-fake-block full h30"></div></div>
+                <div class="wb-fake-row">
+                  <div class="wb-fake-stat"><span>Humidity</span></div>
+                  <div class="wb-fake-stat"><span>Wind</span></div>
+                  <div class="wb-fake-stat"><span>UV</span></div>
+                </div>
+                <div class="wb-fake-row"><div class="wb-fake-block w60 h8"></div></div>
+              </div>
+            </div>
+            <div class="wb-example-info">
+              <div class="wb-example-name">Weather Dashboard</div>
+              <div class="wb-example-api">api.openweathermap.org/data/2.5/weather</div>
+              <div class="wb-example-tags"><span class="wb-example-tag">dashboard</span><span class="wb-example-tag">6 campos</span></div>
+            </div>
+          </div>
+          {% elif forloop.counter == 2 or forloop.counter == 8 %}
+          <div class="wb-example-card">
+            <div class="wb-example-thumb wb-thumb-countries">
+              <div class="wb-fake-ui">
+                <div class="wb-fake-topbar w40"></div>
+                <div class="wb-fake-row">
+                  <div class="wb-fake-stat"><span>195</span></div>
+                  <div class="wb-fake-stat"><span>países</span></div>
+                </div>
+                <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
+                <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
+                <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
+              </div>
+            </div>
+            <div class="wb-example-info">
+              <div class="wb-example-name">Countries Explorer</div>
+              <div class="wb-example-api">restcountries.com/v3.1/all</div>
+              <div class="wb-example-tags"><span class="wb-example-tag">explorer</span><span class="wb-example-tag">4 campos</span></div>
+            </div>
+          </div>
+          {% elif forloop.counter == 3 or forloop.counter == 9 %}
+          <div class="wb-example-card">
+            <div class="wb-example-thumb wb-thumb-pokemon">
+              <div class="wb-fake-ui">
+                <div class="wb-fake-topbar w50"></div>
+                <div class="wb-fake-row">
+                  <div class="wb-poke-circle"></div>
+                  <div class="wb-poke-meta">
+                    <div class="wb-fake-block h8 w70"></div>
+                    <div class="wb-fake-block h6 w40"></div>
+                  </div>
+                </div>
+                <div class="wb-fake-row"><div class="wb-fake-block full h8 wb-poke-bar"></div></div>
+                <div class="wb-fake-row">
+                  <div class="wb-fake-stat"><span>Lv.35</span></div>
+                  <div class="wb-fake-stat"><span>Fire</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="wb-example-info">
+              <div class="wb-example-name">Pokédex App</div>
+              <div class="wb-example-api">pokeapi.co/api/v2/pokemon</div>
+              <div class="wb-example-tags"><span class="wb-example-tag">listado</span><span class="wb-example-tag">5 campos</span></div>
+            </div>
+          </div>
+          {% elif forloop.counter == 4 or forloop.counter == 10 %}
+          <div class="wb-example-card">
+            <div class="wb-example-thumb wb-thumb-crypto">
+              <div class="wb-fake-ui">
+                <div class="wb-fake-topbar w55"></div>
+                <div class="wb-fake-row">
+                  <div class="wb-fake-stat"><span>BTC</span></div>
+                  <div class="wb-fake-stat"><span>$94k</span></div>
+                </div>
+                <div class="wb-fake-chart">
+                  <svg class="wb-fake-chart-line" viewBox="0 0 100 20" preserveAspectRatio="none">
+                    <polyline points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.5"/>
+                    <polygon points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2 100,20 0,20" fill="rgba(251,191,36,0.06)"/>
+                  </svg>
+                </div>
+                <div class="wb-fake-row"><div class="wb-fake-block full h10"></div></div>
+              </div>
+            </div>
+            <div class="wb-example-info">
+              <div class="wb-example-name">Crypto Tracker</div>
+              <div class="wb-example-api">api.coingecko.com/api/v3/coins/markets</div>
+              <div class="wb-example-tags"><span class="wb-example-tag">tracker</span><span class="wb-example-tag">7 campos</span></div>
+            </div>
+          </div>
+          {% elif forloop.counter == 5 or forloop.counter == 11 %}
+          <div class="wb-example-card">
+            <div class="wb-example-thumb wb-thumb-news">
+              <div class="wb-fake-ui">
+                <div class="wb-fake-topbar w30"></div>
+                <div class="wb-news-stack">
+                  <div class="wb-news-item"><div class="wb-news-thumb featured"></div><div class="wb-news-text"><div class="wb-fake-block h7 w90"></div><div class="wb-fake-block h5 w60"></div></div></div>
+                  <div class="wb-news-item"><div class="wb-news-thumb"></div><div class="wb-news-text"><div class="wb-fake-block h7 w80"></div><div class="wb-fake-block h5 w50"></div></div></div>
+                  <div class="wb-news-item"><div class="wb-news-thumb"></div><div class="wb-news-text"><div class="wb-fake-block h7 w70"></div><div class="wb-fake-block h5 w40"></div></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="wb-example-info">
+              <div class="wb-example-name">News Feed</div>
+              <div class="wb-example-api">newsapi.org/v2/top-headlines</div>
+              <div class="wb-example-tags"><span class="wb-example-tag">feed</span><span class="wb-example-tag">5 campos</span></div>
+            </div>
+          </div>
+          {% else %}
+          <div class="wb-example-card">
+            <div class="wb-example-thumb wb-thumb-space">
+              <div class="wb-fake-ui">
+                <div class="wb-fake-topbar w45"></div>
+                <div class="wb-fake-row">
+                  <div class="wb-fake-stat wb-space-accent"><span>ISS</span></div>
+                  <div class="wb-fake-stat"><span>Live</span></div>
+                </div>
+                <div class="wb-fake-row"><div class="wb-space-block"></div></div>
+              </div>
+            </div>
+            <div class="wb-example-info">
+              <div class="wb-example-name">ISS Tracker</div>
+              <div class="wb-example-api">api.open-notify.org/iss-now.json</div>
+              <div class="wb-example-tags"><span class="wb-example-tag">tracker</span><span class="wb-example-tag">3 campos</span></div>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="wb-section">
+    <div class="wb-container">
+      <div id="how-section" class="wb-how">
+
+        <div class="wb-how-left-wrap">
+          <div class="wb-how-left">
+            <div class="wb-section-eyebrow">Proceso</div>
+            <h2 class="wb-section-title">Cómo <span class="muted">funciona</span></h2>
+            <p class="wb-section-sub">Cuatro pasos entre tu fuente de datos y un proyecto Django listo para ejecutar.</p>
+
+            <div class="wb-how-steps">
+              <div class="wb-how-step active" onclick="setStep(0)">
+                <span class="wb-step-num">01</span>
+                <div>
+                  <div class="wb-step-title">Conecta tu fuente</div>
+                  <div class="wb-step-desc">Pega una URL de API pública o arrastra un archivo JSON, CSV o XML. WebBuilder lo descarga y parsea automáticamente.</div>
+                </div>
+              </div>
+
+              <div class="wb-how-step" onclick="setStep(1)">
+                <span class="wb-step-num">02</span>
+                <div>
+                  <div class="wb-step-title">La IA analiza el schema</div>
+                  <div class="wb-step-desc">El LLM detecta los campos, infiere tipos y decide cuáles mostrar. Tú ajustas campo a campo antes de continuar.</div>
+                </div>
+              </div>
+
+              <div class="wb-how-step" onclick="setStep(2)">
+                <span class="wb-step-num">03</span>
+                <div>
+                  <div class="wb-step-title">Genera el proyecto</div>
+                  <div class="wb-step-desc">WebBuilder genera la base Django: modelos, vistas, templates y estilos adaptados al tipo de datos detectado.</div>
+                </div>
+              </div>
+
+              <div class="wb-how-step" onclick="setStep(3)">
+                <span class="wb-step-num">04</span>
+                <div>
+                  <div class="wb-step-title">Despliega con n8n</div>
+                  <div class="wb-step-desc">El flujo automatizado empaqueta el proyecto, construye la imagen Docker y lo despliega en un puerto disponible.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wb-how-right">
+          <div class="wb-flow-diagram">
+            <div class="wb-flow-label">Flujos n8n automatizados</div>
+
+            <div class="wb-flow-tabs">
+              <button type="button" class="wb-flow-tab active" data-flow="deploy">Deploy</button>
+              <button type="button" class="wb-flow-tab" data-flow="login">Login</button>
+              <button type="button" class="wb-flow-tab" data-flow="register">Register</button>
+            </div>
+
+            <div class="wb-flow-content active" id="flow-deploy">
+              <div class="wb-flow-nodes">
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /webbuilder-deploy</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">⌘</div><div class="wb-node-info"><div class="wb-node-name">Descomprimir Zip</div><div class="wb-node-detail">unzip → /files/deploys/{project}</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-docker">⬡</div><div class="wb-node-info"><div class="wb-node-name">Restablecer Contenedor</div><div class="wb-node-detail">docker stop · docker rm</div></div><span class="wb-node-badge wb-nb-docker">docker</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">⚙</div><div class="wb-node-info"><div class="wb-node-name">Elegir Puerto</div><div class="wb-node-detail">Escanea puertos 8100–8999</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-docker">⬡</div><div class="wb-node-info"><div class="wb-node-name">Docker Build</div><div class="wb-node-detail">docker build -t {name}:latest</div></div><span class="wb-node-badge wb-nb-docker">docker</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-docker">▶</div><div class="wb-node-info"><div class="wb-node-name">Docker Run</div><div class="wb-node-detail">docker run -p {port}:8000</div></div><span class="wb-node-badge wb-nb-docker">docker</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">✓</div><div class="wb-node-info"><div class="wb-node-name">Verificar Docker</div><div class="wb-node-detail">Espera 4s · comprueba estado</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-respond">→</div><div class="wb-node-info"><div class="wb-node-name">Respond to Webhook</div><div class="wb-node-detail">→ preview_url · container · port</div></div><span class="wb-node-badge wb-nb-ok">response</span></div>
+              </div>
+            </div>
+
+            <div class="wb-flow-content" id="flow-login">
+              <div class="wb-flow-nodes">
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /WebBuilder-Login</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-email">✉</div><div class="wb-node-info"><div class="wb-node-name">Send Email — Login</div><div class="wb-node-detail">Notifica IP · hora · dispositivo</div></div><span class="wb-node-badge wb-nb-email">email</span></div>
+              </div>
+            </div>
+
+            <div class="wb-flow-content" id="flow-register">
+              <div class="wb-flow-nodes">
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /WebBuilder-Register</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-email">✉</div><div class="wb-node-info"><div class="wb-node-name">Send Email — Bienvenida</div><div class="wb-node-detail">Correo de bienvenida al usuario</div></div><span class="wb-node-badge wb-nb-email">email</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- LLMS -->
+  <section id="llms" class="wb-section">
+    <div class="wb-container">
+      <div class="wb-header">
+        <div class="wb-section-eyebrow">Modelos</div>
+        <h2 class="wb-section-title">Elige tu <span class="muted">modelo de IA</span></h2>
+        <p class="wb-section-sub">Selecciona el LLM que genera tu proyecto. Cada modelo tiene sus fortalezas.</p>
+      </div>
+
+      <div class="wb-llm-layout">
+        <div class="wb-llm-list">
+          <div class="wb-llm-list-label">Modelos disponibles</div>
+
+          <div class="wb-llm-item active" data-panel="llm-gpt4o">
+            <div class="wb-llm-logo wb-logo-gpt">GPT</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">GPT-4o</div><div class="wb-llm-item-provider">OpenAI</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-item" data-panel="llm-claude">
+            <div class="wb-llm-logo wb-logo-claude">ANT</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Claude Sonnet 4</div><div class="wb-llm-item-provider">Anthropic</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-item" data-panel="llm-llama">
+            <div class="wb-llm-logo wb-logo-llama">LLM</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Llama 3.3 70B</div><div class="wb-llm-item-provider">Meta · Groq</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-item" data-panel="llm-gemini">
+            <div class="wb-llm-logo wb-logo-gemini">GEM</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Gemini 2.5 Pro</div><div class="wb-llm-item-provider">Google</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-item" data-panel="llm-qwen">
+            <div class="wb-llm-logo wb-logo-qwen">QWN</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Qwen3 32B</div><div class="wb-llm-item-provider">Alibaba · Groq</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-sep-title">Personalizado</div>
+
+          <div class="wb-llm-custom" data-panel="llm-custom">
+            <div class="wb-llm-custom-icon">API</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Conecta tu modelo</div><div class="wb-llm-item-provider">OpenRouter · Groq · Ollama</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="wb-llm-detail active" id="llm-gpt4o">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">🤖</div>
+            <div>
+              <div class="wb-llm-detail-name">GPT-4o</div>
+              <div class="wb-llm-detail-model">gpt-4o · OpenAI</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-quality">alta calidad</span>
+                <span class="wb-llm-tag tag-code">código</span>
+                <span class="wb-llm-tag tag-speed">rápido</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">El modelo más equilibrado de OpenAI. Destaca en generación de código estructurado, comprensión de schemas complejos y seguimiento de instrucciones detalladas.</p>
+          <div class="wb-llm-section-title">Especificaciones</div>
+          <div class="wb-llm-specs-grid">
+            <div class="wb-llm-spec"><div class="wb-llm-spec-label">Contexto</div><div class="wb-llm-spec-value">128K tokens</div></div>
+            <div class="wb-llm-spec"><div class="wb-llm-spec-label">Velocidad</div><div class="wb-llm-spec-value">Alta</div></div>
+            <div class="wb-llm-spec"><div class="wb-llm-spec-label">Proveedor</div><div class="wb-llm-spec-value">OpenAI API</div></div>
+            <div class="wb-llm-spec"><div class="wb-llm-spec-label">Coste</div><div class="wb-llm-spec-value">De pago</div></div>
+          </div>
+        </div>
+
+        <div class="wb-llm-detail" id="llm-claude">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">◆</div>
+            <div>
+              <div class="wb-llm-detail-name">Claude Sonnet 4</div>
+              <div class="wb-llm-detail-model">claude-sonnet-4 · Anthropic</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-reason">razonamiento</span>
+                <span class="wb-llm-tag tag-code">código</span>
+                <span class="wb-llm-tag tag-quality">preciso</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">Muy fuerte en comprensión de APIs, inferencia de tipos de datos y generación de código Python/Django limpio.</p>
+        </div>
+
+        <div class="wb-llm-detail" id="llm-llama">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">🦙</div>
+            <div>
+              <div class="wb-llm-detail-name">Llama 3.3 70B</div>
+              <div class="wb-llm-detail-model">llama-3.3-70b-versatile · Meta via Groq</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-free">gratuito</span>
+                <span class="wb-llm-tag tag-speed">muy rápido</span>
+                <span class="wb-llm-tag tag-code">open source</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">Una opción open source muy rápida para una generación económica y con buena latencia.</p>
+        </div>
+
+        <div class="wb-llm-detail" id="llm-gemini">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">✦</div>
+            <div>
+              <div class="wb-llm-detail-name">Gemini 2.5 Pro</div>
+              <div class="wb-llm-detail-model">gemini-2.5-pro · Google</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-reason">razonamiento</span>
+                <span class="wb-llm-tag tag-quality">multimodal</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">Especialmente útil cuando hay datasets largos o estructuras amplias que necesitan mucho contexto.</p>
+        </div>
+
+        <div class="wb-llm-detail" id="llm-qwen">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">🔷</div>
+            <div>
+              <div class="wb-llm-detail-name">Qwen3 32B</div>
+              <div class="wb-llm-detail-model">qwen/qwen3-32b · Alibaba via Groq</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-free">gratuito</span>
+                <span class="wb-llm-tag tag-reason">thinking</span>
+                <span class="wb-llm-tag tag-speed">rápido</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">Buena relación calidad/coste y buen razonamiento para generar templates coherentes.</p>
+        </div>
+
+        <div class="wb-llm-custom-detail" id="llm-custom">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo wb-dashed">API</div>
+            <div>
+              <div class="wb-llm-detail-name">Conecta tu modelo</div>
+              <div class="wb-llm-detail-model">Compatible con OpenRouter y Groq</div>
+            </div>
+          </div>
+
+          <p class="wb-custom-note">WebBuilder es compatible con APIs estilo OpenAI. Pega tu clave y el modelo que quieras usar.</p>
+
+          <div class="wb-provider-tabs">
+            <button type="button" class="wb-provider-tab active" data-provider="openrouter">OpenRouter</button>
+            <button type="button" class="wb-provider-tab" data-provider="groq">Groq</button>
+            <button type="button" class="wb-provider-tab" data-provider="ollama">Ollama / Local</button>
+          </div>
+
+          <div class="wb-provider-fields active" id="fields-openrouter">
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">API Key</div>
+              <input class="wb-custom-input" type="password" placeholder="sk-or-v1-...">
+            </div>
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">Modelo</div>
+              <input class="wb-custom-input" type="text" placeholder="meta-llama/llama-3.3-70b-instruct">
+            </div>
+          </div>
+
+          <div class="wb-provider-fields" id="fields-groq">
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">API Key</div>
+              <input class="wb-custom-input" type="password" placeholder="gsk_...">
+            </div>
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">Modelo</div>
+              <input class="wb-custom-input" type="text" placeholder="llama-3.3-70b-versatile">
+            </div>
+          </div>
+
+          <div class="wb-provider-fields" id="fields-ollama">
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">URL del servidor</div>
+              <input class="wb-custom-input" type="text" placeholder="http://localhost:11434">
+            </div>
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">Modelo</div>
+              <input class="wb-custom-input" type="text" placeholder="llama3.2, mistral, gemma3...">
+            </div>
+          </div>
+
+          <button class="wb-custom-save">Guardar y usar este modelo →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MÉTRICAS -->
+  <section id="metrics" class="wb-section wb-metrics-section">
+    <div class="wb-container">
+      <div class="wb-metrics-row">
+        <div class="wb-metric-item"><div class="wb-metric-value">5+</div><div class="wb-metric-label">modelos de IA</div></div>
+        <div class="wb-metric-item"><div class="wb-metric-value">&lt;30s</div><div class="wb-metric-label">tiempo de generación</div></div>
+        <div class="wb-metric-item"><div class="wb-metric-value">3</div><div class="wb-metric-label">flujos n8n automatizados</div></div>
+        <div class="wb-metric-item"><div class="wb-metric-value">Django 5</div><div class="wb-metric-label">framework de salida</div></div>
+        <div class="wb-metric-item"><div class="wb-metric-value">100%</div><div class="wb-metric-label">proyectos ejecutables</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta" class="wb-section">
+    <div class="wb-container wb-cta-center">
+      <h2 class="wb-cta-title">Empieza con <span class="muted">tu primera API</span></h2>
+      <p class="wb-cta-sub">Sin configuración. Sin código. Solo una URL.</p>
+      <a href="{% url 'assistant' %}" class="wb-cta-btn">Empezar ahora →</a>
+    </div>
+  </section>
+
+  <footer class="wb-footer">
+    <span class="wb-footer-left">WebBuilder · TFG 2025</span>
+    <div class="wb-footer-links">
+      <a class="wb-footer-link" href="#">Documentación</a>
+      <a class="wb-footer-link" href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a class="wb-footer-link" href="#examples">Ejemplos</a>
+    </div>
+  </footer>
+
+</div>
+
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}

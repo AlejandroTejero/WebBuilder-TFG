@@ -1,0 +1,198 @@
+  <!-- LLMS -->
+  <section id="llms" class="wb-section">
+    <div class="wb-container">
+      <div class="wb-header">
+        <div class="wb-section-eyebrow">Modelos</div>
+        <h2 class="wb-section-title">Elige tu <span class="muted">modelo de IA</span></h2>
+        <p class="wb-section-sub">Selecciona el LLM que genera tu proyecto. Cada modelo tiene sus fortalezas.</p>
+      </div>
+
+      <div class="wb-llm-layout">
+        <div class="wb-llm-list">
+          <div class="wb-llm-list-label">Modelos disponibles</div>
+
+          <div class="wb-llm-item active" data-panel="llm-gpt4o">
+            <div class="wb-llm-logo wb-logo-gpt">GPT</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">GPT-4o</div><div class="wb-llm-item-provider">OpenAI</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-item" data-panel="llm-claude">
+            <div class="wb-llm-logo wb-logo-claude">ANT</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Claude Sonnet 4</div><div class="wb-llm-item-provider">Anthropic</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-item" data-panel="llm-llama">
+            <div class="wb-llm-logo wb-logo-llama">LLM</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Llama 3.3 70B</div><div class="wb-llm-item-provider">Meta · Groq</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-item" data-panel="llm-gemini">
+            <div class="wb-llm-logo wb-logo-gemini">GEM</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Gemini 2.5 Pro</div><div class="wb-llm-item-provider">Google</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-item" data-panel="llm-qwen">
+            <div class="wb-llm-logo wb-logo-qwen">QWN</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Qwen3 32B</div><div class="wb-llm-item-provider">Alibaba · Groq</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+
+          <div class="wb-llm-sep-title">Personalizado</div>
+
+          <div class="wb-llm-custom" data-panel="llm-custom">
+            <div class="wb-llm-custom-icon">API</div>
+            <div class="wb-llm-item-info"><div class="wb-llm-item-name">Conecta tu modelo</div><div class="wb-llm-item-provider">OpenRouter · Groq · Ollama</div></div>
+            <span class="wb-llm-item-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="wb-llm-detail active" id="llm-gpt4o">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">🤖</div>
+            <div>
+              <div class="wb-llm-detail-name">GPT-4o</div>
+              <div class="wb-llm-detail-model">gpt-4o · OpenAI</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-quality">alta calidad</span>
+                <span class="wb-llm-tag tag-code">código</span>
+                <span class="wb-llm-tag tag-speed">rápido</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">El modelo más equilibrado de OpenAI. Destaca en generación de código estructurado, comprensión de schemas complejos y seguimiento de instrucciones detalladas.</p>
+          <div class="wb-llm-section-title">Especificaciones</div>
+          <div class="wb-llm-specs-grid">
+            <div class="wb-llm-spec"><div class="wb-llm-spec-label">Contexto</div><div class="wb-llm-spec-value">128K tokens</div></div>
+            <div class="wb-llm-spec"><div class="wb-llm-spec-label">Velocidad</div><div class="wb-llm-spec-value">Alta</div></div>
+            <div class="wb-llm-spec"><div class="wb-llm-spec-label">Proveedor</div><div class="wb-llm-spec-value">OpenAI API</div></div>
+            <div class="wb-llm-spec"><div class="wb-llm-spec-label">Coste</div><div class="wb-llm-spec-value">De pago</div></div>
+          </div>
+        </div>
+
+        <div class="wb-llm-detail" id="llm-claude">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">◆</div>
+            <div>
+              <div class="wb-llm-detail-name">Claude Sonnet 4</div>
+              <div class="wb-llm-detail-model">claude-sonnet-4 · Anthropic</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-reason">razonamiento</span>
+                <span class="wb-llm-tag tag-code">código</span>
+                <span class="wb-llm-tag tag-quality">preciso</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">Muy fuerte en comprensión de APIs, inferencia de tipos de datos y generación de código Python/Django limpio.</p>
+        </div>
+
+        <div class="wb-llm-detail" id="llm-llama">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">🦙</div>
+            <div>
+              <div class="wb-llm-detail-name">Llama 3.3 70B</div>
+              <div class="wb-llm-detail-model">llama-3.3-70b-versatile · Meta via Groq</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-free">gratuito</span>
+                <span class="wb-llm-tag tag-speed">muy rápido</span>
+                <span class="wb-llm-tag tag-code">open source</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">Una opción open source muy rápida para una generación económica y con buena latencia.</p>
+        </div>
+
+        <div class="wb-llm-detail" id="llm-gemini">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">✦</div>
+            <div>
+              <div class="wb-llm-detail-name">Gemini 2.5 Pro</div>
+              <div class="wb-llm-detail-model">gemini-2.5-pro · Google</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-reason">razonamiento</span>
+                <span class="wb-llm-tag tag-quality">multimodal</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">Especialmente útil cuando hay datasets largos o estructuras amplias que necesitan mucho contexto.</p>
+        </div>
+
+        <div class="wb-llm-detail" id="llm-qwen">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo">🔷</div>
+            <div>
+              <div class="wb-llm-detail-name">Qwen3 32B</div>
+              <div class="wb-llm-detail-model">qwen/qwen3-32b · Alibaba via Groq</div>
+              <div class="wb-llm-detail-tags">
+                <span class="wb-llm-tag tag-free">gratuito</span>
+                <span class="wb-llm-tag tag-reason">thinking</span>
+                <span class="wb-llm-tag tag-speed">rápido</span>
+              </div>
+            </div>
+          </div>
+          <div class="wb-llm-section-title">Descripción</div>
+          <p class="wb-llm-overview">Buena relación calidad/coste y buen razonamiento para generar templates coherentes.</p>
+        </div>
+
+        <div class="wb-llm-custom-detail" id="llm-custom">
+          <div class="wb-llm-detail-head">
+            <div class="wb-llm-detail-logo wb-dashed">API</div>
+            <div>
+              <div class="wb-llm-detail-name">Conecta tu modelo</div>
+              <div class="wb-llm-detail-model">Compatible con OpenRouter y Groq</div>
+            </div>
+          </div>
+
+          <p class="wb-custom-note">WebBuilder es compatible con APIs estilo OpenAI. Pega tu clave y el modelo que quieras usar.</p>
+
+          <div class="wb-provider-tabs">
+            <button type="button" class="wb-provider-tab active" data-provider="openrouter">OpenRouter</button>
+            <button type="button" class="wb-provider-tab" data-provider="groq">Groq</button>
+            <button type="button" class="wb-provider-tab" data-provider="ollama">Ollama / Local</button>
+          </div>
+
+          <div class="wb-provider-fields active" id="fields-openrouter">
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">API Key</div>
+              <input class="wb-custom-input" type="password" placeholder="sk-or-v1-...">
+            </div>
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">Modelo</div>
+              <input class="wb-custom-input" type="text" placeholder="meta-llama/llama-3.3-70b-instruct">
+            </div>
+          </div>
+
+          <div class="wb-provider-fields" id="fields-groq">
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">API Key</div>
+              <input class="wb-custom-input" type="password" placeholder="gsk_...">
+            </div>
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">Modelo</div>
+              <input class="wb-custom-input" type="text" placeholder="llama-3.3-70b-versatile">
+            </div>
+          </div>
+
+          <div class="wb-provider-fields" id="fields-ollama">
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">URL del servidor</div>
+              <input class="wb-custom-input" type="text" placeholder="http://localhost:11434">
+            </div>
+            <div class="wb-custom-input-wrap">
+              <div class="wb-custom-label">Modelo</div>
+              <input class="wb-custom-input" type="text" placeholder="llama3.2, mistral, gemma3...">
+            </div>
+          </div>
+
+          <button class="wb-custom-save">Guardar y usar este modelo →</button>
+        </div>
+      </div>
+    </div>
+  </section>

@@ -28,6 +28,14 @@
 ## Casos de uso para la memoria
 - Pensar tres casos de uso que se expondran en la defensa - Tienda operativa, Peridico informativo, otro mas.
 
+## Modo oscuro / claro - Idiomas
+- La pagina esta creada en modo oscuro, tener la posibilidad de poner modo claro 
+- Intentar poner boton de cambio de idioma
+
+## Login con credenciales de google
+- Que exista la posibilidad de poder iniciar sesion con google u otros mecanismos conocidos.
+
+
 
 # Posibles implementaciones
 

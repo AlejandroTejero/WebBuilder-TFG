@@ -1,0 +1,98 @@
+  <!-- HOW -->
+  <section class="wb-section">
+    <div class="wb-container">
+      <div id="how-section" class="wb-how">
+
+        <div class="wb-how-left-wrap">
+          <div class="wb-how-left">
+            <div class="wb-section-eyebrow">Proceso</div>
+            <h2 class="wb-section-title">Cómo <span class="muted">funciona</span></h2>
+            <p class="wb-section-sub">Cuatro pasos entre tu fuente de datos y un proyecto Django listo para ejecutar.</p>
+
+            <div class="wb-how-steps">
+              <div class="wb-how-step active" onclick="setStep(0)">
+                <span class="wb-step-num">01</span>
+                <div>
+                  <div class="wb-step-title">Conecta tu fuente</div>
+                  <div class="wb-step-desc">Pega una URL de API pública o arrastra un archivo JSON, CSV o XML. WebBuilder lo descarga y parsea automáticamente.</div>
+                </div>
+              </div>
+
+              <div class="wb-how-step" onclick="setStep(1)">
+                <span class="wb-step-num">02</span>
+                <div>
+                  <div class="wb-step-title">La IA analiza el schema</div>
+                  <div class="wb-step-desc">El LLM detecta los campos, infiere tipos y decide cuáles mostrar. Tú ajustas campo a campo antes de continuar.</div>
+                </div>
+              </div>
+
+              <div class="wb-how-step" onclick="setStep(2)">
+                <span class="wb-step-num">03</span>
+                <div>
+                  <div class="wb-step-title">Genera el proyecto</div>
+                  <div class="wb-step-desc">WebBuilder genera la base Django: modelos, vistas, templates y estilos adaptados al tipo de datos detectado.</div>
+                </div>
+              </div>
+
+              <div class="wb-how-step" onclick="setStep(3)">
+                <span class="wb-step-num">04</span>
+                <div>
+                  <div class="wb-step-title">Despliega con n8n</div>
+                  <div class="wb-step-desc">El flujo automatizado empaqueta el proyecto, construye la imagen Docker y lo despliega en un puerto disponible.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wb-how-right">
+          <div class="wb-flow-diagram">
+            <div class="wb-flow-label">Flujos n8n automatizados</div>
+
+            <div class="wb-flow-tabs">
+              <button type="button" class="wb-flow-tab active" data-flow="deploy">Deploy</button>
+              <button type="button" class="wb-flow-tab" data-flow="login">Login</button>
+              <button type="button" class="wb-flow-tab" data-flow="register">Register</button>
+            </div>
+
+            <div class="wb-flow-content active" id="flow-deploy">
+              <div class="wb-flow-nodes">
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /webbuilder-deploy</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">⌘</div><div class="wb-node-info"><div class="wb-node-name">Descomprimir Zip</div><div class="wb-node-detail">unzip → /files/deploys/{project}</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-docker">⬡</div><div class="wb-node-info"><div class="wb-node-name">Restablecer Contenedor</div><div class="wb-node-detail">docker stop · docker rm</div></div><span class="wb-node-badge wb-nb-docker">docker</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">⚙</div><div class="wb-node-info"><div class="wb-node-name">Elegir Puerto</div><div class="wb-node-detail">Escanea puertos 8100–8999</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-docker">⬡</div><div class="wb-node-info"><div class="wb-node-name">Docker Build</div><div class="wb-node-detail">docker build -t {name}:latest</div></div><span class="wb-node-badge wb-nb-docker">docker</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-docker">▶</div><div class="wb-node-info"><div class="wb-node-name">Docker Run</div><div class="wb-node-detail">docker run -p {port}:8000</div></div><span class="wb-node-badge wb-nb-docker">docker</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">✓</div><div class="wb-node-info"><div class="wb-node-name">Verificar Docker</div><div class="wb-node-detail">Espera 4s · comprueba estado</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-respond">→</div><div class="wb-node-info"><div class="wb-node-name">Respond to Webhook</div><div class="wb-node-detail">→ preview_url · container · port</div></div><span class="wb-node-badge wb-nb-ok">response</span></div>
+              </div>
+            </div>
+
+            <div class="wb-flow-content" id="flow-login">
+              <div class="wb-flow-nodes">
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /WebBuilder-Login</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-email">✉</div><div class="wb-node-info"><div class="wb-node-name">Send Email — Login</div><div class="wb-node-detail">Notifica IP · hora · dispositivo</div></div><span class="wb-node-badge wb-nb-email">email</span></div>
+              </div>
+            </div>
+
+            <div class="wb-flow-content" id="flow-register">
+              <div class="wb-flow-nodes">
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /WebBuilder-Register</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
+                <div class="wb-flow-connector"></div>
+                <div class="wb-flow-node"><div class="wb-node-icon wb-ni-email">✉</div><div class="wb-node-info"><div class="wb-node-name">Send Email — Bienvenida</div><div class="wb-node-detail">Correo de bienvenida al usuario</div></div><span class="wb-node-badge wb-nb-email">email</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
