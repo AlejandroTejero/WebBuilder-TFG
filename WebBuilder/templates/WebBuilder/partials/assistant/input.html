@@ -5,10 +5,17 @@
     <p class="asst-card__subtitle">Soporta JSON y XML. La IA analizará la estructura y generará el schema automáticamente.</p>
   </div>
 
-  <form method="post" class="asst-form" id="form-analyze">
+  <form method="post" class="asst-form" id="form-analyze" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="asst-field">
+      <div class="asst-input-toggle">
+        <button type="button" class="asst-toggle-btn active" id="btn-mode-url" onclick="switchInputMode('url')">🔗 URL</button>
+        <button type="button" class="asst-toggle-btn" id="btn-mode-file" onclick="switchInputMode('file')">📂 Fichero</button>
+      </div>
+    </div>
+
+    <div class="asst-field" id="field-url">
       <label class="asst-label" for="{{ form.api_url.id_for_label }}">URL de la API</label>
       <div class="asst-input-group">
         <span class="asst-input-icon">🔗</span>
@@ -24,6 +31,17 @@
         <button type="button" class="asst-example-chip" onclick="fillUrl('https://www.w3schools.com/xml/plant_catalog.xml')">Plant Catalog XML</button>
         <button type="button" class="asst-example-chip" onclick="fillUrl('https://fakestoreapi.com/products')">Products JSON</button>
       </div>
+    </div>
+
+    <div class="asst-field" id="field-file" style="display:none;">
+      <label class="asst-label" for="{{ form.file_input.id_for_label }}">Fichero JSON o XML</label>
+      <div class="asst-input-group">
+        <span class="asst-input-icon">📂</span>
+        {{ form.file_input }}
+      </div>
+      {% if form.file_input.errors %}
+        <div class="asst-field-error">{{ form.file_input.errors }}</div>
+      {% endif %}
     </div>
 
     <div class="asst-field">

@@ -1,7 +1,7 @@
 from .auth import register
 from .pages import home
 from .assistant import assistant
-from .history import history
+from .history import history, history_analysis, history_sites, delete_analysis, delete_site
 from .edit import edit
 from .site import (
     site_render,
@@ -18,6 +18,8 @@ __all__ = [
     "home",
     "assistant",
     "history",
+	"history_analysis",
+    "history_sites",
     "edit",
     "site_render",
     "site_generate",
@@ -26,4 +28,6 @@ __all__ = [
     "site_deploy",
     "site_deploy_status",
 	"site_update_file",
+	"delete_analysis",
+	"delete_site",
 ]

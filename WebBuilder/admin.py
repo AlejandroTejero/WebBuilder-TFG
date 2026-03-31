@@ -17,8 +17,8 @@ from .models import APIRequest, GeneratedSite, GenerationLog
 # ══════════════════════════════════════════════════════════════════
 admin.site.site_header  = "WebBuilder Admin"
 admin.site.site_title   = "WebBuilder"
-admin.site.index_title  = "Panel de administración"
-
+# admin.site.index_title  = "Panel de administración"
+admin.site.index_title  = "Panel de administración — Métricas: /admin/metricas/"
 
 # ══════════════════════════════════════════════════════════════════
 # Utils
@@ -363,3 +363,78 @@ class CustomUserAdmin(UserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(GenerationLog)
+
+
+class GenerationLogAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "step",
+        "llm_model",
+        "site_link",
+        "had_retry_badge",
+        "consistency_errors_count",
+        "created_at",
+    )
+
+    list_filter  = ("step", "llm_model", "had_retry", "created_at")
+    search_fields = ("step", "llm_model", "site__project_name")
+    ordering     = ("-created_at",)
+    list_per_page = 50
+
+    fieldsets = (
+        ("Identificación", {
+            "fields": ("site", "step", "llm_model", "had_retry", "created_at"),
+        }),
+        ("Prompts", {
+            "classes": ("collapse",),
+            "fields": ("system_prompt_pretty", "user_prompt_pretty"),
+        }),
+        ("Respuesta", {
+            "classes": ("collapse",),
+            "fields": ("raw_output_pretty",),
+        }),
+        ("Errores de consistencia", {
+            "classes": ("collapse",),
+            "fields": ("consistency_errors_pretty",),
+        }),
+    )
+
+    readonly_fields = (
+        "created_at", "site_link", "had_retry_badge",
+        "consistency_errors_count", "consistency_errors_pretty",
+        "system_prompt_pretty", "user_prompt_pretty", "raw_output_pretty",
+    )
+
+    exclude = ("system_prompt", "user_prompt", "raw_output", "consistency_errors")
+
+    @admin.display(description="Sitio")
+    def site_link(self, obj):
+        url = reverse("admin:WebBuilder_generatedsite_change", args=[obj.site.id])
+        name = obj.site.project_name or f"#{obj.site.id}"
+        return format_html("<a href='{}'>{}</a>", url, name)
+
+    @admin.display(description="Reintento")
+    def had_retry_badge(self, obj):
+        return _badge("✓ sí", "orange") if obj.had_retry else _badge("no", "gray")
+
+    @admin.display(description="Errores")
+    def consistency_errors_count(self, obj):
+        count = len(obj.consistency_errors or [])
+        return _badge(str(count), "red") if count else _badge("0", "green")
+
+    @admin.display(description="System prompt")
+    def system_prompt_pretty(self, obj):
+        return _pre(obj.system_prompt or "—")
+
+    @admin.display(description="User prompt")
+    def user_prompt_pretty(self, obj):
+        return _pre(obj.user_prompt or "—")
+
+    @admin.display(description="Raw output")
+    def raw_output_pretty(self, obj):
+        return _pre(obj.raw_output or "—")
+
+    @admin.display(description="Errores de consistencia")
+    def consistency_errors_pretty(self, obj):
+        return _pre(_pretty_json(obj.consistency_errors)) if obj.consistency_errors else "—"

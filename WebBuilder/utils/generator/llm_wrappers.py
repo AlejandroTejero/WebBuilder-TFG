@@ -57,7 +57,7 @@ def llm_call_logged(
 
     if site is not None:
         try:
-            from ..models import GenerationLog
+            from ...models import GenerationLog
             from django.conf import settings
             GenerationLog.objects.create(
                 site=site,

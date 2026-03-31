@@ -8,6 +8,12 @@ class APIRequest(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='api_requests')   # Usuario dueño
     api_url = models.URLField("URL de la API")                                              # URL introducida
+    input_type = models.CharField(
+        max_length=10,
+        choices=[("url", "URL"), ("file", "Fichero")],
+        default="url",
+    )   
+
     date = models.DateTimeField(auto_now_add=True)                                          # Fecha del análisis
     raw_data = models.TextField(blank=True, null=True)                                      # Datos en crudo (raw)
     parsed_data = models.JSONField(blank=True, null=True)                                   # Datos parseados

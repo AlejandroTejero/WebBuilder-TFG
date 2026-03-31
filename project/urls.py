@@ -17,7 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from WebBuilder.views.metrics import metrics_view
+
+
 urlpatterns = [
+	
+    path('admin/metricas/', metrics_view, name='admin_metrics'),
+
     path('admin/', admin.site.urls),
     path('', include('WebBuilder.urls')),
 ]

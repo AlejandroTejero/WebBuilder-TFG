@@ -7,7 +7,7 @@
   --wb-border-md: rgba(255,255,255,0.12);
   --wb-t1: rgba(255,255,255,0.90);
   --wb-t2: rgba(255,255,255,0.55);
-  --wb-t3: rgba(255, 255, 255, 0.39);
+  --wb-t3: rgba(255,255,255,0.28);
   --wb-t4: rgba(255,255,255,0.12);
   --wb-mono: 'Geist Mono', 'Fira Code', monospace;
 
@@ -103,6 +103,55 @@ body {
 @keyframes wbFadeUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SCROLL ANIMATIONS ── */
+.wb-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.wb-reveal.wb-reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wb-reveal-left {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.wb-reveal-left.wb-reveal--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.wb-reveal-right {
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.wb-reveal-right.wb-reveal--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* delays encadenados para listas */
+.wb-reveal-d1 { transition-delay: 0.08s; }
+.wb-reveal-d2 { transition-delay: 0.16s; }
+.wb-reveal-d3 { transition-delay: 0.24s; }
+.wb-reveal-d4 { transition-delay: 0.32s; }
+.wb-reveal-d5 { transition-delay: 0.40s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wb-reveal, .wb-reveal-left, .wb-reveal-right {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 @media (max-width: 768px) {

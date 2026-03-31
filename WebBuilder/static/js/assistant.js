@@ -23,6 +23,25 @@ function fillPrompt(text) {
   }
 }
 
+function switchInputMode(mode) {
+    const fieldUrl = document.getElementById('field-url') // necesitamos añadir este id
+    const fieldFile = document.getElementById('field-file')
+    const btnUrl = document.getElementById('btn-mode-url')
+    const btnFile = document.getElementById('btn-mode-file')
+
+    if (mode === 'url') {
+        fieldUrl.style.display = 'block'
+        fieldFile.style.display = 'none'
+        btnUrl.classList.add('active')
+        btnFile.classList.remove('active')
+    } else {
+        fieldUrl.style.display = 'none'
+        fieldFile.style.display = 'block'
+        btnUrl.classList.remove('active')
+        btnFile.classList.add('active')
+    }
+}
+
 /**
  * Muestra el overlay de carga y anima los pasos secuencialmente.
  * Se llama desde el onclick del botón de submit.

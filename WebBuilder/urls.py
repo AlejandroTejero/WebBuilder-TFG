@@ -6,9 +6,14 @@ from .views.auth import WebBuilderLoginView
 urlpatterns = [
     path("", views.home, name="home"),
     path("asistente", views.assistant, name="assistant"),
+
     path("historial", views.history, name="history"),
+    path("historial/analisis", views.history_analysis, name="history_analysis"),
+    path("historial/sitios", views.history_sites, name="history_sites"),
+    path("historial/eliminar/<int:api_request_id>", views.delete_analysis, name="delete_analysis"),
+    path("historial/sitios/eliminar/<int:site_id>", views.delete_site, name="delete_site"),
 	
-	#path("login", LoginView.as_view(), name="login"),
+    #path("login", LoginView.as_view(), name="login"),
     path("login", WebBuilderLoginView.as_view(), name="login"),
     path("logout", LogoutView.as_view(), name="logout"),
     path("registro", views.register, name="register"),

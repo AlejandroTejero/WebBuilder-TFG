@@ -22,6 +22,17 @@ def validate_url(api_url: str) -> None:
         raise ValueError("La URL debe empezar por http:// o https://.")
 
 
+# ========================== LECTURA DE FICHERO ==========================
+
+def read_file(file_obj, *, max_bytes: int = MAX_BYTES) -> tuple[str, str]:
+    raw_bytes = file_obj.read(max_bytes + 1)
+    if len(raw_bytes) > max_bytes:
+        raise ValueError(f"Fichero demasiado grande. Límite {max_bytes} bytes.")
+    
+    raw_text = raw_bytes.decode("utf-8", errors="replace")
+    summary = f"Fichero subido. {len(raw_text)} caracteres. ({len(raw_bytes)} bytes)"
+    return raw_text, summary
+
 # ========================== DESCARGA + TEXTO CRUDO -> CONTROLADO ==========================
 
 # Validamos la url, decargamos contenido en raw
@@ -78,3 +89,4 @@ def fetch_url(api_url: str, *, timeout: int = DEFAULT_TIMEOUT, max_bytes: int = 
 # Devuelve una previsualización truncada del texto de los 600 primeros CARACTERES
 def make_preview(raw_text: str, max_chars: int = 600) -> str:
     return raw_text[:max_chars]
+

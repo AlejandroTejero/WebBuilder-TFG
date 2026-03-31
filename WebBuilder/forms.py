@@ -38,6 +38,14 @@ class APIRequestForm(forms.ModelForm):
         })
     )
 
+    file_input = forms.FileField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            "class": "form-control",
+            "accept": ".json,.xml",
+        })
+    )
+
     class Meta:
         model = APIRequest
         fields = ["api_url"]
@@ -50,3 +58,4 @@ class APIRequestForm(forms.ModelForm):
         labels = {
             "api_url": ""
         }
+        fields = ["api_url", "file_input"]

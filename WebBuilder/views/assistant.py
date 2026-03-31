@@ -31,7 +31,7 @@ from datetime import timedelta
 
 from ..forms import APIRequestForm
 from ..models import APIRequest
-from ..utils.ingest.url_reader import fetch_url
+from ..utils.ingest.url_reader import fetch_url, read_file
 from ..utils.ingest.parsers import parse_raw, summarize_data
 from ..utils.analysis import build_analysis
 from ..utils.analysis.helpers import get_by_path
@@ -355,9 +355,16 @@ def analyze_url(request):
         api_url=api_url,
         status="pending",
     )
+    uploaded_file = request.FILES.get("file_input")
 
     try:
-        raw_text, fetch_summary = fetch_url(api_url)
+        if uploaded_file:
+            raw_text, fetch_summary = read_file(uploaded_file)
+            api_request_obj.input_type = "file"
+        else:
+            raw_text, fetch_summary = fetch_url(api_url)
+            api_request_obj.input_type = "url"
+
         fmt, parsed_payload = parse_raw(raw_text)
 
         analysis_result = build_analysis(parsed_payload, raw_text=raw_text)
