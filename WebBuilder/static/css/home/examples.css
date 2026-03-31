@@ -6,8 +6,10 @@
 .wb-carousel-wrap {
   overflow: hidden;
   position: relative;
-  margin: 0 -40px;
-  padding: 0 40px;
+  padding: 0 60px;
+  /* Longitud cards */
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .wb-carousel-wrap::before,
@@ -16,7 +18,8 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 80px;
+  /* Difuminado */ 
+  width: 150px;
   z-index: 2;
   pointer-events: none;
 }
@@ -29,6 +32,26 @@
 .wb-carousel-wrap::after {
   right: 0;
   background: linear-gradient(to left, var(--wb-bg), transparent);
+}
+
+@media (max-width: 1024px) {
+  .wb-carousel-wrap {
+    padding: 0 40px;
+  }
+  .wb-carousel-wrap::before,
+  .wb-carousel-wrap::after {
+    width: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .wb-carousel-wrap {
+    padding: 0 20px;
+  }
+  .wb-carousel-wrap::before,
+  .wb-carousel-wrap::after {
+    width: 40px;
+  }
 }
 
 .wb-carousel-track {
@@ -53,7 +76,8 @@
   border-radius: 8px;
   overflow: hidden;
   transition: border-color .18s, transform .18s;
-  width: 240px;
+  /* Ancho card */
+  width: 300px;
   flex-shrink: 0;
 }
 
@@ -64,7 +88,8 @@
 
 .wb-example-thumb {
   width: 100%;
-  height: 260px;
+  /* Alto card */ 
+  height: 300px;
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--wb-border);
