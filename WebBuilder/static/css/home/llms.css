@@ -51,8 +51,8 @@
 
 .wb-llm-item.active,
 .wb-llm-custom.active {
-  background: rgba(255,255,255,0.04);
-  border-left-color: rgba(255,255,255,0.25);
+  background: var(--wb-bg-3);
+  border-left-color: var(--wb-border-md);
 }
 
 .wb-llm-logo,
@@ -79,7 +79,7 @@
 
 .wb-llm-custom-icon {
   border-style: dashed;
-  border-color: rgba(255,255,255,0.2);
+  border-color: var(--wb-border-md);
   color: var(--wb-t2);
 }
 
@@ -149,7 +149,7 @@
 .wb-llm-detail-name {
   font-size: 22px;
   font-weight: 600;
-  color: #fff;
+  color: var(--wb-title);
   letter-spacing: -0.02em;
   margin-bottom: 4px;
 }
@@ -177,7 +177,7 @@
 .tag-speed { background: rgba(251,191,36,0.08); color: rgba(251,191,36,0.6); }
 .tag-quality { background: rgba(74,222,128,0.08); color: rgba(74,222,128,0.6); }
 .tag-code { background: rgba(96,165,250,0.08); color: rgba(96,165,250,0.6); }
-.tag-free { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+.tag-free { background: var(--wb-bg-3); color: var(--wb-t3); }
 .tag-reason { background: rgba(167,139,250,0.08); color: rgba(167,139,250,0.6); }
 
 .wb-llm-section-title {
@@ -292,8 +292,8 @@
 .wb-custom-save {
   font-size: 12px;
   font-weight: 500;
-  background: rgba(255,255,255,0.88);
-  color: #0e0e10;
+  background: var(--wb-title);
+  color: var(--wb-bg);
   padding: 8px 18px;
   border-radius: 5px;
   cursor: pointer;

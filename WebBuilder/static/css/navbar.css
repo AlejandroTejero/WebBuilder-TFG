@@ -629,3 +629,34 @@ body {
   outline: 2px solid green;
 }
 */
+
+
+/* ── BOTON DARK/LIGHT MODE ── */
+.wb-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
+.wb-theme-toggle:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.15);
+}
+
+:root.light .wb-theme-toggle {
+  border-color: rgba(0,0,0,0.1);
+}
+
+:root.light .wb-theme-toggle:hover {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.2);
+}

@@ -40,7 +40,7 @@
 
 .wb-how-step.active .wb-step-num,
 .wb-how-step.active .wb-step-title {
-  color: #fff;
+  color: var(--wb-title);
 }
 
 .wb-step-num {

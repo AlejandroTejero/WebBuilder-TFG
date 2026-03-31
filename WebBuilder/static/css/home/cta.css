@@ -12,7 +12,7 @@
   font-size: clamp(32px, 4vw, 52px);
   font-weight: 600;
   letter-spacing: -0.03em;
-  color: #fff;
+  color: var(--wb-title);
   margin-bottom: 16px;
 }
 
@@ -26,8 +26,8 @@
 .wb-cta-btn {
   font-size: 12px;
   font-weight: 500;
-  background: #fff;
-  color: #0e0e10;
+  background: var(--wb-title);
+  color: var(--wb-bg);
   padding: 11px 28px;
   border-radius: 6px;
   cursor: pointer;
@@ -42,7 +42,7 @@
 
 .wb-cta-btn:hover {
   opacity: .86;
-  color: #0e0e10;
+  color: var(--wb-bg);
 }
 
 .wb-footer {

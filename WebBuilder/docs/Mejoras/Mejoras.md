@@ -28,7 +28,6 @@
 
 
 
-
 # Implementaciones secundarias
 
 ### Sencillo
@@ -44,7 +43,6 @@
 ### Dificiles
 7. Galería pública de proyectos generados — que los usuarios puedan marcar un proyecto como público y aparecer en una galería con el tipo de sitio, la API de origen y un screenshot. Da vida al proyecto visualmente
 8. Tests automáticos del código generado — después de generar el proyecto, ejecutarlo en un contenedor efímero y verificar que responde HTTP 200 antes de marcarlo como "ready". Cierra el loop de calidad end-to-end
-
 
 
 

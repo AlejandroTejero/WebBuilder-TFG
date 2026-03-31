@@ -177,6 +177,11 @@
       {% endif %}
     </div>
 
+    <!-- Toggle dark/light mode ====================================================== -->
+    <button class="wb-theme-toggle" id="themeToggle" aria-label="Cambiar tema" onclick="toggleTheme()">
+      <span class="wb-theme-toggle__icon" id="themeIcon">☀️</span>
+    </button>
+
     <!-- Botón hamburguesa para móvil -->
     <button class="wb-nav-toggle" id="navToggle" aria-label="Toggle menu">
       <span></span>
@@ -240,4 +245,19 @@
       });
     }
   });
+
+  // Dark/light mode ======================================================
+  function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
+  }
+
+  // Aplicar tema guardado al cargar
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light') {
+    document.documentElement.classList.add('light');
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.textContent = '🌙';
+  }
 </script>

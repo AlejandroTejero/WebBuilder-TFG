@@ -25,27 +25,6 @@
   --wb-ic-countries: #4ade80;
   --wb-ic-posts: #a78bfa;
   --wb-ic-site: #fbbf24;
-
-  --wb-title: #ffffff;
-  --wb-title-muted: rgba(255,255,255,0.22);
-  --wb-gradient-fade: var(--wb-bg);
-}
-
-:root.light {
-  --wb-bg: #f8f8f9;
-  --wb-bg-2: #ffffff;
-  --wb-bg-3: #f0f0f2;
-  --wb-bg-4: #e8e8ea;
-  --wb-border: rgba(0,0,0,0.07);
-  --wb-border-md: rgba(0,0,0,0.12);
-  --wb-t1: rgba(0,0,0,0.90);
-  --wb-t2: rgba(0,0,0,0.55);
-  --wb-t3: rgba(0,0,0,0.40);
-  --wb-t4: rgba(0,0,0,0.18);
-
-  --wb-title: #0e0e10;
-  --wb-title-muted: rgba(0,0,0,0.22);
-  --wb-gradient-fade: #f8f8f9;
 }
 
 html {
@@ -97,7 +76,7 @@ body {
   font-size: clamp(28px, 3.5vw, 44px);
   font-weight: 600;
   letter-spacing: -0.03em;
-  color: var(--wb-title);
+  color: #fff;
   line-height: 1.08;
   margin-bottom: 14px;
 }
@@ -105,7 +84,7 @@ body {
 .wb-section-title .muted,
 .wb-hero-title .muted,
 .wb-cta-title .muted {
-  color: var(--wb-title-muted);
+  color: rgba(255,255,255,0.22);
   font-weight: 300;
 }
 
