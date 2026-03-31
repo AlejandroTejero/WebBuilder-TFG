@@ -1,0 +1,279 @@
+#examples {
+  padding: 120px 0;
+  border-top: 1px solid var(--wb-border);
+}
+
+.wb-carousel-wrap {
+  overflow: hidden;
+  position: relative;
+  margin: 0 -40px;
+  padding: 0 40px;
+}
+
+.wb-carousel-wrap::before,
+.wb-carousel-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.wb-carousel-wrap::before {
+  left: 0;
+  background: linear-gradient(to right, var(--wb-bg), transparent);
+}
+
+.wb-carousel-wrap::after {
+  right: 0;
+  background: linear-gradient(to left, var(--wb-bg), transparent);
+}
+
+.wb-carousel-track {
+  display: flex;
+  gap: 14px;
+  width: max-content;
+  animation: wbCarouselScroll 32s linear infinite;
+}
+
+.wb-carousel-wrap:hover .wb-carousel-track {
+  animation-play-state: paused;
+}
+
+@keyframes wbCarouselScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 7px)); }
+}
+
+.wb-example-card {
+  background: var(--wb-bg-2);
+  border: 1px solid var(--wb-border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color .18s, transform .18s;
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.wb-example-card:hover {
+  border-color: var(--wb-border-md);
+  transform: translateY(-3px);
+}
+
+.wb-example-thumb {
+  width: 100%;
+  height: 260px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--wb-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wb-thumb-weather { background: #071428; }
+.wb-thumb-countries { background: #071a0d; }
+.wb-thumb-pokemon { background: #1e0808; }
+.wb-thumb-crypto { background: #181200; }
+.wb-thumb-news { background: #0a0818; }
+.wb-thumb-space { background: #050e1c; }
+
+.wb-fake-ui {
+  width: 88%;
+  height: 84%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 5px;
+  padding: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.wb-fake-topbar {
+  height: 8px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.07);
+  width: 60%;
+}
+
+.wb-fake-row {
+  display: flex;
+  gap: 5px;
+}
+
+.wb-fake-block {
+  border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+}
+
+.wb-fake-block.full { width: 100%; }
+.wb-fake-block.w60 { width: 60%; }
+.wb-fake-block.w40 { width: 40%; }
+.wb-fake-block.w50 { width: 50%; }
+.wb-fake-block.w55 { width: 55%; }
+.wb-fake-block.w30 { width: 30%; }
+.wb-fake-block.w90 { width: 90%; }
+.wb-fake-block.w80 { width: 80%; }
+.wb-fake-block.w70 { width: 70%; }
+.wb-fake-block.h30 { height: 30px; }
+.wb-fake-block.h16 { height: 16px; }
+.wb-fake-block.h10 { height: 10px; }
+.wb-fake-block.h8 { height: 8px; }
+.wb-fake-block.h7 { height: 7px; }
+.wb-fake-block.h6 { height: 6px; }
+.wb-fake-block.h5 { height: 5px; }
+
+.wb-fake-stat {
+  flex: 1;
+  height: 34px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wb-fake-stat span {
+  font-size: 9px;
+  font-family: var(--wb-mono);
+  color: rgba(255,255,255,0.22);
+}
+
+.wb-fake-chart {
+  flex: 1;
+  height: 44px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.07);
+  overflow: hidden;
+  position: relative;
+}
+
+.wb-fake-chart-line {
+  position: absolute;
+  bottom: 6px;
+  left: 4px;
+  right: 4px;
+  height: 22px;
+}
+
+.wb-thumb-weather .wb-fake-stat:first-child { border-color: rgba(56,148,255,0.45); background: rgba(56,148,255,0.07); }
+.wb-thumb-weather .wb-fake-stat:first-child span { color: #60a5fa; }
+.wb-thumb-countries .wb-fake-stat:first-child { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
+.wb-thumb-countries .wb-fake-stat:first-child span { color: #34d399; }
+.wb-thumb-pokemon .wb-fake-stat:first-child { border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.07); }
+.wb-thumb-pokemon .wb-fake-stat:first-child span { color: #f87171; }
+.wb-thumb-crypto .wb-fake-stat:first-child { border-color: rgba(251,191,36,0.45); background: rgba(251,191,36,0.07); }
+.wb-thumb-crypto .wb-fake-stat:first-child span { color: #fbbf24; }
+.wb-thumb-news .wb-fake-stat:first-child { border-color: rgba(192,132,252,0.45); background: rgba(192,132,252,0.07); }
+.wb-thumb-news .wb-fake-stat:first-child span { color: #c084fc; }
+
+.wb-space-accent {
+  border-color: rgba(34,211,238,0.4) !important;
+  background: rgba(34,211,238,0.07) !important;
+}
+
+.wb-space-accent span {
+  color: #22d3ee !important;
+}
+
+.wb-space-block {
+  width: 100%;
+  height: 50px;
+  border-radius: 3px;
+  background: rgba(34,211,238,0.04);
+  border: 1px solid rgba(34,211,238,0.15);
+}
+
+.wb-poke-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(248,113,113,0.3);
+  background: rgba(248,113,113,0.06);
+  flex-shrink: 0;
+}
+
+.wb-poke-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+}
+
+.wb-poke-bar {
+  border-radius: 4px;
+  background: rgba(248,113,113,0.15);
+}
+
+.wb-news-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.wb-news-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.wb-news-thumb {
+  width: 36px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+}
+
+.wb-news-thumb.featured {
+  background: rgba(192,132,252,0.1);
+  border: 1px solid rgba(192,132,252,0.2);
+}
+
+.wb-news-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wb-example-info {
+  padding: 14px 16px;
+}
+
+.wb-example-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--wb-t1);
+  margin-bottom: 4px;
+}
+
+.wb-example-api {
+  font-size: 10px;
+  font-family: var(--wb-mono);
+  color: var(--wb-t3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 10px;
+}
+
+.wb-example-tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.wb-example-tag {
+  font-size: 10px;
+  font-family: var(--wb-mono);
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.3);
+}

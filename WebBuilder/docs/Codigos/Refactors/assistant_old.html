@@ -1,0 +1,347 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="asst-layout">
+
+  <!-- ═══════════════════════════════════════════════
+       PANEL IZQUIERDO — Stepper fijo
+  ════════════════════════════════════════════════ -->
+  <aside class="asst-sidebar">
+    <div class="asst-sidebar__inner">
+
+      <div class="asst-brand">
+        <span class="asst-brand__text">Asistente IA</span>
+      </div>
+
+      <nav class="asst-steps">
+
+        <!-- Paso 1 -->
+        <div class="asst-step {% if not analysis %}asst-step--active{% else %}asst-step--done{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot">
+              {% if analysis %}<span class="asst-step__check">✓</span>{% else %}<span>1</span>{% endif %}
+            </div>
+            <div class="asst-step__line"></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Introducir URL</div>
+            <div class="asst-step__desc">API pública en JSON o XML</div>
+          </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="asst-step {% if analysis and not llm_plan %}asst-step--active{% elif llm_plan %}asst-step--done{% else %}asst-step--pending{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot">
+              {% if llm_plan %}<span class="asst-step__check">✓</span>{% else %}<span>2</span>{% endif %}
+            </div>
+            <div class="asst-step__line"></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Análisis IA</div>
+            <div class="asst-step__desc">Schema generado automáticamente</div>
+          </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="asst-step {% if llm_plan %}asst-step--active{% else %}asst-step--pending{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot"><span>3</span></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Revisar y publicar</div>
+            <div class="asst-step__desc">Ajusta campos y genera el sitio</div>
+          </div>
+        </div>
+
+      </nav>
+
+      {% if api_request %}
+      <div class="asst-meta">
+        <div class="asst-meta__label">Análisis activo</div>
+        <div class="asst-meta__url">{{ api_request.api_url|truncatechars:45 }}</div>
+        <div class="asst-meta__status asst-meta__status--{{ api_request.status }}">
+          {% if api_request.status == "processed" %}✓ Procesado
+          {% elif api_request.status == "error" %}✗ Error
+          {% else %}⏳ Pendiente{% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <a href="{% url 'history' %}" class="asst-history-link">
+        <span>📋</span> Ver historial
+      </a>
+
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════
+       PANEL DERECHO — Dos columnas
+  ════════════════════════════════════════════════ -->
+  <main class="asst-content">
+
+    {% if messages %}
+      <div class="asst-alerts">
+        {% for message in messages %}
+          <div class="asst-alert asst-alert--{{ message.tags }}">
+            <span class="asst-alert__icon">
+              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}⚠{% else %}ℹ{% endif %}
+            </span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="asst-columns">
+
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="asst-col asst-col--left">
+
+        <!-- BLOQUE 1: Formulario URL -->
+        <section class="asst-card" id="block-url">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge">Paso 1</div>
+            <h2 class="asst-card__title">Introduce la URL de la API</h2>
+            <p class="asst-card__subtitle">Soporta JSON y XML. La IA analizará la estructura y generará el schema automáticamente.</p>
+          </div>
+
+          <form method="post" class="asst-form" id="form-analyze">
+            {% csrf_token %}
+
+            <div class="asst-field">
+              <label class="asst-label" for="{{ form.api_url.id_for_label }}">URL de la API</label>
+              <div class="asst-input-group">
+                <span class="asst-input-icon">🔗</span>
+                {{ form.api_url }}
+              </div>
+              {% if form.api_url.errors %}
+                <div class="asst-field-error">{{ form.api_url.errors }}</div>
+              {% endif %}
+
+              <!-- PRUEBAS HABITUALES -->
+              <div class="asst-examples">
+                <span class="asst-examples__label">Prueba con:</span>
+                <button type="button" class="asst-example-chip" onclick="fillUrl('https://jsonplaceholder.typicode.com/posts')">Posts JSON</button>
+                <button type="button" class="asst-example-chip" onclick="fillUrl('https://www.w3schools.com/xml/plant_catalog.xml')">Plant Catalog XML</button>
+                <button type="button" class="asst-example-chip" onclick="fillUrl('https://fakestoreapi.com/products')">Products JSON</button>
+              </div>
+
+            </div>
+
+            <div class="asst-field">
+              <label class="asst-label" for="{{ form.user_prompt.id_for_label }}">
+                Describe el tipo de web que quieres, cuanto más detalle mejor.
+                <span class="asst-label__optional">opcional</span>
+              </label>
+              {{ form.user_prompt }}
+
+              <!-- Ejemplos de prompts clickables -->
+              <div class="asst-examples" style="margin-top: 10px;">
+                <span class="asst-examples__label">Ejemplos:</span>
+                <button type="button" class="asst-example-chip"
+                  onclick="fillPrompt('Catálogo minimalista en blanco y negro, grid de 3 columnas, imagen grande, precio destacado en negro y botón de ver detalle.')">
+                  🛍 Tienda
+                </button>
+                <button type="button" class="asst-example-chip"
+                  onclick="fillPrompt('Blog estilo periódico, tipografía grande, columnas de texto, colores sobrios en gris y blanco, fecha y categoría visibles.')">
+                  📰 Blog
+                </button>
+                <button type="button" class="asst-example-chip"
+                  onclick="fillPrompt('Portfolio moderno con fondo negro, tarjetas con efecto hover, imagen a pantalla completa y título en verde neón.')">
+                  💼 Portfolio
+                </button>
+                <button type="button" class="asst-example-chip"
+                  onclick="fillPrompt('Dashboard con tablas de datos, gráficos simples, colores azul y gris, diseño compacto y profesional.')">
+                  📊 Dashboard
+                </button>
+              </div>
+
+              <p class="asst-hint">Cuanto más detallas colores, layout y estilo, mejor será el resultado.</p>
+            </div>
+            {% if api_request %}
+              <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
+            {% endif %}
+
+            <div class="asst-form-footer">
+              <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze" onclick="showLoading()">
+                Analizar URL
+              </button>
+              {% if api_request and llm_plan %}
+                <button type="submit" class="asst-btn asst-btn--ghost" name="action" value="regenerate" onclick="showLoading()">
+                  Regenerar mapa
+                </button>
+              {% endif %}
+            </div>
+
+          </form>
+        </section>
+
+        <!-- BLOQUE 2: Dataset analizado -->
+        {% if analysis %}
+        <section class="asst-card asst-card--result" id="block-analysis">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge asst-card__step-badge--done">Paso 2 — Completado</div>
+            <h2 class="asst-card__title">Dataset analizado</h2>
+          </div>
+
+          <div class="asst-analysis-grid">
+            {% if analysis.main_collection.found %}
+              <div class="asst-stat">
+                <div class="asst-stat__value">{{ analysis.main_collection.count }}</div>
+                <div class="asst-stat__label">Items encontrados</div>
+              </div>
+              <div class="asst-stat">
+                <div class="asst-stat__value">{{ analysis.keys.top|length|default:"—" }}</div>
+                <div class="asst-stat__label">Campos disponibles</div>
+              </div>
+              {% if analysis.main_collection.path %}
+              <div class="asst-stat asst-stat--wide">
+                <div class="asst-stat__value asst-stat__value--mono">{{ analysis.main_collection.path }}</div>
+                <div class="asst-stat__label">Ruta colección principal</div>
+              </div>
+              {% endif %}
+            {% else %}
+              <div class="asst-stat asst-stat--wide">
+                <div class="asst-stat__value asst-stat__value--muted">{{ analysis.message|default:"No se encontraron items" }}</div>
+                <div class="asst-stat__label">Estado</div>
+              </div>
+            {% endif %}
+            {% if api_request.response_summary %}
+              <div class="asst-stat asst-stat--wide">
+                <div class="asst-stat__value asst-stat__value--sm">{{ api_request.response_summary }}</div>
+                <div class="asst-stat__label">Resumen</div>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+        {% endif %}
+
+      </div><!-- /col-left -->
+
+      <!-- COLUMNA DERECHA --> 
+      <div class="asst-col asst-col--right">
+
+        <!-- BLOQUE 3: Error LLM -->
+        {% if llm_error %}
+        <section class="asst-card asst-card--error">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge asst-card__step-badge--error">Error IA</div>
+            <h2 class="asst-card__title">No se pudo generar el schema</h2>
+            <p class="asst-card__subtitle">{{ llm_error }}</p>
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- BLOQUE 4: Esquema generado -->
+        {% if llm_plan %}
+        <section class="asst-card asst-card--schema" id="block-schema">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge asst-card__step-badge--ai">✦ IA</div>
+            <h2 class="asst-card__title">Esquema generado</h2>
+            <p class="asst-card__subtitle">La IA analizó tu dataset y propuso este schema. Puedes ajustarlo campo a campo en el boton de editar.</p>
+          </div>
+
+          <div class="asst-schema-overview">
+            <div class="asst-schema-meta">
+              <div class="asst-meta-pill">
+                <span class="asst-meta-pill__label">Tipo</span>
+                <span class="asst-meta-pill__value">{{ llm_plan.site_type }}</span>
+              </div>
+              <div class="asst-meta-pill">
+                <span class="asst-meta-pill__label">Título</span>
+                <span class="asst-meta-pill__value">{{ llm_plan.site_title }}</span>
+              </div>
+              <div class="asst-meta-pill">
+                <span class="asst-meta-pill__label">Campos</span>
+                <span class="asst-meta-pill__value">{{ llm_plan.fields|length }}</span>
+              </div>
+            </div>
+
+            {% if llm_plan.fields %}
+            <div class="asst-fields-list">
+              {% for field in llm_plan.fields %}
+                <div class="asst-field-chip">
+                  <code class="asst-field-chip__key">{{ field.key }}</code>
+                  <span class="asst-field-chip__arrow">→</span>
+                  <span class="asst-field-chip__label">{{ field.label }}</span>
+                </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="asst-card__actions">
+            <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
+              Editar y publicar
+            </a>
+          </div>
+        </section>
+
+        {% else %}
+        <!-- Estado vacío: aún no hay schema -->
+        <section class="asst-card asst-card--empty" id="block-schema-empty">
+          <div class="asst-empty-state">
+            <div class="asst-empty-state__icon">✦</div>
+            <div class="asst-empty-state__title">Aquí aparecerá el schema</div>
+            <div class="asst-empty-state__desc">Introduce una URL y la IA generará automáticamente el schema de campos para tu sitio.</div>
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- BLOQUE 5: Muestra de datos -->
+        {% if preview_items %}
+        {% load wb_extras %}
+        <section class="asst-card asst-card--preview" id="block-preview">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge asst-card__step-badge--preview">👁 Vista previa</div>
+            <h2 class="asst-card__title">Muestra de datos</h2>
+            <p class="asst-card__subtitle">3 items de tu dataset con los campos seleccionados por la IA.</p>
+          </div>
+
+          <div class="asst-preview-grid">
+            {% for item in preview_items %}
+              <div class="asst-preview-card">
+                <div class="asst-preview-card__index">#{{ forloop.counter }}</div>
+                {% for field in llm_plan.fields %}
+                  {% with val=item|get_item:field.key %}
+                    {% if val %}
+                      <div class="asst-preview-field">
+                        <span class="asst-preview-field__label">{{ field.label }}</span>
+                        <span class="asst-preview-field__value">{{ val|truncatechars:120 }}</span>
+                      </div>
+                    {% endif %}
+                  {% endwith %}
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+          
+        </section>
+        {% endif %}
+
+      </div><!-- /col-right -->
+
+    </div><!-- /asst-columns -->
+
+  </main>
+</div>
+
+<!-- Loading overlay -->
+<div class="asst-loading" id="loading-overlay">
+  <div class="asst-loading__box">
+    <div class="asst-loading__spinner"></div>
+    <div class="asst-loading__title">Analizando URL...</div>
+    <div class="asst-loading__sub">La IA está procesando los datos</div>
+    <div class="asst-loading__steps">
+      <div class="asst-loading__step" id="ls-1">⬇ Descargando datos</div>
+      <div class="asst-loading__step" id="ls-2">🔍 Detectando estructura</div>
+      <div class="asst-loading__step" id="ls-3">✦ Generando schema con IA</div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/assistant.js' %}"></script>
+
+{% endblock %}

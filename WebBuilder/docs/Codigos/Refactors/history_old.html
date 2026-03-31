@@ -1,0 +1,217 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/assistant.css' %}">
+<link rel="stylesheet" href="{% static 'css/history.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="asst-layout">
+
+  <!-- ═══════════════════════════════════════════════
+       PANEL IZQUIERDO — Info
+  ════════════════════════════════════════════════ -->
+  <aside class="asst-sidebar">
+    <div class="asst-sidebar__inner">
+
+      <div class="asst-brand">
+        <span class="asst-brand__icon">📋</span>
+        <span class="asst-brand__text">Historial</span>
+      </div>
+
+      <!-- Stats globales -->
+      <div class="hist-sidebar-stats">
+        <div class="hist-sidebar-stat">
+          <div class="hist-sidebar-stat__value">{{ api_requests|length }}</div>
+          <div class="hist-sidebar-stat__label">Análisis</div>
+        </div>
+        <div class="hist-sidebar-stat">
+          <div class="hist-sidebar-stat__value">{{ generated_sites|length }}</div>
+          <div class="hist-sidebar-stat__label">Sitios publicados</div>
+        </div>
+      </div>
+
+      <!-- Filtro rápido -->
+      <div class="hist-sidebar-section">
+        <div class="asst-meta__label">Ir a sección</div>
+        <a href="#section-analysis" class="hist-sidebar-link">📊 Análisis recientes</a>
+        <a href="#section-sites" class="hist-sidebar-link">🌐 Sitios publicados</a>
+      </div>
+
+      <a href="{% url 'assistant' %}" class="asst-btn asst-btn--primary" style="margin-top: auto; text-align: center;">
+        + Nuevo análisis
+      </a>
+
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════
+       CONTENIDO PRINCIPAL
+  ════════════════════════════════════════════════ -->
+  <main class="asst-content">
+
+    {% if messages %}
+      <div class="asst-alerts">
+        {% for message in messages %}
+          <div class="asst-alert asst-alert--{{ message.tags }}">
+            <span class="asst-alert__icon">
+              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}⚠{% else %}ℹ{% endif %}
+            </span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- ── SECCIÓN 1: Análisis recientes ── -->
+    <section id="section-analysis">
+      <div class="hist-section-header">
+        <div>
+          <h2 class="hist-section-title">Análisis recientes</h2>
+          <p class="hist-section-desc">URLs analizadas y sus schemas generados por la IA.</p>
+        </div>
+        <span class="hist-count-badge">{{ api_requests|length }}</span>
+      </div>
+
+      {% if api_requests %}
+        <div class="hist-grid">
+          {% for r in api_requests %}
+            <div class="hist-card {% if r.status == 'error' %}hist-card--error{% elif r.field_mapping %}hist-card--done{% endif %}">
+
+              <!-- Cabecera de la card -->
+              <div class="hist-card__head">
+                <div class="hist-card__status-dot
+                  {% if r.status == 'processed' %}hist-card__status-dot--ok
+                  {% elif r.status == 'error' %}hist-card__status-dot--error
+                  {% else %}hist-card__status-dot--pending{% endif %}">
+                </div>
+                <span class="hist-card__id">#{{ r.id }}</span>
+                <span class="hist-card__date">{{ r.date|date:"d M Y · H:i" }}</span>
+              </div>
+
+              <!-- URL -->
+              <div class="hist-card__url" title="{{ r.api_url }}">
+                {{ r.api_url|truncatechars:60 }}
+              </div>
+
+              <!-- Summary si existe -->
+              {% if r.response_summary %}
+                <div class="hist-card__summary">{{ r.response_summary|truncatechars:100 }}</div>
+              {% endif %}
+
+              <!-- Pills de estado -->
+              <div class="hist-card__pills">
+                <span class="hist-pill
+                  {% if r.status == 'processed' %}hist-pill--green
+                  {% elif r.status == 'error' %}hist-pill--red
+                  {% else %}hist-pill--orange{% endif %}">
+                  {% if r.status == 'processed' %}✓ Procesado
+                  {% elif r.status == 'error' %}✗ Error
+                  {% else %}⏳ Pendiente{% endif %}
+                </span>
+                {% if r.field_mapping %}
+                  <span class="hist-pill hist-pill--purple">✦ Schema</span>
+                {% endif %}
+                {% if r.plan_accepted %}
+                  <span class="hist-pill hist-pill--blue">🌐 Publicado</span>
+                {% endif %}
+              </div>
+
+              <!-- Acciones -->
+              <div class="hist-card__actions">
+                <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="asst-btn asst-btn--ghost asst-btn--sm">
+                  Asistente
+                </a>
+                {% if r.status == "processed" and r.field_mapping %}
+                  <a href="{% url 'edit' r.id %}" class="asst-btn asst-btn--primary asst-btn--sm">
+                    Editar →
+                  </a>
+                {% elif r.status == "processed" and r.parsed_data %}
+                  <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="asst-btn asst-btn--primary asst-btn--sm">
+                    Generar schema →
+                  </a>
+                {% endif %}
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <!-- Estado vacío análisis -->
+        <div class="asst-card asst-card--empty">
+          <div class="asst-empty-state">
+            <div class="asst-empty-state__icon">📊</div>
+            <div class="asst-empty-state__title">Aún no tienes análisis</div>
+            <div class="asst-empty-state__desc">Introduce una URL de API en el asistente para empezar.</div>
+            <a href="{% url 'assistant' %}" class="asst-btn asst-btn--primary" style="margin-top: 1rem;">
+              Ir al asistente →
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- ── SECCIÓN 2: Sitios publicados ── -->
+    <section id="section-sites">
+      <div class="hist-section-header">
+        <div>
+          <h2 class="hist-section-title">Sitios publicados</h2>
+          <p class="hist-section-desc">Webs generadas con diseño completo listas para usar.</p>
+        </div>
+        <span class="hist-count-badge">{{ generated_sites|length }}</span>
+      </div>
+
+      {% if generated_sites %}
+        <div class="hist-grid">
+          {% for w in generated_sites %}
+            <div class="hist-card hist-card--site">
+
+              <div class="hist-card__head">
+                <span class="hist-pill hist-pill--blue">🌐 Publicado</span>
+                <span class="hist-card__date">{{ w.created_at|date:"d M Y · H:i" }}</span>
+              </div>
+
+              <div class="hist-card__title">
+                {{ w.accepted_plan.site_title|default:w.accepted_plan.site_type|default:"Sitio sin título" }}
+              </div>
+
+              <div class="hist-card__url" title="{{ w.project_source.api_url }}">
+                {{ w.project_source.api_url|truncatechars:60 }}
+              </div>
+
+              <div class="hist-card__pills">
+                <span class="hist-pill hist-pill--purple">{{ w.accepted_plan.site_type|default:"other" }}</span>
+                <span class="hist-pill">{{ w.accepted_plan.fields|length }} campos</span>
+              </div>
+
+              <div class="hist-card__actions">
+                <a href="{% url 'edit' w.project_source.id %}" class="asst-btn asst-btn--ghost asst-btn--sm">
+                  Editar
+                </a>
+                <a href="{% url 'site_render' w.project_source.id %}" class="asst-btn asst-btn--primary asst-btn--sm">
+                  Ver sitio →
+                </a>
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <!-- Estado vacío sitios -->
+        <div class="asst-card asst-card--empty">
+          <div class="asst-empty-state">
+            <div class="asst-empty-state__icon">🌐</div>
+            <div class="asst-empty-state__title">Aún no has publicado ningún sitio</div>
+            <div class="asst-empty-state__desc">Cuando aceptes un schema en el editor, aparecerá aquí.</div>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+  </main>
+</div>
+
+{% endblock %}

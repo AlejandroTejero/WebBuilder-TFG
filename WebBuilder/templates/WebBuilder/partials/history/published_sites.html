@@ -1,0 +1,55 @@
+<section id="section-sites">
+  <div class="hist-section-header">
+    <div>
+      <h2 class="hist-section-title">Sitios publicados</h2>
+      <p class="hist-section-desc">Webs generadas con diseño completo listas para usar.</p>
+    </div>
+    <span class="hist-count-badge">{{ generated_sites|length }}</span>
+  </div>
+
+  {% if generated_sites %}
+    <div class="hist-grid">
+      {% for w in generated_sites %}
+        <div class="hist-card hist-card--site">
+
+          <div class="hist-card__head">
+            <span class="hist-pill hist-pill--blue">🌐 Publicado</span>
+            <span class="hist-card__date">{{ w.created_at|date:"d M Y · H:i" }}</span>
+          </div>
+
+          <div class="hist-card__title">
+            {{ w.accepted_plan.site_title|default:w.accepted_plan.site_type|default:"Sitio sin título" }}
+          </div>
+
+          <div class="hist-card__url" title="{{ w.project_source.api_url }}">
+            {{ w.project_source.api_url|truncatechars:60 }}
+          </div>
+
+          <div class="hist-card__pills">
+            <span class="hist-pill hist-pill--purple">{{ w.accepted_plan.site_type|default:"other" }}</span>
+            <span class="hist-pill">{{ w.accepted_plan.fields|length }} campos</span>
+          </div>
+
+          <div class="hist-card__actions">
+            <a href="{% url 'edit' w.project_source.id %}" class="asst-btn asst-btn--ghost asst-btn--sm">
+              Editar
+            </a>
+            <a href="{% url 'site_render' w.project_source.id %}" class="asst-btn asst-btn--primary asst-btn--sm">
+              Ver sitio →
+            </a>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="asst-card asst-card--empty">
+      <div class="asst-empty-state">
+        <div class="asst-empty-state__icon">🌐</div>
+        <div class="asst-empty-state__title">Aún no has publicado ningún sitio</div>
+        <div class="asst-empty-state__desc">Cuando aceptes un schema en el editor, aparecerá aquí.</div>
+      </div>
+    </div>
+  {% endif %}
+</section>

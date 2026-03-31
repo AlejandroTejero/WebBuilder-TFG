@@ -1,14 +1,26 @@
 {% extends 'WebBuilder/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home/base.css' %}">
+<link rel="stylesheet" href="{% static 'css/home/hero.css' %}">
+<link rel="stylesheet" href="{% static 'css/home/examples.css' %}">
+<link rel="stylesheet" href="{% static 'css/home/how.css' %}">
+<link rel="stylesheet" href="{% static 'css/home/llms.css' %}">
+<link rel="stylesheet" href="{% static 'css/home/metrics.css' %}">
+<link rel="stylesheet" href="{% static 'css/home/cta.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="wb-home">
+
   {% include 'WebBuilder/partials/home/hero.html' %}
   {% include 'WebBuilder/partials/home/examples.html' %}
   {% include 'WebBuilder/partials/home/how.html' %}
   {% include 'WebBuilder/partials/home/llms.html' %}
   {% include 'WebBuilder/partials/home/metrics.html' %}
   {% include 'WebBuilder/partials/home/cta.html' %}
+
 </div>
 
 <script src="{% static 'js/home.js' %}"></script>

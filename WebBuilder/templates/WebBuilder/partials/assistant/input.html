@@ -1,0 +1,74 @@
+<section class="asst-card" id="block-url">
+  <div class="asst-card__header">
+    <div class="asst-card__step-badge">Paso 1</div>
+    <h2 class="asst-card__title">Introduce la URL de la API</h2>
+    <p class="asst-card__subtitle">Soporta JSON y XML. La IA analizará la estructura y generará el schema automáticamente.</p>
+  </div>
+
+  <form method="post" class="asst-form" id="form-analyze">
+    {% csrf_token %}
+
+    <div class="asst-field">
+      <label class="asst-label" for="{{ form.api_url.id_for_label }}">URL de la API</label>
+      <div class="asst-input-group">
+        <span class="asst-input-icon">🔗</span>
+        {{ form.api_url }}
+      </div>
+      {% if form.api_url.errors %}
+        <div class="asst-field-error">{{ form.api_url.errors }}</div>
+      {% endif %}
+
+      <div class="asst-examples">
+        <span class="asst-examples__label">Prueba con:</span>
+        <button type="button" class="asst-example-chip" onclick="fillUrl('https://jsonplaceholder.typicode.com/posts')">Posts JSON</button>
+        <button type="button" class="asst-example-chip" onclick="fillUrl('https://www.w3schools.com/xml/plant_catalog.xml')">Plant Catalog XML</button>
+        <button type="button" class="asst-example-chip" onclick="fillUrl('https://fakestoreapi.com/products')">Products JSON</button>
+      </div>
+    </div>
+
+    <div class="asst-field">
+      <label class="asst-label" for="{{ form.user_prompt.id_for_label }}">
+        Describe el tipo de web que quieres, cuanto más detalle mejor.
+        <span class="asst-label__optional">opcional</span>
+      </label>
+      {{ form.user_prompt }}
+
+      <div class="asst-examples" style="margin-top: 10px;">
+        <span class="asst-examples__label">Ejemplos:</span>
+        <button type="button" class="asst-example-chip"
+          onclick="fillPrompt('Catálogo minimalista en blanco y negro, grid de 3 columnas, imagen grande, precio destacado en negro y botón de ver detalle.')">
+          🛍 Tienda
+        </button>
+        <button type="button" class="asst-example-chip"
+          onclick="fillPrompt('Blog estilo periódico, tipografía grande, columnas de texto, colores sobrios en gris y blanco, fecha y categoría visibles.')">
+          📰 Blog
+        </button>
+        <button type="button" class="asst-example-chip"
+          onclick="fillPrompt('Portfolio moderno con fondo negro, tarjetas con efecto hover, imagen a pantalla completa y título en verde neón.')">
+          💼 Portfolio
+        </button>
+        <button type="button" class="asst-example-chip"
+          onclick="fillPrompt('Dashboard con tablas de datos, gráficos simples, colores azul y gris, diseño compacto y profesional.')">
+          📊 Dashboard
+        </button>
+      </div>
+
+      <p class="asst-hint">Cuanto más detallas colores, layout y estilo, mejor será el resultado.</p>
+    </div>
+
+    {% if api_request %}
+      <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
+    {% endif %}
+
+    <div class="asst-form-footer">
+      <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze" onclick="showLoading()">
+        Analizar URL
+      </button>
+      {% if api_request and llm_plan %}
+        <button type="submit" class="asst-btn asst-btn--ghost" name="action" value="regenerate" onclick="showLoading()">
+          Regenerar mapa
+        </button>
+      {% endif %}
+    </div>
+  </form>
+</section>
