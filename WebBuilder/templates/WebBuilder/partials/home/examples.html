@@ -1,150 +1,151 @@
-  <!-- EJEMPLOS -->
-  <section id="examples" class="wb-section">
-    <div class="wb-container">
-      <div class="wb-header">
-        <div class="wb-section-eyebrow wb-reveal">Ejemplos</div>
-        <h2 class="wb-section-title wb-reveal wb-reveal-d1">Lo que puedes <span class="muted">construir</span></h2>
-        <p class="wb-section-sub wb-reveal wb-reveal-d2">Proyectos Django generados a partir de APIs públicas. Listos para ejecutar.</p>
+{% load i18n %}
+
+<!-- EJEMPLOS -->
+<section id="examples" class="wb-section">
+  <div class="wb-container">
+    <div class="wb-header">
+      <div class="wb-section-eyebrow wb-reveal">{% translate "Ejemplos" %}</div>
+      <h2 class="wb-section-title wb-reveal wb-reveal-d1">{% translate "Lo que puedes" %} <span class="muted">{% translate "construir" %}</span></h2>
+      <p class="wb-section-sub wb-reveal wb-reveal-d2">{% translate "Proyectos Django generados a partir de APIs públicas. Listos para ejecutar." %}</p>
+    </div>
+  </div>
+
+  <div class="wb-carousel-wrap">
+      <div class="wb-carousel-track">
+
+        {% for item in "123456123456" %}
+        {% if forloop.counter == 1 or forloop.counter == 7 %}
+        <div class="wb-example-card">
+          <div class="wb-example-thumb wb-thumb-weather">
+            <div class="wb-fake-ui">
+              <div class="wb-fake-topbar"></div>
+              <div class="wb-fake-row">
+                <div class="wb-fake-stat"><span>22°C</span></div>
+                <div class="wb-fake-stat"><span>Madrid</span></div>
+              </div>
+              <div class="wb-fake-row"><div class="wb-fake-block full h30"></div></div>
+              <div class="wb-fake-row">
+                <div class="wb-fake-stat"><span>Humidity</span></div>
+                <div class="wb-fake-stat"><span>Wind</span></div>
+                <div class="wb-fake-stat"><span>UV</span></div>
+              </div>
+              <div class="wb-fake-row"><div class="wb-fake-block w60 h8"></div></div>
+            </div>
+          </div>
+          <div class="wb-example-info">
+            <div class="wb-example-name">Weather Dashboard</div>
+            <div class="wb-example-api">api.openweathermap.org/data/2.5/weather</div>
+            <div class="wb-example-tags"><span class="wb-example-tag">dashboard</span><span class="wb-example-tag">6 {% translate "campos" %}</span></div>
+          </div>
+        </div>
+        {% elif forloop.counter == 2 or forloop.counter == 8 %}
+        <div class="wb-example-card">
+          <div class="wb-example-thumb wb-thumb-countries">
+            <div class="wb-fake-ui">
+              <div class="wb-fake-topbar w40"></div>
+              <div class="wb-fake-row">
+                <div class="wb-fake-stat"><span>195</span></div>
+                <div class="wb-fake-stat"><span>{% translate "países" %}</span></div>
+              </div>
+              <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
+              <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
+              <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
+            </div>
+          </div>
+          <div class="wb-example-info">
+            <div class="wb-example-name">Countries Explorer</div>
+            <div class="wb-example-api">restcountries.com/v3.1/all</div>
+            <div class="wb-example-tags"><span class="wb-example-tag">explorer</span><span class="wb-example-tag">4 {% translate "campos" %}</span></div>
+          </div>
+        </div>
+        {% elif forloop.counter == 3 or forloop.counter == 9 %}
+        <div class="wb-example-card">
+          <div class="wb-example-thumb wb-thumb-pokemon">
+            <div class="wb-fake-ui">
+              <div class="wb-fake-topbar w50"></div>
+              <div class="wb-fake-row">
+                <div class="wb-poke-circle"></div>
+                <div class="wb-poke-meta">
+                  <div class="wb-fake-block h8 w70"></div>
+                  <div class="wb-fake-block h6 w40"></div>
+                </div>
+              </div>
+              <div class="wb-fake-row"><div class="wb-fake-block full h8 wb-poke-bar"></div></div>
+              <div class="wb-fake-row">
+                <div class="wb-fake-stat"><span>Lv.35</span></div>
+                <div class="wb-fake-stat"><span>Fire</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="wb-example-info">
+            <div class="wb-example-name">Pokédex App</div>
+            <div class="wb-example-api">pokeapi.co/api/v2/pokemon</div>
+            <div class="wb-example-tags"><span class="wb-example-tag">{% translate "listado" %}</span><span class="wb-example-tag">5 {% translate "campos" %}</span></div>
+          </div>
+        </div>
+        {% elif forloop.counter == 4 or forloop.counter == 10 %}
+        <div class="wb-example-card">
+          <div class="wb-example-thumb wb-thumb-crypto">
+            <div class="wb-fake-ui">
+              <div class="wb-fake-topbar w55"></div>
+              <div class="wb-fake-row">
+                <div class="wb-fake-stat"><span>BTC</span></div>
+                <div class="wb-fake-stat"><span>$94k</span></div>
+              </div>
+              <div class="wb-fake-chart">
+                <svg class="wb-fake-chart-line" viewBox="0 0 100 20" preserveAspectRatio="none">
+                  <polyline points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.5"/>
+                  <polygon points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2 100,20 0,20" fill="rgba(251,191,36,0.06)"/>
+                </svg>
+              </div>
+              <div class="wb-fake-row"><div class="wb-fake-block full h10"></div></div>
+            </div>
+          </div>
+          <div class="wb-example-info">
+            <div class="wb-example-name">Crypto Tracker</div>
+            <div class="wb-example-api">api.coingecko.com/api/v3/coins/markets</div>
+            <div class="wb-example-tags"><span class="wb-example-tag">tracker</span><span class="wb-example-tag">7 {% translate "campos" %}</span></div>
+          </div>
+        </div>
+        {% elif forloop.counter == 5 or forloop.counter == 11 %}
+        <div class="wb-example-card">
+          <div class="wb-example-thumb wb-thumb-news">
+            <div class="wb-fake-ui">
+              <div class="wb-fake-topbar w30"></div>
+              <div class="wb-news-stack">
+                <div class="wb-news-item"><div class="wb-news-thumb featured"></div><div class="wb-news-text"><div class="wb-fake-block h7 w90"></div><div class="wb-fake-block h5 w60"></div></div></div>
+                <div class="wb-news-item"><div class="wb-news-thumb"></div><div class="wb-news-text"><div class="wb-fake-block h7 w80"></div><div class="wb-fake-block h5 w50"></div></div></div>
+                <div class="wb-news-item"><div class="wb-news-thumb"></div><div class="wb-news-text"><div class="wb-fake-block h7 w70"></div><div class="wb-fake-block h5 w40"></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="wb-example-info">
+            <div class="wb-example-name">News Feed</div>
+            <div class="wb-example-api">newsapi.org/v2/top-headlines</div>
+            <div class="wb-example-tags"><span class="wb-example-tag">feed</span><span class="wb-example-tag">5 {% translate "campos" %}</span></div>
+          </div>
+        </div>
+        {% else %}
+        <div class="wb-example-card">
+          <div class="wb-example-thumb wb-thumb-space">
+            <div class="wb-fake-ui">
+              <div class="wb-fake-topbar w45"></div>
+              <div class="wb-fake-row">
+                <div class="wb-fake-stat wb-space-accent"><span>ISS</span></div>
+                <div class="wb-fake-stat"><span>Live</span></div>
+              </div>
+              <div class="wb-fake-row"><div class="wb-space-block"></div></div>
+            </div>
+          </div>
+          <div class="wb-example-info">
+            <div class="wb-example-name">ISS Tracker</div>
+            <div class="wb-example-api">api.open-notify.org/iss-now.json</div>
+            <div class="wb-example-tags"><span class="wb-example-tag">tracker</span><span class="wb-example-tag">3 {% translate "campos" %}</span></div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+
       </div>
     </div>
-
-    <div class="wb-carousel-wrap">
-        <div class="wb-carousel-track">
-
-          {% for item in "123456123456" %}
-          {% if forloop.counter == 1 or forloop.counter == 7 %}
-          <div class="wb-example-card">
-            <div class="wb-example-thumb wb-thumb-weather">
-              <div class="wb-fake-ui">
-                <div class="wb-fake-topbar"></div>
-                <div class="wb-fake-row">
-                  <div class="wb-fake-stat"><span>22°C</span></div>
-                  <div class="wb-fake-stat"><span>Madrid</span></div>
-                </div>
-                <div class="wb-fake-row"><div class="wb-fake-block full h30"></div></div>
-                <div class="wb-fake-row">
-                  <div class="wb-fake-stat"><span>Humidity</span></div>
-                  <div class="wb-fake-stat"><span>Wind</span></div>
-                  <div class="wb-fake-stat"><span>UV</span></div>
-                </div>
-                <div class="wb-fake-row"><div class="wb-fake-block w60 h8"></div></div>
-              </div>
-            </div>
-            <div class="wb-example-info">
-              <div class="wb-example-name">Weather Dashboard</div>
-              <div class="wb-example-api">api.openweathermap.org/data/2.5/weather</div>
-              <div class="wb-example-tags"><span class="wb-example-tag">dashboard</span><span class="wb-example-tag">6 campos</span></div>
-            </div>
-          </div>
-          {% elif forloop.counter == 2 or forloop.counter == 8 %}
-          <div class="wb-example-card">
-            <div class="wb-example-thumb wb-thumb-countries">
-              <div class="wb-fake-ui">
-                <div class="wb-fake-topbar w40"></div>
-                <div class="wb-fake-row">
-                  <div class="wb-fake-stat"><span>195</span></div>
-                  <div class="wb-fake-stat"><span>países</span></div>
-                </div>
-                <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
-                <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
-                <div class="wb-fake-row"><div class="wb-fake-block full h16"></div></div>
-              </div>
-            </div>
-            <div class="wb-example-info">
-              <div class="wb-example-name">Countries Explorer</div>
-              <div class="wb-example-api">restcountries.com/v3.1/all</div>
-              <div class="wb-example-tags"><span class="wb-example-tag">explorer</span><span class="wb-example-tag">4 campos</span></div>
-            </div>
-          </div>
-          {% elif forloop.counter == 3 or forloop.counter == 9 %}
-          <div class="wb-example-card">
-            <div class="wb-example-thumb wb-thumb-pokemon">
-              <div class="wb-fake-ui">
-                <div class="wb-fake-topbar w50"></div>
-                <div class="wb-fake-row">
-                  <div class="wb-poke-circle"></div>
-                  <div class="wb-poke-meta">
-                    <div class="wb-fake-block h8 w70"></div>
-                    <div class="wb-fake-block h6 w40"></div>
-                  </div>
-                </div>
-                <div class="wb-fake-row"><div class="wb-fake-block full h8 wb-poke-bar"></div></div>
-                <div class="wb-fake-row">
-                  <div class="wb-fake-stat"><span>Lv.35</span></div>
-                  <div class="wb-fake-stat"><span>Fire</span></div>
-                </div>
-              </div>
-            </div>
-            <div class="wb-example-info">
-              <div class="wb-example-name">Pokédex App</div>
-              <div class="wb-example-api">pokeapi.co/api/v2/pokemon</div>
-              <div class="wb-example-tags"><span class="wb-example-tag">listado</span><span class="wb-example-tag">5 campos</span></div>
-            </div>
-          </div>
-          {% elif forloop.counter == 4 or forloop.counter == 10 %}
-          <div class="wb-example-card">
-            <div class="wb-example-thumb wb-thumb-crypto">
-              <div class="wb-fake-ui">
-                <div class="wb-fake-topbar w55"></div>
-                <div class="wb-fake-row">
-                  <div class="wb-fake-stat"><span>BTC</span></div>
-                  <div class="wb-fake-stat"><span>$94k</span></div>
-                </div>
-                <div class="wb-fake-chart">
-                  <svg class="wb-fake-chart-line" viewBox="0 0 100 20" preserveAspectRatio="none">
-                    <polyline points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.5"/>
-                    <polygon points="0,18 15,14 30,16 45,8 60,10 75,4 90,6 100,2 100,20 0,20" fill="rgba(251,191,36,0.06)"/>
-                  </svg>
-                </div>
-                <div class="wb-fake-row"><div class="wb-fake-block full h10"></div></div>
-              </div>
-            </div>
-            <div class="wb-example-info">
-              <div class="wb-example-name">Crypto Tracker</div>
-              <div class="wb-example-api">api.coingecko.com/api/v3/coins/markets</div>
-              <div class="wb-example-tags"><span class="wb-example-tag">tracker</span><span class="wb-example-tag">7 campos</span></div>
-            </div>
-          </div>
-          {% elif forloop.counter == 5 or forloop.counter == 11 %}
-          <div class="wb-example-card">
-            <div class="wb-example-thumb wb-thumb-news">
-              <div class="wb-fake-ui">
-                <div class="wb-fake-topbar w30"></div>
-                <div class="wb-news-stack">
-                  <div class="wb-news-item"><div class="wb-news-thumb featured"></div><div class="wb-news-text"><div class="wb-fake-block h7 w90"></div><div class="wb-fake-block h5 w60"></div></div></div>
-                  <div class="wb-news-item"><div class="wb-news-thumb"></div><div class="wb-news-text"><div class="wb-fake-block h7 w80"></div><div class="wb-fake-block h5 w50"></div></div></div>
-                  <div class="wb-news-item"><div class="wb-news-thumb"></div><div class="wb-news-text"><div class="wb-fake-block h7 w70"></div><div class="wb-fake-block h5 w40"></div></div></div>
-                </div>
-              </div>
-            </div>
-            <div class="wb-example-info">
-              <div class="wb-example-name">News Feed</div>
-              <div class="wb-example-api">newsapi.org/v2/top-headlines</div>
-              <div class="wb-example-tags"><span class="wb-example-tag">feed</span><span class="wb-example-tag">5 campos</span></div>
-            </div>
-          </div>
-          {% else %}
-          <div class="wb-example-card">
-            <div class="wb-example-thumb wb-thumb-space">
-              <div class="wb-fake-ui">
-                <div class="wb-fake-topbar w45"></div>
-                <div class="wb-fake-row">
-                  <div class="wb-fake-stat wb-space-accent"><span>ISS</span></div>
-                  <div class="wb-fake-stat"><span>Live</span></div>
-                </div>
-                <div class="wb-fake-row"><div class="wb-space-block"></div></div>
-              </div>
-            </div>
-            <div class="wb-example-info">
-              <div class="wb-example-name">ISS Tracker</div>
-              <div class="wb-example-api">api.open-notify.org/iss-now.json</div>
-              <div class="wb-example-tags"><span class="wb-example-tag">tracker</span><span class="wb-example-tag">3 campos</span></div>
-            </div>
-          </div>
-          {% endif %}
-          {% endfor %}
-
-        </div>
-      </div>
-  </section>
-
+</section>

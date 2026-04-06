@@ -1,0 +1,689 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-06 16:11+0000\n"
+"PO-Revision-Date: 2026-04-06 18:30+0000\n"
+"Last-Translator: ChatGPT <noreply@example.com>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: WebBuilder/templates/WebBuilder/partials/home/cta.html:6
+msgid "Empieza con"
+msgstr "Start with"
+
+#: WebBuilder/templates/WebBuilder/partials/home/cta.html:6
+msgid "tu primera API"
+msgstr "your first API"
+
+#: WebBuilder/templates/WebBuilder/partials/home/cta.html:7
+msgid "Sin configuración. Sin código. Solo una URL."
+msgstr "No setup. No code. Just one URL."
+
+#: WebBuilder/templates/WebBuilder/partials/home/cta.html:8
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:15
+msgid "Empezar ahora"
+msgstr "Start now"
+
+#: WebBuilder/templates/WebBuilder/partials/home/cta.html:15
+msgid "Documentación"
+msgstr "Documentation"
+
+#: WebBuilder/templates/WebBuilder/partials/home/cta.html:17
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:7
+msgid "Ejemplos"
+msgstr "Examples"
+
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:8
+msgid "Lo que puedes"
+msgstr "What you can"
+
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:8
+msgid "construir"
+msgstr "build"
+
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:9
+msgid ""
+"Proyectos Django generados a partir de APIs públicas. Listos para ejecutar."
+msgstr "Django projects generated from public APIs. Ready to run."
+
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:38
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:58
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:83
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:107
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:125
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:143
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:250
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:255
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:260
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:322
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:326
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:330
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:334
+msgid "campos"
+msgstr "fields"
+
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:48
+msgid "países"
+msgstr "countries"
+
+#: WebBuilder/templates/WebBuilder/partials/home/examples.html:83
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:261
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:307
+msgid "listado"
+msgstr "listing"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:6
+msgid "Generación con IA · Django · APIs públicas"
+msgstr "AI-powered generation · Django · Public APIs"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:8
+msgid "Convierte"
+msgstr "Turn"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:8
+msgid "datos crudos"
+msgstr "raw data"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:9
+msgid "en un proyecto Django"
+msgstr "into a real Django project"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:9
+msgid "real"
+msgstr "real"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:12
+msgid ""
+"Pega una URL o arrastra un archivo, WebBuilder lo analiza y se encarga de "
+"todo."
+msgstr "Paste a URL or drag a file, WebBuilder analyzes it and takes care of everything."
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:17
+msgid "Ver cómo funciona"
+msgstr "See how it works"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:30
+msgid "File"
+msgstr "File"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:31
+msgid "Edit"
+msgstr "Edit"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:32
+msgid "View"
+msgstr "View"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:33
+msgid "Run"
+msgstr "Run"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:35
+msgid "asistente de análisis"
+msgstr "analysis assistant"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:46
+msgid "nuevo"
+msgstr "new"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:55
+msgid "Análisis"
+msgstr "Analysis"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:86
+msgid "Generados"
+msgstr "Generated"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:106
+msgid "Workspace"
+msgstr "Workspace"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:116
+msgid "Nuevo análisis"
+msgstr "New analysis"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:128
+msgid "hace 2 horas"
+msgstr "2 hours ago"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:130
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:217
+msgid "procesado"
+msgstr "processed"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:139
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:169
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:198
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:226
+msgid "Campos detectados"
+msgstr "Detected fields"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:139
+msgid "de 8 seleccionados"
+msgstr "of 8 selected"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:141
+msgid "Nombre ciudad"
+msgstr "City name"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:142
+msgid "Temperatura"
+msgstr "Temperature"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:143
+msgid "Humedad"
+msgstr "Humidity"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:144
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:68
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:92
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:109
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:125
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:142
+msgid "Descripción"
+msgstr "Description"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:145
+msgid "Datos de viento"
+msgstr "Wind data"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:146
+msgid "Visibilidad"
+msgstr "Visibility"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:147
+msgid "País"
+msgstr "Country"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:148
+msgid "Coordenadas"
+msgstr "Coordinates"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:158
+msgid "hace 1 día"
+msgstr "1 day ago"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:160
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:326
+msgid "publicado"
+msgstr "published"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:169
+msgid "de 7 seleccionados"
+msgstr "of 7 selected"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:171
+msgid "Nombre"
+msgstr "Name"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:172
+msgid "Exp. base"
+msgstr "Base exp."
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:173
+msgid "Tipos"
+msgstr "Types"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:174
+msgid "Estadísticas"
+msgstr "Stats"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:175
+msgid "Imagen"
+msgstr "Image"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:176
+msgid "Habilidades"
+msgstr "Abilities"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:177
+msgid "Movimientos"
+msgstr "Moves"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:187
+msgid "hace 3 días"
+msgstr "3 days ago"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:189
+msgid "pendiente"
+msgstr "pending"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:198
+msgid "de 6 seleccionados"
+msgstr "of 6 selected"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:200
+msgid "Nombre país"
+msgstr "Country name"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:201
+msgid "Capital"
+msgstr "Capital"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:202
+msgid "Población"
+msgstr "Population"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:203
+msgid "Bandera"
+msgstr "Flag"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:204
+msgid "Región"
+msgstr "Region"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:205
+msgid "Idiomas"
+msgstr "Languages"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:215
+msgid "hace 1 semana"
+msgstr "1 week ago"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:226
+msgid "de 4 seleccionados"
+msgstr "of 4 selected"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:228
+msgid "Título"
+msgstr "Title"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:229
+msgid "Contenido"
+msgstr "Content"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:230
+msgid "ID usuario"
+msgstr "User ID"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:231
+msgid "Identificador"
+msgstr "Identifier"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:240
+msgid "sitios generados"
+msgstr "generated sites"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:241
+msgid "proyectos Django · listos para descargar"
+msgstr "Django projects · ready to download"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:246
+msgid "Proyectos generados"
+msgstr "Generated projects"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:250
+msgid "hace 2h"
+msgstr "2h ago"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:255
+msgid "hace 3d"
+msgstr "3d ago"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:260
+msgid "hace 1d"
+msgstr "1d ago"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:270
+msgid "URL de la API"
+msgstr "API URL"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:272
+msgid "https://api.example.com/v1/data"
+msgstr "https://api.example.com/v1/data"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:273
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:343
+msgid "Analizar"
+msgstr "Analyze"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:280
+msgid "o adjunta un archivo"
+msgstr "or attach a file"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:290
+msgid "Arrastra un archivo JSON, CSV o XML"
+msgstr "Drag a JSON, CSV or XML file"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:291
+msgid "o haz click para seleccionar"
+msgstr "or click to select"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:298
+msgid "Sugerencias rápidas"
+msgstr "Quick suggestions"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:302
+msgid "meteorología"
+msgstr "weather"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:322
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:326
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:330
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:334
+msgid "Detectado:"
+msgstr "Detected:"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:322
+msgid "Dashboard meteorológico"
+msgstr "Weather dashboard"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:322
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:334
+msgid "listo para generar"
+msgstr "ready to generate"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:323
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:331
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:335
+msgid "Generar sitio"
+msgstr "Generate site"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:326
+msgid "Pokédex / listado"
+msgstr "Pokédex / listing"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:327
+msgid "Ver sitio"
+msgstr "View site"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:330
+msgid "pendiente de confirmar"
+msgstr "pending confirmation"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:334
+msgid "Blog / posts"
+msgstr "Blog / posts"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:338
+msgid "proyectos"
+msgstr "projects"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:338
+msgid "generados · listos para descargar"
+msgstr "generated · ready to download"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:339
+msgid "Ver historial"
+msgstr "View history"
+
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:342
+msgid "Introduce una URL o arrastra un archivo para comenzar"
+msgstr "Enter a URL or drag a file to get started"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:10
+msgid "Proceso"
+msgstr "Process"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:11
+msgid "Cómo"
+msgstr "How"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:11
+msgid "funciona"
+msgstr "it works"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:12
+msgid ""
+"Cuatro pasos entre tu fuente de datos y un proyecto Django listo para "
+"ejecutar."
+msgstr "Four steps between your data source and a Django project ready to run."
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:18
+msgid "Conecta tu fuente"
+msgstr "Connect your source"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:19
+msgid ""
+"Pega una URL de API pública o arrastra un archivo JSON, CSV o XML. "
+"WebBuilder lo descarga y parsea automáticamente."
+msgstr "Paste a public API URL or drag a JSON, CSV or XML file. WebBuilder downloads and parses it automatically."
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:26
+msgid "La IA analiza el schema"
+msgstr "The AI analyzes the schema"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:27
+msgid ""
+"El LLM detecta los campos, infiere tipos y decide cuáles mostrar. Tú ajustas "
+"campo a campo antes de continuar."
+msgstr "The LLM detects fields, infers types and decides which ones to show. You adjust them field by field before continuing."
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:34
+msgid "Genera el proyecto"
+msgstr "Generate the project"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:35
+msgid ""
+"WebBuilder genera la base Django: modelos, vistas, templates y estilos "
+"adaptados al tipo de datos detectado."
+msgstr "WebBuilder generates the Django foundation: models, views, templates and styles adapted to the detected data type."
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:42
+msgid "Despliega con n8n"
+msgstr "Deploy with n8n"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:43
+msgid ""
+"El flujo automatizado empaqueta el proyecto, construye la imagen Docker y lo "
+"despliega en un puerto disponible."
+msgstr "The automated flow packages the project, builds the Docker image and deploys it on an available port."
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:52
+msgid "Flujos n8n automatizados"
+msgstr "Automated n8n flows"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:64
+msgid "Descomprimir Zip"
+msgstr "Unzip archive"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:66
+msgid "Restablecer Contenedor"
+msgstr "Reset container"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:68
+msgid "Elegir Puerto"
+msgstr "Choose port"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:68
+msgid "Escanea puertos 8100–8999"
+msgstr "Scans ports 8100–8999"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:74
+msgid "Verificar Docker"
+msgstr "Check Docker"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:74
+msgid "Espera 4s · comprueba estado"
+msgstr "Waits 4s · checks status"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:84
+msgid "Notifica IP · hora · dispositivo"
+msgstr "Notifies IP · time · device"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:92
+msgid "Bienvenida"
+msgstr "Welcome"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:92
+msgid "Correo de bienvenida al usuario"
+msgstr "Welcome email to the user"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:7
+msgid "Modelos"
+msgstr "Models"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:8
+msgid "Elige tu"
+msgstr "Choose your"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:8
+msgid "modelo de IA"
+msgstr "AI model"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:9
+msgid ""
+"Selecciona el LLM que genera tu proyecto. Cada modelo tiene sus fortalezas."
+msgstr "Choose the LLM that generates your project. Each model has its strengths."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:14
+msgid "Modelos disponibles"
+msgstr "Available models"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:46
+msgid "Personalizado"
+msgstr "Custom"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:50
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:150
+msgid "Conecta tu modelo"
+msgstr "Connect your model"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:62
+msgid "alta calidad"
+msgstr "high quality"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:63
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:87
+msgid "código"
+msgstr "code"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:64
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:138
+msgid "rápido"
+msgstr "fast"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:69
+msgid ""
+"El modelo más equilibrado de OpenAI. Destaca en generación de código "
+"estructurado, comprensión de schemas complejos y seguimiento de "
+"instrucciones detalladas."
+msgstr "OpenAI's most balanced model. It stands out in structured code generation, understanding complex schemas and following detailed instructions."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:70
+msgid "Especificaciones"
+msgstr "Specifications"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:72
+msgid "Contexto"
+msgstr "Context"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:73
+msgid "Velocidad"
+msgstr "Speed"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:73
+msgid "Alta"
+msgstr "High"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:74
+msgid "Proveedor"
+msgstr "Provider"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:75
+msgid "Coste"
+msgstr "Cost"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:75
+msgid "De pago"
+msgstr "Paid"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:86
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:120
+msgid "razonamiento"
+msgstr "reasoning"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:88
+msgid "preciso"
+msgstr "precise"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:93
+msgid ""
+"Muy fuerte en comprensión de APIs, inferencia de tipos de datos y generación "
+"de código Python/Django limpio."
+msgstr "Very strong at understanding APIs, inferring data types and generating clean Python/Django code."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:103
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:136
+msgid "gratuito"
+msgstr "free"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:104
+msgid "muy rápido"
+msgstr "very fast"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:110
+msgid ""
+"Una opción open source muy rápida para una generación económica y con buena "
+"latencia."
+msgstr "A very fast open source option for cost-effective generation with good latency."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:121
+msgid "multimodal"
+msgstr "multimodal"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:126
+msgid ""
+"Especialmente útil cuando hay datasets largos o estructuras amplias que "
+"necesitan mucho contexto."
+msgstr "Especially useful when there are long datasets or broad structures that need a lot of context."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:143
+msgid ""
+"Buena relación calidad/coste y buen razonamiento para generar templates "
+"coherentes."
+msgstr "Good quality/cost ratio and solid reasoning for generating coherent templates."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:151
+msgid "Compatible con OpenRouter y Groq"
+msgstr "Compatible with OpenRouter and Groq"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:155
+msgid ""
+"WebBuilder es compatible con APIs estilo OpenAI. Pega tu clave y el modelo "
+"que quieras usar."
+msgstr "WebBuilder is compatible with OpenAI-style APIs. Paste your key and the model you want to use."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:169
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:180
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:191
+msgid "Modelo"
+msgstr "Model"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:187
+msgid "URL del servidor"
+msgstr "Server URL"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:196
+msgid "Guardar y usar este modelo"
+msgstr "Save and use this model"
+
+#: WebBuilder/templates/WebBuilder/partials/home/metrics.html:7
+msgid "modelos de IA"
+msgstr "AI models"
+
+#: WebBuilder/templates/WebBuilder/partials/home/metrics.html:8
+msgid "tiempo de generación"
+msgstr "generation time"
+
+#: WebBuilder/templates/WebBuilder/partials/home/metrics.html:9
+msgid "flujos n8n automatizados"
+msgstr "automated n8n flows"
+
+#: WebBuilder/templates/WebBuilder/partials/home/metrics.html:10
+msgid "framework de salida"
+msgstr "output framework"
+
+#: WebBuilder/templates/WebBuilder/partials/home/metrics.html:11
+msgid "proyectos ejecutables"
+msgstr "runnable projects"

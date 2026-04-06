@@ -14,6 +14,10 @@
 - Introducir opcion de creacion automatica de usuario / super usuarios, para que al iniciar la pagina existan ya.
 - Posibilidad de reseñas, comentarios y demas sobre los articulos.
 
+## Botos y valoraciones
+- No estaria mal que al crear la pagina indiques tu futuro usuario, y cuando se cree la pagina con login y 
+todo puedas acceder, votar y todo lo demas
+
 ## IAs personalizadas
 - Investigar la configuracion de las IA "bascias" - OpenRouter, OpenAI, etc. Para poder seguir el patron para una IA personalizada.
 

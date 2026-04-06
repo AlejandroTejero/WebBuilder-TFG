@@ -16,14 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from django.conf.urls.i18n import i18n_patterns
+from django.views.i18n import set_language
 from WebBuilder.views.metrics import metrics_view
-
 
 urlpatterns = [
 	
+    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/metricas/', metrics_view, name='admin_metrics'),
-
     path('admin/', admin.site.urls),
     path('', include('WebBuilder.urls')),
+
 ]

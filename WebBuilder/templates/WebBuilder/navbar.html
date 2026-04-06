@@ -1,9 +1,33 @@
 {% load static %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+
+
+<!-- ============================================================
+   NAVBAR — WebBuilder
+   Secciones:
+     1. Logo / Brand
+     2. Menú central con dropdowns (hover desktop / click móvil)
+     3. Sección derecha
+        3a. Usuario autenticado (dropdown de perfil)
+        3b. Usuario no autenticado (botón Sign In)
+        3c. Separador vertical
+        3d. Selector de idioma (pill ES | EN)
+        3e. Toggle tema claro/oscuro (botón neumórfico)
+        3f. Botón hamburguesa (solo móvil)
+     4. JavaScript
+        4a. Aplicar tema guardado antes de pintar (IIFE)
+        4b. Dropdowns hover (desktop) y click (móvil)
+        4c. Botón hamburguesa móvil
+        4d. toggleTheme()
+        4e. switchLang()
+   ============================================================ -->
 
 <nav class="wb-navbar">
   <div class="wb-navbar-container">
-    
-    <!-- Logo y nombre -->
+
+
+    <!-- ── 1. LOGO / BRAND ── -->
     <a href="{% url 'home' %}" class="wb-navbar-brand">
       <div class="wb-navbar-logo">
         <img src="{% static 'images/logo.jpg' %}" alt="WB">
@@ -11,16 +35,19 @@
       <span class="wb-navbar-title">WebBuilder</span>
     </a>
 
-    <!-- Menú de navegación -->
+
+    <!-- ── 2. MENÚ CENTRAL CON DROPDOWNS ── -->
+    <!-- Desktop: mouseenter/mouseleave con delay de 120ms al cerrar.
+         Móvil: click sobre .wb-nav-link (ver JS 4b). -->
     <div class="wb-nav-menu">
-      
-      <!-- Inicio (sin desplegable) -->
-      <a href="{% url 'home' %}" 
+
+      <!-- Inicio - sin dropdown -->
+      <a href="{% url 'home' %}"
          class="wb-nav-link {% if request.resolver_match.url_name == 'home' %}wb-nav-link--active{% endif %}">
         Inicio
       </a>
 
-      <!-- Asistente (con desplegable) -->
+      <!-- Asistente - con dropdown -->
       <div class="wb-nav-item" data-dropdown="asistente">
         <div class="wb-nav-link {% if request.resolver_match.url_name == 'assistant' %}wb-nav-link--active{% endif %}">
           Asistente
@@ -48,7 +75,7 @@
         </div>
       </div>
 
-      <!-- Historial (con desplegable) -->
+      <!-- Historial - con dropdown -->
       <div class="wb-nav-item" data-dropdown="historial">
         <div class="wb-nav-link {% if request.resolver_match.url_name == 'history' %}wb-nav-link--active{% endif %}">
           Historial
@@ -64,7 +91,7 @@
           {% if api_request %}
           <a href="{% url 'edit' api_request.id %}" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Edit</div>
+              <div class="wb-dropdown-title">Editar</div>
               <div class="wb-dropdown-description">Vista previa del proyecto actual</div>
             </div>
           </a>
@@ -79,7 +106,7 @@
         </div>
       </div>
 
-      <!-- Ayuda (con desplegable) -->
+      <!-- Ayuda - con dropdown -->
       <div class="wb-nav-item" data-dropdown="ayuda">
         <div class="wb-nav-link">
           Ayuda
@@ -114,12 +141,14 @@
         </div>
       </div>
 
-    </div>
+    </div><!-- /wb-nav-menu -->
 
-    <!-- Sección derecha -->
+
+    <!-- ── 3. SECCIÓN DERECHA ── -->
     <div class="wb-nav-right">
+
+      <!-- 3a. Usuario autenticado -->
       {% if user.is_authenticated %}
-        <!-- Usuario autenticado -->
         <div class="wb-nav-item" data-dropdown="user">
           <div class="wb-nav-link">
             <span class="wb-user-icon">{{ user.username|first|upper }}</span>
@@ -137,127 +166,173 @@
                 <div class="wb-dropdown-title">Configuración</div>
               </div>
             </a>
+            <div class="wb-dropdown-divider"></div>
             <form method="post" action="{% url 'logout' %}">
               {% csrf_token %}
-              <button type="submit" class="wb-dropdown-item" style="width:100%; background:none; border:none; cursor:pointer; text-align:left; font:inherit; color:inherit; display:block;">
+              <button type="submit" class="wb-dropdown-item wb-dropdown-item--btn">
                 <div class="wb-dropdown-content">
                   <div class="wb-dropdown-title">Cerrar Sesión</div>
                 </div>
               </button>
             </form>
-            <!--
-            <a href="{% url 'history' %}" class="wb-dropdown-item">
-              <div class="wb-dropdown-content">
-                <div class="wb-dropdown-title">Mis Proyectos</div>
-              </div>
-            </a>
-            <a href="#" class="wb-dropdown-item">
-              <div class="wb-dropdown-content">
-                <div class="wb-dropdown-title">Configuración</div>
-              </div>
-            </a>
-            <a href="{% url 'login' %}" class="wb-dropdown-item">
-              <div class="wb-dropdown-content">
-                <div class="wb-dropdown-title">Cerrar Sesión</div>
-              </div>
-            </a>
-            -->
           </div>
         </div>
+
+      <!-- 3b. Usuario no autenticado -->
       {% else %}
-        <!-- Usuario no autenticado -->
         <a href="{% url 'login' %}" class="wb-nav-btn wb-nav-btn--secondary">
           Sign In
         </a>
-        <!--
-        <a href="{% url 'register' %}" class="wb-nav-btn wb-nav-btn--primary">
-          Registrarse
-        </a>
-        -->
       {% endif %}
-    </div>
 
-    <!-- Toggle dark/light mode ====================================================== -->
-    <button class="wb-theme-toggle" id="themeToggle" aria-label="Cambiar tema" onclick="toggleTheme()">
-      <span class="wb-theme-toggle__icon" id="themeIcon">☀️</span>
-    </button>
+      <!-- 3c. Separador vertical decorativo -->
+      <div class="wb-nav-divider"></div>
 
-    <!-- Botón hamburguesa para móvil -->
-    <button class="wb-nav-toggle" id="navToggle" aria-label="Toggle menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+      <!-- 3d. Selector de idioma — pill ES | EN
+           Idioma activo resaltado. Pulsar el activo no hace nada.
+           Pulsar el otro rellena el hidden y envía el form de Django i18n. -->
+      <form action="{% url 'set_language' %}" method="post" id="langForm" class="wb-lang-form">
+        {% csrf_token %}
+        <input type="hidden" name="next"     value="{{ request.get_full_path }}">
+        <input type="hidden" name="language" id="langInput" value="">
+        <div class="wb-lang-pill">
+          <button type="button"
+                  class="wb-lang-opt {% if CURRENT_LANGUAGE == 'es' %}wb-lang-opt--active{% endif %}"
+                  onclick="switchLang('es')">ES</button>
+          <button type="button"
+                  class="wb-lang-opt {% if CURRENT_LANGUAGE == 'en' %}wb-lang-opt--active{% endif %}"
+                  onclick="switchLang('en')">EN</button>
+        </div>
+      </form>
 
-  </div>
+      <!-- 3e. Toggle tema claro/oscuro — botón neumórfico circular
+           Luna visible en modo oscuro, sol en modo claro.
+           Gestiona la clase 'light' en <html> + localStorage. -->
+      <button class="wb-theme-toggle" id="themeToggle"
+              onclick="toggleTheme()" aria-label="Cambiar tema">
+        <!-- Icono luna (modo oscuro) -->
+        <svg class="wb-theme-icon wb-theme-icon--moon"
+             viewBox="0 0 24 24" fill="none"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Icono sol (modo claro) -->
+        <svg class="wb-theme-icon wb-theme-icon--sun"
+             viewBox="0 0 24 24" fill="none"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12"    y1="1"     x2="12"    y2="3"/>
+          <line x1="12"    y1="21"    x2="12"    y2="23"/>
+          <line x1="4.22"  y1="4.22"  x2="5.64"  y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1"     y1="12"    x2="3"     y2="12"/>
+          <line x1="21"    y1="12"    x2="23"    y2="12"/>
+          <line x1="4.22"  y1="19.78" x2="5.64"  y2="18.36"/>
+          <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <!-- 3f. Botón hamburguesa — solo visible en móvil (≤768px) -->
+      <button class="wb-nav-toggle" id="navToggle" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+    </div><!-- /wb-nav-right -->
+
+  </div><!-- /wb-navbar-container -->
 </nav>
 
-<!-- JavaScript para los menús desplegables -->
+
+<!-- ── 4. JAVASCRIPT ── -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const navItems = document.querySelectorAll('.wb-nav-item[data-dropdown]');
-    
-    // Toggle de dropdowns
+
+  /* 4a. IIFE — aplica el tema guardado antes de que el navegador
+     pinte para evitar el parpadeo de colores al recargar. */
+  (function () {
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.add('light');
+    }
+  })();
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+    /* 4b. DROPDOWNS
+       Desktop: hover con mouseenter/mouseleave.
+       Delay de 120ms al cerrar para poder mover el ratón
+       desde el link hasta el panel sin que se cierre.
+       Móvil: click sobre el .wb-nav-link. */
+
+    const navItems    = document.querySelectorAll('.wb-nav-item[data-dropdown]');
+    const isMobile    = () => window.innerWidth <= 768;
+    const closeTimers = {};
+
     navItems.forEach(item => {
-      const navLink = item.querySelector('.wb-nav-link');
-      
-      navLink.addEventListener('click', function(e) {
+      const key = item.dataset.dropdown;
+
+      item.addEventListener('mouseenter', () => {
+        if (isMobile()) return;
+        clearTimeout(closeTimers[key]);
+        navItems.forEach(other => {
+          if (other !== item) other.classList.remove('wb-nav-item--open');
+        });
+        item.classList.add('wb-nav-item--open');
+      });
+
+      item.addEventListener('mouseleave', () => {
+        if (isMobile()) return;
+        closeTimers[key] = setTimeout(() => {
+          item.classList.remove('wb-nav-item--open');
+        }, 120);
+      });
+
+      item.querySelector('.wb-nav-link').addEventListener('click', function (e) {
+        if (!isMobile()) return;
         e.preventDefault();
         e.stopPropagation();
-        
-        // Cerrar otros menús
-        navItems.forEach(otherItem => {
-          if (otherItem !== item) {
-            otherItem.classList.remove('wb-nav-item--open');
-          }
+        navItems.forEach(other => {
+          if (other !== item) other.classList.remove('wb-nav-item--open');
         });
-        
-        // Toggle del menú actual
         item.classList.toggle('wb-nav-item--open');
       });
     });
 
-    // Cerrar menús al hacer clic fuera
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       if (!e.target.closest('.wb-nav-item')) {
-        navItems.forEach(item => {
-          item.classList.remove('wb-nav-item--open');
-        });
+        navItems.forEach(item => item.classList.remove('wb-nav-item--open'));
       }
     });
 
-    // Prevenir que los clics dentro del dropdown cierren el menú
-    const dropdowns = document.querySelectorAll('.wb-dropdown');
-    dropdowns.forEach(dropdown => {
-      dropdown.addEventListener('click', function(e) {
-        e.stopPropagation();
-      });
-    });
 
-    // Toggle del menú móvil
+    /* 4c. BOTÓN HAMBURGUESA */
     const navToggle = document.getElementById('navToggle');
-    const navMenu = document.querySelector('.wb-nav-menu');
-    
+    const navMenu   = document.querySelector('.wb-nav-menu');
     if (navToggle) {
-      navToggle.addEventListener('click', function() {
+      navToggle.addEventListener('click', function () {
         navMenu.classList.toggle('wb-nav-menu--active');
         navToggle.classList.toggle('wb-nav-toggle--active');
       });
     }
-  });
 
-  // Dark/light mode ======================================================
+  }); /* fin DOMContentLoaded */
+
+
+  /* 4d. TOGGLE TEMA — añade/quita la clase 'light' en <html> */
   function toggleTheme() {
     const isLight = document.documentElement.classList.toggle('light');
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
   }
 
-  // Aplicar tema guardado al cargar
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'light') {
-    document.documentElement.classList.add('light');
-    const icon = document.getElementById('themeIcon');
-    if (icon) icon.textContent = '🌙';
+
+  /* 4e. SELECTOR DE IDIOMA — no hace nada si se pulsa el activo;
+     si se pulsa el otro, envía el form de Django i18n. */
+  function switchLang(lang) {
+    const currentLang = '{{ CURRENT_LANGUAGE }}';
+    if (lang === currentLang) return;
+    document.getElementById('langInput').value = lang;
+    document.getElementById('langForm').submit();
   }
+
 </script>
