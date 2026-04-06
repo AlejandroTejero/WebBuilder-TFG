@@ -1,12 +1,13 @@
 # Implementaciones esenciales
 
+## Mejora visual
+- Adaptar todo el proyecto al estilo del home (monocromatico con colores vivos en parte puqueñas)
+
 ## Mejora del historial y boton de eliminar proyectos 
-- Añadir paginacion, busqueda por filtros, es decir, hacerlo bonito y util
 - IMPORTANTE: Posibilidad de eliminar el pryoecto de la cuenta, que ahora solo se puede desde /admin.
 
 ## Lectura de datos
 - Implementacion de lectura: CSV y GEOJson.
-- Implementacion de adjuntar ficheros, no solo a traves de enlace.
 - Implementacion del codigo directo.
 
 ## Usuarios
@@ -53,3 +54,31 @@
 
 ## Prompting LLM
 - Investigar tecticas de prompting para añadir en la memoria
+
+
+# Claude (2, 3, 4, 5, 9)
+
+1. Preview en vivo del sitio generado
+Ahora mismo el usuario descarga un ZIP y tiene que levantarlo él. Con n8n ya tienes la infraestructura de despliegue montada — podrías mostrar un iframe dentro de la propia app con el site renderizado al momento. Muy vistoso en una demo del TFG.
+2. Editor de código integrado (tipo Monaco/CodeMirror)
+Tienes el endpoint site_update_file implementado pero el frontend seguramente es un textarea básico. Integrar Monaco Editor (el de VS Code) daría un salto visual enorme y es relativamente fácil de añadir vía CDN. Syntax highlighting, autocompletado, todo.
+3. Chat de refinamiento post-generación
+En lugar de solo regenerar el plan con un prompt, un mini-chat donde el usuario diga "quiero que la home tenga un hero más grande" o "añade un filtro por categoría" y el LLM modifique solo el fichero relevante. Sería la funcionalidad estrella del TFG.
+
+⚡ Útiles y relativamente rápidas de implementar
+4. Comparador de modelos LLM
+Como ya soportas cualquier proveedor OpenAI-compatible, podrías añadir un modo "benchmark" que mande el mismo prompt a dos modelos distintos y muestre los resultados lado a lado. Muy relevante académicamente para el TFG.
+5. Galería pública de sitios generados
+Una página tipo showcase donde se listen los GeneratedSite marcados como públicos, con screenshot y enlace. Da contexto de lo que puede hacer la herramienta sin necesidad de registrarse.
+6. Exportación a otros formatos
+Ahora exportas un proyecto Django. Podrías añadir opción de exportar como sitio estático (HTML/CSS/JS puro) para casos simples. Mucho más fácil de desplegar para usuarios no técnicos.
+7. Detección automática de paginación en la API
+Si la API tiene next, page, cursor... detectarlo y ofrecer cargar más datos antes de generar el sitio. Ahora mismo imagino que solo procesas la primera respuesta.
+
+🎨 Vistosas para la demo
+8. Modo "paso a paso" animado
+Una progress bar real que muestre en tiempo real qué fichero está generando el LLM en cada momento (ya tienes GenerationLog con el campo step). Hace que la espera sea mucho más engaging.
+9. Historial de versiones del proyecto generado
+Guardar snapshots de project_files antes de cada regeneración, con opción de volver a una versión anterior. Git-like pero sin Git.
+10. Thumbnails automáticos del sitio generado
+Usar Playwright o Puppeteer (desde n8n o un microservicio) para hacer un screenshot automático del site desplegado y mostrarlo en el historial. Transforma completamente cómo se ve la página de historial.

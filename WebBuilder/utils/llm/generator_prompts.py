@@ -184,7 +184,58 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
 
 # ── 5) TEMPLATE POR PÁGINA ───────────────────────────────────────────────────
 
-def prompt_template(*, page, fields, sample_items, site_type, site_title, user_prompt, all_pages,  real_fields=None, real_url_names=None):
+_VISUAL_REQUIREMENTS = {
+    "home": [
+        "OBLIGATORIO: Hero section con H1 grande (text-5xl+), subtítulo text-xl y botón CTA hacia el listado.",
+        "OBLIGATORIO: El hero usa gradiente CSS (bg-gradient-to-br) con los colores del tema, nunca color plano.",
+        "OBLIGATORIO: Sección de stats/highlights con 3 números o características en cards pequeñas.",
+        "OBLIGATORIO: Grid de featured items con los primeros 6 items (variable 'items'). Cards con imagen si existe.",
+        "OBLIGATORIO: Cada card del grid tiene hover effect: hover:-translate-y-1 hover:shadow-2xl transition-all duration-300.",
+        "OBLIGATORIO: Título del hero con gradiente de texto: bg-gradient-to-r bg-clip-text text-transparent.",
+        "RECOMENDADO: Eyebrow label sobre el H1 (badge pequeño con el tipo de sitio o temática).",
+    ],
+    "list": [
+        "OBLIGATORIO: Cabecera de sección con título H1 y contador de resultados ({{ items|length }} items).",
+        "OBLIGATORIO: Grid responsive: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4.",
+        "OBLIGATORIO: Cards con imagen (aspect-video object-cover) si existe campo de imagen en el modelo.",
+        "OBLIGATORIO: Placeholder visual con SVG inline cuando no hay imagen. NUNCA uses placeholder.com.",
+        "OBLIGATORIO: Badge de categoría en las cards si existe el campo.",
+        "OBLIGATORIO: Hover en cards: hover:-translate-y-1 hover:shadow-2xl transition-all duration-300.",
+        "OBLIGATORIO: Empty state visual con icono SVG y mensaje cuando no hay items ({% empty %}).",
+        "RECOMENDADO: Mini hero (py-12) con título y subtítulo antes del grid.",
+    ],
+    "detail": [
+        "OBLIGATORIO: Breadcrumb arriba: Inicio › Listado › Nombre del item.",
+        "OBLIGATORIO: Layout dos columnas en desktop: lg:grid lg:grid-cols-2 lg:gap-16.",
+        "OBLIGATORIO: Imagen grande (aspect-square object-cover rounded-2xl) con placeholder SVG si no existe.",
+        "OBLIGATORIO: Mostrar TODOS los campos del modelo. Campos secundarios en grid de metadatos con separadores.",
+        "OBLIGATORIO: Dato principal (precio, score...) con tipografía grande y color de acento si existe.",
+        "OBLIGATORIO: Botón 'Volver al listado' bien visible al final.",
+        "RECOMENDADO: Sección 'También te puede interesar' con 3 items al final si hay variable 'items'.",
+    ],
+    "other": [
+        "OBLIGATORIO: Hero con título y descripción clara de la página.",
+        "OBLIGATORIO: Al menos un elemento visual destacado (stats, timeline o grid de features).",
+        "OBLIGATORIO: Diseño coherente con el resto del sitio.",
+    ],
+}
+
+_TAILWIND_DESIGN_RULES = [
+    "TIPOGRAFÍA: jerarquía clara — H1: text-5xl font-black, H2: text-3xl font-bold, cuerpo: text-base text-gray-300.",
+    "ESPACIADO: secciones separadas con py-16 o py-20. Nunca aglomeres contenido.",
+    "CARDS: siempre border rounded-2xl overflow-hidden. Nunca esquinas cuadradas.",
+    "BOTONES primarios: bg-gradient-to-r font-bold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity.",
+    "BOTONES secundarios: border border-gray-600 text-gray-300 hover:border-white hover:text-white transition-colors.",
+    "IMÁGENES: siempre con aspect-ratio fijo (aspect-video o aspect-square). Nunca dejes que rompan el layout.",
+    "BADGES: pills con bg-color/10 text-color text-xs font-semibold px-3 py-1 rounded-full.",
+    "FONDOS: alterna entre bg-gray-950 y bg-gray-900/50 en secciones consecutivas.",
+    "SOMBRAS: usa shadow-xl o shadow-2xl. Nunca shadow sin modificador.",
+    "GRADIENTES de texto en heroes: bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent.",
+    "ICONOS SVG: úsalos en features, empty states y stats. Paths simples 24x24, sin librerías externas.",
+]
+
+
+def prompt_template(*, page, fields, sample_items, site_type, site_title, user_prompt, all_pages, real_fields=None, real_url_names=None):
     is_list   = page.get("is_list", False)
     is_detail = page.get("is_detail", False)
 
@@ -202,15 +253,19 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
     elif is_detail:
         context_hint = (
             "CONTEXTO: 'item' (objeto Item individual), 'site_title'.\n"
-            "Muestra todos los campos del item.\n"
+            "Muestra TODOS los campos del item de forma visual y organizada.\n"
             "Enlace de vuelta: {% url 'catalog' %} (o la página de listado)."
         )
     else:
         context_hint = (
             "CONTEXTO: 'site_title', 'items' (primeros 6 para featured).\n"
-            "Es una página estática/editorial. Diseña un hero atractivo.\n"
-            "Incluye CTA hacia el listado principal."
+            "Es la portada del sitio. Diseña un hero impactante con CTA al listado.\n"
+            "Incluye grid de featured items usando la variable 'items'."
         )
+
+    # Requisitos visuales según tipo de página
+    page_kind    = "list" if is_list else ("detail" if is_detail else ("home" if page["name"] == "home" else "other"))
+    requirements = _VISUAL_REQUIREMENTS.get(page_kind, _VISUAL_REQUIREMENTS["other"])
 
     rules = [
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con {% extends 'base.html' %}. Sin nada antes.",
@@ -218,65 +273,59 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
         "USA {% extends 'base.html' %} y {% block content %}...{% endblock %}.",
         "USA Tailwind CSS (CDN ya en base.html). Sin <style> extenso.",
         "DISEÑO: sigue el estilo indicado en el prompt del usuario para colores y estética.",
-        "Si no hay indicación de colores, usa un diseño oscuro moderno.",
-        "Hover en cards: añade transición suave hover:shadow-lg transition-all.",
+        "Si no hay indicación de colores, usa un diseño oscuro moderno con bg-gray-950.",
         context_hint,
         "USA {% if item.campo %} para campos opcionales.",
-        "El diseño debe adaptarse al site_type y al prompt del usuario.",
         "Nombres de campo: usa los 'key' del schema directamente como atributos del modelo.",
-        "CRITICO: todos los campos del modelo son strings o tipos simples, NUNCA objetos. No uses item.campo.subcampo.",
+        "CRÍTICO: todos los campos del modelo son strings o tipos simples. NUNCA uses item.campo.subcampo.",
     ]
 
     if real_fields:
-        rules.append(f"CAMPOS EXACTOS del modelo Item: {real_fields}")
-        rules.append("En los templates usa item.<campo> SOLO con campos de esa lista.")
-        rules.append("NUNCA uses item.campo.subcampo — todos son strings simples.")
+        rules.append(f"CAMPOS EXACTOS del modelo Item (úsalos tal cual, ninguno más): {real_fields}")
+        rules.append("NUNCA uses un campo que no esté en esa lista.")
 
     if real_url_names:
         detail_page = next((n for n, v in real_url_names.items()
                            if any(p.get("is_detail") and p["name"] == n
                                   for p in all_pages)), None)
-        
         url_rules = "NOMBRES EXACTOS de las URLs para usar en {% url %}:\n"
         for name, view_name in real_url_names.items():
             url_rules += f"  - {{% url '{view_name}' %}}\n"
         if detail_page:
             url_rules += f"  - Para detalle con pk: {{% url '{real_url_names[detail_page]}' item.pk %}}\n"
-
         rules.append(url_rules)
         rules.append("NUNCA inventes nombres de URL que no estén en esa lista.")
 
     user_text = "\n".join([
         f"SITIO: {site_title}  |  TIPO: {site_type}",
         "",
-        "═══ INSTRUCCIÓN PRINCIPAL DEL USUARIO (prioridad máxima) ═══",
+        "═══ INSTRUCCIÓN DEL USUARIO (prioridad máxima) ═══",
         f"{user_prompt or '(sin instrucciones — usa tu criterio según el dataset)'}",
-        "═══════════════════════════════════════════════════════════",
+        "═══════════════════════════════════════════════════",
         "",
-        "IMPORTANTE: El diseño, estilo, colores y estructura deben",
-        "reflejar fielmente la instrucción del usuario de arriba.",
-        "Si pide minimalista → minimalista. Si pide colorido → colorido.",
-        "Si pide oscuro → oscuro. La instrucción del usuario manda.",
+        "IMPORTANTE: colores, estilo y estructura deben reflejar fielmente la instrucción del usuario.",
+        "Si pide minimalista → minimalista. Si pide oscuro → oscuro. El usuario manda.",
         "",
         f"PÁGINA: {page['name']} — {page['description']}",
         "", "NAVEGACIÓN:", nav_links,
         "", "CAMPOS:", _fields_info(fields),
         "", "DATOS DE EJEMPLO:", _samples_info(sample_items, 3),
+        "", "COMPONENTES OBLIGATORIOS para esta página (implementa TODOS los marcados como OBLIGATORIO):",
+        "\n".join(f"  {r}" for r in requirements),
+        "", "REGLAS DE DISEÑO TAILWIND:",
+        "\n".join(f"  {r}" for r in _TAILWIND_DESIGN_RULES),
         "", "REGLAS TÉCNICAS:", "\n".join(f"- {r}" for r in rules),
-        f"", f"Genera el template '{page['name']}' ahora:",
+        "", f"Genera el template '{page['name']}' ahora:",
     ])
 
-    # Añadir ejemplo few-shot si existe para este tipo
-    page_kind = 'list' if is_list else ('detail' if is_detail else 'home')
+    # Few-shot example
+    page_kind    = "list" if is_list else ("detail" if is_detail else "home")
     example_html = get_example(site_type, page_kind)
-
     if example_html:
-        user_text += "\n\nEJEMPLO DE REFERENCIA (úsalo como inspiración estructural):"
+        user_text += "\n\nEJEMPLO DE REFERENCIA (inspiración estructural — adapta los campos reales, NO copies esto tal cual):"
         user_text += example_html
-        user_text += "\n(Adapta el diseño libremente. USA los campos reales, NO los del ejemplo. NO copies esto tal cual.)"
 
     return _base_system(), user_text
-
 
 # ── 6) LOAD_DATA.PY ──────────────────────────────────────────────────────────
 

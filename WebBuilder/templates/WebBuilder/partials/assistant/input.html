@@ -45,34 +45,194 @@
     </div>
 
     <div class="asst-field">
-      <label class="asst-label" for="{{ form.user_prompt.id_for_label }}">
-        Describe el tipo de web que quieres, cuanto más detalle mejor.
-        <span class="asst-label__optional">opcional</span>
-      </label>
-      {{ form.user_prompt }}
-
-      <div class="asst-examples" style="margin-top: 10px;">
-        <span class="asst-examples__label">Ejemplos:</span>
-        <button type="button" class="asst-example-chip"
-          onclick="fillPrompt('Catálogo minimalista en blanco y negro, grid de 3 columnas, imagen grande, precio destacado en negro y botón de ver detalle.')">
-          🛍 Tienda
-        </button>
-        <button type="button" class="asst-example-chip"
-          onclick="fillPrompt('Blog estilo periódico, tipografía grande, columnas de texto, colores sobrios en gris y blanco, fecha y categoría visibles.')">
-          📰 Blog
-        </button>
-        <button type="button" class="asst-example-chip"
-          onclick="fillPrompt('Portfolio moderno con fondo negro, tarjetas con efecto hover, imagen a pantalla completa y título en verde neón.')">
-          💼 Portfolio
-        </button>
-        <button type="button" class="asst-example-chip"
-          onclick="fillPrompt('Dashboard con tablas de datos, gráficos simples, colores azul y gris, diseño compacto y profesional.')">
-          📊 Dashboard
-        </button>
+      <div class="asst-label-row">
+        <label class="asst-label" for="{{ form.user_prompt.id_for_label }}">
+          Describe el tipo de web que quieres
+          <span class="asst-label__optional">opcional</span>
+        </label>
+        <div class="asst-input-toggle" id="prompt-mode-toggle">
+          <button type="button" class="asst-toggle-btn active" onclick="switchPromptMode('free')">✏️ Libre</button>
+          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('examples')">⚡ Ejemplos</button>
+          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('guided')">✨ Guiado</button>
+        </div>
       </div>
 
-      <p class="asst-hint">Cuanto más detallas colores, layout y estilo, mejor será el resultado.</p>
+      <!-- Modo libre: textarea normal -->
+      <div id="prompt-mode-free">
+        {{ form.user_prompt }}
+        <p class="asst-hint">Cuanto más detallas colores, layout y estilo, mejor será el resultado.</p>
+      </div>
+
+      <!-- Modo ejemplos: chips -->
+      <div id="prompt-mode-examples" style="display:none;">
+        <div class="asst-wizard-examples">
+          <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Catálogo minimalista en blanco y negro, grid de 3 columnas, imagen grande, precio destacado en negro y botón de ver detalle.')">
+            <span class="asst-wizard-example__icon">🛍</span>
+            <span class="asst-wizard-example__label">Tienda</span>
+            <span class="asst-wizard-example__desc">Catálogo minimalista, grid 3 cols, precio destacado</span>
+          </button>
+          <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Blog estilo periódico, tipografía grande, columnas de texto, colores sobrios en gris y blanco, fecha y categoría visibles.')">
+            <span class="asst-wizard-example__icon">📰</span>
+            <span class="asst-wizard-example__label">Blog</span>
+            <span class="asst-wizard-example__desc">Estilo periódico, tipografía grande, sobrio</span>
+          </button>
+          <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Portfolio moderno con fondo negro, tarjetas con efecto hover, imagen a pantalla completa y título en verde neón.')">
+            <span class="asst-wizard-example__icon">💼</span>
+            <span class="asst-wizard-example__label">Portfolio</span>
+            <span class="asst-wizard-example__desc">Fondo negro, hover effects, imágenes grandes</span>
+          </button>
+          <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Dashboard con tablas de datos, gráficos simples, colores azul y gris, diseño compacto y profesional.')">
+            <span class="asst-wizard-example__icon">📊</span>
+            <span class="asst-wizard-example__label">Dashboard</span>
+            <span class="asst-wizard-example__desc">Tablas, métricas, azul y gris, profesional</span>
+          </button>
+        </div>
+        <p class="asst-hint">Pulsa un ejemplo para usarlo como punto de partida. Puedes editarlo en modo libre.</p>
+      </div>
+
+      <!-- Modo guiado: wizard -->
+      <div id="prompt-mode-guided" style="display:none;">
+        <div class="asst-wizard">
+
+          <!-- Indicador de pasos -->
+          <div class="asst-wizard__steps">
+            <div class="asst-wizard__step-dot active" id="wdot-1">1</div>
+            <div class="asst-wizard__step-line"></div>
+            <div class="asst-wizard__step-dot" id="wdot-2">2</div>
+            <div class="asst-wizard__step-line"></div>
+            <div class="asst-wizard__step-dot" id="wdot-3">3</div>
+          </div>
+
+          <!-- Paso 1: Estilo visual -->
+          <div class="asst-wizard__panel" id="wpanel-1">
+            <p class="asst-wizard__question">¿Qué estilo visual quieres?</p>
+
+            <div class="asst-wizard__group">
+              <span class="asst-wizard__group-label">Fondo</span>
+              <div class="asst-wizard__options">
+                <button type="button" class="asst-wizard__opt asst-wizard__opt--selected" data-group="bg" data-value="fondo oscuro">
+                  🌑 Oscuro
+                </button>
+                <button type="button" class="asst-wizard__opt" data-group="bg" data-value="fondo claro y minimalista">
+                  ☀️ Claro
+                </button>
+              </div>
+            </div>
+
+            <div class="asst-wizard__group">
+              <span class="asst-wizard__group-label">Color de acento</span>
+              <div class="asst-wizard__options">
+                <button type="button" class="asst-wizard__opt asst-wizard__opt--selected" data-group="color" data-value="acento verde esmeralda">
+                  🟢 Verde
+                </button>
+                <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento azul eléctrico">
+                  🔵 Azul
+                </button>
+                <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento morado vibrante">
+                  🟣 Morado
+                </button>
+                <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento naranja cálido">
+                  🟠 Naranja
+                </button>
+                <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento rojo intenso">
+                  🔴 Rojo
+                </button>
+              </div>
+            </div>
+
+            <div class="asst-wizard__nav">
+              <span></span>
+              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardNext(2)">Siguiente →</button>
+            </div>
+          </div>
+
+          <!-- Paso 2: Qué destacar -->
+          <div class="asst-wizard__panel" id="wpanel-2" style="display:none;">
+            <p class="asst-wizard__question">¿Qué elementos quieres destacar?</p>
+
+            <div class="asst-wizard__checks">
+              <label class="asst-wizard__check">
+                <input type="checkbox" data-hint="imágenes grandes y destacadas" checked>
+                <span class="asst-wizard__check-box"></span>
+                <span>🖼 Imágenes grandes</span>
+              </label>
+              <label class="asst-wizard__check">
+                <input type="checkbox" data-hint="precios visibles y en tipografía grande">
+                <span class="asst-wizard__check-box"></span>
+                <span>💰 Precios</span>
+              </label>
+              <label class="asst-wizard__check">
+                <input type="checkbox" data-hint="valoraciones con estrellas o badge numérico">
+                <span class="asst-wizard__check-box"></span>
+                <span>⭐ Valoraciones</span>
+              </label>
+              <label class="asst-wizard__check">
+                <input type="checkbox" data-hint="badges de categoría con colores">
+                <span class="asst-wizard__check-box"></span>
+                <span>🏷 Categorías</span>
+              </label>
+              <label class="asst-wizard__check">
+                <input type="checkbox" data-hint="fechas visibles en las cards">
+                <span class="asst-wizard__check-box"></span>
+                <span>📅 Fechas</span>
+              </label>
+              <label class="asst-wizard__check">
+                <input type="checkbox" data-hint="botones de enlace externo o CTA">
+                <span class="asst-wizard__check-box"></span>
+                <span>🔗 Botones de acción</span>
+              </label>
+            </div>
+
+            <div class="asst-wizard__nav">
+              <button type="button" class="asst-btn asst-btn--ghost asst-btn--sm" onclick="wizardNext(1)">← Atrás</button>
+              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardNext(3)">Siguiente →</button>
+            </div>
+          </div>
+
+          <!-- Paso 3: Personalidad -->
+          <div class="asst-wizard__panel" id="wpanel-3" style="display:none;">
+            <p class="asst-wizard__question">¿Qué personalidad tiene el sitio?</p>
+
+            <div class="asst-wizard__options asst-wizard__options--grid">
+              <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño minimalista, mucho espacio en blanco, tipografía limpia">
+                <span class="asst-wizard__opt-icon">◻️</span>
+                <span class="asst-wizard__opt-name">Minimalista</span>
+                <span class="asst-wizard__opt-sub">Limpio, espaciado, sobrio</span>
+              </button>
+              <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño moderno con gradientes, sombras y efectos hover dinámicos">
+                <span class="asst-wizard__opt-icon">⚡</span>
+                <span class="asst-wizard__opt-name">Moderno</span>
+                <span class="asst-wizard__opt-sub">Gradientes, sombras, dinámico</span>
+              </button>
+              <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño elegante y sofisticado, tipografía serif, colores neutros">
+                <span class="asst-wizard__opt-icon">✦</span>
+                <span class="asst-wizard__opt-name">Elegante</span>
+                <span class="asst-wizard__opt-sub">Sofisticado, serif, neutros</span>
+              </button>
+              <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño colorido y vibrante, colores saturados, energético">
+                <span class="asst-wizard__opt-icon">🎨</span>
+                <span class="asst-wizard__opt-name">Colorido</span>
+                <span class="asst-wizard__opt-sub">Vibrante, saturado, energético</span>
+              </button>
+            </div>
+
+            <div class="asst-wizard__group" style="margin-top: 1rem;">
+              <span class="asst-wizard__group-label">Algo más que añadir <span class="asst-label__optional">opcional</span></span>
+              <textarea class="asst-wizard__extra" id="wizard-extra" placeholder="Ej: quiero que las cards tengan bordes redondeados y la navbar sea transparente..."></textarea>
+            </div>
+
+            <div class="asst-wizard__nav">
+              <button type="button" class="asst-btn asst-btn--ghost asst-btn--sm" onclick="wizardNext(2)">← Atrás</button>
+              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardBuild()">✨ Generar prompt</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
+
+
 
     {% if api_request %}
       <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
