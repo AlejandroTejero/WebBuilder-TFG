@@ -8,7 +8,8 @@
 </section>
 {% endif %}
 
-{% if llm_plan %}
+{% if llm_plan or api_request.field_mapping %}
+{% with plan=llm_plan|default:api_request.field_mapping %}
 <section class="asst-card asst-card--schema" id="block-schema">
   <div class="asst-card__header">
     <div class="asst-card__step-badge asst-card__step-badge--ai">✦ IA</div>
@@ -20,21 +21,21 @@
     <div class="asst-schema-meta">
       <div class="asst-meta-pill">
         <span class="asst-meta-pill__label">Tipo</span>
-        <span class="asst-meta-pill__value">{{ llm_plan.site_type }}</span>
+        <span class="asst-meta-pill__value">{{ plan.site_type }}</span>
       </div>
       <div class="asst-meta-pill">
         <span class="asst-meta-pill__label">Título</span>
-        <span class="asst-meta-pill__value">{{ llm_plan.site_title }}</span>
+        <span class="asst-meta-pill__value">{{ plan.site_title }}</span>
       </div>
       <div class="asst-meta-pill">
         <span class="asst-meta-pill__label">Campos</span>
-        <span class="asst-meta-pill__value">{{ llm_plan.fields|length }}</span>
+        <span class="asst-meta-pill__value">{{ plan.fields|length }}</span>
       </div>
     </div>
 
-    {% if llm_plan.fields %}
+    {% if plan.fields %}
     <div class="asst-fields-list">
-      {% for field in llm_plan.fields %}
+      {% for field in plan.fields %}
         <div class="asst-field-chip">
           <code class="asst-field-chip__key">{{ field.key }}</code>
           <span class="asst-field-chip__arrow">→</span>
@@ -51,6 +52,7 @@
     </a>
   </div>
 </section>
+{% endwith %}
 {% else %}
 <section class="asst-card asst-card--empty" id="block-schema-empty">
   <div class="asst-empty-state">
@@ -74,7 +76,7 @@
     {% for item in preview_items %}
       <div class="asst-preview-card">
         <div class="asst-preview-card__index">#{{ forloop.counter }}</div>
-        {% for field in llm_plan.fields %}
+        {% for field in plan.fields %}
           {% with val=item|get_item:field.key %}
             {% if val %}
               <div class="asst-preview-field">

@@ -58,7 +58,9 @@ def prompt_pages_structure(*, site_type, site_title, user_prompt, fields, sample
 
     rules = [
         "Devuelve SOLO JSON con key 'pages' (lista de páginas).",
-        "Mínimo obligatorio: home/portada + listado + detalle.",
+        "MÍNIMO OBLIGATORIO: home + listado + detalle. Siempre estas tres.",
+        "CRÍTICO: la página 'home' es una LANDING PAGE — hero, stats y featured items. NUNCA es el listado completo.",
+        "CRÍTICO: el listado completo va SIEMPRE en una página separada (catalog, list, etc.) con is_list=true.",
         "Opcionales según el prompt: about, contact, categorías, búsqueda.",
         "Máximo 6 páginas en total.",
         "Cada página: name, url, template, view_name, description, is_list, is_detail.",
@@ -120,10 +122,19 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con 'from django.shortcuts import render, get_object_or_404'. Sin nada antes.",
         "CRÍTICO: PROHIBIDO usar ```, ```python o cualquier bloque Markdown. Código puro.",
         "Importa: from .models import Item",
+        "Importa: from django.core.paginator import Paginator",
         "Una view por cada página en PÁGINAS.",
-        "La view de listado: items = Item.objects.all().order_by('-id')",
+        "La view de listado acepta búsqueda server-side: q = request.GET.get('q', ''); si q no está vacío, filtra con Item.objects.filter(pk__isnull=False) y añade Q objects para cada campo de texto disponible. Pasa 'q' al contexto para que el template pueda mostrar el valor en el input.",
+        "La view de listado DEBE usar paginación:",
+        "  from django.core.paginator import Paginator",
+        "  queryset = Item.objects.all().order_by('-id')",
+        "  paginator = Paginator(queryset, 12)",
+        "  page_number = request.GET.get('page', 1)",
+        "  items = paginator.get_page(page_number)",
+        "  Pasar 'items' y 'page_obj' (= items) al contexto.",
         "La view de detalle: recibe pk y usa get_object_or_404(Item, pk=pk).",
-        "Páginas no-listado no-detalle (home, about...): puede pasar items[:6] como featured.",
+        "La view de detalle ADEMÁS pasa 'related' al contexto: related = Item.objects.exclude(pk=item.pk).order_by('?')[:3]",
+        "Páginas no-listado no-detalle (home, about...): pasa items[:6] como featured usando Item.objects.all().order_by('-id')[:6].",
         "Cada view pasa 'site_title' al contexto.",
         "Sin autenticación, sin formularios complejos.",
     ]
@@ -147,7 +158,7 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
 
 def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
     nav_pages = [p for p in all_pages if not p.get("is_detail")]
-    nav_info = json.dumps(
+    nav_info  = json.dumps(
         [{"name": p["name"], "url": p["url"], "view_name": p["view_name"]} for p in nav_pages],
         ensure_ascii=False,
     )
@@ -155,27 +166,30 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con '<!doctype html>'. Sin nada antes.",
         "CRÍTICO: PROHIBIDO usar ```, ```html o cualquier bloque Markdown. HTML puro.",
         "Incluye <script src='https://cdn.tailwindcss.com'></script> en <head>.",
-        "Incluye Inter font de Google Fonts en <head>.",
-        "COLORES: usa los colores indicados en el prompt del usuario.",
-        "Si no hay indicación, usa fondo oscuro bg-gray-950 con texto claro.",
-        "Navbar: site_title a la izquierda, links de nav a la derecha.",
+        "Incluye la fuente Inter de Google Fonts en <head>: family=Inter:wght@300;400;500;600;700.",
+        "META TAGS OBLIGATORIOS en <head>: charset, viewport, description con site_title, og:title.",
+        "FAVICON: añade <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>'>.",
+        "NAVBAR: sticky top-0 z-50 con backdrop-blur-sm y border-b sutil. site_title a la izquierda en font-bold.",
+        "NAVBAR ACTIVO: usa request.path para marcar el link activo — añade color primario y font-semibold al link actual.",
         "Links del navbar usan {% url 'view_name' %}.",
+        "COLORES: usa los colores indicados en el prompt del usuario con clases Tailwind.",
+        "Si no hay indicación de colores, usa fondo oscuro bg-gray-950 con texto claro.",
         "{% block content %}{% endblock %} dentro de <main class='max-w-7xl mx-auto px-6 py-10'>.",
-        "Footer minimalista con el nombre del sitio.",
+        "FOOTER OBLIGATORIO: dos columnas — (1) nombre del sitio + descripción breve, (2) links de navegación. Separado con border-t. Copyright: © {% now 'Y' %} {{ site_title }}.",
+        "ANIMACIONES: añade en <head> un <style> con estas clases: @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } } .animate-in { animation: fadeInUp 0.5s ease-out forwards; } .animate-in-delay-1 { opacity:0; animation: fadeInUp 0.5s 0.1s ease-out forwards; } .animate-in-delay-2 { opacity:0; animation: fadeInUp 0.5s 0.2s ease-out forwards; }",
         "NO uses JavaScript propio.",
     ]
-    
+
     user_text = "\n".join([
         f"SITIO: {site_title}  |  TIPO: {site_type}",
         "",
-        "═══ INSTRUCCIÓN PRINCIPAL DEL USUARIO (prioridad máxima) ═══",
+        "═══ INSTRUCCIÓN DEL USUARIO (prioridad máxima) ═══",
         f"{user_prompt or '(sin instrucciones — usa tu criterio según el dataset)'}",
-        "═══════════════════════════════════════════════════════════",
+        "═══════════════════════════════════════════════════",
         "",
-        "IMPORTANTE: El estilo visual del sitio debe reflejar",
-        "fielmente la instrucción del usuario.",
+        "IMPORTANTE: el estilo visual, colores y personalidad deben reflejar fielmente la instrucción del usuario.",
         "",
-        "", "PÁGINAS PARA EL NAVBAR:", nav_info,
+        "PÁGINAS PARA EL NAVBAR:", nav_info,
         "", "REGLAS TÉCNICAS:", "\n".join(f"- {r}" for r in rules),
         "", "Genera base.html ahora:",
     ])
@@ -195,7 +209,12 @@ _VISUAL_REQUIREMENTS = {
         "RECOMENDADO: Eyebrow label sobre el H1 (badge pequeño con el tipo de sitio o temática).",
     ],
     "list": [
+        "CRÍTICO: para el enlace al detalle de cada card usa EXACTAMENTE el nombre de URL de la página de detalle indicado en NOMBRES EXACTOS de las URLs. NUNCA uses 'detail' genérico.",
         "OBLIGATORIO: Cabecera de sección con título H1 y contador de resultados ({{ items|length }} items).",
+        "OBLIGATORIO: Input de búsqueda con id='search-input' y placeholder descriptivo justo antes del grid.",
+        "OBLIGATORIO: Cada card debe tener atributo data-search con todos sus campos concatenados en minúsculas. Ejemplo: data-search='{{ item.title|lower }} {{ item.category|lower }} {{ item.description|lower }}'.",
+        "OBLIGATORIO: Al final del {% block content %}, antes del {% endblock %}, añade este JS exacto: <script>const si=document.getElementById('search-input');si.addEventListener('input',()=>{const q=si.value.toLowerCase();document.querySelectorAll('.search-item').forEach(c=>{c.style.display=c.dataset.search.includes(q)?'':'none';});});</script>",
+        "OBLIGATORIO: Cada card debe tener además la clase CSS 'search-item'.",
         "OBLIGATORIO: Grid responsive: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4.",
         "OBLIGATORIO: Cards con imagen (aspect-video object-cover) si existe campo de imagen en el modelo.",
         "OBLIGATORIO: Placeholder visual con SVG inline cuando no hay imagen. NUNCA uses placeholder.com.",
@@ -244,17 +263,25 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
         for p in all_pages if not p.get("is_detail")
     )
 
+    # Resolver nombre real de la URL de detalle
+    detail_page = next((p for p in all_pages if p.get("is_detail")), None)
+    detail_url_name = detail_page["name"] if detail_page else "detail"
+
+    # Resolver nombre real de la URL de listado
+    list_page = next((p for p in all_pages if p.get("is_list")), None)
+    list_url_name = list_page["name"] if list_page else "catalog"
+
     if is_list:
         context_hint = (
             "CONTEXTO: 'items' (queryset de Item), 'site_title'.\n"
             "Usa {% for item in items %} para iterar.\n"
-            "Enlace a detalle: {% url 'detail' item.pk %}"
+            f"Enlace a detalle: {{% url '{detail_url_name}' item.pk %}}"
         )
     elif is_detail:
         context_hint = (
             "CONTEXTO: 'item' (objeto Item individual), 'site_title'.\n"
             "Muestra TODOS los campos del item de forma visual y organizada.\n"
-            "Enlace de vuelta: {% url 'catalog' %} (o la página de listado)."
+            f"Enlace de vuelta: {{% url '{list_url_name}' %}} (o la página de listado)."
         )
     else:
         context_hint = (
@@ -278,6 +305,8 @@ def prompt_template(*, page, fields, sample_items, site_type, site_title, user_p
         "USA {% if item.campo %} para campos opcionales.",
         "Nombres de campo: usa los 'key' del schema directamente como atributos del modelo.",
         "CRÍTICO: todos los campos del modelo son strings o tipos simples. NUNCA uses item.campo.subcampo.",
+        "ICONOS SVG: para features, stats, empty states y botones usa iconos SVG inline simples (24x24). No necesitas librerías externas. Ejemplo: <svg class='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/></svg>. Dibuja paths básicos: checks, flechas, estrellas, imágenes, calendarios, ubicaciones.",
+        "ANIMACIONES: aplica la clase 'animate-in' al hero principal y 'animate-in-delay-1', 'animate-in-delay-2' a los elementos siguientes (subtítulo, CTA, primer grid). Estas clases ya están definidas en base.html.",
     ]
 
     if real_fields:

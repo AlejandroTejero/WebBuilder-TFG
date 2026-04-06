@@ -171,7 +171,8 @@ def generate_project_files(site) -> dict[str, str]:
         if not html.strip():
             html = fallback_template(page)
 
-        files[f"{project}/{app}/templates/{page['template']}"] = strip_markdown_fences(html)
+        from ..llm.consistency_checker import fix_template
+        files[f"{project}/{app}/templates/{page['template']}"] = fix_template(html)
 
     # ── PASO 6: load_data.py ─────────────────────────────────────────────────
     logger.info("[generator] Paso 6: load_data.py")
