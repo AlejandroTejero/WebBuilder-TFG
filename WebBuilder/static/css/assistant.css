@@ -1224,3 +1224,58 @@
 .asst-wizard-example__label { font-size: 0.85rem; font-weight: 600; color: #94a3b8; }
 .asst-wizard-example__desc  { font-size: 0.72rem; color: #334155; line-height: 1.4; }
 .asst-wizard-example:hover .asst-wizard-example__label { color: #93c5fd; }
+
+/* ── Versiones en sidebar ─────────────────────────────── */
+.asst-versions {
+  margin-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 1rem;
+}
+
+.asst-versions__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .75rem;
+  color: #64748b;
+  margin-bottom: .5rem;
+}
+
+.asst-versions__count {
+  font-size: .7rem;
+  color: #475569;
+}
+
+.asst-versions__empty {
+  font-size: .72rem;
+  color: #334155;
+  padding: .25rem 0;
+}
+
+.asst-versions__item {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .35rem .5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.asst-versions__item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.asst-versions__tag {
+  font-size: .7rem;
+  font-weight: 600;
+  background: rgba(99,102,241,0.15);
+  color: #818cf8;
+  padding: .1rem .4rem;
+  border-radius: 4px;
+}
+
+.asst-versions__date {
+  font-size: .7rem;
+  color: #475569;
+}

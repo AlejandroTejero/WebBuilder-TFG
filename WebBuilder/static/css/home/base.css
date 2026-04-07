@@ -31,6 +31,7 @@
   --wb-gradient-fade: var(--wb-bg);
 }
 
+/*
 :root.light {
   --wb-bg: #f8f8f9;
   --wb-bg-2: #ffffff;
@@ -47,6 +48,27 @@
   --wb-title-muted: rgba(0,0,0,0.22);
   --wb-gradient-fade: #f8f8f9;
 }
+*/
+
+:root.light {
+  --wb-bg: #f5f7fb;                         /* fondo principal de la página */
+  --wb-bg-2: #ffffff;                       /* fondo de bloques/cards principales */
+  --wb-bg-3: #eef2f7;                       /* fondo alternativo para secciones suaves */
+  --wb-bg-4: #e2e8f0;                       /* fondo más marcado para detalles, cajas secundarias o zonas destacadas */
+
+  --wb-border: rgba(15, 23, 42, 0.08);      /* borde suave general */
+  --wb-border-md: rgba(15, 23, 42, 0.14);   /* borde medio, algo más visible */
+
+  --wb-t1: rgba(15, 23, 42, 0.92);          /* texto principal: títulos cortos, párrafos importantes */
+  --wb-t2: rgba(15, 23, 42, 0.68);          /* texto secundario: descripciones, subtítulos */
+  --wb-t3: rgba(15, 23, 42, 0.52);          /* texto auxiliar: etiquetas, texto menos importante */
+  --wb-t4: rgba(15, 23, 42, 0.22);          /* texto muy tenue o detalles decorativos */
+
+  --wb-title: #0f172a;                      /* color principal para títulos grandes/headings */
+  --wb-title-muted: rgba(15, 23, 42, 0.28); /* versión apagada para partes decorativas del título */
+  --wb-gradient-fade: #f5f7fb;              /* color de desvanecido usado en gradientes hacia el fondo */
+}
+
 
 html {
   scroll-behavior: smooth;

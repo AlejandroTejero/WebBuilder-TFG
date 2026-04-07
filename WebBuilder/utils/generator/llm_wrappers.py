@@ -30,7 +30,8 @@ def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) 
         )
     except LLMError as e:
         logger.error(f"[generator] LLM falló en '{label}': {e}")
-        return ""
+        # propagar en vez de pasar
+        raise   
 
 
 def llm_json_call(system: str, user_text: str, label: str) -> dict:
@@ -53,7 +54,14 @@ def llm_call_logged(
     site=None,
 ) -> str:
     """Llama al LLM y guarda el log en BD si se pasa un objeto site."""
-    result = llm_call(system, user_text, label, temperature)
+    error_msg = ""
+    result = ""
+
+    try:
+        result = llm_call(system, user_text, label, temperature)
+    except LLMError as e:
+        error_msg = str(e)   # ← capturamos el error real aquí
+        logger.error(f"[generator] Error capturado en '{label}': {error_msg}")
 
     if site is not None:
         try:
@@ -65,30 +73,30 @@ def llm_call_logged(
                 llm_model=settings.LLM_MODEL,
                 system_prompt=system[:2000],
                 user_prompt=user_text[:2000],
-                raw_output=result[:5000],
+                raw_output=result[:5000] if result else f"[ERROR] {error_msg}",  # ← el error queda visible
             )
         except Exception:
-            pass  # El log nunca puede romper la generación
+            pass
 
-    return result
-
+    return result  # sigue devolviendo "" cuando falla, el flujo no se rompe
 
 def strip_markdown_fences(code: str) -> str:
-    """
-    Limpieza definitiva de fences Markdown en respuestas del LLM.
-
-    Estrategia: eliminar cualquier línea que sea únicamente un fence (```xxx),
-    sin tocar el código real. Funciona independientemente de dónde ponga
-    el LLM los fences.
-    """
     code = code.strip()
 
-    # Primero intentar extraer el interior de un bloque completo
+    # Extraer interior de bloque completo
     match = re.search(r"```(?:\w+)?\n(.*?)```", code, re.DOTALL)
     if match:
         return match.group(1).strip()
 
-    # Si no hay bloque completo, eliminar línea a línea cualquier fence
+    # Eliminar líneas que sean solo fences
     lines = code.splitlines()
     clean = [line for line in lines if not re.match(r"^\s*```", line)]
-    return "\n".join(clean).strip()
+    code = "\n".join(clean).strip()
+
+    # ← NUEVO: eliminar artefactos típicos del LLM al final del archivo
+    artifacts = {"EOF", "# end of file", "# EOF", "# fin", "# end"}
+    final_lines = code.splitlines()
+    while final_lines and final_lines[-1].strip() in artifacts:
+        final_lines.pop()
+
+    return "\n".join(final_lines).strip()

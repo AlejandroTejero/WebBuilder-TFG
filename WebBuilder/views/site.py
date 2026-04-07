@@ -13,6 +13,8 @@ from django.views.decorators.http import require_GET, require_POST
 from ..models import APIRequest, GeneratedSite
 from ..utils.generator.project_generator import generate_project_files
 
+from django.views.decorators.http import require_GET, require_POST
+
 import requests as http_requests
 from django.conf import settings
 
@@ -57,6 +59,18 @@ def site_generate(request, api_request_id: int):
     if request.method != "POST":
         return redirect("site_render", api_request_id=api_request.id)
 
+    # Si ya había archivos generados, guardamos snapshot antes de borrarlos
+    if site.project_files:
+        from ..models import SiteVersion
+        last = site.versions.order_by('-version_number').first()
+        next_number = (last.version_number + 1) if last else 1
+        SiteVersion.objects.create(
+            site=site,
+            version_number=next_number,
+            project_files=site.project_files,
+            label="Antes de regenerar",
+        )
+
     site.generation_status = "generating"
     site.generation_error = ""
     site.project_files = {}
@@ -66,7 +80,6 @@ def site_generate(request, api_request_id: int):
     thread.start()
 
     return redirect("site_render", api_request_id=api_request.id)
-
 
 @login_required
 @require_GET
@@ -248,3 +261,73 @@ def site_update_file(request, api_request_id: int):
     site.save(update_fields=["project_files"])
 
     return JsonResponse({"ok": True})
+
+@login_required
+@require_GET
+def site_versions(request, api_request_id: int):
+    from ..models import SiteVersion
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+
+    versions = site.versions.order_by('-version_number').values(
+        'id', 'version_number', 'label', 'created_at'
+    )
+
+    return JsonResponse({
+        'versions': [
+            {
+                'id': v['id'],
+                'version_number': v['version_number'],
+                'label': v['label'],
+                'created_at': v['created_at'].strftime('%d/%m/%Y %H:%M'),
+            }
+            for v in versions
+        ]
+    })
+
+
+@login_required
+@require_POST
+def site_version_restore(request, api_request_id: int, version_id: int):
+    from ..models import SiteVersion
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+    version = get_object_or_404(SiteVersion, id=version_id, site=site)
+
+    # Guardamos la versión actual antes de restaurar
+    if site.project_files:
+        last = site.versions.order_by('-version_number').first()
+        next_number = (last.version_number + 1) if last else 1
+        SiteVersion.objects.create(
+            site=site,
+            version_number=next_number,
+            project_files=site.project_files,
+            label="Antes de restaurar",
+        )
+
+    # Restauramos
+    site.project_files = version.project_files
+    site.generation_status = "ready"
+    site.save(update_fields=["project_files", "generation_status"])
+
+    return JsonResponse({'ok': True})
+
+@login_required
+@require_GET
+def site_version_download(request, api_request_id: int, version_id: int):
+    from ..models import SiteVersion
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+    version = get_object_or_404(SiteVersion, id=version_id, site=site)
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for path, content in (version.project_files or {}).items():
+            safe_path = str(path).lstrip("/").replace("..", "")
+            zf.writestr(safe_path, content or "")
+
+    buf.seek(0)
+    filename = f"{site.project_name or 'version'}_v{version.version_number}.zip"
+    resp = HttpResponse(buf.getvalue(), content_type="application/zip")
+    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return resp

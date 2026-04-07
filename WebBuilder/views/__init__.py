@@ -10,7 +10,10 @@ from .site import (
     site_status,
     site_deploy,
     site_deploy_status,
-	site_update_file
+    site_update_file,
+    site_versions,
+    site_version_restore,
+    site_version_download,
 )
 
 __all__ = [
@@ -18,7 +21,7 @@ __all__ = [
     "home",
     "assistant",
     "history",
-	"history_analysis",
+    "history_analysis",
     "history_sites",
     "edit",
     "site_render",
@@ -27,7 +30,10 @@ __all__ = [
     "site_status",
     "site_deploy",
     "site_deploy_status",
-	"site_update_file",
-	"delete_analysis",
-	"delete_site",
+    "site_update_file",
+    "site_versions",
+    "site_version_restore",
+    "site_version_download",
+    "delete_analysis",
+    "delete_site",
 ]

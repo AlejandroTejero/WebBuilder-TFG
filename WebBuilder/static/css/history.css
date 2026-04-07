@@ -292,3 +292,21 @@
   background: rgba(59,130,246,0.06);
   border-color: rgba(59,130,246,0.15);
 }
+
+.hist-card__versions {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .72rem;
+  color: #64748b;
+  margin-top: .5rem;
+}
+
+.hist-card__versions a {
+  color: #818cf8;
+  text-decoration: none;
+}
+
+.hist-card__versions a:hover {
+  text-decoration: underline;
+}

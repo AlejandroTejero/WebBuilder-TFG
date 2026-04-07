@@ -114,3 +114,23 @@ class GenerationLog(models.Model):
 
     def __str__(self):
         return f'{self.step} — {self.llm_model} ({self.created_at:%Y-%m-%d %H:%M})'
+    
+    
+class SiteVersion(models.Model):
+
+    site = models.ForeignKey(
+        GeneratedSite,
+        on_delete=models.CASCADE,
+        related_name='versions'
+    )
+
+    version_number = models.PositiveIntegerField()
+    project_files  = models.JSONField(default=dict)
+    label          = models.CharField(max_length=100, blank=True, default="")
+    created_at     = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-version_number']   # La más reciente primero
+
+    def __str__(self):
+        return f'v{self.version_number} — {self.site.project_name} ({self.created_at:%d/%m/%Y %H:%M})'

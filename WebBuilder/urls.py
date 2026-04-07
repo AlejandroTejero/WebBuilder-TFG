@@ -29,4 +29,9 @@ urlpatterns = [
     path("site/<int:api_request_id>/deploy-status/", views.site_deploy_status, name="site_deploy_status"),
 	
     path("site/<int:api_request_id>/update-file/", views.site_update_file, name="site_update_file"),
+	
+    path("site/<int:api_request_id>/versions/", views.site_versions, name="site_versions"),
+    path("site/<int:api_request_id>/versions/<int:version_id>/restore/", views.site_version_restore, name="site_version_restore"),
+
+	path("site/<int:api_request_id>/versions/<int:version_id>/download/", views.site_version_download, name="site_version_download"),
 ]
