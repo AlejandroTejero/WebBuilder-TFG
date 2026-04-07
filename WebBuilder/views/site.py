@@ -48,8 +48,8 @@ def site_render(request, api_request_id: int):
     return render(request, "WebBuilder/site_render.html", {
         "api_request": api_request,
         "site": site,
+        "site_users": site.site_users.all(),
     })
-
 
 @login_required
 def site_generate(request, api_request_id: int):
@@ -331,3 +331,33 @@ def site_version_download(request, api_request_id: int, version_id: int):
     resp = HttpResponse(buf.getvalue(), content_type="application/zip")
     resp["Content-Disposition"] = f'attachment; filename="{filename}"'
     return resp
+
+@login_required
+@require_POST
+def site_users_save(request, api_request_id: int):
+    from ..models import SiteUser
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+
+    try:
+        data = json.loads(request.body)
+        users = data.get('users', [])
+    except json.JSONDecodeError:
+        return JsonResponse({'ok': False, 'error': 'JSON inválido'}, status=400)
+
+    # Validación básica
+    for u in users:
+        if not u.get('username') or not u.get('password'):
+            return JsonResponse({'ok': False, 'error': 'Usuario o contraseña vacíos'}, status=400)
+
+    # Borramos los anteriores y guardamos los nuevos
+    SiteUser.objects.filter(site=site).delete()
+    for u in users:
+        SiteUser.objects.create(
+            site=site,
+            username=u['username'].strip(),
+            password=u['password'].strip(),
+            role=u.get('role', 'normal'),
+        )
+
+    return JsonResponse({'ok': True, 'saved': len(users)})

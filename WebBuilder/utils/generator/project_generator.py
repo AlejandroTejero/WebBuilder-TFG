@@ -186,13 +186,48 @@ def generate_project_files(site) -> dict[str, str]:
     load_data_code = llm_call_logged(system, user_text, "load_data", temperature=0.05, site=site)
     if not load_data_code.strip():
         load_data_code = fallback_load_data(fields, api_url)
-
     files[f"{project}/{app}/management/commands/load_data.py"] = strip_markdown_fences(load_data_code)
+
+    # ── PASO 6b: seed_users.py ───────────────────────────────────────────────
+    logger.info("[generator] Paso 6b: seed_users.py")
+    site_users = list(site.site_users.values('username', 'password', 'role'))
+    if site_users:
+        seed_lines = []
+        for u in site_users:
+            seed_lines.append(f"    ('{u['username']}', '{u['password']}', '{u['role']}'),")
+
+        seed_users_code = (
+            '"""\n'
+            'Management command: seed_users\n'
+            'Crea los usuarios predefinidos al arrancar el proyecto.\n'
+            'Uso: python manage.py seed_users\n'
+            '"""\n'
+            'from django.contrib.auth.models import User\n'
+            'from django.core.management.base import BaseCommand\n'
+            '\n'
+            'USERS = [\n'
+            + "\n".join(seed_lines) + "\n"
+            ']\n'
+            '\n'
+            'class Command(BaseCommand):\n'
+            '    help = "Crea los usuarios predefinidos del proyecto"\n'
+            '\n'
+            '    def handle(self, *args, **kwargs):\n'
+            '        for username, password, role in USERS:\n'
+            '            if User.objects.filter(username=username).exists():\n'
+            '                self.stdout.write(f"  \u26a0 Usuario {username} ya existe, omitido.")\n'
+            '                continue\n'
+            '            if role == "super":\n'
+            '                User.objects.create_superuser(username=username, password=password)\n'
+            '            else:\n'
+            '                User.objects.create_user(username=username, password=password)\n'
+            '            self.stdout.write(f"  \u2714 Creado: {username} ({role})")\n'
+        )
+        files[f"{project}/{app}/management/commands/seed_users.py"] = seed_users_code
 
     # ── PASO 7: archivos estáticos ───────────────────────────────────────────
     logger.info("[generator] Paso 7: archivos estáticos")
     files.update(build_static_files(project, app))
-
     # ── PASO 8: Validación de consistencia y autocorrección ─────────────────
     logger.info("[generator] Paso 8: validando consistencia entre archivos")
     issues = check_consistency(files)

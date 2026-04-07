@@ -14,6 +14,7 @@ from .site import (
     site_versions,
     site_version_restore,
     site_version_download,
+    site_users_save,
 )
 
 __all__ = [
@@ -36,4 +37,5 @@ __all__ = [
     "site_version_download",
     "delete_analysis",
     "delete_site",
+    "site_users_save",
 ]

@@ -34,4 +34,6 @@ urlpatterns = [
     path("site/<int:api_request_id>/versions/<int:version_id>/restore/", views.site_version_restore, name="site_version_restore"),
 
 	path("site/<int:api_request_id>/versions/<int:version_id>/download/", views.site_version_download, name="site_version_download"),
+
+    path("site/<int:api_request_id>/users/save/", views.site_users_save, name="site_users_save"),
 ]

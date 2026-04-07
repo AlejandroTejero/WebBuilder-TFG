@@ -134,3 +134,27 @@ class SiteVersion(models.Model):
 
     def __str__(self):
         return f'v{self.version_number} — {self.site.project_name} ({self.created_at:%d/%m/%Y %H:%M})'
+    
+    
+class SiteUser(models.Model):
+
+    ROLE_CHOICES = [
+        ("super",  "Superusuario"),
+        ("normal", "Usuario normal"),
+    ]
+
+    site = models.ForeignKey(
+        GeneratedSite,
+        on_delete=models.CASCADE,
+        related_name='site_users'
+    )
+
+    username = models.CharField(max_length=150)
+    password = models.CharField(max_length=128)
+    role     = models.CharField(max_length=10, choices=ROLE_CHOICES, default="normal")
+
+    class Meta:
+        unique_together = [('site', 'username')]  # No duplicados por proyecto
+
+    def __str__(self):
+        return f'{self.username} ({self.role}) — {self.site.project_name}'

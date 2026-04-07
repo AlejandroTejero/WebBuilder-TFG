@@ -171,6 +171,7 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
         "FAVICON: añade <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>'>.",
         "NAVBAR: sticky top-0 z-50 con backdrop-blur-sm y border-b sutil. site_title a la izquierda en font-bold.",
         "NAVBAR ACTIVO: usa request.path para marcar el link activo — añade color primario y font-semibold al link actual.",
+        "NAVBAR AUTH OBLIGATORIO: en el lado derecho del navbar incluye SIEMPRE este bloque exacto de autenticación, estilado con Tailwind acorde al diseño:\n{% if user.is_authenticated %}\n  <span class='text-gray-400 text-sm'>{{ user.username }}</span>\n  <form method='post' action='{% url \"logout\" %}'>\n    {% csrf_token %}\n    <button type='submit' class='text-gray-400 hover:text-white text-sm'>Cerrar sesión</button>\n  </form>\n{% else %}\n  <a href='{% url \"login\" %}' class='text-gray-400 hover:text-white text-sm'>Entrar</a>\n  <a href='{% url \"register\" %}' class='bg-blue-600 hover:bg-blue-500 text-white text-sm px-3 py-1 rounded-lg'>Registro</a>\n{% endif %}",
         "Links del navbar usan {% url 'view_name' %}.",
         "COLORES: usa los colores indicados en el prompt del usuario con clases Tailwind.",
         "Si no hay indicación de colores, usa fondo oscuro bg-gray-950 con texto claro.",

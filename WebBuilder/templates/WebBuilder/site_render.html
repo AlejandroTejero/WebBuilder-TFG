@@ -163,6 +163,49 @@
       <div><strong>Error de despliegue</strong> — <span id="deploy-error-msg">{{ site.deploy_error }}</span></div>
     </div>
 
+    <!-- Usuarios del proyecto generado -->
+    <section class="asst-card" id="block-users">
+      <div class="asst-card__header">
+        <div class="asst-card__step-badge asst-card__step-badge--preview">Usuarios</div>
+        <h2 class="asst-card__title">Usuarios de la app generada</h2>
+        <p class="asst-card__subtitle">Define los usuarios que tendrá tu proyecto al arrancarlo por primera vez.</p>
+      </div>
+
+      <div id="users-list">
+        <!-- Las filas se renderizan desde el servidor -->
+        {% for u in site_users %}
+          <div class="site-user-row" data-username="{{ u.username }}">
+            <input type="text"     class="user-input" placeholder="Usuario"     value="{{ u.username }}">
+            <input type="password" class="user-input" placeholder="Contraseña"  value="{{ u.password }}">
+            <select class="user-select">
+              <option value="normal" {% if u.role == "normal" %}selected{% endif %}>Normal</option>
+              <option value="super"  {% if u.role == "super"  %}selected{% endif %}>Superusuario</option>
+            </select>
+            <button class="sr-btn sr-btn--cancel" onclick="removeUserRow(this)">✕</button>
+          </div>
+        {% empty %}
+          <!-- Fila vacía por defecto -->
+          <div class="site-user-row">
+            <input type="text"     class="user-input" placeholder="Usuario">
+            <input type="password" class="user-input" placeholder="Contraseña">
+            <select class="user-select">
+              <option value="normal">Normal</option>
+              <option value="super">Superusuario</option>
+            </select>
+            <button class="sr-btn sr-btn--cancel" onclick="removeUserRow(this)">✕</button>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div style="display:flex; gap:.5rem; margin-top:.75rem;">
+        <button class="sr-btn sr-btn--edit" onclick="addUserRow()">+ Añadir usuario</button>
+        <button class="sr-btn sr-btn--save" onclick="saveUsers()">Guardar</button>
+      </div>
+
+      <div id="users-feedback" style="display:none; margin-top:.5rem; font-size:.8rem;"></div>
+
+    </section>
+
     <div style="display:flex; justify-content:center;">
       <div style="width:80%;">
         <section class="asst-card" id="block-files">
@@ -381,6 +424,67 @@ async function restoreVersion(versionId) {
   const data = await res.json();
   if (data.ok) location.reload();
   else alert('Error al restaurar');
+}
+
+// ── Usuarios ─────────────────────────────────────────────
+function addUserRow() {
+  const list = document.getElementById('users-list');
+  const row = document.createElement('div');
+  row.className = 'site-user-row';
+  row.innerHTML = `
+    <input type="text"     class="user-input" placeholder="Usuario">
+    <input type="password" class="user-input" placeholder="Contraseña">
+    <select class="user-select">
+      <option value="normal">Normal</option>
+      <option value="super">Superusuario</option>
+    </select>
+    <button class="sr-btn sr-btn--cancel" onclick="removeUserRow(this)">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+function removeUserRow(btn) {
+  btn.closest('.site-user-row').remove();
+}
+
+async function saveUsers() {
+  const rows = document.querySelectorAll('.site-user-row');
+  const users = [];
+
+  for (const row of rows) {
+    const inputs  = row.querySelectorAll('.user-input');
+    const select  = row.querySelector('.user-select');
+    const username = inputs[0].value.trim();
+    const password = inputs[1].value.trim();
+    const role     = select.value;
+
+    if (!username || !password) {
+      showUsersFeedback('Todos los usuarios deben tener usuario y contraseña.', false);
+      return;
+    }
+    users.push({ username, password, role });
+  }
+
+  const res = await fetch("{% url 'site_users_save' api_request.id %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': SR_CONFIG.csrfToken,
+    },
+    body: JSON.stringify({ users }),
+  });
+
+  const data = await res.json();
+  if (data.ok) showUsersFeedback(`✔ ${data.saved} usuario(s) guardados correctamente.`, true);
+  else         showUsersFeedback(`✗ Error: ${data.error}`, false);
+}
+
+function showUsersFeedback(msg, ok) {
+  const el = document.getElementById('users-feedback');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.color = ok ? '#4ade80' : '#f87171';
+  setTimeout(() => el.style.display = 'none', 3000);
 }
 
 // Cargar versiones al arrancar
