@@ -1,5 +1,6 @@
 from .auth import register
 from .pages import home
+from .metrics import metrics_view
 from .assistant import assistant
 from .history import history, history_analysis, history_sites, delete_analysis, delete_site
 from .edit import edit
@@ -16,10 +17,11 @@ from .site import (
     site_version_download,
     site_users_save,
 )
-
+ 
 __all__ = [
     "register",
     "home",
+    "metrics_view",
     "assistant",
     "history",
     "history_analysis",

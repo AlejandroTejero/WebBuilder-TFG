@@ -3,9 +3,11 @@ from django.urls import path
 from . import views
 from .views.auth import WebBuilderLoginView
 
+
 urlpatterns = [
     path("", views.home, name="home"),
     path("asistente", views.assistant, name="assistant"),
+    path('metricas/', views.metrics_view, name='metrics'),
 
     path("historial", views.history, name="history"),
     path("historial/analisis", views.history_analysis, name="history_analysis"),

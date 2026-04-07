@@ -75,6 +75,13 @@
         </div>
       </div>
 
+      <!-- Métricas - solo staff -->
+      {% if request.user.is_staff %}
+      <a href="{% url 'metrics' %}"
+         class="wb-nav-link {% if request.resolver_match.url_name == 'metrics' %}wb-nav-link--active{% endif %}">
+        Métricas
+      </a>
+      {% endif %}
       <!-- Historial - con dropdown -->
       <div class="wb-nav-item" data-dropdown="historial">
         <div class="wb-nav-link {% if request.resolver_match.url_name == 'history' %}wb-nav-link--active{% endif %}">
