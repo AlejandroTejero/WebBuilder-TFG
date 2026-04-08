@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	
 	'django.contrib.humanize',
+    'encrypted_model_fields',
 ]
 
 MIDDLEWARE = [
@@ -176,3 +178,7 @@ LOGGING = {
         },
     },
 }
+
+
+# LLM personalizados
+FIELD_ENCRYPTION_KEY = os.getenv("FIELD_ENCRYPTION_KEY", "")

@@ -1,5 +1,5 @@
 from .auth import register
-from .pages import home
+from .pages import home, profile
 from .metrics import metrics_view
 from .assistant import assistant
 from .history import history, history_analysis, history_sites, delete_analysis, delete_site
@@ -21,6 +21,7 @@ from .site import (
 __all__ = [
     "register",
     "home",
+	"profile",
     "metrics_view",
     "assistant",
     "history",

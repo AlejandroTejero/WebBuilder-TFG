@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from encrypted_model_fields.fields import EncryptedCharField
 
 
 # Modelo para cada peticion URL
@@ -158,3 +159,16 @@ class SiteUser(models.Model):
 
     def __str__(self):
         return f'{self.username} ({self.role}) — {self.site.project_name}'
+    
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+
+    # LLM personalizado (opcional)
+    custom_llm_base_url = models.URLField(blank=True, default="")
+    custom_llm_model    = models.CharField(max_length=200, blank=True, default="")
+    custom_llm_api_key  = EncryptedCharField(max_length=500, blank=True, default="")
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"

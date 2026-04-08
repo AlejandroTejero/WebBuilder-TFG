@@ -230,6 +230,9 @@ def generate_site_plan(
     examples: list[dict],
     main_collection_path: list | None,
     retries: int = 1,
+    model: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
 ) -> dict:
     """
     Genera y devuelve un schema dinámico validado:
@@ -253,7 +256,14 @@ def generate_site_plan(
         )
 
         try:
-            raw = chat_completion(user_text=user_text, system_text=system_text, temperature=0.0)
+            raw = chat_completion(
+                user_text=user_text,
+                system_text=system_text,
+                temperature=0.0,
+                model=model,
+                base_url=base_url,
+                api_key=api_key,
+            )
         except LLMError:
             return _validate_and_normalize_schema({}, available_keys=available_keys)
 

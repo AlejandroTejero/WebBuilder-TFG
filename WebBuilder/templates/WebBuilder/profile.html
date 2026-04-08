@@ -1,0 +1,67 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+
+  <div class="profile-header">
+    <h1 class="profile-title">Mi perfil</h1>
+    <p class="profile-subtitle">Configura tu modelo LLM personalizado</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="asst-alert asst-alert--{{ message.tags }}">
+        <span class="asst-alert__icon">
+          {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% else %}ℹ{% endif %}
+        </span>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="profile-card">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="profile-section">
+        <h2 class="profile-section__title">🤖 Modelo LLM personalizado</h2>
+        <p class="profile-section__desc">
+          Si quieres usar tu propio proveedor, rellena estos campos. 
+          Debe ser compatible con la API de OpenAI (mismo formato de request).
+          Si los dejas vacíos, se usará el modelo que elijas en el asistente.
+        </p>
+
+        <div class="profile-field">
+          <label class="profile-label">{{ form.custom_llm_base_url.label }}</label>
+          {{ form.custom_llm_base_url }}
+          <span class="profile-hint">Ej: https://api.openai.com/v1</span>
+        </div>
+
+        <div class="profile-field">
+          <label class="profile-label">{{ form.custom_llm_model.label }}</label>
+          {{ form.custom_llm_model }}
+          <span class="profile-hint">Ej: gpt-4o, claude-3-5-sonnet...</span>
+        </div>
+
+        <div class="profile-field">
+          <label class="profile-label">{{ form.custom_llm_api_key.label }}</label>
+          {{ form.custom_llm_api_key }}
+          <span class="profile-hint">Se guarda cifrada. No se muestra una vez guardada.</span>
+        </div>
+      </div>
+
+      <div class="profile-footer">
+        <button type="submit" class="asst-btn asst-btn--primary">Guardar cambios</button>
+        <a href="{% url 'home' %}" class="asst-btn asst-btn--ghost">Cancelar</a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

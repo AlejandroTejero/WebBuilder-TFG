@@ -1,0 +1,276 @@
+:root {
+  --m-sidebar-w: 220px;
+  --m-green: #34d399;
+  --m-red:   #f87171;
+
+  /* ── Design system variables (dark mode) ── */
+  --wb-bg:        #0e0e10;
+  --wb-bg-2:      #131315;
+  --wb-bg-3:      #1a1a1c;
+  --wb-bg-4:      #1f1f22;
+  --wb-border:    rgba(255,255,255,0.07);
+  --wb-border-md: rgba(255,255,255,0.12);
+  --wb-t1:        rgba(255,255,255,0.90);
+  --wb-t2:        rgba(255,255,255,0.62);
+  --wb-t3:        rgba(255,255,255,0.34);
+  --wb-t4:        rgba(255,255,255,0.14);
+  --wb-title:     #ffffff;
+  --wb-mono:      'Geist Mono', 'Fira Code', monospace;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 34%),
+    linear-gradient(180deg, #101013 0%, #0c0c0e 100%);
+  color: var(--wb-t1);
+}
+
+main {
+  min-height: calc(100vh - 64px);
+}
+
+/* ── PROFILE PAGE ── */
+
+.profile-container {
+  position: relative;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 84px 24px 96px;
+}
+
+.profile-container::before {
+  content: "";
+  position: absolute;
+  inset: 24px 24px auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--wb-border-md), transparent);
+  pointer-events: none;
+}
+
+.profile-header {
+  max-width: 640px;
+  margin-bottom: 34px;
+}
+
+.profile-title {
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.04;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--wb-title);
+  margin: 0 0 12px;
+}
+
+.profile-subtitle {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--wb-t2);
+  margin: 0;
+  max-width: 520px;
+}
+
+.profile-container .asst-alert {
+  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.02));
+  border: 1px solid var(--wb-border);
+  border-left: 1px solid var(--wb-border-md);
+  border-radius: 16px;
+  color: var(--wb-t1);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+}
+
+.profile-container .asst-alert--success,
+.profile-container .asst-alert--error,
+.profile-container .asst-alert--info,
+.profile-container .asst-alert--warning {
+  color: var(--wb-t1);
+}
+
+.profile-container .asst-alert__icon {
+  color: var(--wb-t2);
+}
+
+.profile-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+    linear-gradient(180deg, var(--wb-bg-2) 0%, var(--wb-bg-3) 100%);
+  border: 1px solid var(--wb-border);
+  border-radius: 28px;
+  padding: 34px;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.34),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.profile-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.16), transparent);
+}
+
+.profile-section {
+  display: grid;
+  gap: 0;
+}
+
+.profile-section__title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--wb-t1);
+  margin: 0 0 8px;
+}
+
+.profile-section__desc {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--wb-t2);
+  margin: 0 0 26px;
+  max-width: 640px;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 18px;
+}
+
+.profile-field:last-of-type {
+  margin-bottom: 0;
+}
+
+.profile-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wb-t3);
+  font-family: var(--wb-mono);
+}
+
+.profile-card .form-control {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(10,10,12,0.86);
+  color: var(--wb-t1);
+  font-size: 14px;
+  line-height: 1.45;
+  box-shadow: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.profile-card .form-control::placeholder {
+  color: var(--wb-t3);
+}
+
+.profile-card input.form-control:-webkit-autofill,
+.profile-card input.form-control:-webkit-autofill:hover,
+.profile-card input.form-control:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--wb-t1);
+  -webkit-box-shadow: 0 0 0px 1000px rgba(10,10,12,0.96) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.profile-card .form-control:hover {
+  border-color: rgba(255,255,255,0.12);
+}
+
+.profile-card .form-control:focus {
+  outline: none;
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(14,14,16,0.98);
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.04);
+  transform: translateY(-1px);
+}
+
+.profile-hint {
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--wb-t3);
+}
+
+.profile-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--wb-border);
+}
+
+.profile-footer .asst-btn {
+  min-width: 156px;
+  min-height: 44px;
+  border-radius: 999px;
+  padding: 0.8rem 1.35rem;
+  font-size: 0.84rem;
+  letter-spacing: 0.01em;
+}
+
+.profile-footer .asst-btn--primary {
+  background: linear-gradient(180deg, #f3f4f6 0%, #d4d4d8 100%);
+  color: #09090b;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+}
+
+.profile-footer .asst-btn--primary:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #e4e4e7 100%);
+  color: #09090b;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.26);
+}
+
+.profile-footer .asst-btn--ghost {
+  background: rgba(255,255,255,0.02);
+  color: var(--wb-t2);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.profile-footer .asst-btn--ghost:hover {
+  background: rgba(255,255,255,0.045);
+  color: var(--wb-t1);
+  border-color: rgba(255,255,255,0.12);
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 48px 18px 72px;
+  }
+
+  .profile-container::before {
+    inset-inline: 18px;
+  }
+
+  .profile-card {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .profile-field {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .profile-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profile-footer .asst-btn {
+    width: 100%;
+  }
+}

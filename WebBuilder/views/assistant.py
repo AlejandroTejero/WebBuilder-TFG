@@ -39,6 +39,36 @@ from ..utils.analysis.helpers import get_by_path
 from ..utils.llm.client import LLMError
 from ..utils.llm.planner import generate_site_plan, PlanError
 
+from ..utils.llm.llm_catalog import LLM_CATALOG
+
+# Eleccion de llm 
+def _resolve_llm(user, llm_choice: str) -> tuple[str, str, str]:
+    """
+    Devuelve (model, base_url, api_key) según la elección del usuario.
+    - Si es un modelo del catálogo, usa la api_key del .env.
+    - Si es 'custom', usa los datos del perfil del usuario.
+    """
+    if llm_choice == "custom":
+        profile = getattr(user, 'profile', None)
+        if not profile or not profile.custom_llm_model:
+            raise ValueError("No tienes un modelo personalizado configurado en tu perfil.")
+        return (
+            profile.custom_llm_model,
+            profile.custom_llm_base_url,
+            profile.custom_llm_api_key,
+        )
+
+    catalog_entry = next((m for m in LLM_CATALOG if m["id"] == llm_choice), None)
+    if not catalog_entry:
+        raise ValueError(f"Modelo '{llm_choice}' no encontrado en el catálogo.")
+
+    from django.conf import settings
+    return (
+        catalog_entry["id"],
+        catalog_entry["base_url"],
+        settings.LLM_API_KEY,
+    )
+
 # ────────────────────────── CONFIG ──────────────────────────────────
 
 CACHE_TIMEOUT = 3600  # 1h
@@ -112,9 +142,16 @@ def render_assistant(
     llm_plan_text: str | None = None,
     llm_plan: dict | None = None,
     llm_error: str | None = None,
+    selected_llm_choice: str | None = None,
     template: str = "WebBuilder/assistant.html",
 ):
-    context = {"form": form}
+    default_llm_choice = LLM_CATALOG[0]["id"] if LLM_CATALOG else ""
+
+    context = {
+        "form": form,
+        "llm_catalog": LLM_CATALOG,
+        "selected_llm_choice": selected_llm_choice or default_llm_choice,
+    }
     if api_request is not None:
         context["api_request"] = api_request
     if analysis is not None:
@@ -219,6 +256,9 @@ def analyze_url(request):
         analysis_result: dict,
         parsed_payload: object,
         user_prompt: str,
+        llm_model: str,
+        llm_base_url: str,
+        llm_api_key: str,
     ) -> tuple[dict | None, str | None]:
         """Genera el schema dinámico y lo guarda en api_request.field_mapping."""
         main = (analysis_result.get("main_collection") or {})
@@ -235,6 +275,9 @@ def analyze_url(request):
                 examples=examples,
                 main_collection_path=main_path,
                 retries=1,
+                model=llm_model,
+                base_url=llm_base_url,
+                api_key=llm_api_key,
             )
 
             api_request_obj.field_mapping = plan
@@ -269,6 +312,14 @@ def analyze_url(request):
         # action == regenerate
         form = APIRequestForm(request.POST)
         user_prompt = (form.data.get("user_prompt") or "").strip()
+
+        llm_choice = request.POST.get("llm_choice", "")
+        try:
+            llm_model, llm_base_url, llm_api_key = _resolve_llm(request.user, llm_choice)
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect("assistant")
+        
         analysis_result = build_analysis(api_request_obj.parsed_data, raw_text=api_request_obj.raw_data or "")
 
         llm_plan, llm_error = _call_llm_plan(
@@ -276,6 +327,9 @@ def analyze_url(request):
             analysis_result=analysis_result,
             user_prompt=user_prompt,
             parsed_payload=api_request_obj.parsed_data,
+            llm_model=llm_model,
+            llm_base_url=llm_base_url,
+            llm_api_key=llm_api_key,
         )
 
         if llm_plan is not None:
@@ -290,12 +344,20 @@ def analyze_url(request):
             llm_plan_text=json.dumps(llm_plan, ensure_ascii=False, indent=2) if llm_plan else None,
             llm_plan=llm_plan,
             llm_error=llm_error,
+            selected_llm_choice=llm_choice,
         )
 
     # ── Análisis normal ─────────────────────────────────────────────
     form = APIRequestForm(request.POST)
     if not form.is_valid():
         messages.error(request, "La URL no es válida (incluye http:// o https://).")
+        return render_assistant(request, form=form)
+
+    llm_choice = request.POST.get("llm_choice", "")
+    try:
+        llm_model, llm_base_url, llm_api_key = _resolve_llm(request.user, llm_choice)
+    except ValueError as e:
+        messages.error(request, str(e))
         return render_assistant(request, form=form)
 
     api_url = form.cleaned_data["api_url"]
@@ -337,6 +399,9 @@ def analyze_url(request):
             analysis_result=analysis_result,
             parsed_payload=cached_data["parsed_payload"],
             user_prompt=user_prompt,
+            llm_model=llm_model,
+            llm_base_url=llm_base_url,
+            llm_api_key=llm_api_key,
         )
 
         return render_assistant(
@@ -347,6 +412,7 @@ def analyze_url(request):
             llm_plan_text=json.dumps(llm_plan, ensure_ascii=False, indent=2) if llm_plan else None,
             llm_plan=llm_plan,
             llm_error=llm_error,
+            selected_llm_choice=llm_choice,
         )
 
     # ── CACHE MISS ──────────────────────────────────────────────────
@@ -395,6 +461,9 @@ def analyze_url(request):
             analysis_result=analysis_result,
             parsed_payload=parsed_payload,
             user_prompt=user_prompt,
+            llm_model=llm_model,
+            llm_base_url=llm_base_url,
+            llm_api_key=llm_api_key,
         )
 
         return render_assistant(
@@ -405,6 +474,7 @@ def analyze_url(request):
             llm_plan_text=json.dumps(llm_plan, ensure_ascii=False, indent=2) if llm_plan else None,
             llm_plan=llm_plan,
             llm_error=llm_error,
+            selected_llm_choice=llm_choice,
         )
 
     except Exception as exc:
@@ -420,6 +490,7 @@ def analyze_url(request):
             api_request=api_request_obj,
             analysis={"error": str(exc)},
             llm_error=str(exc),
+            selected_llm_choice=llm_choice,
         )
 
 

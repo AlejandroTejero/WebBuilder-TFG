@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import APIRequest
-
+from .models import APIRequest, UserProfile
 
 class RegisterForm(UserCreationForm):
 
@@ -46,9 +46,10 @@ class APIRequestForm(forms.ModelForm):
         })
     )
 
+
     class Meta:
         model = APIRequest
-        fields = ["api_url"]
+        fields = ["api_url", "file_input"]
         widgets = {
             "api_url": forms.URLInput(attrs={
                 "class": "form-control",
@@ -58,4 +59,33 @@ class APIRequestForm(forms.ModelForm):
         labels = {
             "api_url": ""
         }
-        fields = ["api_url", "file_input"]
+
+class UserProfileForm(forms.ModelForm):
+
+    custom_llm_api_key = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "sk-...",
+            "autocomplete": "off",
+        }),
+        label="API Key",
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = ["custom_llm_base_url", "custom_llm_model", "custom_llm_api_key"]
+        widgets = {
+            "custom_llm_base_url": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "https://api.openai.com/v1",
+            }),
+            "custom_llm_model": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "gpt-4o",
+            }),
+        }
+        labels = {
+            "custom_llm_base_url": "Base URL del proveedor",
+            "custom_llm_model": "Nombre del modelo",
+        }

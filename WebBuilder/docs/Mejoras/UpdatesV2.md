@@ -12,7 +12,7 @@ de traducir el contenido y acicalar el modo claro.
 7. Login con credenciales de google.
 8. Preview en vivo del sitio generado, ver si merece la pena o con el auto-despligue es suficiente
 
-9. Chat de refinamiento post-generación: En lugar de solo regenerar el plan con un prompt, un mini-chat donde el usuario diga "quiero que la home tenga un hero más grande" o "añade un filtro por categoría" y el LLM modifique solo el fichero relevante. Sería la funcionalidad estrella del TFG.
+9. Chat de refinamiento post-generación: En lugar de solo regenerar el plan con un prompt, un mini-chat donde el usuario diga "quiero que la home tenga un hero más grande" o "añade un filtro por categoría" y el LLM modifique solo el fichero relevante.
 10. Conectar los "generando proyecto" con los pasos de verdad, para saber el progreso y no un progreso inventado.
 
 

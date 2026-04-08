@@ -233,20 +233,73 @@
     </div>
 
 
-
+    <!-- -->
     {% if api_request %}
       <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
     {% endif %}
+
+    <div class="asst-field">
+      <label class="asst-label">Modelo LLM</label>
+      <div class="llm-selector">
+
+        {% for model in llm_catalog %}
+        <div class="llm-card {% if model.id == selected_llm_choice %}llm-card--selected{% endif %}"
+            data-model-id="{{ model.id }}"
+            onclick="selectLLM(this)">
+          <div class="llm-card__header">
+            <span class="llm-card__name">{{ model.name }}</span>
+            <span class="llm-card__provider">{{ model.provider }}</span>
+          </div>
+          <p class="llm-card__desc">{{ model.description }}</p>
+          <div class="llm-card__tags">
+            <span class="llm-card__tag llm-card__tag--pro">✓ {{ model.pros }}</span>
+            <span class="llm-card__tag llm-card__tag--con">✗ {{ model.cons }}</span>
+          </div>
+        </div>
+        {% endfor %}
+
+        {% if request.user.profile.custom_llm_model %}
+        <div class="llm-card llm-card--custom {% if selected_llm_choice == "custom" %}llm-card--selected{% endif %}"
+            data-model-id="custom"
+            onclick="selectLLM(this)">
+          <div class="llm-card__header">
+            <span class="llm-card__name">Modelo personalizado</span>
+            <span class="llm-card__provider llm-card__provider--custom">✓ Configurado</span>
+          </div>
+          <p class="llm-card__desc">{{ request.user.profile.custom_llm_model }} — {{ request.user.profile.custom_llm_base_url }}</p>
+        </div>
+        {% else %}
+        <a href="{% url 'profile' %}" class="llm-card llm-card--empty">
+          <div class="llm-card__header">
+            <span class="llm-card__name">Modelo personalizado</span>
+            <span class="llm-card__provider llm-card__provider--empty">⚙️ No configurado</span>
+          </div>
+          <p class="llm-card__desc">Configura tu propio proveedor OpenAI-compatible en tu perfil.</p>
+        </a>
+        {% endif %}
+
+      </div>
+      <input type="hidden" name="llm_choice" id="llm-choice-input" value="{{ selected_llm_choice }}">
+    </div>
 
     <div class="asst-form-footer">
       <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze" onclick="showLoading()">
         Analizar URL
       </button>
       {% if api_request and llm_plan %}
-        <button type="submit" class="asst-btn asst-btn--ghost" name="action" value="regenerate" onclick="showLoading()">
-          Regenerar mapa
-        </button>
+      <button type="submit" class="asst-btn asst-btn--ghost" name="action" value="regenerate" onclick="showLoading()">
+        Regenerar mapa
+      </button>
       {% endif %}
     </div>
+
   </form>
 </section>
+
+<script>
+function selectLLM(card) {
+  document.querySelectorAll('.llm-card').forEach(c => c.classList.remove('llm-card--selected'));
+  card.classList.add('llm-card--selected');
+  document.getElementById('llm-choice-input').value = card.dataset.modelId;
+}
+</script>
