@@ -1,0 +1,78 @@
+<!-- ══════════════════════════════════════════════
+     PANEL: ACTIVIDAD
+══════════════════════════════════════════════ -->
+<div class="m-panel" id="m-panel-actividad">
+  <div class="m-phead">
+    <div class="m-phead-eyebrow">Panel de administración</div>
+    <h1 class="m-phead-title">Actividad</h1>
+    <p class="m-phead-sub">Evolución de análisis y generaciones en los últimos 30 días</p>
+  </div>
+
+  <div class="m-grid-1">
+    <div class="m-card">
+      <div class="m-card-title">Análisis y sitios generados — últimos 30 días</div>
+      <div class="m-chart-legend">
+        <div class="m-chart-legend-item">
+          <div class="m-chart-legend-line" style="background:rgba(255,255,255,0.65)"></div>
+          Análisis
+        </div>
+        <div class="m-chart-legend-item">
+          <div class="m-chart-legend-line" style="background:rgba(255,255,255,0.25)"></div>
+          Sitios generados
+        </div>
+      </div>
+      <div class="m-chart-wrap">
+        <canvas id="m-activity-chart"
+          data-labels='{{ chart_labels|safe }}'
+          data-analyses='{{ chart_analyses|safe }}'
+          data-sites='{{ chart_sites|safe }}'
+        ></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-grid-2">
+    <div class="m-card">
+      <div class="m-card-title">Análisis por formato de entrada</div>
+      {% if total_analyses %}
+        <div class="m-bar-rows">
+          <div class="m-bar-row">
+            <span class="m-bar-label">URL (JSON/XML)</span>
+            <div class="m-bar-track">
+              <div class="m-bar-fill" style="width:{% widthratio json_count total_analyses 100 %}%"></div>
+            </div>
+            <span class="m-bar-num">{% widthratio json_count total_analyses 100 %}%</span>
+          </div>
+          <div class="m-bar-row">
+            <span class="m-bar-label">Fichero subido</span>
+            <div class="m-bar-track">
+              <div class="m-bar-fill" style="width:{% widthratio file_count total_analyses 100 %}%"></div>
+            </div>
+            <span class="m-bar-num">{% widthratio file_count total_analyses 100 %}%</span>
+          </div>
+        </div>
+      {% else %}
+        <div class="m-empty">Sin datos</div>
+      {% endif %}
+    </div>
+
+    <div class="m-card">
+      <div class="m-card-title">Llamadas LLM por paso</div>
+      {% if steps_stats and total_logs %}
+        <div class="m-bar-rows">
+          {% for s in steps_stats %}
+          <div class="m-bar-row">
+            <span class="m-bar-label">{{ s.step }}</span>
+            <div class="m-bar-track">
+              <div class="m-bar-fill" style="width:{% widthratio s.total total_logs 100 %}%"></div>
+            </div>
+            <span class="m-bar-num">{{ s.total }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin datos</div>
+      {% endif %}
+    </div>
+  </div>
+</div>

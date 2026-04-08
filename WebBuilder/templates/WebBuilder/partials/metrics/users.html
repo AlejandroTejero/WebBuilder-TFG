@@ -1,0 +1,68 @@
+<!-- ══════════════════════════════════════════════
+     PANEL: USUARIOS
+══════════════════════════════════════════════ -->
+<div class="m-panel" id="m-panel-usuarios">
+  <div class="m-phead">
+    <div class="m-phead-eyebrow">Panel de administración</div>
+    <h1 class="m-phead-title">Usuarios</h1>
+    <p class="m-phead-sub">Actividad y ranking de usuarios de la plataforma</p>
+  </div>
+
+  <div class="m-kpi-grid">
+    <div class="m-kpi">
+      <div class="m-kpi-label">Total registrados</div>
+      <div class="m-kpi-value">{{ total_users }}</div>
+      <span class="m-kpi-delta neutral">en total</span>
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Activos últimos 7 días</div>
+      <div class="m-kpi-value">{{ active_users }}</div>
+      <span class="m-kpi-delta neutral">usuarios únicos</span>
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Con sitios generados</div>
+      <div class="m-kpi-value">{{ users_with_sites }}</div>
+      {% if total_users %}
+        <span class="m-kpi-delta neutral">{% widthratio users_with_sites total_users 100 %}% del total</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="m-grid-2">
+    <div class="m-card">
+      <div class="m-card-title">Top por análisis realizados</div>
+      {% if top_users_analyses %}
+        <div class="m-user-rows">
+          {% for u in top_users_analyses %}
+          <div class="m-user-row">
+            <span class="m-user-num">{{ forloop.counter }}</span>
+            <div class="m-user-avatar">{{ u.username|slice:":2" }}</div>
+            <span class="m-user-name">{{ u.username }}</span>
+            <span class="m-user-meta">{{ u.total }} análisis</span>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin datos</div>
+      {% endif %}
+    </div>
+
+    <div class="m-card">
+      <div class="m-card-title">Top por sitios generados</div>
+      {% if top_users_sites %}
+        <div class="m-user-rows">
+          {% for u in top_users_sites %}
+          <div class="m-user-row">
+            <span class="m-user-num">{{ forloop.counter }}</span>
+            <div class="m-user-avatar">{{ u.username|slice:":2" }}</div>
+            <span class="m-user-name">{{ u.username }}</span>
+            <span class="m-user-meta">{{ u.total }} sitios</span>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin datos</div>
+      {% endif %}
+    </div>
+  </div>
+</div>

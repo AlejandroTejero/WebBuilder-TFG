@@ -1,0 +1,104 @@
+<!-- ══════════════════════════════════════════════
+     PANEL: RESUMEN
+══════════════════════════════════════════════ -->
+<div class="m-panel active" id="m-panel-resumen">
+  <div class="m-phead">
+    <div class="m-phead-eyebrow">Panel de administración</div>
+    <h1 class="m-phead-title">Resumen</h1>
+    <p class="m-phead-sub">Vista general del sistema en tiempo real</p>
+  </div>
+
+  <div class="m-kpi-grid">
+    <div class="m-kpi">
+      <div class="m-kpi-label">Usuarios registrados</div>
+      <div class="m-kpi-value">{{ total_users }}</div>
+      <span class="m-kpi-delta neutral">total</span>
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Análisis realizados</div>
+      <div class="m-kpi-value">{{ total_analyses }}</div>
+      <span class="m-kpi-delta neutral">total</span>
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Sitios generados</div>
+      <div class="m-kpi-value">{{ total_sites }}</div>
+      <span class="m-kpi-delta neutral">total</span>
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Tasa de éxito análisis</div>
+      <div class="m-kpi-value">{{ success_rate }}%</div>
+      {% if success_rate >= 90 %}
+        <span class="m-kpi-delta up">buen rendimiento</span>
+      {% else %}
+        <span class="m-kpi-delta down">por debajo del objetivo</span>
+      {% endif %}
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Conversión análisis → sitio</div>
+      <div class="m-kpi-value">{{ conversion_rate }}%</div>
+      <span class="m-kpi-delta neutral">de los análisis</span>
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Tasa de reintento LLM</div>
+      <div class="m-kpi-value">{{ retry_rate }}%</div>
+      {% if retry_rate <= 10 %}
+        <span class="m-kpi-delta up">dentro del rango</span>
+      {% else %}
+        <span class="m-kpi-delta down">elevado</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="m-grid-2">
+    <div class="m-card">
+      <div class="m-card-title">Últimas generaciones</div>
+      {% if recent_sites %}
+        <div class="m-site-rows">
+          {% for site in recent_sites %}
+          <div class="m-site-row">
+            <span class="m-badge {% if site.generation_status == 'ready' %}green{% elif site.generation_status == 'error' %}red{% elif site.generation_status == 'generating' %}amber{% endif %}">
+              {{ site.generation_status }}
+            </span>
+            <span class="m-site-name">{{ site.project_name|default:"sin nombre" }}</span>
+            <span class="m-site-user">{{ site.project_source.user.username }}</span>
+            <span class="m-site-time">{{ site.created_at|timesince }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin generaciones todavía</div>
+      {% endif %}
+    </div>
+
+    <div class="m-card">
+      <div class="m-card-title">Alertas activas</div>
+      {% if stuck_generating or pending_analyses %}
+        <div class="m-alert-rows">
+          {% for site in stuck_generating %}
+          <div class="m-alert-row">
+            <div class="m-alert-dot amber"></div>
+            <div class="m-alert-body">
+              <div class="m-alert-title">Sitio atascado en "generating"</div>
+              <div class="m-alert-sub">{{ site.project_name }} — usuario: {{ site.project_source.user.username }}</div>
+            </div>
+            <div class="m-alert-time">{{ site.updated_at|timesince }}</div>
+          </div>
+          {% endfor %}
+          {% if pending_analyses %}
+          <div class="m-alert-row">
+            <div class="m-alert-dot muted"></div>
+            <div class="m-alert-body">
+              <div class="m-alert-title">{{ pending_analyses }} análisis pendientes sin procesar</div>
+              {% if oldest_pending %}
+              <div class="m-alert-sub">El más antiguo: {{ oldest_pending.date|timesince }}</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin alertas activas</div>
+      {% endif %}
+    </div>
+  </div>
+</div>

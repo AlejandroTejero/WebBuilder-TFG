@@ -1,6 +1,12 @@
 {% extends "WebBuilder/base.html" %}
 {% load static %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/assistant/editor.css' %}">
+  <link rel="stylesheet" href="{% static 'css/assistant/loading.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="asst-layout">
 
@@ -181,7 +187,7 @@
               <option value="normal" {% if u.role == "normal" %}selected{% endif %}>Normal</option>
               <option value="super"  {% if u.role == "super"  %}selected{% endif %}>Superusuario</option>
             </select>
-            <button class="sr-btn sr-btn--cancel" onclick="removeUserRow(this)">✕</button>
+            <button class="sr-btn sr-btn--cancel" type="button" data-user-remove>✕</button>
           </div>
         {% empty %}
           <!-- Fila vacía por defecto -->
@@ -192,14 +198,14 @@
               <option value="normal">Normal</option>
               <option value="super">Superusuario</option>
             </select>
-            <button class="sr-btn sr-btn--cancel" onclick="removeUserRow(this)">✕</button>
+            <button class="sr-btn sr-btn--cancel" type="button" data-user-remove>✕</button>
           </div>
         {% endfor %}
       </div>
 
       <div style="display:flex; gap:.5rem; margin-top:.75rem;">
-        <button class="sr-btn sr-btn--edit" onclick="addUserRow()">+ Añadir usuario</button>
-        <button class="sr-btn sr-btn--save" onclick="saveUsers()">Guardar</button>
+        <button class="sr-btn sr-btn--edit" type="button" id="users-add-btn">+ Añadir usuario</button>
+        <button class="sr-btn sr-btn--save" type="button" id="users-save-btn">Guardar</button>
       </div>
 
       <div id="users-feedback" style="display:none; margin-top:.5rem; font-size:.8rem;"></div>
@@ -240,7 +246,7 @@
                 <div class="sr-viewer__header" id="sr-header" style="display:none;">
                   <span class="sr-viewer__filename" id="sr-filename"></span>
                   <div class="sr-viewer__actions">
-                    <button class="sr-btn sr-btn--edit" id="sr-btn-edit" onclick="srStartEdit()">
+                    <button class="sr-btn sr-btn--edit" id="sr-btn-edit" type="button">
                       Editar
                     </button>
                   </div>
@@ -280,8 +286,8 @@
     </div>
     <div class="sr-modal__actions">
       <div class="sr-save-feedback sr-save-feedback--inline" id="sr-save-feedback-modal" style="display:none;"></div>
-      <button class="sr-btn sr-btn--cancel" onclick="srCancelEdit()">Cancelar</button>
-      <button class="sr-btn sr-btn--save" id="sr-btn-save" onclick="srSave()">Guardar</button>
+      <button class="sr-btn sr-btn--cancel" id="sr-btn-cancel" type="button">Cancelar</button>
+      <button class="sr-btn sr-btn--save" id="sr-btn-save" type="button">Guardar</button>
     </div>
   </div>
   <div class="sr-modal__body">
@@ -343,7 +349,7 @@
       <span id="version-modal-title"></span>
     </div>
     <div class="sr-modal__actions">
-      <button class="sr-btn sr-btn--cancel" onclick="closeVersionModal()">Cerrar</button>
+      <button class="sr-btn sr-btn--cancel" id="version-modal-close" type="button">Cerrar</button>
       <a class="sr-btn sr-btn--edit" id="version-modal-download" href="#">Descargar ZIP</a>
       <button class="sr-btn sr-btn--save" id="version-modal-restore">Restaurar</button>
     </div>
@@ -375,121 +381,14 @@
     genStatusUrl:    "{% url 'site_status' api_request.id %}",
     deployStatusUrl: "{% url 'site_deploy_status' api_request.id %}",
     versionsUrl:     "{% url 'site_versions' api_request.id %}",
+    usersSaveUrl:    "{% url 'site_users_save' api_request.id %}",
     restoreBaseUrl:  "/site/{{ api_request.id }}/versions/",
     currentGenStatus:    "{{ site.generation_status }}",
     currentDeployStatus: "{{ site.deploy_status }}",
   };
 </script>
 
-<script>
-// ── Versiones ────────────────────────────────────────────
-async function loadVersions() {
-  const res = await fetch(SR_CONFIG.versionsUrl);
-  const data = await res.json();
-  const list = document.getElementById('versions-list');
-  const count = document.getElementById('versions-count');
 
-  if (!data.versions.length) {
-    list.innerHTML = '<div class="asst-versions__empty">Sin versiones guardadas</div>';
-    count.textContent = '';
-    return;
-  }
-
-  count.textContent = `(${data.versions.length})`;
-  list.innerHTML = data.versions.map(v => `
-    <div class="asst-versions__item" onclick="openVersionModal(${v.id}, ${v.version_number}, '${v.created_at}')">
-      <span class="asst-versions__tag">v${v.version_number}</span>
-      <span class="asst-versions__date">${v.created_at}</span>
-    </div>
-  `).join('');
-}
-
-async function openVersionModal(versionId, versionNumber, createdAt) {
-  document.getElementById('version-modal-title').textContent = `v${versionNumber} — ${createdAt}`;
-  document.getElementById('version-modal-restore').onclick = () => restoreVersion(versionId);
-  document.getElementById('version-modal-download').href = `${SR_CONFIG.restoreBaseUrl}${versionId}/download/`;
-  document.getElementById('version-modal').style.display = 'flex';
-}
-
-function closeVersionModal() {
-  document.getElementById('version-modal').style.display = 'none';
-}
-
-async function restoreVersion(versionId) {
-  if (!confirm('¿Restaurar esta versión? La actual se guardará como snapshot.')) return;
-  const res = await fetch(`${SR_CONFIG.restoreBaseUrl}${versionId}/restore/`, {
-    method: 'POST',
-    headers: { 'X-CSRFToken': SR_CONFIG.csrfToken },
-  });
-  const data = await res.json();
-  if (data.ok) location.reload();
-  else alert('Error al restaurar');
-}
-
-// ── Usuarios ─────────────────────────────────────────────
-function addUserRow() {
-  const list = document.getElementById('users-list');
-  const row = document.createElement('div');
-  row.className = 'site-user-row';
-  row.innerHTML = `
-    <input type="text"     class="user-input" placeholder="Usuario">
-    <input type="password" class="user-input" placeholder="Contraseña">
-    <select class="user-select">
-      <option value="normal">Normal</option>
-      <option value="super">Superusuario</option>
-    </select>
-    <button class="sr-btn sr-btn--cancel" onclick="removeUserRow(this)">✕</button>
-  `;
-  list.appendChild(row);
-}
-
-function removeUserRow(btn) {
-  btn.closest('.site-user-row').remove();
-}
-
-async function saveUsers() {
-  const rows = document.querySelectorAll('.site-user-row');
-  const users = [];
-
-  for (const row of rows) {
-    const inputs  = row.querySelectorAll('.user-input');
-    const select  = row.querySelector('.user-select');
-    const username = inputs[0].value.trim();
-    const password = inputs[1].value.trim();
-    const role     = select.value;
-
-    if (!username || !password) {
-      showUsersFeedback('Todos los usuarios deben tener usuario y contraseña.', false);
-      return;
-    }
-    users.push({ username, password, role });
-  }
-
-  const res = await fetch("{% url 'site_users_save' api_request.id %}", {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': SR_CONFIG.csrfToken,
-    },
-    body: JSON.stringify({ users }),
-  });
-
-  const data = await res.json();
-  if (data.ok) showUsersFeedback(`✔ ${data.saved} usuario(s) guardados correctamente.`, true);
-  else         showUsersFeedback(`✗ Error: ${data.error}`, false);
-}
-
-function showUsersFeedback(msg, ok) {
-  const el = document.getElementById('users-feedback');
-  el.textContent = msg;
-  el.style.display = 'block';
-  el.style.color = ok ? '#4ade80' : '#f87171';
-  setTimeout(() => el.style.display = 'none', 3000);
-}
-
-// Cargar versiones al arrancar
-loadVersions();
-</script>
 
 <script src="{% static 'js/site_render.js' %}"></script>
 

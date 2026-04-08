@@ -41,7 +41,15 @@ from ..utils.llm.planner import generate_site_plan, PlanError
 
 from ..utils.llm.llm_catalog import LLM_CATALOG
 
-# Eleccion de llm 
+
+# ────────────────────────── CONFIG ──────────────────────────────────
+
+CACHE_TIMEOUT = 3600  # 1h
+CACHE_KEY_PREFIX = "api_analysis"
+
+
+# ────────────────────────── HELPERS LLM ─────────────────────────────
+
 def _resolve_llm(user, llm_choice: str) -> tuple[str, str, str]:
     """
     Devuelve (model, base_url, api_key) según la elección del usuario.
@@ -69,18 +77,90 @@ def _resolve_llm(user, llm_choice: str) -> tuple[str, str, str]:
         settings.LLM_API_KEY,
     )
 
-# ────────────────────────── CONFIG ──────────────────────────────────
 
-CACHE_TIMEOUT = 3600  # 1h
-CACHE_KEY_PREFIX = "api_analysis"
+def _call_llm_plan(
+    *,
+    api_request_obj: APIRequest,
+    analysis_result: dict,
+    parsed_payload: object,
+    user_prompt: str,
+    llm_model: str,
+    llm_base_url: str,
+    llm_api_key: str,
+) -> tuple[dict | None, str | None]:
+    """Genera el schema dinámico y lo guarda en api_request.field_mapping."""
+    main = (analysis_result.get("main_collection") or {})
+    keys = (analysis_result.get("keys") or {})
 
+    available_keys = (keys.get("all") or [])[:50]
+    main_path = main.get("path")
+    examples = _build_examples(parsed_payload, main_path=main_path, available_keys=available_keys)
+
+    try:
+        plan = generate_site_plan(
+            user_prompt=user_prompt or "",
+            available_keys=available_keys,
+            examples=examples,
+            main_collection_path=main_path,
+            retries=1,
+            model=llm_model,
+            base_url=llm_base_url,
+            api_key=llm_api_key,
+        )
+
+        api_request_obj.field_mapping = plan
+        if hasattr(api_request_obj, "plan_accepted"):
+            api_request_obj.plan_accepted = False
+            api_request_obj.save(update_fields=["field_mapping", "plan_accepted"])
+        else:
+            api_request_obj.save(update_fields=["field_mapping"])
+
+        return plan, None
+    except (PlanError, LLMError) as e:
+        return None, str(e)
+
+
+# ────────────────────────── HELPERS DE DATOS ────────────────────────
 
 def _get_cache_key(api_url: str) -> str:
     url_hash = hashlib.md5(api_url.encode("utf-8")).hexdigest()
     return f"{CACHE_KEY_PREFIX}:{url_hash}"
 
 
-# ────────────────────────── RENDER ──────────────────────────────────
+def _truncate_value(v: object, *, max_len: int = 220) -> object:
+    if v is None:
+        return None
+    if isinstance(v, (int, float, bool)):
+        return v
+    if isinstance(v, str):
+        s = v.strip()
+        return s if len(s) <= max_len else (s[: max_len - 3] + "...")
+    try:
+        s = json.dumps(v, ensure_ascii=False)
+    except Exception:
+        s = str(v)
+    return s if len(s) <= max_len else (s[: max_len - 3] + "...")
+
+
+def _build_examples(
+    parsed_payload: object,
+    *,
+    main_path: list | None,
+    available_keys: list[str],
+) -> list[dict]:
+    if not main_path:
+        return []
+    items = get_by_path(parsed_payload, main_path)
+    if not isinstance(items, list):
+        return []
+    out: list[dict] = []
+    for item in items[:3]:
+        if not isinstance(item, dict):
+            continue
+        keys = (available_keys or list(item.keys()))[:20]
+        out.append({k: _truncate_value(item.get(k)) for k in keys if k in item})
+    return out
+
 
 def _build_preview_items(
     parsed_data: object,
@@ -133,6 +213,8 @@ def _build_preview_items(
     return result
 
 
+# ────────────────────────── RENDER ──────────────────────────────────
+
 def render_assistant(
     request,
     *,
@@ -163,7 +245,6 @@ def render_assistant(
     if llm_error is not None:
         context["llm_error"] = llm_error
 
-    # Preview items: solo se calculan si hay datos y plan
     if api_request is not None and llm_plan is not None:
         context["preview_items"] = _build_preview_items(
             api_request.parsed_data,
@@ -222,75 +303,6 @@ def analyze_url(request):
     action = (request.POST.get("action") or "analyze").strip().lower()
     api_request_id = (request.POST.get("api_request_id") or "").strip()
 
-    def _truncate_value(v: object, *, max_len: int = 220) -> object:
-        if v is None:
-            return None
-        if isinstance(v, (int, float, bool)):
-            return v
-        if isinstance(v, str):
-            s = v.strip()
-            return s if len(s) <= max_len else (s[: max_len - 3] + "...")
-        try:
-            s = json.dumps(v, ensure_ascii=False)
-        except Exception:
-            s = str(v)
-        return s if len(s) <= max_len else (s[: max_len - 3] + "...")
-
-    def _build_examples(parsed_payload: object, *, main_path: list | None, available_keys: list[str]) -> list[dict]:
-        if not main_path:
-            return []
-        items = get_by_path(parsed_payload, main_path)
-        if not isinstance(items, list):
-            return []
-        out: list[dict] = []
-        for item in items[:3]:
-            if not isinstance(item, dict):
-                continue
-            keys = (available_keys or list(item.keys()))[:20]
-            out.append({k: _truncate_value(item.get(k)) for k in keys if k in item})
-        return out
-
-    def _call_llm_plan(
-        *,
-        api_request_obj: APIRequest,
-        analysis_result: dict,
-        parsed_payload: object,
-        user_prompt: str,
-        llm_model: str,
-        llm_base_url: str,
-        llm_api_key: str,
-    ) -> tuple[dict | None, str | None]:
-        """Genera el schema dinámico y lo guarda en api_request.field_mapping."""
-        main = (analysis_result.get("main_collection") or {})
-        keys = (analysis_result.get("keys") or {})
-        
-        available_keys = (keys.get("all") or [])[:50]
-        main_path = main.get("path")
-        examples = _build_examples(parsed_payload, main_path=main_path, available_keys=available_keys)
-
-        try:
-            plan = generate_site_plan(
-                user_prompt=user_prompt or "",
-                available_keys=available_keys,
-                examples=examples,
-                main_collection_path=main_path,
-                retries=1,
-                model=llm_model,
-                base_url=llm_base_url,
-                api_key=llm_api_key,
-            )
-
-            api_request_obj.field_mapping = plan
-            if hasattr(api_request_obj, "plan_accepted"):
-                api_request_obj.plan_accepted = False
-                api_request_obj.save(update_fields=["field_mapping", "plan_accepted"])
-            else:
-                api_request_obj.save(update_fields=["field_mapping"])
-
-            return plan, None
-        except (PlanError, LLMError) as e:
-            return None, str(e)
-
     # ── Acciones sobre análisis existente ───────────────────────────
     if action in {"regenerate", "accept_plan"}:
         api_request_obj = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
@@ -302,7 +314,7 @@ def analyze_url(request):
             if not api_request_obj.field_mapping:
                 messages.error(request, "Aún no hay un plan válido para aceptar.")
                 return redirect(reverse("assistant") + f"?api_request_id={api_request_obj.id}")
-            
+
             if hasattr(api_request_obj, "plan_accepted"):
                 api_request_obj.plan_accepted = True
                 api_request_obj.save(update_fields=["plan_accepted"])
@@ -319,7 +331,7 @@ def analyze_url(request):
         except ValueError as e:
             messages.error(request, str(e))
             return redirect("assistant")
-        
+
         analysis_result = build_analysis(api_request_obj.parsed_data, raw_text=api_request_obj.raw_data or "")
 
         llm_plan, llm_error = _call_llm_plan(

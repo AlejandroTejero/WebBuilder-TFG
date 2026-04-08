@@ -1,0 +1,68 @@
+<!-- ══════════════════════════════════════════════
+     PANEL: ALERTAS
+══════════════════════════════════════════════ -->
+<div class="m-panel" id="m-panel-alertas">
+  <div class="m-phead">
+    <div class="m-phead-eyebrow">Panel de administración</div>
+    <h1 class="m-phead-title">Alertas</h1>
+    <p class="m-phead-sub">Incidencias y estados anómalos del sistema</p>
+  </div>
+
+  <div class="m-grid-1">
+    <div class="m-card">
+      <div class="m-card-title">Activas ahora</div>
+      {% if stuck_generating or pending_analyses %}
+        <div class="m-alert-rows">
+          {% for site in stuck_generating %}
+          <div class="m-alert-row">
+            <div class="m-alert-dot amber"></div>
+            <div class="m-alert-body">
+              <div class="m-alert-title">Sitio atascado en "generating"</div>
+              <div class="m-alert-sub">{{ site.project_name }} — usuario: {{ site.project_source.user.username }} — sin actualización desde {{ site.updated_at|timesince }}</div>
+            </div>
+            <div class="m-alert-time">{{ site.updated_at|timesince }}</div>
+          </div>
+          {% endfor %}
+          {% if pending_analyses %}
+          <div class="m-alert-row">
+            <div class="m-alert-dot muted"></div>
+            <div class="m-alert-body">
+              <div class="m-alert-title">{{ pending_analyses }} análisis en estado "pending" sin procesar</div>
+              {% if oldest_pending %}
+              <div class="m-alert-sub">El más antiguo lleva {{ oldest_pending.date|timesince }} sin cambio de estado</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin alertas activas</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="m-grid-1">
+    <div class="m-card">
+      <div class="m-card-title">Errores de generación — últimas 24 h</div>
+      {% if recent_errors %}
+        <div class="m-alert-rows">
+          {% for site in recent_errors %}
+          <div class="m-alert-row">
+            <div class="m-alert-dot red"></div>
+            <div class="m-alert-body">
+              <div class="m-alert-title">{{ site.project_name|default:"Sin nombre" }} — fallo en generación</div>
+              <div class="m-alert-sub">
+                usuario: {{ site.project_source.user.username }}
+                {% if site.generation_error %} — {{ site.generation_error|truncatechars:80 }}{% endif %}
+              </div>
+            </div>
+            <div class="m-alert-time">{{ site.updated_at|timesince }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin errores en las últimas 24 h</div>
+      {% endif %}
+    </div>
+  </div>
+</div>

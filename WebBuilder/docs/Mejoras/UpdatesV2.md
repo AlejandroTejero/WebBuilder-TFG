@@ -26,3 +26,19 @@ de traducir el contenido y acicalar el modo claro.
 # Investigacion 
 1. Prompting LLM: Investigar tecticas de prompting para añadir en la memoria
 
+
+# Refactors
+
+- Vale la pena hacer ahora:
+1. template_examples.py (703 líneas) es el archivo más largo del backend. Contiene los ejemplos few-shot para los prompts del LLM. No tiene lógica compleja, pero está todo mezclado en un solo fichero. Separarlo por tipo de página (list, detail, base, etc.) lo  haría mucho más navegable y fácil de ampliar, que es algo que claramente vas a seguir haciendo.
+2. generator_prompts.py (404 líneas) tiene todos los prompts de generación juntos. Está bien organizado con funciones separadas, pero cada prompt es largo y el archivo es denso. Se podría separar en prompts/pages.py, prompts/models.py, prompts/views.py, etc. siguiendo la misma lógica que ya tiene internamente.
+
+
+- Tiene menos urgencia pero está bien saberlo:
+1. site.py (362 líneas) está bien estructurado. _run_generation y _run_deploy son las únicas funciones densas, pero tienen responsabilidades claras y no mezclan cosas. No lo tocaría.
+2. edit.py y metrics.py están en un tamaño razonable y bien organizados. No necesitan nada.
+3. planner.py (279 líneas) es el corazón del análisis LLM. Está bastante bien, solo _validate_and_normalize_schema es algo larga pero hace una sola cosa.
+
+
+- No tocaría:
+1. Todo utils/analysis/, utils/ingest/, views/auth.py, views/history.py, views/helpers.py — están en tamaños correctos y bien separados.

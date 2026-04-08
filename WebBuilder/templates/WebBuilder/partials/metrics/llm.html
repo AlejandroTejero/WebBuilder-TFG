@@ -1,0 +1,106 @@
+<!-- ══════════════════════════════════════════════
+     PANEL: LLM
+══════════════════════════════════════════════ -->
+<div class="m-panel" id="m-panel-llm">
+  <div class="m-phead">
+    <div class="m-phead-eyebrow">Panel de administración</div>
+    <h1 class="m-phead-title">LLM</h1>
+    <p class="m-phead-sub">Rendimiento y salud del sistema de generación con IA</p>
+  </div>
+
+  <div class="m-kpi-grid">
+    <div class="m-kpi">
+      <div class="m-kpi-label">Llamadas totales</div>
+      <div class="m-kpi-value">{{ total_logs }}</div>
+      <span class="m-kpi-delta neutral">desde el inicio</span>
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Errores de consistencia</div>
+      <div class="m-kpi-value">{{ consistency_errors_total }}</div>
+      {% if consistency_rate <= 5 %}
+        <span class="m-kpi-delta up">{{ consistency_rate }}% del total</span>
+      {% else %}
+        <span class="m-kpi-delta down">{{ consistency_rate }}% del total</span>
+      {% endif %}
+    </div>
+    <div class="m-kpi">
+      <div class="m-kpi-label">Media llamadas / sitio</div>
+      <div class="m-kpi-value">{{ avg_calls_per_site }}</div>
+      <span class="m-kpi-delta neutral">pasos por generación</span>
+    </div>
+  </div>
+
+  <div class="m-grid-2">
+    <div class="m-card">
+      <div class="m-card-title">Uso por modelo</div>
+      {% if model_stats %}
+        <div class="m-bar-rows">
+          {% for m in model_stats %}
+          <div class="m-bar-row">
+            <span class="m-bar-label">{{ m.llm_model }}</span>
+            <div class="m-bar-track">
+              <div class="m-bar-fill" style="width:{{ m.bar_pct }}%"></div>
+            </div>
+            <span class="m-bar-num">{{ m.total }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin datos</div>
+      {% endif %}
+    </div>
+
+    <div class="m-card">
+      <div class="m-card-title">Tasa de reintento por modelo</div>
+      {% if model_stats %}
+        <table class="m-table">
+          <thead>
+            <tr>
+              <th>Modelo</th>
+              <th>Llamadas</th>
+              <th>Tasa</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in model_stats %}
+            <tr>
+              <td class="m-mono">{{ m.llm_model }}</td>
+              <td class="m-mono">{{ m.total }}</td>
+              <td>
+                {% if m.retry_rate <= 10 %}
+                  <span class="m-kpi-delta up" style="font-size:12px">{{ m.retry_rate }}%</span>
+                {% else %}
+                  <span class="m-kpi-delta down" style="font-size:12px">{{ m.retry_rate }}%</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="m-empty">Sin datos</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="m-grid-1">
+    <div class="m-card">
+      <div class="m-card-title">Pasos con más errores de consistencia</div>
+      {% if error_steps %}
+        <div class="m-bar-rows">
+          {% for e in error_steps %}
+          <div class="m-bar-row">
+            <span class="m-bar-label">{{ e.step }}</span>
+            <div class="m-bar-track">
+              <div class="m-bar-fill {% if forloop.first %}danger{% endif %}" style="width:{{ e.bar_pct }}%"></div>
+            </div>
+            <span class="m-bar-num {% if forloop.first %}danger{% endif %}">{{ e.total_errors }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="m-empty">Sin errores de consistencia registrados</div>
+      {% endif %}
+    </div>
+  </div>
+</div>

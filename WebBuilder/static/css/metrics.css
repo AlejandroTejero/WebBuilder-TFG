@@ -3,6 +3,30 @@
    Sidebar layout con 5 paneles navegables
    =============================================================== */
 
+/*
+ * TABLA DE CONTENIDOS
+ * -----------------
+ * 1. Root variables .......... ~25
+ * 2. Layout shell ............ ~44
+ * 3. Sidebar ................. ~50
+ * 4. Main .................... ~136
+ * 5. Panels .................. ~144
+ * 6. Page header ............. ~156
+ * 7. KPI grid ................ ~187
+ * 8. Card .................... ~233
+ * 9. Grids ................... ~253
+ * 10. Table .................. ~258
+ * 11. Badge .................. ~287
+ * 12. Bar rows ............... ~305
+ * 13. User rows .............. ~349
+ * 14. Alert rows ............. ~391
+ * 15. Site rows .............. ~424
+ * 16. Empty .................. ~450
+ * 17. Chart .................. ~459
+ * 18. Responsive ............. ~475
+ * 19. Global reset ........... ~492
+ */
+
 :root {
   --m-sidebar-w: 220px;
   --m-green: #34d399;
@@ -22,13 +46,13 @@
   --wb-mono:      'Geist Mono', 'Fira Code', monospace;
 }
 
-/* ── LAYOUT SHELL ── */
+/* ── Layout shell ── */
 .m-shell {
   display: flex;
   min-height: calc(100vh - 64px); /* descuenta la navbar */
 }
 
-/* ── SIDEBAR ── */
+/* ── Sidebar ── */
 .m-sidebar {
   width: var(--m-sidebar-w);
   flex-shrink: 0;
@@ -46,6 +70,7 @@
   z-index: 10;
 }
 
+/* Grupos de navegación */
 .m-sidebar-section {
   font-family: var(--wb-mono);
   font-size: 9px;
@@ -73,6 +98,7 @@
   user-select: none;
 }
 
+/* Estados del item */
 .m-sidebar-item:hover {
   background: var(--wb-t4);
   color: var(--wb-t1);
@@ -84,6 +110,7 @@
   border-color: var(--wb-border);
 }
 
+/* Iconografía */
 .m-sidebar-icon {
   width: 15px;
   height: 15px;
@@ -93,6 +120,7 @@
 
 .m-sidebar-item.active .m-sidebar-icon { opacity: 0.75; }
 
+/* Indicador de actividad */
 .m-sidebar-dot {
   width: 5px;
   height: 5px;
@@ -105,7 +133,7 @@
 
 @keyframes m-blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-/* ── MAIN ── */
+/* ── Main ── */
 .m-main {
   margin-left: var(--m-sidebar-w);
   flex: 1;
@@ -113,7 +141,8 @@
   min-width: 0;
 }
 
-/* ── PANELS ── */
+/* ── Panels ── */
+/* Visibilidad de paneles */
 .m-panel { display: none; }
 .m-panel.active {
   display: block;
@@ -125,13 +154,14 @@
   to   { opacity: 1; transform: none; }
 }
 
-/* ── PAGE HEADER ── */
+/* ── Page header ── */
 .m-phead {
   margin-bottom: 36px;
   padding-bottom: 28px;
   border-bottom: 1px solid var(--wb-border);
 }
 
+/* Elementos del encabezado */
 .m-phead-eyebrow {
   font-family: var(--wb-mono);
   font-size: 10px;
@@ -156,7 +186,7 @@
   font-weight: 300;
 }
 
-/* ── KPI GRID ── */
+/* ── KPI grid ── */
 .m-kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -164,6 +194,7 @@
   margin-bottom: 28px;
 }
 
+/* Tarjeta KPI */
 .m-kpi {
   background: var(--wb-bg-2);
   border: 1px solid var(--wb-border);
@@ -174,6 +205,7 @@
 
 .m-kpi:hover { border-color: var(--wb-border-md); }
 
+/* Contenido KPI */
 .m-kpi-label {
   font-family: var(--wb-mono);
   font-size: 10px;
@@ -202,7 +234,7 @@
 .m-kpi-delta.down    { color: var(--m-red); }
 .m-kpi-delta.neutral { color: var(--wb-t3); }
 
-/* ── CARD ── */
+/* ── Card ── */
 .m-card {
   background: var(--wb-bg-2);
   border: 1px solid var(--wb-border);
@@ -211,6 +243,7 @@
   transition: border-color .2s;
 }
 
+/* Encabezado de tarjeta */
 .m-card:hover { border-color: var(--wb-border-md); }
 
 .m-card-title {
@@ -222,13 +255,15 @@
   margin-bottom: 24px;
 }
 
-/* ── GRIDS ── */
+/* ── Grids ── */
+/* Variantes de grid */
 .m-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 .m-grid-1 { margin-bottom: 14px; }
 
-/* ── TABLE ── */
+/* ── Table ── */
 .m-table { width: 100%; border-collapse: collapse; }
 
+/* Cabecera de tabla */
 .m-table th {
   font-family: var(--wb-mono);
   font-size: 10px;
@@ -241,6 +276,7 @@
   border-bottom: 1px solid var(--wb-border);
 }
 
+/* Celdas de tabla */
 .m-table td {
   font-size: 13px;
   color: var(--wb-t2);
@@ -253,7 +289,7 @@
 .m-table tr:hover td { color: var(--wb-t1); }
 .m-mono { font-family: var(--wb-mono); font-size: 12px; }
 
-/* ── BADGE ── */
+/* ── Badge ── */
 .m-badge {
   display: inline-flex;
   align-items: center;
@@ -267,13 +303,15 @@
   color: var(--wb-t2);
 }
 
+/* Variantes de badge */
 .m-badge.green { color: var(--m-green); background: rgba(52,211,153,0.06); border-color: rgba(52,211,153,0.15); }
 .m-badge.red   { color: var(--m-red);   background: rgba(248,113,113,0.06); border-color: rgba(248,113,113,0.15); }
 .m-badge.amber { color: #f59e0b; background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.15); }
 
-/* ── BARRAS ── */
+/* ── Bar rows ── */
 .m-bar-rows { display: flex; flex-direction: column; gap: 18px; }
 
+/* Estructura de barras */
 .m-bar-row { display: flex; align-items: center; gap: 14px; }
 
 .m-bar-label {
@@ -301,6 +339,7 @@
   transition: width .7s cubic-bezier(.4,0,.2,1);
 }
 
+/* Estados de barras */
 .m-bar-fill.danger { background: rgba(248,113,113,0.6); }
 
 .m-bar-num {
@@ -313,9 +352,10 @@
 
 .m-bar-num.danger { color: var(--m-red); }
 
-/* ── USER ROWS ── */
+/* ── User rows ── */
 .m-user-rows { display: flex; flex-direction: column; }
 
+/* Fila de usuario */
 .m-user-row {
   display: flex;
   align-items: center;
@@ -349,12 +389,14 @@
   text-transform: uppercase;
 }
 
+/* Contenido de usuario */
 .m-user-name { font-size: 13px; color: var(--wb-t1); flex: 1; }
 .m-user-meta { font-family: var(--wb-mono); font-size: 11px; color: var(--wb-t3); }
 
-/* ── ALERT ROWS ── */
+/* ── Alert rows ── */
 .m-alert-rows { display: flex; flex-direction: column; }
 
+/* Fila de alerta */
 .m-alert-row {
   display: flex;
   align-items: flex-start;
@@ -373,18 +415,21 @@
   flex-shrink: 0;
 }
 
+/* Variantes de alerta */
 .m-alert-dot.red   { background: var(--m-red);   box-shadow: 0 0 6px var(--m-red); }
 .m-alert-dot.amber { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
 .m-alert-dot.muted { background: var(--wb-t3); }
 
+/* Contenido de alerta */
 .m-alert-body  { flex: 1; }
 .m-alert-title { font-size: 13px; color: var(--wb-t1); margin-bottom: 3px; }
 .m-alert-sub   { font-family: var(--wb-mono); font-size: 11px; color: var(--wb-t3); }
 .m-alert-time  { font-family: var(--wb-mono); font-size: 10px; color: var(--wb-t3); white-space: nowrap; margin-top: 3px; }
 
-/* ── SITE ROWS ── */
+/* ── Site rows ── */
 .m-site-rows { display: flex; flex-direction: column; }
 
+/* Fila de sitio */
 .m-site-row {
   display: flex;
   align-items: center;
@@ -405,10 +450,11 @@
   text-overflow: ellipsis;
 }
 
+/* Metadatos de sitio */
 .m-site-user { font-size: 11px; color: var(--wb-t3); font-family: var(--wb-mono); width: 110px; }
 .m-site-time { font-size: 10px; color: var(--wb-t3); font-family: var(--wb-mono); white-space: nowrap; }
 
-/* ── EMPTY ── */
+/* ── Empty ── */
 .m-empty {
   padding: 40px;
   text-align: center;
@@ -417,7 +463,8 @@
   font-family: var(--wb-mono);
 }
 
-/* ── CHART ── */
+/* ── Chart ── */
+/* Contenedor y leyenda */
 .m-chart-wrap { height: 240px; position: relative; }
 
 .m-chart-legend { display: flex; gap: 20px; margin-bottom: 20px; }
@@ -433,7 +480,8 @@
 
 .m-chart-legend-line { width: 18px; height: 2px; border-radius: 2px; }
 
-/* ── RESPONSIVE ── */
+/* ── Responsive ── */
+/* Puntos de corte */
 @media (max-width: 1024px) {
   .m-kpi-grid  { grid-template-columns: repeat(2, 1fr); }
   .m-grid-2    { grid-template-columns: 1fr; }
@@ -450,7 +498,8 @@
 }
 
 
-/* ── Reset interferencias de CSS globales ── */
+/* ── Global reset ── */
+/* Neutralización de estilos heredados */
 .m-shell * {
   color: unset;
 }

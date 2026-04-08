@@ -1,6 +1,13 @@
 {% extends 'WebBuilder/base.html' %}
 {% load static wb_extras %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/assistant/editor.css' %}">
+  <link rel="stylesheet" href="{% static 'css/assistant/loading.css' %}">
+  <link rel="stylesheet" href="{% static 'css/edit.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="asst-layout">
 
