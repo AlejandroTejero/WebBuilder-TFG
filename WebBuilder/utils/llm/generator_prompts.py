@@ -14,7 +14,7 @@ Archivos fijos (NO genera el LLM):
 from __future__ import annotations
 import json
 
-from .template_examples import get_example
+from .examples import get_example
 
 def _fields_info(fields):
     return json.dumps(fields, ensure_ascii=False, indent=2)
