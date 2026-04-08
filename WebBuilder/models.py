@@ -76,7 +76,8 @@ class GeneratedSite(models.Model):
         default="pending",
     )
     generation_error = models.TextField(blank=True, default="")
-
+    generation_step = models.CharField(max_length=100, blank=True, default="")
+    
     # Estado del despliegue vía n8n + Docker
     DEPLOY_STATUS_CHOICES = [
         ("idle",      "Sin desplegar"),

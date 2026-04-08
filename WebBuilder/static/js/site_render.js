@@ -432,32 +432,51 @@
   const genOverlay = document.getElementById('gen-loading-overlay');
   const genSteps = ['gs-1', 'gs-2', 'gs-3', 'gs-4', 'gs-5', 'gs-6'].map(id => document.getElementById(id));
 
+  const GEN_STEP_MAP = [
+    { id: 'gs-1', key: 'Analizando' },
+    { id: 'gs-2', key: 'modelos' },
+    { id: 'gs-3', key: 'vistas' },
+    { id: 'gs-4', key: 'plantilla' },
+    { id: 'gs-5', key: 'pagina' },
+    { id: 'gs-6', key: 'Ensamblando' },
+  ];
+
   function showGenOverlay() {
     if (!genOverlay) return;
     genOverlay.classList.add('active');
-    genSteps.forEach((step, i) => {
-      setTimeout(() => {
-        if (i > 0 && genSteps[i - 1]) {
-          genSteps[i - 1].classList.remove('active');
-          genSteps[i - 1].classList.add('done');
-        }
-        if (step) step.classList.add('active');
-      }, i * 8000);
-    });
   }
 
   function startGenPolling() {
+    let currentStep = -1;
+
     const interval = setInterval(async () => {
       try {
         const data = await (await fetch(CFG.genStatusUrl)).json();
+
+        // Buscar qué paso corresponde al texto del servidor
+        if (data.step) {
+          const stepIndex = GEN_STEP_MAP.findIndex(s => data.step.includes(s.key));
+          if (stepIndex !== -1 && stepIndex !== currentStep) {
+            // Marcar anteriores como done
+            for (let i = 0; i < stepIndex; i++) {
+              const el = document.getElementById(GEN_STEP_MAP[i].id);
+              if (el) { el.classList.remove('active'); el.classList.add('done'); }
+            }
+            // Activar el actual
+            const el = document.getElementById(GEN_STEP_MAP[stepIndex].id);
+            if (el) { el.classList.remove('done'); el.classList.add('active'); }
+            currentStep = stepIndex;
+          }
+        }
+
         if (data.status === 'ready' || data.status === 'error') {
           clearInterval(interval);
           window.location.reload();
         }
       } catch (_) {}
-    }, 4000);
+    }, 2000);
   }
-
+  
   /* ══════════════════════════════════════════════════════════
      OVERLAY — DESPLIEGUE
   ══════════════════════════════════════════════════════════ */

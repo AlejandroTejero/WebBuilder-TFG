@@ -45,6 +45,19 @@ logger = logging.getLogger(__name__)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# HELPER DE PROGRESO
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _update_step(site, step: str) -> None:
+    """Actualiza el paso actual de generación en la base de datos."""
+    try:
+        site.generation_step = step
+        site.save(update_fields=["generation_step"])
+    except Exception:
+        pass
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # FUNCIÓN PRINCIPAL
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -83,6 +96,7 @@ def generate_project_files(site) -> dict[str, str]:
     files: dict[str, str] = {}
 
     # ── PASO 1: Estructura de páginas ────────────────────────────────────────
+    _update_step(site, "Analizando estructura del sitio...")
     logger.info("[generator] Paso 1: estructura de páginas")
     system, user_text = prompt_pages_structure(
         site_type=site_type,
@@ -101,6 +115,7 @@ def generate_project_files(site) -> dict[str, str]:
         pages = fallback_pages(site_type)
 
     # ── PASO 2: models.py ────────────────────────────────────────────────────
+    _update_step(site, "Generando modelos de datos...")
     logger.info("[generator] Paso 2: models.py")
     system, user_text = prompt_models(
         fields=fields,
@@ -120,6 +135,7 @@ def generate_project_files(site) -> dict[str, str]:
     files[f"{project}/{app}/migrations/0001_initial.py"] = generate_initial_migration(models_code, app)
 
     # ── PASO 3: views.py ─────────────────────────────────────────────────────
+    _update_step(site, "Generando vistas y controladores...")
     logger.info("[generator] Paso 3: views.py")
     system, user_text = prompt_views(
         fields=fields,
@@ -140,6 +156,7 @@ def generate_project_files(site) -> dict[str, str]:
     logger.info(f"[generator] URLs reales: {real_url_names}")
 
     # ── PASO 4: base.html ────────────────────────────────────────────────────
+    _update_step(site, "Generando plantilla base...")
     logger.info("[generator] Paso 4: base.html")
     system, user_text = prompt_base_template(
         site_title=site_title,
@@ -155,6 +172,7 @@ def generate_project_files(site) -> dict[str, str]:
 
     # ── PASO 5: template por página ──────────────────────────────────────────
     for page in pages:
+        _update_step(site, f"Generando pagina '{page['name']}'...")
         logger.info(f"[generator] Paso 5: template '{page['name']}'")
         system, user_text = prompt_template(
             page=page,
@@ -175,6 +193,7 @@ def generate_project_files(site) -> dict[str, str]:
         files[f"{project}/{app}/templates/{page['template']}"] = fix_template(html)
 
     # ── PASO 6: load_data.py ─────────────────────────────────────────────────
+    _update_step(site, "Generando cargador de datos...")
     logger.info("[generator] Paso 6: load_data.py")
     system, user_text = prompt_load_data(
         fields=fields,
@@ -226,15 +245,19 @@ def generate_project_files(site) -> dict[str, str]:
         files[f"{project}/{app}/management/commands/seed_users.py"] = seed_users_code
 
     # ── PASO 7: archivos estáticos ───────────────────────────────────────────
+    _update_step(site, "Ensamblando archivos del proyecto...")
     logger.info("[generator] Paso 7: archivos estáticos")
     files.update(build_static_files(project, app))
+
     # ── PASO 8: Validación de consistencia y autocorrección ─────────────────
+    _update_step(site, "Validando consistencia entre archivos...")
     logger.info("[generator] Paso 8: validando consistencia entre archivos")
     issues = check_consistency(files)
     if issues:
         logger.warning(f"[generator] {len(issues)} inconsistencias detectadas:")
         for issue in issues:
             logger.warning(f"  - {issue}")
+        _update_step(site, "Corrigiendo inconsistencias detectadas...")
         logger.info("[generator] Intentando autocorrección...")
         files = _regenerate_with_errors(
             files=files,
@@ -253,6 +276,7 @@ def generate_project_files(site) -> dict[str, str]:
     else:
         logger.info("[generator] Sin inconsistencias detectadas")
 
+    _update_step(site, "Generacion completada.")
     logger.info(f"[generator] Completado: {len(files)} archivos generados")
     return files
 
@@ -283,7 +307,7 @@ def _regenerate_with_errors(
             real_fields=real_fields,
         )
         user_text += (
-            f"\n\nCORRECCIÓN OBLIGATORIA — tu views.py anterior tenía estos errores:\n"
+            f"\n\nCORRECCION OBLIGATORIA — tu views.py anterior tenia estos errores:\n"
             f"{error_context}\n"
             f"Los campos reales del modelo son: {real_fields}\n"
             f"Corrige views.py usando SOLO esos campos."
@@ -291,7 +315,7 @@ def _regenerate_with_errors(
         new_views = llm_call_logged(system, user_text, "views_retry", temperature=0.05, site=site)
         if new_views.strip():
             files[f"{project}/{app}/views.py"] = new_views
-            logger.info("[generator] views.py regenerado ✅")
+            logger.info("[generator] views.py regenerado")
 
     # ── Regenerar templates con errores ─────────────────────────────
     for page in pages:
@@ -314,7 +338,7 @@ def _regenerate_with_errors(
             real_url_names=real_url_names,
         )
         user_text += (
-            f"\n\nCORRECCIÓN OBLIGATORIA — tu template anterior tenía estos errores:\n"
+            f"\n\nCORRECCION OBLIGATORIA — tu template anterior tenia estos errores:\n"
             f"{template_error_context}\n"
             f"Los campos reales del modelo son: {real_fields}\n"
             f"Corrige el template usando SOLO esos campos y URLs."
@@ -322,6 +346,6 @@ def _regenerate_with_errors(
         new_html = llm_call_logged(system, user_text, f"template_{page['name']}_retry", temperature=0.4, site=site)
         if new_html.strip():
             files[template_path] = new_html
-            logger.info(f"[generator] Template '{page['name']}' regenerado ✅")
+            logger.info(f"[generator] Template '{page['name']}' regenerado")
 
     return files

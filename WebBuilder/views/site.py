@@ -90,8 +90,8 @@ def site_status(request, api_request_id: int):
         "status": site.generation_status,
         "error": site.generation_error or "",
         "files_count": len(site.project_files) if site.project_files else 0,
+        "step": site.generation_step or "",
     })
-
 
 @login_required
 def site_download_zip(request, api_request_id: int):
