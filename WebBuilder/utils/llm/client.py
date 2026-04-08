@@ -14,12 +14,14 @@ def chat_completion(
     temperature: float = 0.2,
     model: str | None = None,
     base_url: str | None = None,
+    api_key: str | None = None,
 ) -> str:
     """
     Minimal OpenAI-compatible client for OpenRouter.
     Returns assistant text.
     """
-    if not settings.LLM_API_KEY:
+    _effective_api_key = api_key or settings.LLM_API_KEY
+    if not _effective_api_key:
         raise LLMError("LLM_API_KEY está vacío. Revisa .env y load_dotenv().")
 
     _base_url = base_url or settings.LLM_BASE_URL
@@ -28,7 +30,7 @@ def chat_completion(
     url = f"{_base_url.rstrip('/')}/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {settings.LLM_API_KEY}",
+        "Authorization": f"Bearer {_effective_api_key}",
         "Content-Type": "application/json",
         "HTTP-Referer": "http://localhost:8000",
         "X-Title": "WebBuilder",

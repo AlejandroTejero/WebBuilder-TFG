@@ -4,16 +4,13 @@
 
 1. Mejora visual de proyecto: Adapar todo el proyecto al estilo del home (monocromatico y algo de color), terminar 
 de traducir el contenido y acicalar el modo claro.
-2. Mejora del admin/metricas con estilo moderno y adaptado al actual.
-3. Variacion LLM: Posibilidad mediante formulario de que el usuario pueda cambiar el LLM (metiendose los datos en metricas)
-4. Lectura de datos: Implementar lectura CSV, GEOJson, y posibilidad de meter codigo directo.
-5. Reseñas y comentarios: Actualmente existen los usuarios, pero hay que meterles cosas que poder hacer (votos / valoraciones).
-6. IAs locales: Posibilidad de meter IAs locales o personalizadas.
-7. Login con credenciales de google.
-8. Preview en vivo del sitio generado, ver si merece la pena o con el auto-despligue es suficiente
+2. Lectura de datos: Implementar lectura CSV, GEOJson, y posibilidad de meter codigo directo.
+3. Reseñas y comentarios: Actualmente existen los usuarios, pero hay que meterles cosas que poder hacer (votos / valoraciones).
+4. Login con credenciales de google.
+5. Preview en vivo del sitio generado, ver si merece la pena o con el auto-despligue es suficiente
 
-9. Chat de refinamiento post-generación: En lugar de solo regenerar el plan con un prompt, un mini-chat donde el usuario diga "quiero que la home tenga un hero más grande" o "añade un filtro por categoría" y el LLM modifique solo el fichero relevante.
-10. Conectar los "generando proyecto" con los pasos de verdad, para saber el progreso y no un progreso inventado.
+6. Chat de refinamiento post-generación: En lugar de solo regenerar el plan con un prompt, un mini-chat donde el usuario diga "quiero que la home tenga un hero más grande" o "añade un filtro por categoría" y el LLM modifique solo el fichero relevante.
+7. Conectar los "generando proyecto" con los pasos de verdad, para saber el progreso y no un progreso inventado.
 
 
 # Implementaciones secundarias
