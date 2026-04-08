@@ -29,6 +29,14 @@ class RegisterForm(UserCreationForm):
 # Formulario para introducir SOLO la URL de la API
 class APIRequestForm(forms.ModelForm):
 
+    api_url = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={
+            "class": "form-control",
+            "placeholder": "Introduce la URL de la API",
+        })
+    )
+
     user_prompt = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
@@ -42,20 +50,27 @@ class APIRequestForm(forms.ModelForm):
         required=False,
         widget=forms.FileInput(attrs={
             "class": "form-control",
-            "accept": ".json,.xml",
+            "accept": ".json,.xml,.csv,.geojson",
         })
     )
 
+    def clean_api_url(self):
+        url = self.cleaned_data.get("api_url", "")
+        if url and ("\n" in url or len(url.split()) > 1):
+            raise forms.ValidationError("Introduce una URL válida, no texto.")
+        return url
+
+    def clean(self):
+        cleaned_data = super().clean()
+        api_url = cleaned_data.get("api_url")
+        file_input = cleaned_data.get("file_input")
+        if not api_url and not file_input:
+            raise forms.ValidationError("Introduce una URL o sube un fichero.")
+        return cleaned_data
 
     class Meta:
         model = APIRequest
         fields = ["api_url", "file_input"]
-        widgets = {
-            "api_url": forms.URLInput(attrs={
-                "class": "form-control",
-                "placeholder": "Introduce la URL de la API",
-            })
-        }
         labels = {
             "api_url": ""
         }

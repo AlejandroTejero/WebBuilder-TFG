@@ -282,6 +282,9 @@
       <input type="hidden" name="llm_choice" id="llm-choice-input" value="{{ selected_llm_choice }}">
     </div>
 
+    <div id="url-error" style="display:none" class="asst-error-msg">
+      Introduce una URL válida (debe empezar por http:// o https://).
+    </div>
     <div class="asst-form-footer">
       <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze" onclick="showLoading()">
         Analizar URL

@@ -360,9 +360,9 @@ def analyze_url(request):
         )
 
     # ── Análisis normal ─────────────────────────────────────────────
-    form = APIRequestForm(request.POST)
+    form = APIRequestForm(request.POST, request.FILES)
     if not form.is_valid():
-        messages.error(request, "La URL no es válida (incluye http:// o https://).")
+        messages.error(request, "Por favor corrige los errores del formulario.")
         return render_assistant(request, form=form)
 
     llm_choice = request.POST.get("llm_choice", "")

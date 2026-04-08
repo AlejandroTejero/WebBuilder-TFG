@@ -310,3 +310,15 @@
 .asst-btn--ghost:hover { background: rgba(255,255,255,0.03); color: #64748b; }
 .asst-btn--lg  { padding: 0.85rem 1.85rem; font-size: 0.93rem; }
 .asst-btn--sm  { padding: 0.45rem 1rem; font-size: 0.8rem; }
+
+
+/* Cuadrado alerta en caso de fallo */
+.asst-error-msg {
+  color: #f87171;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #f8717144;
+  border-radius: 8px;
+  background: #f871711a;
+}

@@ -47,6 +47,24 @@ function switchInputMode(mode) {
  * Se llama desde el onclick del botón de submit.
  */
 function showLoading() {
+  // Si el modo activo es URL, validamos antes de mostrar el overlay
+  const fieldUrl = document.getElementById('field-url');
+  const isUrlMode = fieldUrl && fieldUrl.style.display !== 'none';
+
+  if (isUrlMode) {
+    const input = document.querySelector('#form-analyze input[type="url"]');
+    const val = input ? input.value.trim() : '';
+    const looksLikeUrl = /^https?:\/\/\S+$/.test(val);
+    if (!looksLikeUrl) {
+      const errorDiv = document.getElementById('url-error');
+      if (errorDiv) {
+        errorDiv.style.display = 'block';
+        setTimeout(() => { errorDiv.style.display = 'none'; }, 3500);
+      }
+      return false;
+    }
+  }
+
   const overlay = document.getElementById('loading-overlay');
   if (!overlay) return;
 
@@ -57,12 +75,10 @@ function showLoading() {
 
   steps.forEach((step, i) => {
     setTimeout(() => {
-      // Marcar el anterior como completado
       if (i > 0 && steps[i - 1]) {
         steps[i - 1].classList.remove('active');
         steps[i - 1].classList.add('done');
       }
-      // Activar el actual
       if (step) step.classList.add('active');
     }, i * 2400);
   });

@@ -15,13 +15,16 @@ DEFAULT_HEADERS = {"User-Agent": "WebBuilder/1.0"}
 
 # ========================== VALIDACION ==========================
 
-# Valida que la URL use http o https
+# Valida que la URL use http o https, no permite texto plano
 def validate_url(api_url: str) -> None:
     parsed_url = urlparse(api_url)
     if parsed_url.scheme not in ("http", "https"):
         raise ValueError("La URL debe empezar por http:// o https://.")
-
-
+    if not parsed_url.netloc:
+        raise ValueError("La URL no tiene un dominio válido.")
+    if len(api_url) > 2048:
+        raise ValueError("La URL es demasiado larga para ser válida.")
+    
 # ========================== LECTURA DE FICHERO ==========================
 
 def read_file(file_obj, *, max_bytes: int = MAX_BYTES) -> tuple[str, str]:
