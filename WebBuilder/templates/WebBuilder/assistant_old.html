@@ -1,0 +1,123 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/assistant/form.css' %}">
+  <link rel="stylesheet" href="{% static 'css/assistant/schema.css' %}">
+  <link rel="stylesheet" href="{% static 'css/assistant/loading.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="asst-layout">
+
+  <aside class="asst-sidebar">
+    <div class="asst-sidebar__inner">
+
+      <div class="asst-brand">
+        <span class="asst-brand__text">Asistente IA</span>
+      </div>
+
+      <nav class="asst-steps">
+
+        <div class="asst-step {% if not analysis %}asst-step--active{% else %}asst-step--done{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot">
+              {% if analysis %}<span class="asst-step__check">✓</span>{% else %}<span>1</span>{% endif %}
+            </div>
+            <div class="asst-step__line"></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Introducir URL</div>
+            <div class="asst-step__desc">API pública en JSON o XML</div>
+          </div>
+        </div>
+
+        <div class="asst-step {% if analysis and not llm_plan %}asst-step--active{% elif llm_plan %}asst-step--done{% else %}asst-step--pending{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot">
+              {% if llm_plan %}<span class="asst-step__check">✓</span>{% else %}<span>2</span>{% endif %}
+            </div>
+            <div class="asst-step__line"></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Análisis IA</div>
+            <div class="asst-step__desc">Schema generado automáticamente</div>
+          </div>
+        </div>
+
+        <div class="asst-step {% if llm_plan %}asst-step--active{% else %}asst-step--pending{% endif %}">
+          <div class="asst-step__track">
+            <div class="asst-step__dot"><span>3</span></div>
+          </div>
+          <div class="asst-step__info">
+            <div class="asst-step__label">Revisar y publicar</div>
+            <div class="asst-step__desc">Ajusta campos y genera el sitio</div>
+          </div>
+        </div>
+
+      </nav>
+
+      {% if api_request %}
+      <div class="asst-meta">
+        <div class="asst-meta__label">Análisis activo</div>
+        <div class="asst-meta__url">{{ api_request.api_url|truncatechars:45 }}</div>
+        <div class="asst-meta__status asst-meta__status--{{ api_request.status }}">
+          {% if api_request.status == "processed" %}✓ Procesado
+          {% elif api_request.status == "error" %}✗ Error
+          {% else %}⏳ Pendiente{% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <a href="{% url 'history' %}" class="asst-history-link">
+        <span>📋</span> Ver historial
+      </a>
+
+    </div>
+  </aside>
+
+  <main class="asst-content">
+
+    {% if messages %}
+      <div class="asst-alerts">
+        {% for message in messages %}
+          <div class="asst-alert asst-alert--{{ message.tags }}">
+            <span class="asst-alert__icon">
+              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}⚠{% else %}ℹ{% endif %}
+            </span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="asst-columns">
+      <div class="asst-col asst-col--left">
+        {% include 'WebBuilder/partials/assistant/input.html' %}
+        {% include 'WebBuilder/partials/assistant/analysis.html' %}
+      </div>
+
+      <div class="asst-col asst-col--right">
+        {% include 'WebBuilder/partials/assistant/preview.html' %}
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="asst-loading" id="loading-overlay">
+  <div class="asst-loading__box">
+    <div class="asst-loading__spinner"></div>
+    <div class="asst-loading__title">Analizando URL...</div>
+    <div class="asst-loading__sub">La IA está procesando los datos</div>
+    <div class="asst-loading__steps">
+      <div class="asst-loading__step" id="ls-1">⬇ Descargando datos</div>
+      <div class="asst-loading__step" id="ls-2">🔍 Detectando estructura</div>
+      <div class="asst-loading__step" id="ls-3">✦ Generando schema con IA</div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/assistant.js' %}"></script>
+{% endblock %}

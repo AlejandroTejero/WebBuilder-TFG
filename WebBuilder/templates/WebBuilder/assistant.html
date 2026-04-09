@@ -14,10 +14,6 @@
   <aside class="asst-sidebar">
     <div class="asst-sidebar__inner">
 
-      <div class="asst-brand">
-        <span class="asst-brand__text">Asistente IA</span>
-      </div>
-
       <nav class="asst-steps">
 
         <div class="asst-step {% if not analysis %}asst-step--active{% else %}asst-step--done{% endif %}">
@@ -63,15 +59,15 @@
         <div class="asst-meta__label">Análisis activo</div>
         <div class="asst-meta__url">{{ api_request.api_url|truncatechars:45 }}</div>
         <div class="asst-meta__status asst-meta__status--{{ api_request.status }}">
-          {% if api_request.status == "processed" %}✓ Procesado
-          {% elif api_request.status == "error" %}✗ Error
-          {% else %}⏳ Pendiente{% endif %}
+          {% if api_request.status == "processed" %}Procesado
+          {% elif api_request.status == "error" %}Error
+          {% else %}Pendiente{% endif %}
         </div>
       </div>
       {% endif %}
 
       <a href="{% url 'history' %}" class="asst-history-link">
-        <span>📋</span> Ver historial
+        Ver historial
       </a>
 
     </div>
@@ -104,6 +100,90 @@
     </div>
 
   </main>
+</div>
+
+<div class="llm-modal" id="llm-modal">
+  <div class="llm-modal__backdrop" onclick="closeLLMModal()"></div>
+  <div class="llm-modal__panel">
+
+    <div class="llm-modal__header">
+      <span class="llm-modal__title">Modelo LLM</span>
+      <button class="llm-modal__close" onclick="closeLLMModal()">✕</button>
+    </div>
+
+    <div class="llm-modal__options">
+
+      <div class="llm-modal__option llm-modal__option--selected"
+           id="llm-opt-default"
+           onclick="selectLLMOption('default')">
+        <div class="llm-modal__opt-header">
+          <span class="llm-modal__opt-name">Predeterminado</span>
+          <span class="llm-modal__opt-badge">Recomendado</span>
+        </div>
+        <p class="llm-modal__opt-desc">
+          Selección automática del modelo más adecuado según tu API.
+          Equilibrio óptimo entre velocidad y calidad.
+        </p>
+      </div>
+
+      <div class="llm-modal__option" id="llm-opt-choose"
+           onclick="selectLLMOption('choose')">
+        <div class="llm-modal__opt-header">
+          <span class="llm-modal__opt-name">Elegir modelo</span>
+        </div>
+        <p class="llm-modal__opt-desc">
+          Selecciona manualmente entre los modelos disponibles.
+        </p>
+
+        <div class="llm-modal__cards" id="llm-cards-list">
+          {% for model in llm_catalog %}
+          <div class="llm-modal__card {% if model.id == selected_llm_choice %}llm-modal__card--selected{% endif %}"
+               data-model-id="{{ model.id }}"
+               onclick="event.stopPropagation(); selectLLMCard(this)">
+            <div class="llm-modal__card-header">
+              <span class="llm-modal__card-name">{{ model.name }}</span>
+              <span class="llm-modal__card-provider">{{ model.provider }}</span>
+            </div>
+            <p class="llm-modal__card-desc">{{ model.description }}</p>
+            <div class="llm-modal__card-tags">
+              <span class="llm-modal__card-tag llm-modal__card-tag--pro">{{ model.pros }}</span>
+              <span class="llm-modal__card-tag llm-modal__card-tag--con">{{ model.cons }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if request.user.profile.custom_llm_model %}
+      <div class="llm-modal__option" id="llm-opt-custom"
+           onclick="window.location.href='{% url 'profile' %}'">
+        <div class="llm-modal__opt-header">
+          <span class="llm-modal__opt-name">Modelo personalizado</span>
+          <span class="llm-modal__opt-badge llm-modal__opt-badge--ok">Configurado</span>
+        </div>
+        <p class="llm-modal__opt-desc">
+          {{ request.user.profile.custom_llm_model }} —
+          {{ request.user.profile.custom_llm_base_url }}
+        </p>
+      </div>
+      {% else %}
+      <div class="llm-modal__option llm-modal__option--muted" id="llm-opt-custom"
+           onclick="window.location.href='{% url 'profile' %}'">
+        <div class="llm-modal__opt-header">
+          <span class="llm-modal__opt-name">Modelo personalizado</span>
+          <span class="llm-modal__opt-badge llm-modal__opt-badge--empty">No configurado</span>
+        </div>
+        <p class="llm-modal__opt-desc">
+          Configura tu propio proveedor OpenAI-compatible en tu perfil.
+        </p>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <input type="hidden" name="llm_choice" id="llm-choice-input" value="{{ selected_llm_choice }}">
+
+  </div>
 </div>
 
 <div class="asst-loading" id="loading-overlay">

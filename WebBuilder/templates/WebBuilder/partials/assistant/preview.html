@@ -62,32 +62,3 @@
   </div>
 </section>
 {% endif %}
-
-{% if preview_items %}
-{% load wb_extras %}
-<section class="asst-card asst-card--preview" id="block-preview">
-  <div class="asst-card__header">
-    <div class="asst-card__step-badge asst-card__step-badge--preview">👁 Vista previa</div>
-    <h2 class="asst-card__title">Muestra de datos</h2>
-    <p class="asst-card__subtitle">3 items de tu dataset con los campos seleccionados por la IA.</p>
-  </div>
-
-  <div class="asst-preview-grid">
-    {% for item in preview_items %}
-      <div class="asst-preview-card">
-        <div class="asst-preview-card__index">#{{ forloop.counter }}</div>
-        {% for field in plan.fields %}
-          {% with val=item|get_item:field.key %}
-            {% if val %}
-              <div class="asst-preview-field">
-                <span class="asst-preview-field__label">{{ field.label }}</span>
-                <span class="asst-preview-field__value">{{ val|truncatechars:120 }}</span>
-              </div>
-            {% endif %}
-          {% endwith %}
-        {% endfor %}
-      </div>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}

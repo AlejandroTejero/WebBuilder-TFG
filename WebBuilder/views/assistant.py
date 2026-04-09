@@ -56,6 +56,8 @@ def _resolve_llm(user, llm_choice: str) -> tuple[str, str, str]:
     - Si es un modelo del catálogo, usa la api_key del .env.
     - Si es 'custom', usa los datos del perfil del usuario.
     """
+    if llm_choice == "default" or not llm_choice:
+        llm_choice = LLM_CATALOG[0]["id"]
     if llm_choice == "custom":
         profile = getattr(user, 'profile', None)
         if not profile or not profile.custom_llm_model:

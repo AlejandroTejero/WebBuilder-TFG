@@ -10,8 +10,8 @@
 
     <div class="asst-field">
       <div class="asst-input-toggle">
-        <button type="button" class="asst-toggle-btn active" id="btn-mode-url" onclick="switchInputMode('url')">🔗 URL</button>
-        <button type="button" class="asst-toggle-btn" id="btn-mode-file" onclick="switchInputMode('file')">📂 Fichero</button>
+        <button type="button" class="asst-toggle-btn active" id="btn-mode-url" onclick="switchInputMode('url')">URL</button>
+        <button type="button" class="asst-toggle-btn" id="btn-mode-file" onclick="switchInputMode('file')">Fichero</button>
       </div>
     </div>
 
@@ -51,38 +51,32 @@
           <span class="asst-label__optional">opcional</span>
         </label>
         <div class="asst-input-toggle" id="prompt-mode-toggle">
-          <button type="button" class="asst-toggle-btn active" onclick="switchPromptMode('free')">✏️ Libre</button>
-          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('examples')">⚡ Ejemplos</button>
-          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('guided')">✨ Guiado</button>
+          <button type="button" class="asst-toggle-btn active" onclick="switchPromptMode('free')">Libre</button>
+          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('examples')">Ejemplos</button>
+          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('guided')">Guiado</button>
         </div>
       </div>
 
-      <!-- Modo libre: textarea normal -->
       <div id="prompt-mode-free">
         {{ form.user_prompt }}
         <p class="asst-hint">Cuanto más detallas colores, layout y estilo, mejor será el resultado.</p>
       </div>
 
-      <!-- Modo ejemplos: chips -->
       <div id="prompt-mode-examples" style="display:none;">
         <div class="asst-wizard-examples">
           <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Catálogo minimalista en blanco y negro, grid de 3 columnas, imagen grande, precio destacado en negro y botón de ver detalle.')">
-            <span class="asst-wizard-example__icon">🛍</span>
             <span class="asst-wizard-example__label">Tienda</span>
             <span class="asst-wizard-example__desc">Catálogo minimalista, grid 3 cols, precio destacado</span>
           </button>
           <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Blog estilo periódico, tipografía grande, columnas de texto, colores sobrios en gris y blanco, fecha y categoría visibles.')">
-            <span class="asst-wizard-example__icon">📰</span>
             <span class="asst-wizard-example__label">Blog</span>
             <span class="asst-wizard-example__desc">Estilo periódico, tipografía grande, sobrio</span>
           </button>
           <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Portfolio moderno con fondo negro, tarjetas con efecto hover, imagen a pantalla completa y título en verde neón.')">
-            <span class="asst-wizard-example__icon">💼</span>
             <span class="asst-wizard-example__label">Portfolio</span>
             <span class="asst-wizard-example__desc">Fondo negro, hover effects, imágenes grandes</span>
           </button>
           <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Dashboard con tablas de datos, gráficos simples, colores azul y gris, diseño compacto y profesional.')">
-            <span class="asst-wizard-example__icon">📊</span>
             <span class="asst-wizard-example__label">Dashboard</span>
             <span class="asst-wizard-example__desc">Tablas, métricas, azul y gris, profesional</span>
           </button>
@@ -90,11 +84,9 @@
         <p class="asst-hint">Pulsa un ejemplo para usarlo como punto de partida. Puedes editarlo en modo libre.</p>
       </div>
 
-      <!-- Modo guiado: wizard -->
       <div id="prompt-mode-guided" style="display:none;">
         <div class="asst-wizard">
 
-          <!-- Indicador de pasos -->
           <div class="asst-wizard__steps">
             <div class="asst-wizard__step-dot active" id="wdot-1">1</div>
             <div class="asst-wizard__step-line"></div>
@@ -103,7 +95,6 @@
             <div class="asst-wizard__step-dot" id="wdot-3">3</div>
           </div>
 
-          <!-- Paso 1: Estilo visual -->
           <div class="asst-wizard__panel" id="wpanel-1">
             <p class="asst-wizard__question">¿Qué estilo visual quieres?</p>
 
@@ -111,10 +102,10 @@
               <span class="asst-wizard__group-label">Fondo</span>
               <div class="asst-wizard__options">
                 <button type="button" class="asst-wizard__opt asst-wizard__opt--selected" data-group="bg" data-value="fondo oscuro">
-                  🌑 Oscuro
+                  Oscuro
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="bg" data-value="fondo claro y minimalista">
-                  ☀️ Claro
+                  Claro
                 </button>
               </div>
             </div>
@@ -123,19 +114,19 @@
               <span class="asst-wizard__group-label">Color de acento</span>
               <div class="asst-wizard__options">
                 <button type="button" class="asst-wizard__opt asst-wizard__opt--selected" data-group="color" data-value="acento verde esmeralda">
-                  🟢 Verde
+                  Verde
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento azul eléctrico">
-                  🔵 Azul
+                  Azul
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento morado vibrante">
-                  🟣 Morado
+                  Morado
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento naranja cálido">
-                  🟠 Naranja
+                  Naranja
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento rojo intenso">
-                  🔴 Rojo
+                  Rojo
                 </button>
               </div>
             </div>
@@ -146,7 +137,6 @@
             </div>
           </div>
 
-          <!-- Paso 2: Qué destacar -->
           <div class="asst-wizard__panel" id="wpanel-2" style="display:none;">
             <p class="asst-wizard__question">¿Qué elementos quieres destacar?</p>
 
@@ -154,32 +144,32 @@
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="imágenes grandes y destacadas" checked>
                 <span class="asst-wizard__check-box"></span>
-                <span>🖼 Imágenes grandes</span>
+                <span>Imágenes grandes</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="precios visibles y en tipografía grande">
                 <span class="asst-wizard__check-box"></span>
-                <span>💰 Precios</span>
+                <span>Precios</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="valoraciones con estrellas o badge numérico">
                 <span class="asst-wizard__check-box"></span>
-                <span>⭐ Valoraciones</span>
+                <span>Valoraciones</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="badges de categoría con colores">
                 <span class="asst-wizard__check-box"></span>
-                <span>🏷 Categorías</span>
+                <span>Categorías</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="fechas visibles en las cards">
                 <span class="asst-wizard__check-box"></span>
-                <span>📅 Fechas</span>
+                <span>Fechas</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="botones de enlace externo o CTA">
                 <span class="asst-wizard__check-box"></span>
-                <span>🔗 Botones de acción</span>
+                <span>Botones de acción</span>
               </label>
             </div>
 
@@ -189,28 +179,23 @@
             </div>
           </div>
 
-          <!-- Paso 3: Personalidad -->
           <div class="asst-wizard__panel" id="wpanel-3" style="display:none;">
             <p class="asst-wizard__question">¿Qué personalidad tiene el sitio?</p>
 
             <div class="asst-wizard__options asst-wizard__options--grid">
               <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño minimalista, mucho espacio en blanco, tipografía limpia">
-                <span class="asst-wizard__opt-icon">◻️</span>
                 <span class="asst-wizard__opt-name">Minimalista</span>
                 <span class="asst-wizard__opt-sub">Limpio, espaciado, sobrio</span>
               </button>
               <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño moderno con gradientes, sombras y efectos hover dinámicos">
-                <span class="asst-wizard__opt-icon">⚡</span>
                 <span class="asst-wizard__opt-name">Moderno</span>
                 <span class="asst-wizard__opt-sub">Gradientes, sombras, dinámico</span>
               </button>
               <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño elegante y sofisticado, tipografía serif, colores neutros">
-                <span class="asst-wizard__opt-icon">✦</span>
                 <span class="asst-wizard__opt-name">Elegante</span>
                 <span class="asst-wizard__opt-sub">Sofisticado, serif, neutros</span>
               </button>
               <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño colorido y vibrante, colores saturados, energético">
-                <span class="asst-wizard__opt-icon">🎨</span>
                 <span class="asst-wizard__opt-name">Colorido</span>
                 <span class="asst-wizard__opt-sub">Vibrante, saturado, energético</span>
               </button>
@@ -223,7 +208,7 @@
 
             <div class="asst-wizard__nav">
               <button type="button" class="asst-btn asst-btn--ghost asst-btn--sm" onclick="wizardNext(2)">← Atrás</button>
-              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardBuild()">✨ Generar prompt</button>
+              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardBuild()">Generar prompt</button>
             </div>
           </div>
 
@@ -232,77 +217,32 @@
 
     </div>
 
-
-    <!-- -->
     {% if api_request %}
       <input type="hidden" name="api_request_id" value="{{ api_request.id }}">
     {% endif %}
-
-    <div class="asst-field">
-      <label class="asst-label">Modelo LLM</label>
-      <div class="llm-selector">
-
-        {% for model in llm_catalog %}
-        <div class="llm-card {% if model.id == selected_llm_choice %}llm-card--selected{% endif %}"
-            data-model-id="{{ model.id }}"
-            onclick="selectLLM(this)">
-          <div class="llm-card__header">
-            <span class="llm-card__name">{{ model.name }}</span>
-            <span class="llm-card__provider">{{ model.provider }}</span>
-          </div>
-          <p class="llm-card__desc">{{ model.description }}</p>
-          <div class="llm-card__tags">
-            <span class="llm-card__tag llm-card__tag--pro">✓ {{ model.pros }}</span>
-            <span class="llm-card__tag llm-card__tag--con">✗ {{ model.cons }}</span>
-          </div>
-        </div>
-        {% endfor %}
-
-        {% if request.user.profile.custom_llm_model %}
-        <div class="llm-card llm-card--custom {% if selected_llm_choice == "custom" %}llm-card--selected{% endif %}"
-            data-model-id="custom"
-            onclick="selectLLM(this)">
-          <div class="llm-card__header">
-            <span class="llm-card__name">Modelo personalizado</span>
-            <span class="llm-card__provider llm-card__provider--custom">✓ Configurado</span>
-          </div>
-          <p class="llm-card__desc">{{ request.user.profile.custom_llm_model }} — {{ request.user.profile.custom_llm_base_url }}</p>
-        </div>
-        {% else %}
-        <a href="{% url 'profile' %}" class="llm-card llm-card--empty">
-          <div class="llm-card__header">
-            <span class="llm-card__name">Modelo personalizado</span>
-            <span class="llm-card__provider llm-card__provider--empty">⚙️ No configurado</span>
-          </div>
-          <p class="llm-card__desc">Configura tu propio proveedor OpenAI-compatible en tu perfil.</p>
-        </a>
-        {% endif %}
-
-      </div>
-      <input type="hidden" name="llm_choice" id="llm-choice-input" value="{{ selected_llm_choice }}">
-    </div>
 
     <div id="url-error" style="display:none" class="asst-error-msg">
       Introduce una URL válida (debe empezar por http:// o https://).
     </div>
     <div class="asst-form-footer">
-      <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze" onclick="showLoading()">
+      <button type="button" class="asst-btn asst-btn--ghost" id="btn-llm-selector"
+              onclick="openLLMModal()">
+        <span class="llm-btn-dot"></span>
+        Modelo: <span id="llm-label-display">Predeterminado</span>
+      </button>
+      <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze"
+              onclick="showLoading()">
         Analizar URL
       </button>
       {% if api_request and llm_plan %}
-      <button type="submit" class="asst-btn asst-btn--ghost" name="action" value="regenerate" onclick="showLoading()">
+      <button type="submit" class="asst-btn asst-btn--ghost" name="action"
+              value="regenerate" onclick="showLoading()">
         Regenerar mapa
       </button>
       {% endif %}
     </div>
 
   </form>
+  <input type="hidden" name="llm_choice" id="llm-choice-input-form"
+         value="{{ selected_llm_choice }}" form="form-analyze">
 </section>
-
-<script>
-function selectLLM(card) {
-  document.querySelectorAll('.llm-card').forEach(c => c.classList.remove('llm-card--selected'));
-  card.classList.add('llm-card--selected');
-  document.getElementById('llm-choice-input').value = card.dataset.modelId;
-}
-</script>

@@ -167,3 +167,64 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.classList.add('asst-wizard__opt--selected');
   });
 });
+
+// ── MODAL LLM ────────────────────────────────────────────────────────────────
+
+function openLLMModal() {
+  document.getElementById('llm-modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLLMModal() {
+  document.getElementById('llm-modal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function selectLLMOption(option) {
+  // Marcar opción seleccionada
+  document.querySelectorAll('.llm-modal__option').forEach(el => {
+    el.classList.remove('llm-modal__option--selected');
+  });
+  document.getElementById(`llm-opt-${option}`).classList.add('llm-modal__option--selected');
+
+  // Mostrar/ocultar lista de cards
+  const cards = document.getElementById('llm-cards-list');
+  if (option === 'choose') {
+    cards.classList.add('visible');
+  } else {
+    cards.classList.remove('visible');
+  }
+
+  // Si es predeterminado o personalizado, actualizar valor y cerrar
+  if (option === 'default') {
+    setLLMValue('default', 'Predeterminado');
+    closeLLMModal();
+  }
+}
+
+function selectLLMCard(card) {
+  document.querySelectorAll('.llm-modal__card').forEach(c => {
+    c.classList.remove('llm-modal__card--selected');
+  });
+  card.classList.add('llm-modal__card--selected');
+
+  const modelId = card.dataset.modelId;
+  const modelName = card.querySelector('.llm-modal__card-name').textContent.trim();
+  setLLMValue(modelId, modelName);
+  closeLLMModal();
+}
+
+function setLLMValue(value, label) {
+  // Actualizar el input hidden del form
+  const input = document.getElementById('llm-choice-input-form');
+  if (input) input.value = value;
+
+  // Actualizar el texto del botón
+  const display = document.getElementById('llm-label-display');
+  if (display) display.textContent = label;
+}
+
+// Cerrar con Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLLMModal();
+});

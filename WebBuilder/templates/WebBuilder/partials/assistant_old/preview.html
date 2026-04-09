@@ -1,0 +1,93 @@
+{% if llm_error %}
+<section class="asst-card asst-card--error">
+  <div class="asst-card__header">
+    <div class="asst-card__step-badge asst-card__step-badge--error">Error IA</div>
+    <h2 class="asst-card__title">No se pudo generar el schema</h2>
+    <p class="asst-card__subtitle">{{ llm_error }}</p>
+  </div>
+</section>
+{% endif %}
+
+{% if llm_plan or api_request.field_mapping %}
+{% with plan=llm_plan|default:api_request.field_mapping %}
+<section class="asst-card asst-card--schema" id="block-schema">
+  <div class="asst-card__header">
+    <div class="asst-card__step-badge asst-card__step-badge--ai">✦ IA</div>
+    <h2 class="asst-card__title">Esquema generado</h2>
+    <p class="asst-card__subtitle">La IA analizó tu dataset y propuso este schema. Puedes ajustarlo campo a campo en el boton de editar.</p>
+  </div>
+
+  <div class="asst-schema-overview">
+    <div class="asst-schema-meta">
+      <div class="asst-meta-pill">
+        <span class="asst-meta-pill__label">Tipo</span>
+        <span class="asst-meta-pill__value">{{ plan.site_type }}</span>
+      </div>
+      <div class="asst-meta-pill">
+        <span class="asst-meta-pill__label">Título</span>
+        <span class="asst-meta-pill__value">{{ plan.site_title }}</span>
+      </div>
+      <div class="asst-meta-pill">
+        <span class="asst-meta-pill__label">Campos</span>
+        <span class="asst-meta-pill__value">{{ plan.fields|length }}</span>
+      </div>
+    </div>
+
+    {% if plan.fields %}
+    <div class="asst-fields-list">
+      {% for field in plan.fields %}
+        <div class="asst-field-chip">
+          <code class="asst-field-chip__key">{{ field.key }}</code>
+          <span class="asst-field-chip__arrow">→</span>
+          <span class="asst-field-chip__label">{{ field.label }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="asst-card__actions">
+    <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
+      Editar y publicar
+    </a>
+  </div>
+</section>
+{% endwith %}
+{% else %}
+<section class="asst-card asst-card--empty" id="block-schema-empty">
+  <div class="asst-empty-state">
+    <div class="asst-empty-state__icon">✦</div>
+    <div class="asst-empty-state__title">Aquí aparecerá el schema</div>
+    <div class="asst-empty-state__desc">Introduce una URL y la IA generará automáticamente el schema de campos para tu sitio.</div>
+  </div>
+</section>
+{% endif %}
+
+{% if preview_items %}
+{% load wb_extras %}
+<section class="asst-card asst-card--preview" id="block-preview">
+  <div class="asst-card__header">
+    <div class="asst-card__step-badge asst-card__step-badge--preview">👁 Vista previa</div>
+    <h2 class="asst-card__title">Muestra de datos</h2>
+    <p class="asst-card__subtitle">3 items de tu dataset con los campos seleccionados por la IA.</p>
+  </div>
+
+  <div class="asst-preview-grid">
+    {% for item in preview_items %}
+      <div class="asst-preview-card">
+        <div class="asst-preview-card__index">#{{ forloop.counter }}</div>
+        {% for field in plan.fields %}
+          {% with val=item|get_item:field.key %}
+            {% if val %}
+              <div class="asst-preview-field">
+                <span class="asst-preview-field__label">{{ field.label }}</span>
+                <span class="asst-preview-field__value">{{ val|truncatechars:120 }}</span>
+              </div>
+            {% endif %}
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
