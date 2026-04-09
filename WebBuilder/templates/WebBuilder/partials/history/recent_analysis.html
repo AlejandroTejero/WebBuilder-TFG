@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/assistant.css' %}">
+<link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
 <link rel="stylesheet" href="{% static 'css/history.css' %}">
 {% endblock %}
 
@@ -11,11 +11,6 @@
 
   <aside class="asst-sidebar">
     <div class="asst-sidebar__inner">
-
-      <div class="asst-brand">
-        <span class="asst-brand__icon">📋</span>
-        <span class="asst-brand__text">Historial</span>
-      </div>
 
       <div class="hist-sidebar-stats">
         <div class="hist-sidebar-stat">
@@ -30,8 +25,8 @@
 
       <div class="hist-sidebar-section">
         <div class="asst-meta__label">Secciones</div>
-        <a href="{% url 'history_analysis' %}" class="hist-sidebar-link hist-sidebar-link--active">📊 Análisis</a>
-        <a href="{% url 'history_sites' %}" class="hist-sidebar-link">🌐 Sitios publicados</a>
+        <a href="{% url 'history_analysis' %}" class="hist-sidebar-link hist-sidebar-link--active">Análisis</a>
+        <a href="{% url 'history_sites' %}" class="hist-sidebar-link">Sitios publicados</a>
       </div>
 
       <a href="{% url 'assistant' %}" class="asst-btn asst-btn--primary" style="margin-top: auto; text-align: center;">
@@ -48,7 +43,7 @@
         {% for message in messages %}
           <div class="asst-alert asst-alert--{{ message.tags }}">
             <span class="asst-alert__icon">
-              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}⚠{% else %}ℹ{% endif %}
+              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}!{% else %}i{% endif %}
             </span>
             {{ message }}
           </div>
@@ -67,18 +62,18 @@
 
       <form method="get" class="hist-filters">
         <div class="hist-search-wrap">
-          <span class="hist-search-icon">🔍</span>
+          <span class="hist-search-icon">_</span>
           <input type="text" name="q" value="{{ search }}" placeholder="Buscar por URL..." class="hist-search-input">
         </div>
         <select name="status" class="hist-select">
           <option value="">Todos</option>
-          <option value="processed" {% if status_filter == "processed" %}selected{% endif %}>✓ Procesados</option>
-          <option value="error"     {% if status_filter == "error"     %}selected{% endif %}>✗ Error</option>
-          <option value="pending"   {% if status_filter == "pending"   %}selected{% endif %}>⏳ Pendientes</option>
+          <option value="processed" {% if status_filter == "processed" %}selected{% endif %}>Procesados</option>
+          <option value="error"     {% if status_filter == "error"     %}selected{% endif %}>Error</option>
+          <option value="pending"   {% if status_filter == "pending"   %}selected{% endif %}>Pendientes</option>
         </select>
         <button type="submit" class="asst-btn asst-btn--ghost asst-btn--sm">Filtrar</button>
         {% if search or status_filter %}
-          <a href="{% url 'history_analysis' %}" class="asst-btn asst-btn--ghost asst-btn--sm">✕ Limpiar</a>
+          <a href="{% url 'history_analysis' %}" class="asst-btn asst-btn--ghost asst-btn--sm">Limpiar</a>
         {% endif %}
       </form>
 
@@ -110,15 +105,15 @@
                   {% if r.status == 'processed' %}hist-pill--green
                   {% elif r.status == 'error' %}hist-pill--red
                   {% else %}hist-pill--orange{% endif %}">
-                  {% if r.status == 'processed' %}✓ Procesado
-                  {% elif r.status == 'error' %}✗ Error
-                  {% else %}⏳ Pendiente{% endif %}
+                  {% if r.status == 'processed' %}Procesado
+                  {% elif r.status == 'error' %}Error
+                  {% else %}Pendiente{% endif %}
                 </span>
                 {% if r.field_mapping %}
-                  <span class="hist-pill hist-pill--purple">✦ Schema</span>
+                  <span class="hist-pill hist-pill--purple">Schema</span>
                 {% endif %}
                 {% if r.plan_accepted %}
-                  <span class="hist-pill hist-pill--blue">🌐 Publicado</span>
+                  <span class="hist-pill hist-pill--blue">Publicado</span>
                 {% endif %}
               </div>
 
@@ -128,17 +123,17 @@
                 </a>
                 {% if r.status == "processed" and r.field_mapping %}
                   <a href="{% url 'edit' r.id %}" class="asst-btn asst-btn--primary asst-btn--sm">
-                    Editar →
+                    Editar
                   </a>
                 {% elif r.status == "processed" and r.parsed_data %}
                   <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="asst-btn asst-btn--primary asst-btn--sm">
-                    Generar schema →
+                    Generar schema
                   </a>
                 {% endif %}
-                <form method="post" action="{% url 'delete_analysis' r.id %}" onsubmit="return confirm('¿Eliminar este análisis?')">
+                <form method="post" action="{% url 'delete_analysis' r.id %}" onsubmit="return confirm('Eliminar este análisis?')">
                   {% csrf_token %}
                   <button type="submit" class="asst-btn asst-btn--ghost asst-btn--sm hist-btn--danger">
-                    🗑
+                    Eliminar
                   </button>
                 </form>
               </div>
@@ -150,11 +145,10 @@
       {% else %}
         <div class="asst-card asst-card--empty">
           <div class="asst-empty-state">
-            <div class="asst-empty-state__icon">📊</div>
             <div class="asst-empty-state__title">Aún no tienes análisis</div>
             <div class="asst-empty-state__desc">Introduce una URL de API en el asistente para empezar.</div>
             <a href="{% url 'assistant' %}" class="asst-btn asst-btn--primary" style="margin-top: 1rem;">
-              Ir al asistente →
+              Ir al asistente
             </a>
           </div>
         </div>
@@ -163,13 +157,13 @@
       {% if api_requests.paginator.num_pages > 1 %}
         <div class="hist-pagination">
           {% if api_requests.has_previous %}
-            <a href="?page={{ api_requests.previous_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">← Anterior</a>
+            <a href="?page={{ api_requests.previous_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Anterior</a>
           {% endif %}
           <span class="hist-page-info">
             Página {{ api_requests.number }} de {{ api_requests.paginator.num_pages }}
           </span>
           {% if api_requests.has_next %}
-            <a href="?page={{ api_requests.next_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Siguiente →</a>
+            <a href="?page={{ api_requests.next_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Siguiente</a>
           {% endif %}
         </div>
       {% endif %}

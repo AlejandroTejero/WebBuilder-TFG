@@ -45,6 +45,7 @@ def _run_generation(site_id: int):
 def site_render(request, api_request_id: int):
     api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
     site = get_object_or_404(GeneratedSite, project_source=api_request)
+    site, _ = GeneratedSite.objects.get_or_create(project_source=api_request)
     return render(request, "WebBuilder/site_render.html", {
         "api_request": api_request,
         "site": site,
@@ -337,8 +338,11 @@ def site_version_download(request, api_request_id: int, version_id: int):
 def site_users_save(request, api_request_id: int):
     from ..models import SiteUser
     api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site = get_object_or_404(GeneratedSite, project_source=api_request)
-
+    site, _ = GeneratedSite.objects.get_or_create(
+            project_source=api_request,
+            defaults={"accepted_plan": False}
+        )
+    
     try:
         data = json.loads(request.body)
         users = data.get('users', [])

@@ -18,7 +18,6 @@
     <div class="asst-sidebar__inner">
 
       <div class="asst-brand">
-        <span class="asst-brand__icon">✏️</span>
         <span class="asst-brand__text">Editor</span>
       </div>
 
@@ -113,7 +112,7 @@
   </aside>
 
   <!-- ═══════════════════════════════════════════════
-       PANEL DERECHO — Dos columnas
+       PANEL PRINCIPAL — Dos columnas
   ════════════════════════════════════════════════ -->
   <main class="asst-content">
 
@@ -135,11 +134,14 @@
       <!-- ╔══════════════════════════════╗
            ║  COLUMNA IZQUIERDA           ║
            ║  · Editor del schema         ║
+           ║  · Usuarios                  ║
            ╚══════════════════════════════╝ -->
       <div class="asst-col asst-col--left">
+
+        <!-- SCHEMA -->
         <section class="asst-card edit-card--editor" id="block-editor">
           <div class="asst-card__header">
-            <div class="asst-card__step-badge asst-card__step-badge--ai">✦ Schema</div>
+            <div class="asst-card__step-badge asst-card__step-badge--ai">Schema</div>
             <h2 class="asst-card__title">Editar schema</h2>
             <p class="asst-card__subtitle">Ajusta el tipo, título y campos. Al guardar, el preview se actualiza.</p>
           </div>
@@ -148,7 +150,6 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="save_schema">
 
-            <!-- Tipo y título -->
             <div class="edit-meta-row">
               <div class="asst-field edit-field--type">
                 <label class="asst-label">Tipo de sitio</label>
@@ -165,7 +166,6 @@
               </div>
             </div>
 
-            <!-- Lista de campos -->
             <div class="edit-fields-header">
               <span class="asst-label">Campos activos</span>
               <span class="edit-fields-count">{{ plan.fields|length }} campos</span>
@@ -175,7 +175,6 @@
               {% for field in plan.fields %}
                 <div class="edit-field-row" draggable="true">
                   <span class="edit-field-row__handle" title="Arrastrar para reordenar">⠿</span>
-
                   <div class="edit-field-row__check">
                     <input type="checkbox"
                            class="edit-checkbox"
@@ -183,11 +182,8 @@
                            id="active_{{ forloop.counter0 }}"
                            checked>
                   </div>
-
                   <input type="hidden" name="field_key_{{ forloop.counter0 }}" value="{{ field.key }}">
-
                   <code class="edit-field-row__key">{{ field.key }}</code>
-
                   <input type="text"
                          class="edit-field-row__label"
                          name="field_label_{{ forloop.counter0 }}"
@@ -199,7 +195,6 @@
               {% endfor %}
             </div>
 
-            <!-- Campos disponibles no incluidos -->
             {% if unused_keys %}
             <div class="edit-unused-keys">
               <span class="edit-unused-keys__label">Añadir campo:</span>
@@ -213,61 +208,69 @@
             </div>
             {% endif %}
 
-            <!-- Acciones del formulario -->
             <div class="asst-form-footer">
-              <button type="submit" class="asst-btn asst-btn--primary">
-                Guardar cambios
-              </button>
-              <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--ghost">
-                Reset
-              </a>
+              <button type="submit" class="asst-btn asst-btn--primary">Guardar cambios</button>
+              <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--ghost">Reset</a>
             </div>
 
           </form>
         </section>
 
-        <!-- Publicar -->
-        <section class="asst-card edit-card--publish" id="block-publish">
+        <!-- USUARIOS -->
+        <section class="asst-card edit-card--users" id="block-users">
           <div class="asst-card__header">
-            <div class="asst-card__step-badge {% if api_request.plan_accepted %}asst-card__step-badge--done{% endif %}">
-              {% if api_request.plan_accepted %}✓ Publicado{% else %}Paso 4{% endif %}
-            </div>
-            <h2 class="asst-card__title">
-              {% if api_request.plan_accepted %}Sitio publicado{% else %}Publicar sitio{% endif %}
-            </h2>
-            <p class="asst-card__subtitle">
-              {% if api_request.plan_accepted %}
-                La IA ya generó el diseño. Puedes verlo o regenerarlo con el schema actual.
-              {% else %}
-                Cuando el schema esté listo, la IA generará el HTML/CSS del sitio completo.
-              {% endif %}
-            </p>
+            <div class="asst-card__step-badge edit-badge--users">Usuarios</div>
+            <h2 class="asst-card__title">Usuarios de la app</h2>
+            <p class="asst-card__subtitle">Define los usuarios al arrancar el proyecto por primera vez.</p>
           </div>
 
-          <div class="asst-form-footer">
-            {% if not api_request.plan_accepted %}
-              <form method="post" class="m-0">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="accept_plan">
-                <button type="submit" class="asst-btn asst-btn--primary asst-btn--lg" onclick="showPublishLoading()">
-                  🚀 Generar y publicar sitio
-                </button>
-              </form>
-            {% else %}
-              {% if site_obj %}
-                <a href="{% url 'site_render' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
-                  Ver sitio →
-                </a>
-              {% endif %}
-              <form method="post" class="m-0">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="accept_plan">
-                <button type="submit" class="asst-btn asst-btn--ghost" onclick="showPublishLoading()">
-                  🔄 Regenerar diseño
-                </button>
-              </form>
-            {% endif %}
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th style="width:36px"></th>
+                <th>Usuario</th>
+                <th>Contraseña</th>
+                <th>Rol</th>
+                <th style="width:30px"></th>
+              </tr>
+            </thead>
+            <tbody id="users-list">
+              {% for u in site_users %}
+                <tr class="site-user-row" data-username="{{ u.username }}">
+                  <td><div class="user-avatar">{{ u.username|slice:":1"|upper }}</div></td>
+                  <td><input type="text" class="user-input" placeholder="Usuario" value="{{ u.username }}"></td>
+                  <td><input type="password" class="user-input" placeholder="Contraseña" value="{{ u.password }}"></td>
+                  <td>
+                    <select class="user-select">
+                      <option value="normal" {% if u.role == "normal" %}selected{% endif %}>Normal</option>
+                      <option value="super" {% if u.role == "super" %}selected{% endif %}>Superusuario</option>
+                    </select>
+                  </td>
+                  <td><button class="user-del-btn" type="button" data-user-remove>✕</button></td>
+                </tr>
+              {% empty %}
+                <tr class="site-user-row">
+                  <td><div class="user-avatar">?</div></td>
+                  <td><input type="text" class="user-input" placeholder="Usuario"></td>
+                  <td><input type="password" class="user-input" placeholder="Contraseña"></td>
+                  <td>
+                    <select class="user-select">
+                      <option value="normal">Normal</option>
+                      <option value="super">Superusuario</option>
+                    </select>
+                  </td>
+                  <td><button class="user-del-btn" type="button" data-user-remove>✕</button></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="users-footer">
+            <button class="asst-btn asst-btn--ghost asst-btn--sm" type="button" id="users-add-btn">+ Añadir usuario</button>
+            <button class="asst-btn asst-btn--primary asst-btn--sm" type="button" id="users-save-btn">Guardar</button>
           </div>
+          <div id="users-feedback" style="display:none; margin-top:.5rem; font-size:.8rem;"></div>
+
         </section>
 
       </div><!-- /col-left -->
@@ -275,11 +278,14 @@
       <!-- ╔══════════════════════════════╗
            ║  COLUMNA DERECHA             ║
            ║  · Preview items             ║
+           ║  · Publicar sitio            ║
            ╚══════════════════════════════╝ -->
       <div class="asst-col asst-col--right">
+
+        <!-- PREVIEW -->
         <section class="asst-card asst-card--preview" id="block-preview">
           <div class="asst-card__header">
-            <div class="asst-card__step-badge asst-card__step-badge--preview">👁 Preview</div>
+            <div class="asst-card__step-badge asst-card__step-badge--preview">Preview</div>
             <h2 class="asst-card__title">Muestra de datos</h2>
             <p class="asst-card__subtitle">
               {% if api_request.plan_accepted %}
@@ -291,16 +297,25 @@
           </div>
 
           {% if preview_items %}
-            <div class="edit-preview-list">
+            <div class="pager-header">
+              <span class="pager-num" id="pager-label">#1 de {{ preview_items|length }}</span>
+              <div class="pager-dots" id="pager-dots">
+                {% for item in preview_items|slice:":3" %}
+                  <div class="pager-dot {% if forloop.first %}pager-dot--on{% endif %}" onclick="pagerGoTo({{ forloop.counter0 }})"></div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="pager-card" id="pager-card">
               {% for item in preview_items|slice:":3" %}
-                <div class="edit-preview-item">
-                  <div class="edit-preview-item__index">#{{ forloop.counter }}</div>
+                <div class="pager-item {% if forloop.first %}pager-item--active{% endif %}" data-index="{{ forloop.counter0 }}">
+                  <div class="pager-index">#{{ forloop.counter }}</div>
                   {% for field in plan.fields %}
                     {% with val=item|get_item:field.key %}
                       {% if val %}
-                        <div class="asst-preview-field">
-                          <span class="asst-preview-field__label">{{ field.label }}</span>
-                          <span class="asst-preview-field__value">{{ val|truncatechars:140 }}</span>
+                        <div class="pager-field">
+                          <div class="pager-field__label">{{ field.label }}</div>
+                          <div class="pager-field__value {% if forloop.first %}pager-field__value--main{% endif %}">{{ val|truncatechars:140 }}</div>
                         </div>
                       {% endif %}
                     {% endwith %}
@@ -308,6 +323,12 @@
                 </div>
               {% endfor %}
             </div>
+
+            <div class="pager-nav">
+              <button class="pager-btn pager-btn--disabled" id="pager-prev" onclick="pagerNav(-1)">← Anterior</button>
+              <button class="pager-btn" id="pager-next" onclick="pagerNav(1)">Siguiente →</button>
+            </div>
+
           {% else %}
             <div class="asst-empty-state">
               <div class="asst-empty-state__icon">👁</div>
@@ -317,6 +338,55 @@
           {% endif %}
 
         </section>
+
+        <!-- PUBLICAR -->
+        <section class="asst-card edit-card--publish" id="block-publish">
+          <div class="asst-card__header">
+            <div class="asst-card__step-badge {% if api_request.plan_accepted %}asst-card__step-badge--done{% endif %}">
+              {% if api_request.plan_accepted %}✓ Publicado{% else %}Paso 4{% endif %}
+            </div>
+            <h2 class="asst-card__title">
+              {% if api_request.plan_accepted %}Sitio publicado{% else %}Publicar sitio{% endif %}
+            </h2>
+          </div>
+
+          <div class="publish-row">
+            <div class="publish-row__left">
+              <p class="asst-card__subtitle">
+                {% if api_request.plan_accepted %}
+                  La IA ya generó el diseño. Puedes verlo o regenerarlo con el schema actual.
+                {% else %}
+                  Cuando el schema esté listo, la IA generará el HTML/CSS del sitio completo.
+                {% endif %}
+              </p>
+            </div>
+            <div class="publish-row__right">
+              {% if not api_request.plan_accepted %}
+                <form method="post" class="m-0">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="accept_plan">
+                  <button type="submit" class="asst-btn asst-btn--primary asst-btn--lg" onclick="showPublishLoading()">
+                    🚀 Generar y publicar sitio
+                  </button>
+                </form>
+              {% else %}
+                {% if site_obj %}
+                  <a href="{% url 'site_render' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
+                    Ver sitio →
+                  </a>
+                {% endif %}
+                <form method="post" class="m-0">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="accept_plan">
+                  <button type="submit" class="asst-btn asst-btn--ghost" onclick="showPublishLoading()">
+                    🔄 Regenerar diseño
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        </section>
+
       </div><!-- /col-right -->
 
     </div><!-- /asst-columns -->
@@ -338,6 +408,10 @@
   </div>
 </div>
 
+<script>
+  const USERS_SAVE_URL = "{% url 'site_users_save' api_request.id %}";
+  const CSRF_TOKEN = "{{ csrf_token }}";
+</script>
 <script src="{% static 'js/edit.js' %}"></script>
 
 {% endblock %}

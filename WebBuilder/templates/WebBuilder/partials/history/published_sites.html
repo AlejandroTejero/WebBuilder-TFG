@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/assistant.css' %}">
+<link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
 <link rel="stylesheet" href="{% static 'css/history.css' %}">
 {% endblock %}
 
@@ -11,11 +11,6 @@
 
   <aside class="asst-sidebar">
     <div class="asst-sidebar__inner">
-
-      <div class="asst-brand">
-        <span class="asst-brand__icon">📋</span>
-        <span class="asst-brand__text">Historial</span>
-      </div>
 
       <div class="hist-sidebar-stats">
         <div class="hist-sidebar-stat">
@@ -30,8 +25,8 @@
 
       <div class="hist-sidebar-section">
         <div class="asst-meta__label">Secciones</div>
-        <a href="{% url 'history_analysis' %}" class="hist-sidebar-link">📊 Análisis</a>
-        <a href="{% url 'history_sites' %}" class="hist-sidebar-link hist-sidebar-link--active">🌐 Sitios publicados</a>
+        <a href="{% url 'history_analysis' %}" class="hist-sidebar-link">Análisis</a>
+        <a href="{% url 'history_sites' %}" class="hist-sidebar-link hist-sidebar-link--active">Sitios publicados</a>
       </div>
 
       <a href="{% url 'assistant' %}" class="asst-btn asst-btn--primary" style="margin-top: auto; text-align: center;">
@@ -48,7 +43,7 @@
         {% for message in messages %}
           <div class="asst-alert asst-alert--{{ message.tags }}">
             <span class="asst-alert__icon">
-              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}⚠{% else %}ℹ{% endif %}
+              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}!{% else %}i{% endif %}
             </span>
             {{ message }}
           </div>
@@ -67,12 +62,12 @@
 
       <form method="get" class="hist-filters">
         <div class="hist-search-wrap">
-          <span class="hist-search-icon">🔍</span>
+          <span class="hist-search-icon">_</span>
           <input type="text" name="q" value="{{ search }}" placeholder="Buscar por título..." class="hist-search-input">
         </div>
         <button type="submit" class="asst-btn asst-btn--ghost asst-btn--sm">Filtrar</button>
         {% if search %}
-          <a href="{% url 'history_sites' %}" class="asst-btn asst-btn--ghost asst-btn--sm">✕ Limpiar</a>
+          <a href="{% url 'history_sites' %}" class="asst-btn asst-btn--ghost asst-btn--sm">Limpiar</a>
         {% endif %}
       </form>
 
@@ -82,7 +77,7 @@
             <div class="hist-card hist-card--site">
 
               <div class="hist-card__head">
-                <span class="hist-pill hist-pill--blue">🌐 Publicado</span>
+                <span class="hist-pill hist-pill--blue">Publicado</span>
                 <span class="hist-card__date">{{ w.created_at|date:"d M Y · H:i" }}</span>
               </div>
 
@@ -102,7 +97,6 @@
               {% with version_count=w.versions.count %}
                 {% if version_count > 0 %}
                   <div class="hist-card__versions">
-                    <span>🕓</span>
                     <a href="{% url 'site_render' w.project_source.id %}">
                       {{ version_count }} versión{{ version_count|pluralize:"es" }} guardada{{ version_count|pluralize:"s" }}
                     </a>
@@ -115,12 +109,12 @@
                   Editar
                 </a>
                 <a href="{% url 'site_render' w.project_source.id %}" class="asst-btn asst-btn--primary asst-btn--sm">
-                  Ver sitio →
+                  Ver sitio
                 </a>
-                <form method="post" action="{% url 'delete_site' w.id %}" onsubmit="return confirm('¿Eliminar este sitio?')">
+                <form method="post" action="{% url 'delete_site' w.id %}" onsubmit="return confirm('Eliminar este sitio?')">
                   {% csrf_token %}
                   <button type="submit" class="asst-btn asst-btn--ghost asst-btn--sm hist-btn--danger">
-                    🗑
+                    Eliminar
                   </button>
                 </form>
               </div>
@@ -132,11 +126,10 @@
       {% else %}
         <div class="asst-card asst-card--empty">
           <div class="asst-empty-state">
-            <div class="asst-empty-state__icon">🌐</div>
             <div class="asst-empty-state__title">Aún no has publicado ningún sitio</div>
             <div class="asst-empty-state__desc">Cuando aceptes un schema en el editor, aparecerá aquí.</div>
             <a href="{% url 'assistant' %}" class="asst-btn asst-btn--primary" style="margin-top: 1rem;">
-              Ir al asistente →
+              Ir al asistente
             </a>
           </div>
         </div>
@@ -145,13 +138,13 @@
       {% if generated_sites.paginator.num_pages > 1 %}
         <div class="hist-pagination">
           {% if generated_sites.has_previous %}
-            <a href="?page={{ generated_sites.previous_page_number }}&q={{ search }}" class="hist-page-btn">← Anterior</a>
+            <a href="?page={{ generated_sites.previous_page_number }}&q={{ search }}" class="hist-page-btn">Anterior</a>
           {% endif %}
           <span class="hist-page-info">
             Página {{ generated_sites.number }} de {{ generated_sites.paginator.num_pages }}
           </span>
           {% if generated_sites.has_next %}
-            <a href="?page={{ generated_sites.next_page_number }}&q={{ search }}" class="hist-page-btn">Siguiente →</a>
+            <a href="?page={{ generated_sites.next_page_number }}&q={{ search }}" class="hist-page-btn">Siguiente</a>
           {% endif %}
         </div>
       {% endif %}
