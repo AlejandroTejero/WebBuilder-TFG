@@ -8,110 +8,62 @@
   <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body class="auth-page">
 
-  <div class="auth-layout">
+  <div class="auth-wrap">
 
-    <!-- ── PANEL IZQUIERDO — Branding ── -->
-    <div class="auth-brand">
-      <div class="auth-brand__inner">
-
-        <div class="auth-brand__logo">
-          <span class="auth-brand__icon">⚡</span>
-          <span class="auth-brand__name">WebBuilder</span>
-        </div>
-
-        <div class="auth-brand__headline">
-          <h1>De una URL a una<br>web completa</h1>
-          <p>La IA analiza tu API, genera el schema y diseña el sitio. Sin código.</p>
-        </div>
-
-        <div class="auth-brand__steps">
-          <div class="auth-step">
-            <div class="auth-step__num">1</div>
-            <span>Introduce la URL de tu API</span>
-          </div>
-          <div class="auth-step">
-            <div class="auth-step__num">2</div>
-            <span>La IA genera el schema automáticamente</span>
-          </div>
-          <div class="auth-step">
-            <div class="auth-step__num">3</div>
-            <span>Publica o descarga tu proyecto Django</span>
-          </div>
-        </div>
-
-        <div class="auth-brand__grid"></div>
-
-      </div>
+    <div class="auth-logo">
+      <img src="{% static 'images/logo.jpg' %}" alt="WB">
     </div>
 
-    <!-- ── PANEL DERECHO — Formulario ── -->
-    <div class="auth-form-panel">
-      <div class="auth-form-box">
+    <div class="auth-title">Bienvenido a WebBuilder</div>
 
-        <div class="auth-form-header">
-          <div class="auth-form-badge">Bienvenido de vuelta</div>
-          <h2 class="auth-form-title">Iniciar sesión</h2>
-          <p class="auth-form-subtitle">Accede a tus proyectos y análisis guardados</p>
-        </div>
-
-        {% if form.non_field_errors %}
-          <div class="auth-error">
-            {% for err in form.non_field_errors %}
-              <div>{{ err }}</div>
-            {% endfor %}
-          </div>
-        {% endif %}
-
-        <form action="{% url 'login' %}" method="post" class="auth-form" novalidate>
-          {% csrf_token %}
-
-          <div class="auth-field">
-            <label class="auth-label" for="{{ form.username.id_for_label }}">Usuario</label>
-            <div class="auth-input-wrap">
-              <span class="auth-input-icon">👤</span>
-              {{ form.username }}
-            </div>
-            {% if form.username.errors %}
-              <div class="auth-field-error">{{ form.username.errors.0 }}</div>
-            {% endif %}
-          </div>
-
-          <div class="auth-field">
-            <label class="auth-label" for="{{ form.password.id_for_label }}">Contraseña</label>
-            <div class="auth-input-wrap">
-              <span class="auth-input-icon">🔒</span>
-              {{ form.password }}
-            </div>
-            {% if form.password.errors %}
-              <div class="auth-field-error">{{ form.password.errors.0 }}</div>
-            {% endif %}
-          </div>
-
-          <button type="submit" class="auth-submit">
-            Entrar →
-          </button>
-
-          <!-- Recuperar contraseña — pendiente de implementar con n8n -->
-          <div class="auth-hint" style="text-align:center; margin-top: 8px;">
-            <span style="color: #475569; cursor: not-allowed;">¿Olvidaste tu contraseña?</span>
-          </div>
-
-        </form>
-
-        <div class="auth-form-footer">
-          <span>¿No tienes cuenta?</span>
-          <a href="{% url 'register' %}">Regístrate gratis →</a>
-        </div>
-
+    {% if form.non_field_errors %}
+      <div class="auth-error">
+        {% for err in form.non_field_errors %}
+          <div>{{ err }}</div>
+        {% endfor %}
       </div>
+    {% endif %}
+
+    <form action="{% url 'login' %}" method="post" class="auth-fields" novalidate>
+      {% csrf_token %}
+
+      <div class="auth-field">
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="auth-field-error">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="auth-field">
+        {{ form.password }}
+        {% if form.password.errors %}
+          <div class="auth-field-error">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+	  <button type="submit" class="auth-submit"><span>Iniciar sesión</span></button>
+
+    </form>
+
+    <div class="auth-form-footer">
+      ¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate</a>
     </div>
 
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const u = document.querySelector('input[name="username"]');
+      const p = document.querySelector('input[name="password"]');
+      if (u) u.placeholder = 'Usuario';
+      if (p) p.placeholder = 'Contraseña';
+    });
+  </script>
 
 </body>
 </html>

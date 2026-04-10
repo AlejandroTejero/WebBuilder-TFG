@@ -133,11 +133,11 @@
   {% if api_requests.paginator.num_pages > 1 %}
     <div class="hist-pagination">
       {% if api_requests.has_previous %}
-        <a href="?page={{ api_requests.previous_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">← Anterior</a>
+        <a href="?page={{ api_requests.previous_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Anterior</a>
       {% endif %}
       <span class="hist-page-info">{{ api_requests.number }} / {{ api_requests.paginator.num_pages }}</span>
       {% if api_requests.has_next %}
-        <a href="?page={{ api_requests.next_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Siguiente →</a>
+        <a href="?page={{ api_requests.next_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Siguiente</a>
       {% endif %}
     </div>
   {% endif %}

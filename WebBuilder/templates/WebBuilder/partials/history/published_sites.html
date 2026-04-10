@@ -113,11 +113,11 @@
   {% if generated_sites.paginator.num_pages > 1 %}
     <div class="hist-pagination">
       {% if generated_sites.has_previous %}
-        <a href="?page={{ generated_sites.previous_page_number }}&q={{ search }}" class="hist-page-btn">← Anterior</a>
+        <a href="?page={{ generated_sites.previous_page_number }}&q={{ search }}" class="hist-page-btn">Anterior</a>
       {% endif %}
       <span class="hist-page-info">{{ generated_sites.number }} / {{ generated_sites.paginator.num_pages }}</span>
       {% if generated_sites.has_next %}
-        <a href="?page={{ generated_sites.next_page_number }}&q={{ search }}" class="hist-page-btn">Siguiente →</a>
+        <a href="?page={{ generated_sites.next_page_number }}&q={{ search }}" class="hist-page-btn">Siguiente</a>
       {% endif %}
     </div>
   {% endif %}

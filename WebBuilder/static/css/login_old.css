@@ -1,0 +1,294 @@
+/* =============================================================
+   WebBuilder — Auth (login.css)
+   Compartido por login.html y register.html
+   ============================================================= */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body.auth-page {
+  background: #090909;
+  font-family: 'Outfit', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── LAYOUT DOS MITADES ── */
+.auth-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ── PANEL IZQUIERDO — Branding ── */
+.auth-brand {
+  background: #0e0e0e;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-brand__inner {
+  position: relative;
+  z-index: 1;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 480px;
+}
+
+/* Grid decorativo de fondo */
+.auth-brand__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black 20%, transparent 80%);
+  pointer-events: none;
+}
+
+/* Logo */
+.auth-brand__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.auth-brand__icon {
+  font-size: 1.4rem;
+  background: rgba(124,58,237,0.12);
+  border: 1px solid rgba(124,58,237,0.2);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-brand__name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.02em;
+}
+
+/* Headline */
+.auth-brand__headline h1 {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 0%, #9ca3af 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.85rem;
+}
+.auth-brand__headline p {
+  font-size: 1rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* Pasos */
+.auth-brand__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.auth-step {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.88rem;
+  color: #64748b;
+}
+.auth-step__num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(124,58,237,0.1);
+  border: 1px solid rgba(124,58,237,0.2);
+  color: #a78bfa;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── PANEL DERECHO — Formulario ── */
+.auth-form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.auth-form-box {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Cabecera formulario */
+.auth-form-header { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.auth-form-badge {
+  display: inline-flex;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(124,58,237,0.08);
+  color: #a78bfa;
+  border: 1px solid rgba(124,58,237,0.2);
+  width: fit-content;
+}
+
+.auth-form-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.03em;
+}
+
+.auth-form-subtitle {
+  font-size: 0.88rem;
+  color: #475569;
+}
+
+/* Error global */
+.auth-error {
+  background: rgba(239,68,68,0.07);
+  border: 1px solid rgba(239,68,68,0.18);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  color: #fca5a5;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* Formulario */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-field { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.auth-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 13px;
+  font-size: 0.9rem;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Inputs generados por Django */
+.auth-input-wrap input[type="text"],
+.auth-input-wrap input[type="password"],
+.auth-input-wrap input[type="email"] {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.6rem;
+  background: #0c0c0c;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 0.93rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.auth-input-wrap input:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+}
+.auth-input-wrap input::placeholder { color: #1e293b; }
+
+.auth-field-error {
+  font-size: 0.78rem;
+  color: #f87171;
+}
+
+.auth-hint {
+  font-size: 0.75rem;
+  color: #1e293b;
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+
+/* Botón submit */
+.auth-submit {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.25);
+  margin-top: 0.25rem;
+}
+.auth-submit:hover {
+  background: #6d28d9;
+  box-shadow: 0 6px 28px rgba(124,58,237,0.4);
+  transform: translateY(-1px);
+}
+.auth-submit:active { transform: translateY(0); }
+
+/* Footer del formulario */
+.auth-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #334155;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.auth-form-footer a {
+  color: #a78bfa;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.auth-form-footer a:hover { color: #c4b5fd; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .auth-layout { grid-template-columns: 1fr; }
+  .auth-brand  { display: none; }
+  .auth-form-panel { padding: 2rem 1.5rem; min-height: 100vh; }
+}

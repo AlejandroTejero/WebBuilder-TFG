@@ -178,7 +178,7 @@
 }
 
 .hist-item--site {
-  border-color: rgba(99,102,241,0.15);
+  border-color: var(--wb-border);
 }
 
 @keyframes histFadeUp {
@@ -389,8 +389,8 @@
 }
 
 .hist-page-btn:hover {
-  border-color: rgba(99,102,241,0.35);
-  color: rgba(129,140,248,0.90);
+  border-color: rgba(255, 255, 255, 0.733);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .hist-page-info {
