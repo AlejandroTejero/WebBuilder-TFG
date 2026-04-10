@@ -2,174 +2,145 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
-<link rel="stylesheet" href="{% static 'css/history.css' %}">
+  <link rel="stylesheet" href="{% static 'css/history.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="asst-layout">
+<div class="hist-page">
 
-  <aside class="asst-sidebar">
-    <div class="asst-sidebar__inner">
-
-      <div class="hist-sidebar-stats">
-        <div class="hist-sidebar-stat">
-          <div class="hist-sidebar-stat__value">{{ total_count }}</div>
-          <div class="hist-sidebar-stat__label">Análisis</div>
-        </div>
-        <div class="hist-sidebar-stat">
-          <div class="hist-sidebar-stat__value">{{ total_sites }}</div>
-          <div class="hist-sidebar-stat__label">Sitios</div>
-        </div>
+  <!-- ── HEADER ── -->
+  <div class="hist-header">
+    <div>
+      <h1 class="hist-header__title">Historial</h1>
+      <div class="hist-header__meta">
+        <span class="hist-header__stat"><strong>{{ total_count }}</strong> análisis</span>
+        <span class="hist-header__stat"><strong>{{ total_sites }}</strong> sitios publicados</span>
       </div>
-
-      <div class="hist-sidebar-section">
-        <div class="asst-meta__label">Secciones</div>
-        <a href="{% url 'history_analysis' %}" class="hist-sidebar-link hist-sidebar-link--active">Análisis</a>
-        <a href="{% url 'history_sites' %}" class="hist-sidebar-link">Sitios publicados</a>
-      </div>
-
-      <a href="{% url 'assistant' %}" class="asst-btn asst-btn--primary" style="margin-top: auto; text-align: center;">
-        + Nuevo análisis
-      </a>
-
     </div>
-  </aside>
+    <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary">+ Nuevo análisis</a>
+  </div>
 
-  <main class="asst-content">
+  <!-- ── TOPBAR ── -->
+  <div class="hist-topbar">
+    <nav class="hist-tabs">
+      <a href="{% url 'history_analysis' %}" class="hist-tab hist-tab--active">Análisis</a>
+      <a href="{% url 'history_sites' %}" class="hist-tab">Sitios publicados</a>
+    </nav>
 
-    {% if messages %}
-      <div class="asst-alerts">
-        {% for message in messages %}
-          <div class="asst-alert asst-alert--{{ message.tags }}">
-            <span class="asst-alert__icon">
-              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}!{% else %}i{% endif %}
-            </span>
-            {{ message }}
-          </div>
-        {% endfor %}
+    <form method="get" class="hist-topbar-right">
+      <div class="hist-search-wrap">
+        <span class="hist-search-icon">⌕</span>
+        <input type="text" name="q" value="{{ search }}" placeholder="Buscar por URL..." class="hist-search-input">
       </div>
-    {% endif %}
+      <select name="status" class="hist-select" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        <option value="processed" {% if status_filter == "processed" %}selected{% endif %}>Procesados</option>
+        <option value="error"     {% if status_filter == "error"     %}selected{% endif %}>Error</option>
+        <option value="pending"   {% if status_filter == "pending"   %}selected{% endif %}>Pendientes</option>
+      </select>
+      {% if search or status_filter %}
+        <a href="{% url 'history_analysis' %}" class="hist-btn">Limpiar</a>
+      {% endif %}
+    </form>
+  </div>
 
-    <section id="section-analysis">
-      <div class="hist-section-header">
-        <div>
-          <h2 class="hist-section-title">Análisis recientes</h2>
-          <p class="hist-section-desc">URLs analizadas y sus schemas generados por la IA.</p>
+  <!-- ── MENSAJES ── -->
+  {% if messages %}
+    <div style="margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px;">
+      {% for message in messages %}
+        <div style="padding: 10px 14px; border-radius: 8px; font-size: 12px;
+          background: {% if message.tags == 'success' %}rgba(52,211,153,0.08){% else %}rgba(239,68,68,0.08){% endif %};
+          border: 1px solid {% if message.tags == 'success' %}rgba(52,211,153,0.2){% else %}rgba(239,68,68,0.2){% endif %};
+          color: {% if message.tags == 'success' %}rgba(52,211,153,0.85){% else %}rgba(248,113,113,0.85){% endif %};">
+          {{ message }}
         </div>
-        <span class="hist-count-badge">{{ total_count }}</span>
-      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-      <form method="get" class="hist-filters">
-        <div class="hist-search-wrap">
-          <span class="hist-search-icon">_</span>
-          <input type="text" name="q" value="{{ search }}" placeholder="Buscar por URL..." class="hist-search-input">
-        </div>
-        <select name="status" class="hist-select">
-          <option value="">Todos</option>
-          <option value="processed" {% if status_filter == "processed" %}selected{% endif %}>Procesados</option>
-          <option value="error"     {% if status_filter == "error"     %}selected{% endif %}>Error</option>
-          <option value="pending"   {% if status_filter == "pending"   %}selected{% endif %}>Pendientes</option>
-        </select>
-        <button type="submit" class="asst-btn asst-btn--ghost asst-btn--sm">Filtrar</button>
-        {% if search or status_filter %}
-          <a href="{% url 'history_analysis' %}" class="asst-btn asst-btn--ghost asst-btn--sm">Limpiar</a>
-        {% endif %}
-      </form>
+  <!-- ── LISTA ── -->
+  {% if api_requests %}
+    <div class="hist-list">
+      {% for r in api_requests %}
+        <div class="hist-item {% if r.status == 'error' %}hist-item--error{% endif %}">
 
-      {% if api_requests %}
-        <div class="hist-grid">
-          {% for r in api_requests %}
-            <div class="hist-card {% if r.status == 'error' %}hist-card--error{% elif r.field_mapping %}hist-card--done{% endif %}">
-
-              <div class="hist-card__head">
-                <div class="hist-card__status-dot
-                  {% if r.status == 'processed' %}hist-card__status-dot--ok
-                  {% elif r.status == 'error' %}hist-card__status-dot--error
-                  {% else %}hist-card__status-dot--pending{% endif %}">
-                </div>
-                <span class="hist-card__id">#{{ r.id }}</span>
-                <span class="hist-card__date">{{ r.date|date:"d M Y · H:i" }}</span>
-              </div>
-
-              <div class="hist-card__url" title="{{ r.api_url }}">
-                {{ r.api_url|truncatechars:60 }}
-              </div>
-
-              {% if r.response_summary %}
-                <div class="hist-card__summary">{{ r.response_summary|truncatechars:100 }}</div>
-              {% endif %}
-
-              <div class="hist-card__pills">
-                <span class="hist-pill
-                  {% if r.status == 'processed' %}hist-pill--green
-                  {% elif r.status == 'error' %}hist-pill--red
-                  {% else %}hist-pill--orange{% endif %}">
-                  {% if r.status == 'processed' %}Procesado
-                  {% elif r.status == 'error' %}Error
-                  {% else %}Pendiente{% endif %}
-                </span>
-                {% if r.field_mapping %}
-                  <span class="hist-pill hist-pill--purple">Schema</span>
-                {% endif %}
-                {% if r.plan_accepted %}
-                  <span class="hist-pill hist-pill--blue">Publicado</span>
-                {% endif %}
-              </div>
-
-              <div class="hist-card__actions">
-                <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="asst-btn asst-btn--ghost asst-btn--sm">
-                  Asistente
-                </a>
-                {% if r.status == "processed" and r.field_mapping %}
-                  <a href="{% url 'edit' r.id %}" class="asst-btn asst-btn--primary asst-btn--sm">
-                    Editar
-                  </a>
-                {% elif r.status == "processed" and r.parsed_data %}
-                  <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="asst-btn asst-btn--primary asst-btn--sm">
-                    Generar schema
-                  </a>
-                {% endif %}
-                <form method="post" action="{% url 'delete_analysis' r.id %}" onsubmit="return confirm('Eliminar este análisis?')">
-                  {% csrf_token %}
-                  <button type="submit" class="asst-btn asst-btn--ghost asst-btn--sm hist-btn--danger">
-                    Eliminar
-                  </button>
-                </form>
-              </div>
-
+          <!-- status + id -->
+          <div class="hist-item__status">
+            <div class="hist-dot
+              {% if r.status == 'processed' %}hist-dot--ok
+              {% elif r.status == 'error' %}hist-dot--error
+              {% else %}hist-dot--pending{% endif %}">
             </div>
-          {% endfor %}
-        </div>
-
-      {% else %}
-        <div class="asst-card asst-card--empty">
-          <div class="asst-empty-state">
-            <div class="asst-empty-state__title">Aún no tienes análisis</div>
-            <div class="asst-empty-state__desc">Introduce una URL de API en el asistente para empezar.</div>
-            <a href="{% url 'assistant' %}" class="asst-btn asst-btn--primary" style="margin-top: 1rem;">
-              Ir al asistente
-            </a>
+            <span class="hist-item__id">#{{ r.id }}</span>
           </div>
+
+          <div class="hist-item__divider"></div>
+
+          <!-- contenido principal -->
+          <div class="hist-item__main">
+            <div class="hist-item__name">
+              {{ r.api_url|truncatechars:60 }}
+            </div>
+            <div class="hist-item__url">{{ r.response_summary|truncatechars:80 }}</div>
+            <div class="hist-item__meta">
+              <span class="hist-pill
+                {% if r.status == 'processed' %}hist-pill--ok
+                {% elif r.status == 'error' %}hist-pill--error
+                {% else %}hist-pill--pending{% endif %}">
+                {% if r.status == 'processed' %}Procesado
+                {% elif r.status == 'error' %}Error
+                {% else %}Pendiente{% endif %}
+              </span>
+              {% if r.field_mapping %}
+                <span class="hist-pill hist-pill--purple">Schema</span>
+              {% endif %}
+              {% if r.plan_accepted %}
+                <span class="hist-pill hist-pill--purple">Publicado</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- fecha -->
+          <span class="hist-item__date">{{ r.date|date:"d M · H:i" }}</span>
+
+          <!-- acciones -->
+          <div class="hist-item__actions">
+            <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="hist-btn">Asistente</a>
+            {% if r.status == "processed" and r.field_mapping %}
+              <a href="{% url 'edit' r.id %}" class="hist-btn hist-btn--primary">Editar →</a>
+            {% elif r.status == "processed" and r.parsed_data %}
+              <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="hist-btn hist-btn--primary">Schema →</a>
+            {% endif %}
+            <form method="post" action="{% url 'delete_analysis' r.id %}" onsubmit="return confirm('¿Eliminar este análisis?')">
+              {% csrf_token %}
+              <button type="submit" class="hist-btn hist-btn--danger" title="Eliminar">✕</button>
+            </form>
+          </div>
+
         </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="hist-empty">
+      <div class="hist-empty__title">Aún no tienes análisis</div>
+      <div class="hist-empty__desc">Introduce una URL de API en el asistente para empezar.</div>
+      <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary" style="margin-top: 12px;">Ir al asistente</a>
+    </div>
+  {% endif %}
+
+  <!-- ── PAGINACIÓN ── -->
+  {% if api_requests.paginator.num_pages > 1 %}
+    <div class="hist-pagination">
+      {% if api_requests.has_previous %}
+        <a href="?page={{ api_requests.previous_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">← Anterior</a>
       {% endif %}
-
-      {% if api_requests.paginator.num_pages > 1 %}
-        <div class="hist-pagination">
-          {% if api_requests.has_previous %}
-            <a href="?page={{ api_requests.previous_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Anterior</a>
-          {% endif %}
-          <span class="hist-page-info">
-            Página {{ api_requests.number }} de {{ api_requests.paginator.num_pages }}
-          </span>
-          {% if api_requests.has_next %}
-            <a href="?page={{ api_requests.next_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Siguiente</a>
-          {% endif %}
-        </div>
+      <span class="hist-page-info">{{ api_requests.number }} / {{ api_requests.paginator.num_pages }}</span>
+      {% if api_requests.has_next %}
+        <a href="?page={{ api_requests.next_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Siguiente →</a>
       {% endif %}
+    </div>
+  {% endif %}
 
-    </section>
-
-  </main>
 </div>
 {% endblock %}

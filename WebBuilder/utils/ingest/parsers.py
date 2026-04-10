@@ -89,10 +89,18 @@ def summarize_data(fmt: str, parsed: object) -> str:
             return f"GeoJSON con {len(parsed)} features. Propiedades: {', '.join(list(sample_keys)[:8])}{'...' if len(sample_keys) > 8 else ''}."
         return "GeoJSON parseado."
 
+    #if isinstance(parsed, dict):
+    #    return f"Formato detectado: {fmt}. Raíz: dict. Claves raíz: {len(parsed.keys())}."
+
+    #if isinstance(parsed, list):
+    #    return f"Formato detectado: {fmt}. Raíz: list. Elementos: {len(parsed)}."
+
+    #return f"Formato detectado: {fmt}. Raíz: {type(parsed).__name__}."
+
     if isinstance(parsed, dict):
-        return f"Formato detectado: {fmt}. Raíz: dict. Claves raíz: {len(parsed.keys())}."
+        return f"Formato: {fmt}."
 
     if isinstance(parsed, list):
-        return f"Formato detectado: {fmt}. Raíz: list. Elementos: {len(parsed)}."
+        return f"Formato: {fmt}."
 
-    return f"Formato detectado: {fmt}. Raíz: {type(parsed).__name__}."
+    return f"Formato: {fmt}."
