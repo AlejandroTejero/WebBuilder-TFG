@@ -26,7 +26,7 @@ from ..llm.generator_prompts import (
     prompt_load_data,
 )
 from ..llm.field_extractor import extract_model_fields
-from ..llm.consistency_checker import check_consistency
+from ..llm.consistency_checker import check_consistency, check_django_syntax
 from ..llm.enrich_prompt import enrich_user_prompt
 
 from .llm_wrappers import llm_call_logged, llm_json_call, strip_markdown_fences
@@ -252,7 +252,7 @@ def generate_project_files(site) -> dict[str, str]:
     # ── PASO 8: Validación de consistencia y autocorrección ─────────────────
     _update_step(site, "Validando consistencia entre archivos...")
     logger.info("[generator] Paso 8: validando consistencia entre archivos")
-    issues = check_consistency(files)
+    issues = check_consistency(files) + check_django_syntax(files)
     if issues:
         logger.warning(f"[generator] {len(issues)} inconsistencias detectadas:")
         for issue in issues:

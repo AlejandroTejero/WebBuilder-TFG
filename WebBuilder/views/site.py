@@ -365,3 +365,90 @@ def site_users_save(request, api_request_id: int):
         )
 
     return JsonResponse({'ok': True, 'saved': len(users)})
+
+@login_required
+@require_POST
+def site_refine_file(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+
+    if not site.project_files:
+        return JsonResponse({"ok": False, "error": "No hay archivos generados."}, status=400)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"ok": False, "error": "JSON inválido"}, status=400)
+
+    message = data.get("message", "").strip()
+    if not message:
+        return JsonResponse({"ok": False, "error": "Mensaje vacío"}, status=400)
+
+    # Identificar qué archivo tocar según el mensaje del usuario
+    file_list = "\n".join(site.project_files.keys())
+    system_identify = (
+        "Eres un asistente que identifica qué archivo de un proyecto Django "
+        "debe modificarse según la petición del usuario. "
+        "Devuelve SOLO el path exacto del archivo más relevante, sin explicación ni comillas. "
+        "Si la petición afecta a la página de inicio responde con el path del home.html. "
+        "Si afecta al listado responde con el catalog/list html. "
+        "Si afecta al estilo global responde con base.html. "
+        "Si afecta a la lógica responde con views.py."
+    )
+    user_identify = f"Archivos disponibles:\n{file_list}\n\nPetición del usuario: {message}"
+
+    try:
+        from ..utils.llm.client import chat_completion, LLMError
+        target_path = chat_completion(
+            user_text=user_identify,
+            system_text=system_identify,
+            temperature=0.0,
+        ).strip().strip('"').strip("'")
+    except Exception as e:
+        return JsonResponse({"ok": False, "error": f"Error identificando archivo: {e}"}, status=500)
+
+    if target_path not in site.project_files:
+        # Intentar match parcial
+        match = next((p for p in site.project_files if target_path in p or p.endswith(target_path)), None)
+        if not match:
+            return JsonResponse({"ok": False, "error": f"Archivo no encontrado: {target_path}"}, status=404)
+        target_path = match
+
+    current_content = site.project_files[target_path]
+    ext = target_path.split(".")[-1]
+
+    system_rewrite = (
+        "Eres un desarrollador Django senior experto en Python y Tailwind CSS. "
+        "REGLA ABSOLUTA: devuelves ÚNICAMENTE código puro, sin ningún tipo de Markdown. "
+        "PROHIBIDO escribir ``` en cualquier parte de tu respuesta. "
+        "Tu respuesta empieza DIRECTAMENTE con la primera línea de código."
+    )
+    user_rewrite = (
+        f"Modifica el siguiente archivo ({target_path}) según esta petición: {message}\n\n"
+        f"ARCHIVO ACTUAL:\n{current_content}\n\n"
+        f"Devuelve el archivo COMPLETO modificado. No expliques nada, solo el código."
+    )
+
+    try:
+        new_content = chat_completion(
+            user_text=user_rewrite,
+            system_text=system_rewrite,
+            temperature=0.3,
+        )
+    except Exception as e:
+        return JsonResponse({"ok": False, "error": f"Error del LLM: {e}"}, status=500)
+
+    if not new_content.strip():
+        return JsonResponse({"ok": False, "error": "El LLM devolvió una respuesta vacía."}, status=500)
+
+    # Limpiar fences si se colaron
+    import re
+    new_content = re.sub(r'```[\w]*\n?', '', new_content)
+    new_content = re.sub(r'```', '', new_content).strip()
+
+    files = site.project_files
+    files[target_path] = new_content
+    site.project_files = files
+    site.save(update_fields=["project_files"])
+
+    return JsonResponse({"ok": True, "file": target_path})

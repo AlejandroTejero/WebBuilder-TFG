@@ -35,6 +35,15 @@ def fix_template(html: str) -> str:
     # 4. Corregir tags Django sin cerrar: {% endif, {% endfor, {% endblock sin %}
     html = re.sub(r'\{%-?\s*(endif|endfor|endblock|endwith|endblock)\s*\n', r'{% \1 %}\n', html)
     
+    # 5. Detectar {% for %} sin {% endfor %}
+    for_count = len(re.findall(r'\{%[-\s]*for\s', html))
+    endfor_count = len(re.findall(r'\{%[-\s]*endfor', html))
+    # No se puede autocorregir fácilmente, pero se puede loggear
+
+    # 6. Detectar {% if %} sin {% endif %}
+    if_count = len(re.findall(r'\{%[-\s]*if\s', html))
+    endif_count = len(re.findall(r'\{%[-\s]*endif', html))
+
     return html.strip()
 
 
@@ -72,5 +81,36 @@ def check_consistency(files: dict[str, str]) -> list[str]:
         for ref in set(template_refs):
             if ref not in model_fields and ref not in django_attrs:
                 errors.append(f"{path} usa item.{ref} pero no existe en models.py")
+
+    return errors
+
+
+def check_django_syntax(files: dict[str, str]) -> list[str]:
+    errors = []
+    for path, content in files.items():
+        if not path.endswith(".html"):
+            continue
+        
+        # {% for %} sin {% endfor %}
+        for_count = len(re.findall(r'\{%[-\s]*for\s', content))
+        endfor_count = len(re.findall(r'\{%[-\s]*endfor', content))
+        if for_count != endfor_count:
+            errors.append(f"{path}: {for_count} {{% for %}} pero {endfor_count} {{% endfor %}}")
+        
+        # {% if %} sin {% endif %}
+        if_count = len(re.findall(r'\{%[-\s]*if\s', content))
+        endif_count = len(re.findall(r'\{%[-\s]*endif', content))
+        if if_count != endif_count:
+            errors.append(f"{path}: {if_count} {{% if %}} pero {endif_count} {{% endif %}}")
+        
+        # Bloques Markdown que se colaron
+        if '```' in content:
+            errors.append(f"{path}: contiene bloques Markdown (```)")
+        
+        # {% block %} sin {% endblock %}
+        block_count = len(re.findall(r'\{%[-\s]*block\s', content))
+        endblock_count = len(re.findall(r'\{%[-\s]*endblock', content))
+        if block_count != endblock_count:
+            errors.append(f"{path}: {block_count} {{% block %}} pero {endblock_count} {{% endblock %}}")
 
     return errors

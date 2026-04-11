@@ -1,10 +1,10 @@
-{% extends "WebBuilder/base.html" %}
+{% extends 'WebBuilder/base.html' %}
 {% load static %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
-  <link rel="stylesheet" href="{% static 'css/assistant/editor.css' %}">
   <link rel="stylesheet" href="{% static 'css/assistant/loading.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_render.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -17,10 +17,10 @@
     <div class="asst-sidebar__inner">
 
       <div class="asst-brand">
-        <span class="asst-brand__icon">🗂</span>
         <span class="asst-brand__text">Sitio generado</span>
       </div>
 
+      <!-- Stepper -->
       <nav class="asst-steps">
         <div class="asst-step asst-step--done">
           <div class="asst-step__track">
@@ -52,7 +52,7 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Generar código</div>
+            <div class="asst-step__label">Código generado</div>
             <div class="asst-step__desc">LLM escribe el proyecto</div>
           </div>
         </div>
@@ -64,82 +64,80 @@
             </div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Desplegar</div>
+            <div class="asst-step__label">Desplegado</div>
             <div class="asst-step__desc">Contenedor Docker</div>
           </div>
         </div>
       </nav>
 
+      <!-- Info proyecto -->
       <div class="asst-meta">
-        <div class="asst-meta__label">{{ site.project_name|default:"generated_site" }}</div>
-        <div class="asst-meta__url">Request #{{ api_request.id }}</div>
-        <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.6rem;">
+        <div class="asst-meta__label">Proyecto</div>
+        <div class="asst-meta__url">{{ site.project_name|default:"generated_site" }}</div>
+        <div class="sr-meta-pills">
           <div class="asst-meta-pill">
-            <span class="asst-meta-pill__label">Generación</span>
-            <span class="asst-meta-pill__value">{{ site.generation_status }}</span>
-          </div>
-          <div class="asst-meta-pill">
-            <span class="asst-meta-pill__label">Archivos</span>
+            <span class="asst-meta-pill__label">archivos</span>
             <span class="asst-meta-pill__value">{% if site.project_files %}{{ site.project_files|length }}{% else %}0{% endif %}</span>
           </div>
-          <div class="asst-meta-pill" id="deploy-status-pill" style="{% if site.deploy_status == 'idle' %}display:none;{% endif %}">
-            <span class="asst-meta-pill__label">Despliegue</span>
-            <span class="asst-meta-pill__value" id="deploy-status-value">{{ site.deploy_status }}</span>
+          <div class="asst-meta-pill">
+            <span class="asst-meta-pill__label">estado</span>
+            <span class="asst-meta-pill__value">{{ site.generation_status }}</span>
           </div>
         </div>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:.6rem;">
+      <!-- Acciones -->
+      <div class="sr-actions">
+        {% if site.generation_status == 'ready' %}
+          {% if site.deploy_status == 'deploying' %}
+            <button class="asst-btn asst-btn--primary" disabled style="width:100%;">
+              Desplegando…
+            </button>
+          {% else %}
+            <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;" id="deploy-form">
+              {% csrf_token %}
+              <button class="asst-btn asst-btn--primary" type="submit" style="width:100%;">
+                {% if site.deploy_status == 'done' %}Re-desplegar{% else %}Desplegar sitio{% endif %}
+              </button>
+            </form>
+          {% endif %}
 
-        <form method="post" action="{% url 'site_generate' api_request.id %}" style="margin:0;">
-          {% csrf_token %}
-          <button class="asst-btn asst-btn--primary" type="submit" style="width:100%;">
-            Generar proyecto
-          </button>
-        </form>
-
-        {% if site.project_files %}
           <a class="asst-btn asst-btn--ghost" href="{% url 'site_download_zip' api_request.id %}" style="text-align:center;">
             Descargar ZIP
           </a>
+
         {% else %}
           <span class="asst-btn asst-btn--ghost" style="opacity:.4; cursor:not-allowed; text-align:center;">
             Descargar ZIP
           </span>
         {% endif %}
-
-        {% if site.generation_status == "ready" %}
-          {% if site.deploy_status == "deploying" %}
-            <span class="asst-btn asst-btn--primary" style="opacity:.5; cursor:not-allowed; text-align:center;">
-              Desplegando…
-            </span>
-          {% else %}
-            <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;" id="deploy-form">
-              {% csrf_token %}
-              <button class="asst-btn asst-btn--primary" type="submit" style="width:100%;">
-                {% if site.deploy_status == "done" %}Re-desplegar{% else %}Desplegar preview{% endif %}
-              </button>
-            </form>
-          {% endif %}
-        {% endif %}
-
-        {% if site.preview_url %}
-          <a class="asst-btn asst-btn--ghost" href="{{ site.preview_url }}" target="_blank" rel="noopener" id="preview-link" style="text-align:center;">
-            Abrir preview →
-          </a>
-        {% else %}
-          <a class="asst-btn asst-btn--ghost" href="#" id="preview-link" style="display:none; text-align:center;"></a>
-        {% endif %}
       </div>
 
-      <!-- Versiones anteriores -->
-      <div class="asst-versions" id="versions-panel">
-        <div class="asst-versions__header">
-          <span>🕓 Versiones</span>
-          <span class="asst-versions__count" id="versions-count"></span>
+      <!-- Chat de refinamiento -->
+      {% if site.deploy_status == 'done' %}
+      <div class="sr-chat">
+        <div class="sr-chat__header">
+          <span class="sr-chat__title">Refinar con IA</span>
+          <span class="sr-chat__badge">Beta</span>
         </div>
-        <div class="asst-versions__list" id="versions-list">
-          <div class="asst-versions__empty">Sin versiones guardadas</div>
+        <div class="sr-chat__messages" id="chat-messages">
+          <div class="sr-chat__hint">Describe qué quieres cambiar. La IA modificará el archivo relevante.</div>
+        </div>
+        <div class="sr-chat__input-row">
+          <textarea class="sr-chat__textarea" id="chat-input" placeholder="Ej: haz el hero más grande y cambia el color a azul..." rows="2"></textarea>
+          <button class="sr-chat__send" id="chat-send" type="button">↑</button>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Versiones -->
+      <div class="sr-versions" id="versions-panel">
+        <div class="sr-versions__header">
+          <span class="sr-versions__title">Versiones</span>
+          <span class="sr-versions__count" id="versions-count"></span>
+        </div>
+        <div class="sr-versions__list" id="versions-list">
+          <div class="sr-versions__empty">Sin versiones guardadas</div>
         </div>
       </div>
 
@@ -153,10 +151,10 @@
   <!-- ═══════════════════════════════════════════════
        CONTENIDO PRINCIPAL
   ════════════════════════════════════════════════ -->
-  <main class="asst-content">
+  <main class="asst-content" style="padding:0; overflow:hidden;">
 
-    {% if site.generation_status == "error" and site.generation_error %}
-      <div class="asst-alerts">
+    {% if site.generation_status == 'error' and site.generation_error %}
+      <div class="asst-alerts" style="padding:24px 24px 0;">
         <div class="asst-alert asst-alert--error">
           <span class="asst-alert__icon">✗</span>
           <div><strong>Error de generación</strong> — {{ site.generation_error }}</div>
@@ -164,137 +162,64 @@
       </div>
     {% endif %}
 
-    <div class="asst-alert asst-alert--error" id="deploy-error-alert" style="display:none; margin-bottom:1rem;">
+    <div class="asst-alert asst-alert--error" id="deploy-error-alert" style="display:none; margin:24px 24px 0;">
       <span class="asst-alert__icon">✗</span>
       <div><strong>Error de despliegue</strong> — <span id="deploy-error-msg">{{ site.deploy_error }}</span></div>
     </div>
 
-    <!-- Usuarios del proyecto generado -->
-    <section class="asst-card" id="block-users">
-      <div class="asst-card__header">
-        <div class="asst-card__step-badge asst-card__step-badge--preview">Usuarios</div>
-        <h2 class="asst-card__title">Usuarios de la app generada</h2>
-        <p class="asst-card__subtitle">Define los usuarios que tendrá tu proyecto al arrancarlo por primera vez.</p>
-      </div>
-
-      <div id="users-list">
-        <!-- Las filas se renderizan desde el servidor -->
-        {% for u in site_users %}
-          <div class="site-user-row" data-username="{{ u.username }}">
-            <input type="text"     class="user-input" placeholder="Usuario"     value="{{ u.username }}">
-            <input type="password" class="user-input" placeholder="Contraseña"  value="{{ u.password }}">
-            <select class="user-select">
-              <option value="normal" {% if u.role == "normal" %}selected{% endif %}>Normal</option>
-              <option value="super"  {% if u.role == "super"  %}selected{% endif %}>Superusuario</option>
-            </select>
-            <button class="sr-btn sr-btn--cancel" type="button" data-user-remove>✕</button>
+    {% if site.deploy_status == 'done' and site.preview_url %}
+      <!-- iframe del sitio desplegado -->
+      <div class="sr-browser">
+        <div class="sr-browser__bar">
+          <div class="sr-browser__dots">
+            <span class="sr-browser__dot sr-browser__dot--red"></span>
+            <span class="sr-browser__dot sr-browser__dot--yellow"></span>
+            <span class="sr-browser__dot sr-browser__dot--green"></span>
           </div>
-        {% empty %}
-          <!-- Fila vacía por defecto -->
-          <div class="site-user-row">
-            <input type="text"     class="user-input" placeholder="Usuario">
-            <input type="password" class="user-input" placeholder="Contraseña">
-            <select class="user-select">
-              <option value="normal">Normal</option>
-              <option value="super">Superusuario</option>
-            </select>
-            <button class="sr-btn sr-btn--cancel" type="button" data-user-remove>✕</button>
-          </div>
-        {% endfor %}
+          <div class="sr-browser__url" id="browser-url">{{ site.preview_url }}</div>
+          <a class="sr-browser__open" href="{{ site.preview_url }}" target="_blank" rel="noopener">Abrir ↗</a>
+        </div>
+        <iframe
+          class="sr-browser__iframe"
+          id="site-iframe"
+          src="{{ site.preview_url }}"
+          frameborder="0"
+          allowfullscreen>
+        </iframe>
       </div>
 
-      <div style="display:flex; gap:.5rem; margin-top:.75rem;">
-        <button class="sr-btn sr-btn--edit" type="button" id="users-add-btn">+ Añadir usuario</button>
-        <button class="sr-btn sr-btn--save" type="button" id="users-save-btn">Guardar</button>
+    {% elif site.generation_status == 'ready' %}
+      <!-- Sitio generado pero no desplegado -->
+      <div class="sr-ready-state">
+        <div class="sr-ready-state__icon">✓</div>
+        <div class="sr-ready-state__title">Proyecto generado</div>
+        <div class="sr-ready-state__desc">
+          {{ site.project_files|length }} archivos listos. Despliega el sitio para verlo en el navegador.
+        </div>
+        <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;">
+          {% csrf_token %}
+          <button class="asst-btn asst-btn--primary asst-btn--lg" type="submit">
+            Desplegar y ver sitio
+          </button>
+        </form>
       </div>
 
-      <div id="users-feedback" style="display:none; margin-top:.5rem; font-size:.8rem;"></div>
-
-    </section>
-
-    <div style="display:flex; justify-content:center;">
-      <div style="width:80%;">
-        <section class="asst-card" id="block-files">
-          <div class="asst-card__header">
-            <div class="asst-card__step-badge asst-card__step-badge--preview">Project files</div>
-            <h2 class="asst-card__title">Archivos generados</h2>
-            <p class="asst-card__subtitle">Selecciona un archivo para ver su código. Pulsa <strong>Editar</strong> para abrirlo en el editor.</p>
-          </div>
-
-          {% if site.project_files %}
-
-            <!-- JSON con rutas y contenidos para el JS -->
-            <script id="sr-files-data" type="application/json">
-              {"files": [{% for path, content in site.project_files.items %}{"path": "{{ path|escapejs }}", "content": "{{ content|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]}
-            </script>
-
-            <div class="sr-explorer">
-              <!-- El árbol se construye dinámicamente en site_render.js -->
-              <div class="sr-tree" id="sr-tree"></div>
-
-              <!-- Visor -->
-              <div class="sr-viewer" id="sr-viewer">
-
-                <div class="sr-viewer__empty" id="sr-empty">
-                  <div class="asst-empty-state">
-                    <div class="asst-empty-state__icon" style="opacity:.15;">&#128196;</div>
-                    <div class="asst-empty-state__title">Selecciona un archivo</div>
-                    <div class="asst-empty-state__desc">Haz clic en cualquier archivo del árbol para ver su contenido.</div>
-                  </div>
-                </div>
-
-                <div class="sr-viewer__header" id="sr-header" style="display:none;">
-                  <span class="sr-viewer__filename" id="sr-filename"></span>
-                  <div class="sr-viewer__actions">
-                    <button class="sr-btn sr-btn--edit" id="sr-btn-edit" type="button">
-                      Editar
-                    </button>
-                  </div>
-                </div>
-
-                <div class="sr-viewer__code" id="sr-code-wrap" style="display:none;">
-                  <pre id="sr-pre"><code id="sr-code"></code></pre>
-                </div>
-
-                <div class="sr-save-feedback" id="sr-save-feedback" style="display:none;"></div>
-
-              </div>
-            </div>
-
-          {% else %}
-            <div class="asst-empty-state" style="padding:2rem 0;">
-              <div class="asst-empty-state__icon">&#9881;</div>
-              <div class="asst-empty-state__title">Aún no hay archivos</div>
-              <div class="asst-empty-state__desc">Pulsa <strong>Generar proyecto</strong> para que el LLM escriba el código.</div>
-            </div>
-          {% endif %}
-
-        </section>
+    {% else %}
+      <!-- Aún no generado -->
+      <div class="sr-ready-state">
+        <div class="sr-ready-state__icon" style="opacity:.15;">⚙</div>
+        <div class="sr-ready-state__title">Aún no hay código</div>
+        <div class="sr-ready-state__desc">
+          Vuelve al editor y pulsa <strong>Generar y publicar sitio</strong> para que el LLM escriba el código.
+        </div>
+        <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--ghost asst-btn--lg">
+          ← Ir al editor
+        </a>
       </div>
-    </div>
+    {% endif %}
+
   </main>
 </div>
-
-
-<!-- ═══════════════════════════════════════════════════════
-     MODAL EDITOR — Monaco
-════════════════════════════════════════════════════════ -->
-<div class="sr-modal" id="sr-modal">
-  <div class="sr-modal__header">
-    <div class="sr-modal__title">
-      <span id="sr-modal-filename"></span>
-    </div>
-    <div class="sr-modal__actions">
-      <div class="sr-save-feedback sr-save-feedback--inline" id="sr-save-feedback-modal" style="display:none;"></div>
-      <button class="sr-btn sr-btn--cancel" id="sr-btn-cancel" type="button">Cancelar</button>
-      <button class="sr-btn sr-btn--save" id="sr-btn-save" type="button">Guardar</button>
-    </div>
-  </div>
-  <div class="sr-modal__body">
-    <div id="monaco-container"></div>
-  </div>
-</div>
-
 
 <!-- ═══════════════════════════════════════════════════════
      OVERLAY: GENERACIÓN
@@ -309,7 +234,7 @@
       <div class="asst-loading__step" id="gs-2">Generando modelos de datos</div>
       <div class="asst-loading__step" id="gs-3">Generando vistas y controladores</div>
       <div class="asst-loading__step" id="gs-4">Generando plantilla base</div>
-      <div class="asst-loading__step" id="gs-5">Generando paginas</div>
+      <div class="asst-loading__step" id="gs-5">Generando páginas</div>
       <div class="asst-loading__step" id="gs-6">Ensamblando y validando</div>
     </div>
   </div>
@@ -325,11 +250,11 @@
     <div class="asst-loading__title" id="deploy-overlay-title">Desplegando proyecto…</div>
     <div class="asst-loading__sub">n8n está orquestando el contenedor Docker</div>
     <div class="asst-loading__steps">
-      <div class="asst-loading__step" id="ds-zip"><span class="ds-icon">&#128230;</span> Preparando ZIP</div>
-      <div class="asst-loading__step" id="ds-unzip"><span class="ds-icon">&#128194;</span> Descomprimiendo en n8n</div>
-      <div class="asst-loading__step" id="ds-build"><span class="ds-icon">&#128296;</span> Construyendo imagen Docker</div>
-      <div class="asst-loading__step" id="ds-run"><span class="ds-icon">&#128640;</span> Arrancando contenedor</div>
-      <div class="asst-loading__step" id="ds-done"><span class="ds-icon">&#9989;</span> ¡Listo!</div>
+      <div class="asst-loading__step" id="ds-zip">Preparando ZIP</div>
+      <div class="asst-loading__step" id="ds-unzip">Descomprimiendo en n8n</div>
+      <div class="asst-loading__step" id="ds-build">Construyendo imagen Docker</div>
+      <div class="asst-loading__step" id="ds-run">Arrancando contenedor</div>
+      <div class="asst-loading__step" id="ds-done">¡Listo!</div>
     </div>
     <div style="width:100%; background:rgba(255,255,255,0.06); border-radius:99px; height:4px; margin-top:.5rem; overflow:hidden;">
       <div id="deploy-progress-bar" style="height:100%; width:0%; background:linear-gradient(90deg,#3b82f6,#8b5cf6); border-radius:99px; transition:width 0.6s ease;"></div>
@@ -341,57 +266,40 @@
 
 
 <!-- ═══════════════════════════════════════════════════════
-     MODAL — Versiones anteriores
+     MODAL — Versiones
 ════════════════════════════════════════════════════════ -->
-<div class="sr-modal" id="version-modal" style="display:none;">
-  <div class="sr-modal__header">
-    <div class="sr-modal__title">
+<div class="sr-version-modal" id="version-modal" style="display:none;">
+  <div class="sr-version-modal__backdrop" id="version-modal-backdrop"></div>
+  <div class="sr-version-modal__box">
+    <div class="sr-version-modal__header">
       <span id="version-modal-title"></span>
+      <button class="asst-btn asst-btn--ghost asst-btn--sm" id="version-modal-close">Cerrar</button>
     </div>
-    <div class="sr-modal__actions">
-      <button class="sr-btn sr-btn--cancel" id="version-modal-close" type="button">Cerrar</button>
-      <a class="sr-btn sr-btn--edit" id="version-modal-download" href="#">Descargar ZIP</a>
-      <button class="sr-btn sr-btn--save" id="version-modal-restore">Restaurar</button>
-    </div>
-  </div>
-  <div class="sr-modal__body">
-    <div style="padding:2rem; color:#64748b; text-align:center;">
+    <div class="sr-version-modal__body">
       Versión guardada el <strong><span id="version-modal-date"></span></strong>
+    </div>
+    <div class="sr-version-modal__footer">
+      <a class="asst-btn asst-btn--ghost asst-btn--sm" id="version-modal-download" href="#">Descargar ZIP</a>
+      <button class="asst-btn asst-btn--primary asst-btn--sm" id="version-modal-restore">Restaurar</button>
     </div>
   </div>
 </div>
 
-<!-- Prism para el visor de solo lectura -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-django.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 
-<!-- Monaco Editor loader -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
-
-<!-- JS del explorador -->
 <script>
-  // Inyectar las URLs y el token CSRF para que site_render.js las lea
   window.SR_CONFIG = {
-    updateFileUrl:   "{% url 'site_update_file' api_request.id %}",
-    csrfToken:       "{{ csrf_token }}",
-    genStatusUrl:    "{% url 'site_status' api_request.id %}",
-    deployStatusUrl: "{% url 'site_deploy_status' api_request.id %}",
-    versionsUrl:     "{% url 'site_versions' api_request.id %}",
-    usersSaveUrl:    "{% url 'site_users_save' api_request.id %}",
-    restoreBaseUrl:  "/site/{{ api_request.id }}/versions/",
-    currentGenStatus:    "{{ site.generation_status }}",
+    csrfToken:           "{{ csrf_token }}",
+    deployStatusUrl:     "{% url 'site_deploy_status' api_request.id %}",
+    versionsUrl:         "{% url 'site_versions' api_request.id %}",
+    restoreBaseUrl:      "/site/{{ api_request.id }}/versions/",
+    refineUrl:           "{% url 'site_refine_file' api_request.id %}",
+    genStatusUrl:        "{% url 'site_status' api_request.id %}",
     currentDeployStatus: "{{ site.deploy_status }}",
+    currentGenStatus:    "{{ site.generation_status }}",
+    previewUrl:          "{{ site.preview_url|default:'' }}",
   };
 </script>
 
-
-
 <script src="{% static 'js/site_render.js' %}"></script>
-
-
 
 {% endblock %}

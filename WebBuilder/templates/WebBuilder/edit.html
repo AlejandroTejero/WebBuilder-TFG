@@ -362,10 +362,10 @@
             </div>
             <div class="publish-row__right">
               {% if not api_request.plan_accepted %}
-                <form method="post" class="m-0">
+                <form method="post" class="m-0" id="publish-form">
                   {% csrf_token %}
                   <input type="hidden" name="action" value="accept_plan">
-                  <button type="submit" class="asst-btn asst-btn--primary asst-btn--lg" onclick="showPublishLoading()">
+                  <button type="submit" class="asst-btn asst-btn--primary asst-btn--lg">
                     Generar y publicar sitio
                   </button>
                 </form>
@@ -401,16 +401,21 @@
     <div class="asst-loading__title">Generando sitio...</div>
     <div class="asst-loading__sub">La IA está creando el diseño completo</div>
     <div class="asst-loading__steps">
-      <div class="asst-loading__step" id="ls-1">Diseñando templates</div>
-      <div class="asst-loading__step" id="ls-2">Generando HTML/CSS</div>
-      <div class="asst-loading__step" id="ls-3">Publicando sitio</div>
+      <div class="asst-loading__step" id="ls-1">Analizando estructura del sitio</div>
+      <div class="asst-loading__step" id="ls-2">Generando modelos de datos</div>
+      <div class="asst-loading__step" id="ls-3">Generando vistas y controladores</div>
+      <div class="asst-loading__step" id="ls-4">Generando plantilla base</div>
+      <div class="asst-loading__step" id="ls-5">Generando páginas</div>
+      <div class="asst-loading__step" id="ls-6">Ensamblando y validando</div>
     </div>
   </div>
 </div>
 
 <script>
-  const USERS_SAVE_URL = "{% url 'site_users_save' api_request.id %}";
-  const CSRF_TOKEN = "{{ csrf_token }}";
+  const USERS_SAVE_URL  = "{% url 'site_users_save' api_request.id %}";
+  const CSRF_TOKEN      = "{{ csrf_token }}";
+  const GEN_STATUS_URL  = "{% url 'site_status' api_request.id %}";
+  const SITE_RENDER_URL = "{% url 'site_render' api_request.id %}";
 </script>
 <script src="{% static 'js/edit.js' %}"></script>
 

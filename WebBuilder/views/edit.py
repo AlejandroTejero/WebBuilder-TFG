@@ -197,7 +197,31 @@ def edit(request, api_request_id: int):
                 site.accepted_plan = ap
 
             site.save()
-            messages.success(request, "Plan aceptado. Listo para generar el proyecto ✅")
+
+            # Arrancar generación automáticamente
+            site.generation_status = "generating"
+            site.generation_error  = ""
+            site.project_files     = {}
+            site.save(update_fields=["generation_status", "generation_error", "project_files"])
+
+            import threading
+            from ..utils.generator.project_generator import generate_project_files
+
+            def _run():
+                try:
+                    files = generate_project_files(site)
+                    site.project_files     = files
+                    site.generation_status = "ready"
+                    site.generation_error  = ""
+                    site.save(update_fields=["project_files", "generation_status", "generation_error"])
+                except Exception as e:
+                    site.generation_status = "error"
+                    site.generation_error  = str(e)
+                    site.save(update_fields=["generation_status", "generation_error"])
+
+            threading.Thread(target=_run, daemon=True).start()
+
+            messages.success(request, "Plan aceptado. Generando el proyecto...")
             return redirect("site_render", api_request_id=api_request.id)
 
     # ──────────────── GET — construir contexto ────────────────────────

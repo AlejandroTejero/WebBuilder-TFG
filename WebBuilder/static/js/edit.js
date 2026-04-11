@@ -109,26 +109,61 @@
 })();
 
 // ── LOADING OVERLAY AL PUBLICAR ──────────────────────────────────────
-function showPublishLoading() {
-  const overlay = document.getElementById('loading-overlay');
-  if (!overlay) return;
+const GEN_STEP_MAP = [
+  { id: 'ls-1', key: 'Analizando' },
+  { id: 'ls-2', key: 'modelos' },
+  { id: 'ls-3', key: 'vistas' },
+  { id: 'ls-4', key: 'plantilla' },
+  { id: 'ls-5', key: 'pagina' },
+  { id: 'ls-6', key: 'Ensamblando' },
+];
 
-  overlay.classList.add('active');
+(function () {
+  const form = document.getElementById('publish-form');
+  if (!form) return;
 
-  const stepIds = ['ls-1', 'ls-2', 'ls-3'];
-  const steps   = stepIds.map(id => document.getElementById(id));
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
 
-  steps.forEach((step, i) => {
-    setTimeout(() => {
-      if (i > 0 && steps[i - 1]) {
-        steps[i - 1].classList.remove('active');
-        steps[i - 1].classList.add('done');
-      }
-      if (step) step.classList.add('active');
-    }, i * 3000);
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.classList.add('active');
+
+    const formData = new FormData(form);
+
+    try {
+      await fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+      });
+    } catch (_) {}
+
+    let currentStep = -1;
+    const interval = setInterval(async () => {
+      try {
+        const res  = await fetch(GEN_STATUS_URL);
+        const data = await res.json();
+
+        if (data.step) {
+          const idx = GEN_STEP_MAP.findIndex(s => data.step.includes(s.key));
+          if (idx !== -1 && idx !== currentStep) {
+            for (let i = 0; i < idx; i++) {
+              const el = document.getElementById(GEN_STEP_MAP[i].id);
+              if (el) { el.classList.remove('active'); el.classList.add('done'); }
+            }
+            const el = document.getElementById(GEN_STEP_MAP[idx].id);
+            if (el) { el.classList.remove('done'); el.classList.add('active'); }
+            currentStep = idx;
+          }
+        }
+
+        if (data.status === 'ready' || data.status === 'error') {
+          clearInterval(interval);
+          window.location.href = SITE_RENDER_URL;
+        }
+      } catch (_) {}
+    }, 2000);
   });
-}
-
+})();
 
 // ── PAGINADOR PREVIEW ─────────────────────────────────────────────────
 (function () {
