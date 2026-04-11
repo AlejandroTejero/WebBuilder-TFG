@@ -1,0 +1,97 @@
+{% extends 'WebBuilder/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/code_viewer.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="cv-layout">
+
+  <!-- SIDEBAR — árbol de archivos -->
+  <aside class="cv-sidebar">
+    <div class="cv-sidebar__back">
+      <a href="{% url 'site_render' api_request.id %}">← Volver al sitio</a>
+    </div>
+    <div class="cv-sidebar__header">
+      <span class="cv-sidebar__title">{{ site.project_name|default:"Proyecto" }}</span>
+      <span class="cv-sidebar__count">
+        {% if site.project_files %}{{ site.project_files|length }} archivos{% endif %}
+      </span>
+    </div>
+    <div class="cv-tree-wrap">
+      <div id="sr-tree"></div>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL — visor -->
+  <main class="cv-main">
+    <div class="sr-explorer">
+      <div class="sr-viewer" id="sr-viewer">
+
+        <div class="sr-viewer__empty" id="sr-empty">
+          <div style="text-align:center; color:var(--wb-t3);">
+            <div style="font-size:32px; opacity:.15; margin-bottom:10px;">&#128196;</div>
+            <div style="font-size:13px;">Selecciona un archivo del árbol</div>
+          </div>
+        </div>
+
+        <div class="sr-viewer__header" id="sr-header" style="display:none;">
+          <span class="sr-viewer__filename" id="sr-filename"></span>
+          <div class="sr-viewer__actions">
+            <span class="sr-save-feedback" id="sr-save-feedback" style="display:none;"></span>
+            <button class="sr-btn sr-btn--edit" id="sr-btn-edit" type="button">Editar</button>
+          </div>
+        </div>
+
+        <div class="sr-viewer__code" id="sr-code-wrap" style="display:none;">
+          <pre><code id="sr-code"></code></pre>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<!-- JSON con archivos -->
+{% if site.project_files %}
+<script id="sr-files-data" type="application/json">
+  {"files": [{% for path, content in site.project_files.items %}{"path": "{{ path|escapejs }}", "content": "{{ content|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]}
+</script>
+{% endif %}
+
+<!-- Modal Monaco -->
+<div class="sr-modal" id="sr-modal">
+  <div class="sr-modal__header">
+    <div class="sr-modal__title">
+      <span id="sr-modal-filename"></span>
+    </div>
+    <div class="sr-modal__actions">
+      <span class="sr-save-feedback sr-save-feedback--inline" id="sr-save-feedback-modal" style="display:none;"></span>
+      <button class="sr-btn sr-btn--cancel" id="sr-btn-cancel" type="button">Cancelar</button>
+      <button class="sr-btn sr-btn--save" id="sr-btn-save" type="button">Guardar</button>
+    </div>
+  </div>
+  <div class="sr-modal__body">
+    <div id="monaco-container"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-django.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+
+<script>
+  window.CV_CONFIG = {
+    updateFileUrl: "{% url 'site_update_file' api_request.id %}",
+    csrfToken:     "{{ csrf_token }}",
+  };
+</script>
+<script src="{% static 'js/code_viewer.js' %}"></script>
+
+{% endblock %}

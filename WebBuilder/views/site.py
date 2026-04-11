@@ -452,3 +452,14 @@ def site_refine_file(request, api_request_id: int):
     site.save(update_fields=["project_files"])
 
     return JsonResponse({"ok": True, "file": target_path})
+
+
+@login_required
+@require_GET
+def site_code_viewer(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+    return render(request, "WebBuilder/code_viewer.html", {
+        "api_request": api_request,
+        "site": site,
+    })

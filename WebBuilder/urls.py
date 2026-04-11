@@ -23,6 +23,7 @@ urlpatterns = [
 	
     path("edit/<int:api_request_id>", views.edit, name="edit"),
 	path("site/<int:api_request_id>", views.site_render, name="site_render"),
+    path("site/<int:api_request_id>/codigo/", views.site_code_viewer, name="site_code_viewer"),
 
     path("site/<int:api_request_id>/generate/", views.site_generate, name="site_generate"),
     path("site/<int:api_request_id>/download/", views.site_download_zip, name="site_download_zip"),
