@@ -1,15 +1,18 @@
+{% load i18n %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Crear cuenta — WebBuilder</title>
+  <title>{% trans "Crear cuenta" %} — WebBuilder</title>
   <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/colors.css' %}">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <script>if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');</script>
 </head>
 <body class="auth-page">
 
@@ -19,7 +22,7 @@
       <img src="{% static 'images/logo.jpg' %}" alt="WB">
     </div>
 
-    <div class="auth-title">Crear cuenta</div>
+    <div class="auth-title">{% trans "Crear cuenta" %}</div>
 
     {% if form.non_field_errors %}
       <div class="auth-error">
@@ -60,25 +63,26 @@
         {% endif %}
       </div>
 
-      <button type="submit" class="auth-submit"><span>Crear cuenta</span></button>
+      <button type="submit" class="auth-submit"><span>{% trans "Crear cuenta" %}</span></button>
 
     </form>
 
     <div class="auth-form-footer">
-      ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
+      {% trans "¿Ya tienes cuenta?" %} <a href="{% url 'login' %}">{% trans "Inicia sesión" %}</a>
     </div>
 
   </div>
 
   <script>
+    const PLACEHOLDERS = {
+      username:  "{% trans 'Usuario' %}",
+      email:     "{% trans 'Email' %}",
+      password1: "{% trans 'Contraseña' %}",
+      password2: "{% trans 'Repite la contraseña' %}",
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
-      const fields = {
-        username:  'Usuario',
-        email:     'Email',
-        password1: 'Contraseña',
-        password2: 'Repite la contraseña',
-      };
-      for (const [name, placeholder] of Object.entries(fields)) {
+      for (const [name, placeholder] of Object.entries(PLACEHOLDERS)) {
         const el = document.querySelector(`input[name="${name}"]`);
         if (el) el.placeholder = placeholder;
       }

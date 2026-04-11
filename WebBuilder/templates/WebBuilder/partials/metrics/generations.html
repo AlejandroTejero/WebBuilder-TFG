@@ -1,25 +1,26 @@
+{% load i18n %}
 <!-- ══════════════════════════════════════════════
      PANEL: GENERACIONES
 ══════════════════════════════════════════════ -->
 <div class="m-panel" id="m-panel-generaciones">
   <div class="m-phead">
-    <div class="m-phead-eyebrow">Panel de administración</div>
-    <h1 class="m-phead-title">Generaciones</h1>
-    <p class="m-phead-sub">Historial de sitios generados en la plataforma</p>
+    <div class="m-phead-eyebrow">{% trans "Panel de administración" %}</div>
+    <h1 class="m-phead-title">{% trans "Generaciones" %}</h1>
+    <p class="m-phead-sub">{% trans "Historial de sitios generados en la plataforma" %}</p>
   </div>
 
   <div class="m-grid-1">
     <div class="m-card">
-      <div class="m-card-title">Todos los sitios</div>
+      <div class="m-card-title">{% trans "Todos los sitios" %}</div>
       {% if all_sites %}
         <table class="m-table">
           <thead>
             <tr>
-              <th>Estado</th>
-              <th>Nombre</th>
-              <th>Usuario</th>
-              <th>Archivos</th>
-              <th>Fecha</th>
+              <th>{% trans "Estado" %}</th>
+              <th>{% trans "Nombre" %}</th>
+              <th>{% trans "Usuario" %}</th>
+              <th>{% trans "Archivos" %}</th>
+              <th>{% trans "Fecha" %}</th>
             </tr>
           </thead>
           <tbody>
@@ -39,7 +40,7 @@
           </tbody>
         </table>
       {% else %}
-        <div class="m-empty">Sin generaciones todavía</div>
+        <div class="m-empty">{% trans "Sin generaciones todavía" %}</div>
       {% endif %}
     </div>
   </div>

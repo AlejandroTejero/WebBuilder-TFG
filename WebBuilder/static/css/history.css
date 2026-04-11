@@ -314,7 +314,7 @@
 
 .hist-btn:hover {
   color: var(--wb-t1);
-  border-color: rgba(255,255,255,0.18);
+  border-color: var(--wb-border-md);
   background: var(--wb-bg-3);
 }
 
@@ -325,7 +325,7 @@
 }
 
 .hist-btn--primary:hover {
-  background: rgba(255,255,255,0.88);
+  opacity: 0.88;
   color: var(--wb-bg);
 }
 
@@ -389,8 +389,8 @@
 }
 
 .hist-page-btn:hover {
-  border-color: rgba(255, 255, 255, 0.733);
-  color: rgba(255, 255, 255, 0.9);
+  border-color: var(--wb-border-md);
+  color: var(--wb-t1);
 }
 
 .hist-page-info {

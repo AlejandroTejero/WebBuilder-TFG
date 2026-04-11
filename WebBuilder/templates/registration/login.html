@@ -1,15 +1,18 @@
+{% load i18n %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Iniciar sesión — WebBuilder</title>
+  <title>{% trans "Iniciar sesión" %} — WebBuilder</title>
   <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/colors.css' %}">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <script>if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');</script>
 </head>
 <body class="auth-page">
 
@@ -19,7 +22,7 @@
       <img src="{% static 'images/logo.jpg' %}" alt="WB">
     </div>
 
-    <div class="auth-title">Bienvenido a WebBuilder</div>
+    <div class="auth-title">{% trans "Bienvenido a WebBuilder" %}</div>
 
     {% if form.non_field_errors %}
       <div class="auth-error">
@@ -46,22 +49,22 @@
         {% endif %}
       </div>
 
-	  <button type="submit" class="auth-submit"><span>Iniciar sesión</span></button>
+	  <button type="submit" class="auth-submit"><span>{% trans "Iniciar sesión" %}</span></button>
 
     </form>
 
     <div class="auth-form-footer">
-      ¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate</a>
+      {% trans "¿No tienes cuenta?" %} <a href="{% url 'register' %}">{% trans "Regístrate" %}</a>
     </div>
-
+    
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const u = document.querySelector('input[name="username"]');
       const p = document.querySelector('input[name="password"]');
-      if (u) u.placeholder = 'Usuario';
-      if (p) p.placeholder = 'Contraseña';
+      if (u) u.placeholder = "{% trans 'Usuario' %}";
+      if (p) p.placeholder = "{% trans 'Contraseña' %}";
     });
   </script>
 

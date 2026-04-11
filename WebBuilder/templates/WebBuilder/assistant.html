@@ -1,4 +1,5 @@
 {% extends 'WebBuilder/base.html' %}
+{% load i18n %}
 {% load static %}
 
 {% block extra_css %}
@@ -24,8 +25,8 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Introducir URL</div>
-            <div class="asst-step__desc">API pública en JSON o XML</div>
+            <div class="asst-step__label">{% trans "Introducir URL" %}</div>
+            <div class="asst-step__desc">{% trans "API pública en JSON o XML" %}</div>
           </div>
         </div>
 
@@ -37,8 +38,8 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Análisis IA</div>
-            <div class="asst-step__desc">Schema generado automáticamente</div>
+            <div class="asst-step__label">{% trans "Análisis IA" %}</div>
+            <div class="asst-step__desc">{% trans "Schema generado automáticamente" %}</div>
           </div>
         </div>
 
@@ -47,8 +48,8 @@
             <div class="asst-step__dot"><span>3</span></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Revisar y publicar</div>
-            <div class="asst-step__desc">Ajusta campos y genera el sitio</div>
+            <div class="asst-step__label">{% trans "Revisar y publicar" %}</div>
+            <div class="asst-step__desc">{% trans "Ajusta campos y genera el sitio" %}</div>
           </div>
         </div>
 
@@ -56,18 +57,18 @@
 
       {% if api_request %}
       <div class="asst-meta">
-        <div class="asst-meta__label">Análisis activo</div>
+        <div class="asst-meta__label">{% trans "Análisis activo" %}</div>
         <div class="asst-meta__url">{{ api_request.api_url|truncatechars:45 }}</div>
         <div class="asst-meta__status asst-meta__status--{{ api_request.status }}">
-          {% if api_request.status == "processed" %}Procesado
-          {% elif api_request.status == "error" %}Error
-          {% else %}Pendiente{% endif %}
+          {% if api_request.status == "processed" %}{% trans "Procesado" %}
+          {% elif api_request.status == "error" %}{% trans "Error" %}
+          {% else %}{% trans "Pendiente" %}{% endif %}
         </div>
       </div>
       {% endif %}
 
       <a href="{% url 'history' %}" class="asst-history-link">
-        Ver historial
+        {% trans "Ver historial" %}
       </a>
 
     </div>
@@ -107,7 +108,7 @@
   <div class="llm-modal__panel">
 
     <div class="llm-modal__header">
-      <span class="llm-modal__title">Modelo LLM</span>
+      <span class="llm-modal__title">{% trans "Modelo LLM" %}</span>
       <button class="llm-modal__close" onclick="closeLLMModal()">✕</button>
     </div>
 
@@ -117,22 +118,22 @@
            id="llm-opt-default"
            onclick="selectLLMOption('default')">
         <div class="llm-modal__opt-header">
-          <span class="llm-modal__opt-name">Predeterminado</span>
-          <span class="llm-modal__opt-badge">Recomendado</span>
+          <span class="llm-modal__opt-name">{% trans "Predeterminado" %}</span>
+          <span class="llm-modal__opt-badge">{% trans "Recomendado" %}</span>
         </div>
         <p class="llm-modal__opt-desc">
-          Selección automática del modelo más adecuado según tu API.
-          Equilibrio óptimo entre velocidad y calidad.
+          {% trans "Selección automática del modelo más adecuado según tu API." %}
+          {% trans "Equilibrio óptimo entre velocidad y calidad." %}
         </p>
       </div>
 
       <div class="llm-modal__option" id="llm-opt-choose"
            onclick="selectLLMOption('choose')">
         <div class="llm-modal__opt-header">
-          <span class="llm-modal__opt-name">Elegir modelo</span>
+          <span class="llm-modal__opt-name">{% trans "Elegir modelo" %}</span>
         </div>
         <p class="llm-modal__opt-desc">
-          Selecciona manualmente entre los modelos disponibles.
+          {% trans "Selecciona manualmente entre los modelos disponibles." %}
         </p>
 
         <div class="llm-modal__cards" id="llm-cards-list">
@@ -158,8 +159,8 @@
       <div class="llm-modal__option" id="llm-opt-custom"
            onclick="window.location.href='{% url 'profile' %}'">
         <div class="llm-modal__opt-header">
-          <span class="llm-modal__opt-name">Modelo personalizado</span>
-          <span class="llm-modal__opt-badge llm-modal__opt-badge--ok">Configurado</span>
+          <span class="llm-modal__opt-name">{% trans "Modelo personalizado" %}</span>
+          <span class="llm-modal__opt-badge llm-modal__opt-badge--ok">{% trans "Configurado" %}</span>
         </div>
         <p class="llm-modal__opt-desc">
           {{ request.user.profile.custom_llm_model }} —
@@ -170,11 +171,11 @@
       <div class="llm-modal__option llm-modal__option--muted" id="llm-opt-custom"
            onclick="window.location.href='{% url 'profile' %}'">
         <div class="llm-modal__opt-header">
-          <span class="llm-modal__opt-name">Modelo personalizado</span>
-          <span class="llm-modal__opt-badge llm-modal__opt-badge--empty">No configurado</span>
+          <span class="llm-modal__opt-name">{% trans "Modelo personalizado" %}</span>
+          <span class="llm-modal__opt-badge llm-modal__opt-badge--empty">{% trans "No configurado" %}</span>
         </div>
         <p class="llm-modal__opt-desc">
-          Configura tu propio proveedor OpenAI-compatible en tu perfil.
+          {% trans "Configura tu propio proveedor OpenAI-compatible en tu perfil." %}
         </p>
       </div>
       {% endif %}
@@ -189,12 +190,12 @@
 <div class="asst-loading" id="loading-overlay">
   <div class="asst-loading__box">
     <div class="asst-loading__spinner"></div>
-    <div class="asst-loading__title">Analizando URL...</div>
-    <div class="asst-loading__sub">La IA está procesando los datos</div>
+    <div class="asst-loading__title">{% trans "Analizando URL..." %}</div>
+    <div class="asst-loading__sub">{% trans "La IA está procesando los datos" %}</div>
     <div class="asst-loading__steps">
-      <div class="asst-loading__step" id="ls-1">Descargando datos</div>
-      <div class="asst-loading__step" id="ls-2">Detectando estructura</div>
-      <div class="asst-loading__step" id="ls-3">Generando schema con IA</div>
+      <div class="asst-loading__step" id="ls-1">{% trans "Descargando datos" %}</div>
+      <div class="asst-loading__step" id="ls-2">{% trans "Detectando estructura" %}</div>
+      <div class="asst-loading__step" id="ls-3">{% trans "Generando schema con IA" %}</div>
     </div>
   </div>
 </div>

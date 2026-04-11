@@ -2,10 +2,8 @@
 1. Ver si vale la pena sacar un history.html para lo repetido (HEADER)
 2. Factorizar css para sacar cosas generales, ver si es necesario o no
 3. Repasar que cada html no tiene css ni js inline
-4. Terminar de traducir todo el contenido
 5. Apañar el modo claro de todo el proyecto
 
-6. Preview en vivo del sitio generado, ver si merece la pena o con el auto-despligue es suficiente
 
 
 # Implementaciones paginas finales
@@ -21,6 +19,14 @@
 
 # Implementaciones a preguntar
 1. Exportación a otros formatos: Ahora exportas un proyecto Django. Podrías añadir opción de exportar como sitio estático (HTML/CSS/JS puro) para casos simples. Mucho más fácil de desplegar para usuarios no técnicos.
+
+
+# Implementaciones n8n
+1. Notificación cuando la generación termina — ahora mismo el usuario tiene que quedarse mirando la pantalla. Un email de "tu sitio está listo, descárgalo aquí" con el link directo sería muy natural y lo usarías de verdad.
+2. Resumen semanal de uso — un workflow programado (cron) que cada semana envíe al admin cuántos sitios se generaron, con qué LLMs, tasa de error... Esto justifica n8n como herramienta de monitorización y es fácil de implementar.
+3. Webhook de error de generación — si el pipeline falla, n8n alerta al admin. Útil en producción y muy fácil de argumentar en la memoria.
+
+- De estos tres, el de notificación de generación completada es el que más valor visible aporta al usuario y el más fácil de conectar: ya tienes el estado generation_status = "ready" en la BD, solo necesitas que Django haga un POST a n8n cuando cambie a ese estado.
 
 
 # Investigacion 

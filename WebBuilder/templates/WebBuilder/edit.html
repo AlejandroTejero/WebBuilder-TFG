@@ -1,4 +1,5 @@
 {% extends 'WebBuilder/base.html' %}
+{% load i18n %}
 {% load static wb_extras %}
 
 {% block extra_css %}
@@ -18,7 +19,7 @@
     <div class="asst-sidebar__inner">
 
       <div class="asst-brand">
-        <span class="asst-brand__text">Editor</span>
+        <span class="asst-brand__text">{% trans "Editor" %}</span>
       </div>
 
       <!-- Stepper -->
@@ -29,8 +30,8 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">URL analizada</div>
-            <div class="asst-step__desc">Dataset procesado</div>
+            <div class="asst-step__label">{% trans "URL analizada" %}</div>
+            <div class="asst-step__desc">{% trans "Dataset procesado" %}</div>
           </div>
         </div>
 
@@ -40,8 +41,8 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Schema generado</div>
-            <div class="asst-step__desc">IA completada</div>
+            <div class="asst-step__label">{% trans "Schema generado" %}</div>
+            <div class="asst-step__desc">{% trans "IA completada" %}</div>
           </div>
         </div>
 
@@ -51,8 +52,8 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Editar schema</div>
-            <div class="asst-step__desc">Ajusta campos y etiquetas</div>
+            <div class="asst-step__label">{% trans "Editar schema" %}</div>
+            <div class="asst-step__desc">{% trans "Ajusta campos y etiquetas" %}</div>
           </div>
         </div>
 
@@ -63,24 +64,24 @@
             </div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Publicar sitio</div>
-            <div class="asst-step__desc">Genera el diseño con IA</div>
+            <div class="asst-step__label">{% trans "Publicar sitio" %}</div>
+            <div class="asst-step__desc">{% trans "Genera el diseño con IA" %}</div>
           </div>
         </div>
       </nav>
 
       <!-- Info del análisis -->
       <div class="asst-meta">
-        <div class="asst-meta__label">Dataset</div>
+        <div class="asst-meta__label">{% trans "Dataset" %}</div>
         <div class="asst-meta__url">{{ api_request.api_url|truncatechars:45 }}</div>
         <div class="edit-meta-stats">
           <div class="edit-meta-stat">
             <span class="edit-meta-stat__value">{{ analysis.main_collection.count|default:"—" }}</span>
-            <span class="edit-meta-stat__label">items</span>
+            <span class="edit-meta-stat__label">{% trans "items" %}</span>
           </div>
           <div class="edit-meta-stat">
             <span class="edit-meta-stat__value">{{ plan.fields|length }}</span>
-            <span class="edit-meta-stat__label">campos</span>
+            <span class="edit-meta-stat__label">{% trans "campos" %}</span>
           </div>
         </div>
       </div>
@@ -90,22 +91,22 @@
         {% if api_request.plan_accepted %}
           <span class="edit-publish-status__icon">✓</span>
           <div>
-            <div class="edit-publish-status__title">Publicado</div>
+            <div class="edit-publish-status__title">{% trans "Publicado" %}</div>
             {% if site_obj %}
-              <a href="{% url 'site_render' api_request.id %}" class="edit-publish-status__link">Ver sitio →</a>
+              <a href="{% url 'site_render' api_request.id %}" class="edit-publish-status__link">{% trans "Ver sitio →" %}</a>
             {% endif %}
           </div>
         {% else %}
           <span class="edit-publish-status__icon">○</span>
           <div>
-            <div class="edit-publish-status__title">Pendiente</div>
-            <div class="edit-publish-status__desc">Guarda y publica cuando estés listo</div>
+            <div class="edit-publish-status__title">{% trans "Pendiente" %}</div>
+            <div class="edit-publish-status__desc">{% trans "Guarda y publica cuando estés listo" %}</div>
           </div>
         {% endif %}
       </div>
 
       <a href="{% url 'assistant' %}?api_request_id={{ api_request.id }}" class="asst-history-link">
-        <span>←</span> Volver al asistente
+        <span>←</span> {% trans "Volver al asistente" %}
       </a>
 
     </div>
@@ -141,9 +142,9 @@
         <!-- SCHEMA -->
         <section class="asst-card edit-card--editor" id="block-editor">
           <div class="asst-card__header">
-            <div class="asst-card__step-badge asst-card__step-badge--ai">Schema</div>
-            <h2 class="asst-card__title">Editar schema</h2>
-            <p class="asst-card__subtitle">Ajusta el tipo, título y campos. Al guardar, el preview se actualiza.</p>
+            <div class="asst-card__step-badge asst-card__step-badge--ai">{% trans "Schema" %}</div>
+            <h2 class="asst-card__title">{% trans "Editar schema" %}</h2>
+            <p class="asst-card__subtitle">{% trans "Ajusta el tipo, título y campos. Al guardar, el preview se actualiza." %}</p>
           </div>
 
           <form method="post" id="schema-form" class="asst-form">
@@ -152,7 +153,7 @@
 
             <div class="edit-meta-row">
               <div class="asst-field edit-field--type">
-                <label class="asst-label">Tipo de sitio</label>
+                <label class="asst-label">{% trans "Tipo de sitio" %}</label>
                 <select class="edit-select" name="site_type">
                   {% for st in "blog,portfolio,catalog,dashboard,other"|split:"," %}
                     <option value="{{ st }}" {% if plan.site_type == st %}selected{% endif %}>{{ st }}</option>
@@ -160,21 +161,21 @@
                 </select>
               </div>
               <div class="asst-field edit-field--title">
-                <label class="asst-label">Título del sitio</label>
-                <input class="edit-input" name="site_title" placeholder="Nombre del sitio..."
+                <label class="asst-label">{% trans "Título del sitio" %}</label>
+                <input class="edit-input" name="site_title" placeholder="{% trans 'Nombre del sitio...' %}"
                        value="{{ plan.site_title|default:'' }}">
               </div>
             </div>
 
             <div class="edit-fields-header">
-              <span class="asst-label">Campos activos</span>
-              <span class="edit-fields-count">{{ plan.fields|length }} campos</span>
+              <span class="asst-label">{% trans "Campos activos" %}</span>
+              <span class="edit-fields-count">{% blocktrans with count=plan.fields|length %}{{ count }} campos{% endblocktrans %}</span>
             </div>
 
             <div class="edit-fields-list" id="fields-list">
               {% for field in plan.fields %}
                 <div class="edit-field-row" draggable="true">
-                  <span class="edit-field-row__handle" title="Arrastrar para reordenar">⠿</span>
+                  <span class="edit-field-row__handle" title="{% trans 'Arrastrar para reordenar' %}">⠿</span>
                   <div class="edit-field-row__check">
                     <input type="checkbox"
                            class="edit-checkbox"
@@ -188,16 +189,16 @@
                          class="edit-field-row__label"
                          name="field_label_{{ forloop.counter0 }}"
                          value="{{ field.label }}"
-                         placeholder="Etiqueta...">
+                         placeholder="{% trans 'Etiqueta...' %}">
                 </div>
               {% empty %}
-                <div class="edit-fields-empty">No hay campos. Regenera el análisis desde el asistente.</div>
+                <div class="edit-fields-empty">{% trans "No hay campos. Regenera el análisis desde el asistente." %}</div>
               {% endfor %}
             </div>
 
             {% if unused_keys %}
             <div class="edit-unused-keys">
-              <span class="edit-unused-keys__label">Añadir campo:</span>
+              <span class="edit-unused-keys__label">{% trans "Añadir campo:" %}</span>
               <div class="edit-unused-keys__list">
                 {% for k in unused_keys %}
                   <button type="button" class="edit-key-chip add-field-btn" data-key="{{ k }}">
@@ -209,8 +210,8 @@
             {% endif %}
 
             <div class="asst-form-footer">
-              <button type="submit" class="asst-btn asst-btn--primary">Guardar cambios</button>
-              <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--ghost">Reset</a>
+              <button type="submit" class="asst-btn asst-btn--primary">{% trans "Guardar cambios" %}</button>
+              <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--ghost">{% trans "Reset" %}</a>
             </div>
 
           </form>
@@ -219,18 +220,18 @@
         <!-- USUARIOS -->
         <section class="asst-card edit-card--users" id="block-users">
           <div class="asst-card__header">
-            <div class="asst-card__step-badge edit-badge--users">Usuarios</div>
-            <h2 class="asst-card__title">Usuarios de la app</h2>
-            <p class="asst-card__subtitle">Define los usuarios al arrancar el proyecto por primera vez.</p>
+            <div class="asst-card__step-badge edit-badge--users">{% trans "Usuarios" %}</div>
+            <h2 class="asst-card__title">{% trans "Usuarios de la app" %}</h2>
+            <p class="asst-card__subtitle">{% trans "Define los usuarios al arrancar el proyecto por primera vez." %}</p>
           </div>
 
           <table class="users-table">
             <thead>
               <tr>
                 <th style="width:36px"></th>
-                <th>Usuario</th>
-                <th>Contraseña</th>
-                <th>Rol</th>
+                <th>{% trans "Usuario" %}</th>
+                <th>{% trans "Contraseña" %}</th>
+                <th>{% trans "Rol" %}</th>
                 <th style="width:30px"></th>
               </tr>
             </thead>
@@ -238,12 +239,12 @@
               {% for u in site_users %}
                 <tr class="site-user-row" data-username="{{ u.username }}">
                   <td><div class="user-avatar">{{ u.username|slice:":1"|upper }}</div></td>
-                  <td><input type="text" class="user-input" placeholder="Usuario" value="{{ u.username }}"></td>
-                  <td><input type="password" class="user-input" placeholder="Contraseña" value="{{ u.password }}"></td>
+                  <td><input type="text" class="user-input" placeholder="{% trans 'Usuario' %}" value="{{ u.username }}"></td>
+                  <td><input type="password" class="user-input" placeholder="{% trans 'Contraseña' %}" value="{{ u.password }}"></td>
                   <td>
                     <select class="user-select">
-                      <option value="normal" {% if u.role == "normal" %}selected{% endif %}>Normal</option>
-                      <option value="super" {% if u.role == "super" %}selected{% endif %}>Superusuario</option>
+                      <option value="normal" {% if u.role == "normal" %}selected{% endif %}>{% trans "Normal" %}</option>
+                      <option value="super" {% if u.role == "super" %}selected{% endif %}>{% trans "Superusuario" %}</option>
                     </select>
                   </td>
                   <td><button class="user-del-btn" type="button" data-user-remove>✕</button></td>
@@ -251,12 +252,12 @@
               {% empty %}
                 <tr class="site-user-row">
                   <td><div class="user-avatar">?</div></td>
-                  <td><input type="text" class="user-input" placeholder="Usuario"></td>
-                  <td><input type="password" class="user-input" placeholder="Contraseña"></td>
+                  <td><input type="text" class="user-input" placeholder="{% trans 'Usuario' %}"></td>
+                  <td><input type="password" class="user-input" placeholder="{% trans 'Contraseña' %}"></td>
                   <td>
                     <select class="user-select">
-                      <option value="normal">Normal</option>
-                      <option value="super">Superusuario</option>
+                      <option value="normal">{% trans "Normal" %}</option>
+                      <option value="super">{% trans "Superusuario" %}</option>
                     </select>
                   </td>
                   <td><button class="user-del-btn" type="button" data-user-remove>✕</button></td>
@@ -266,8 +267,8 @@
           </table>
 
           <div class="users-footer">
-            <button class="asst-btn asst-btn--ghost asst-btn--sm" type="button" id="users-add-btn">+ Añadir usuario</button>
-            <button class="asst-btn asst-btn--primary asst-btn--sm" type="button" id="users-save-btn">Guardar</button>
+            <button class="asst-btn asst-btn--ghost asst-btn--sm" type="button" id="users-add-btn">+ {% trans "Añadir usuario" %}</button>
+            <button class="asst-btn asst-btn--primary asst-btn--sm" type="button" id="users-save-btn">{% trans "Guardar" %}</button>
           </div>
           <div id="users-feedback" style="display:none; margin-top:.5rem; font-size:.8rem;"></div>
 
@@ -285,20 +286,20 @@
         <!-- PREVIEW -->
         <section class="asst-card asst-card--preview" id="block-preview">
           <div class="asst-card__header">
-            <div class="asst-card__step-badge asst-card__step-badge--preview">Preview</div>
-            <h2 class="asst-card__title">Muestra de datos</h2>
+            <div class="asst-card__step-badge asst-card__step-badge--preview">{% trans "Preview" %}</div>
+            <h2 class="asst-card__title">{% trans "Muestra de datos" %}</h2>
             <p class="asst-card__subtitle">
               {% if api_request.plan_accepted %}
-                Campos del schema guardado.
+                {% trans "Campos del schema guardado." %}
               {% else %}
-                Se actualiza al guardar cambios.
+                {% trans "Se actualiza al guardar cambios." %}
               {% endif %}
             </p>
           </div>
 
           {% if preview_items %}
             <div class="pager-header">
-              <span class="pager-num" id="pager-label">#1 de {{ preview_items|length }}</span>
+              <span class="pager-num" id="pager-label">{% blocktrans with total=preview_items|length %}#1 de {{ total }}{% endblocktrans %}</span>
               <div class="pager-dots" id="pager-dots">
                 {% for item in preview_items|slice:":3" %}
                   <div class="pager-dot {% if forloop.first %}pager-dot--on{% endif %}" onclick="pagerGoTo({{ forloop.counter0 }})"></div>
@@ -325,15 +326,15 @@
             </div>
 
             <div class="pager-nav">
-              <button class="pager-btn pager-btn--disabled" id="pager-prev" onclick="pagerNav(-1)">← Anterior</button>
-              <button class="pager-btn" id="pager-next" onclick="pagerNav(1)">Siguiente →</button>
+              <button class="pager-btn pager-btn--disabled" id="pager-prev" onclick="pagerNav(-1)">← {% trans "Anterior" %}</button>
+              <button class="pager-btn" id="pager-next" onclick="pagerNav(1)">{% trans "Siguiente" %} →</button>
             </div>
 
           {% else %}
             <div class="asst-empty-state">
               <div class="asst-empty-state__icon">👁</div>
-              <div class="asst-empty-state__title">Sin items de muestra</div>
-              <div class="asst-empty-state__desc">No se pudieron extraer items del dataset.</div>
+              <div class="asst-empty-state__title">{% trans "Sin items de muestra" %}</div>
+              <div class="asst-empty-state__desc">{% trans "No se pudieron extraer items del dataset." %}</div>
             </div>
           {% endif %}
 
@@ -343,10 +344,10 @@
         <section class="asst-card edit-card--publish" id="block-publish">
           <div class="asst-card__header">
             <div class="asst-card__step-badge {% if api_request.plan_accepted %}asst-card__step-badge--done{% endif %}">
-              {% if api_request.plan_accepted %}✓ Publicado{% else %}Paso 4{% endif %}
+              {% if api_request.plan_accepted %}✓ {% trans "Publicado" %}{% else %}{% trans "Paso 4" %}{% endif %}
             </div>
             <h2 class="asst-card__title">
-              {% if api_request.plan_accepted %}Sitio publicado{% else %}Publicar sitio{% endif %}
+              {% if api_request.plan_accepted %}{% trans "Sitio publicado" %}{% else %}{% trans "Publicar sitio" %}{% endif %}
             </h2>
           </div>
 
@@ -354,9 +355,9 @@
             <div class="publish-row__left">
               <p class="asst-card__subtitle">
                 {% if api_request.plan_accepted %}
-                  La IA ya generó el diseño. Puedes verlo o regenerarlo con el schema actual.
+                  {% trans "La IA ya generó el diseño. Puedes verlo o regenerarlo con el schema actual." %}
                 {% else %}
-                  Cuando el schema esté listo, la IA generará el HTML/CSS del sitio completo.
+                  {% trans "Cuando el schema esté listo, la IA generará el HTML/CSS del sitio completo." %}
                 {% endif %}
               </p>
             </div>
@@ -366,20 +367,20 @@
                   {% csrf_token %}
                   <input type="hidden" name="action" value="accept_plan">
                   <button type="submit" class="asst-btn asst-btn--primary asst-btn--lg">
-                    Generar y publicar sitio
+                    {% trans "Generar y publicar sitio" %}
                   </button>
                 </form>
               {% else %}
                 {% if site_obj %}
                   <a href="{% url 'site_render' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
-                    Ver sitio →
+                    {% trans "Ver sitio" %} →
                   </a>
                 {% endif %}
                 <form method="post" class="m-0">
                   {% csrf_token %}
                   <input type="hidden" name="action" value="accept_plan">
                   <button type="submit" class="asst-btn asst-btn--ghost" onclick="showPublishLoading()">
-                    🔄 Regenerar diseño
+                    🔄 {% trans "Regenerar diseño" %}
                   </button>
                 </form>
               {% endif %}
@@ -398,15 +399,15 @@
 <div class="asst-loading" id="loading-overlay">
   <div class="asst-loading__box">
     <div class="asst-loading__spinner"></div>
-    <div class="asst-loading__title">Generando sitio...</div>
-    <div class="asst-loading__sub">La IA está creando el diseño completo</div>
+    <div class="asst-loading__title">{% trans "Generando sitio..." %}</div>
+    <div class="asst-loading__sub">{% trans "La IA está creando el diseño completo" %}</div>
     <div class="asst-loading__steps">
-      <div class="asst-loading__step" id="ls-1">Analizando estructura del sitio</div>
-      <div class="asst-loading__step" id="ls-2">Generando modelos de datos</div>
-      <div class="asst-loading__step" id="ls-3">Generando vistas y controladores</div>
-      <div class="asst-loading__step" id="ls-4">Generando plantilla base</div>
-      <div class="asst-loading__step" id="ls-5">Generando páginas</div>
-      <div class="asst-loading__step" id="ls-6">Ensamblando y validando</div>
+      <div class="asst-loading__step" id="ls-1">{% trans "Analizando estructura del sitio" %}</div>
+      <div class="asst-loading__step" id="ls-2">{% trans "Generando modelos de datos" %}</div>
+      <div class="asst-loading__step" id="ls-3">{% trans "Generando vistas y controladores" %}</div>
+      <div class="asst-loading__step" id="ls-4">{% trans "Generando plantilla base" %}</div>
+      <div class="asst-loading__step" id="ls-5">{% trans "Generando páginas" %}</div>
+      <div class="asst-loading__step" id="ls-6">{% trans "Ensamblando y validando" %}</div>
     </div>
   </div>
 </div>

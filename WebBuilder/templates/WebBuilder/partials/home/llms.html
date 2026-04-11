@@ -4,14 +4,14 @@
 <section id="llms" class="wb-section">
   <div class="wb-container">
     <div class="wb-header">
-      <div class="wb-section-eyebrow wb-reveal">{% translate "Modelos" %}</div>
-      <h2 class="wb-section-title wb-reveal wb-reveal-d1">{% translate "Elige tu" %} <span class="muted">{% translate "modelo de IA" %}</span></h2>
-      <p class="wb-section-sub wb-reveal wb-reveal-d2">{% translate "Selecciona el LLM que genera tu proyecto. Cada modelo tiene sus fortalezas." %}</p>
+      <div class="wb-section-eyebrow wb-reveal">{% trans "Modelos" %}</div>
+      <h2 class="wb-section-title wb-reveal wb-reveal-d1">{% trans "Elige tu" %} <span class="muted">{% trans "modelo de IA" %}</span></h2>
+      <p class="wb-section-sub wb-reveal wb-reveal-d2">{% trans "Selecciona el LLM que genera tu proyecto. Cada modelo tiene sus fortalezas." %}</p>
     </div>
 
     <div class="wb-llm-layout wb-reveal wb-reveal-d2">
       <div class="wb-llm-list">
-        <div class="wb-llm-list-label">{% translate "Modelos disponibles" %}</div>
+        <div class="wb-llm-list-label">{% trans "Modelos disponibles" %}</div>
 
         <div class="wb-llm-item active" data-panel="llm-gpt4o">
           <div class="wb-llm-logo wb-logo-gpt">GPT</div>
@@ -43,11 +43,11 @@
           <span class="wb-llm-item-arrow">›</span>
         </div>
 
-        <div class="wb-llm-sep-title">{% translate "Personalizado" %}</div>
+        <div class="wb-llm-sep-title">{% trans "Personalizado" %}</div>
 
         <div class="wb-llm-custom" data-panel="llm-custom">
           <div class="wb-llm-custom-icon">API</div>
-          <div class="wb-llm-item-info"><div class="wb-llm-item-name">{% translate "Conecta tu modelo" %}</div><div class="wb-llm-item-provider">OpenRouter · Groq · Ollama</div></div>
+          <div class="wb-llm-item-info"><div class="wb-llm-item-name">{% trans "Conecta tu modelo" %}</div><div class="wb-llm-item-provider">OpenRouter · Groq · Ollama</div></div>
           <span class="wb-llm-item-arrow">›</span>
         </div>
       </div>
@@ -59,20 +59,20 @@
             <div class="wb-llm-detail-name">GPT-4o</div>
             <div class="wb-llm-detail-model">gpt-4o · OpenAI</div>
             <div class="wb-llm-detail-tags">
-              <span class="wb-llm-tag tag-quality">{% translate "alta calidad" %}</span>
-              <span class="wb-llm-tag tag-code">{% translate "código" %}</span>
-              <span class="wb-llm-tag tag-speed">{% translate "rápido" %}</span>
+              <span class="wb-llm-tag tag-quality">{% trans "alta calidad" %}</span>
+              <span class="wb-llm-tag tag-code">{% trans "código" %}</span>
+              <span class="wb-llm-tag tag-speed">{% trans "rápido" %}</span>
             </div>
           </div>
         </div>
-        <div class="wb-llm-section-title">{% translate "Descripción" %}</div>
-        <p class="wb-llm-overview">{% translate "El modelo más equilibrado de OpenAI. Destaca en generación de código estructurado, comprensión de schemas complejos y seguimiento de instrucciones detalladas." %}</p>
-        <div class="wb-llm-section-title">{% translate "Especificaciones" %}</div>
+        <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
+        <p class="wb-llm-overview">{% trans "El modelo más equilibrado de OpenAI. Destaca en generación de código estructurado, comprensión de schemas complejos y seguimiento de instrucciones detalladas." %}</p>
+        <div class="wb-llm-section-title">{% trans "Especificaciones" %}</div>
         <div class="wb-llm-specs-grid">
-          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% translate "Contexto" %}</div><div class="wb-llm-spec-value">128K tokens</div></div>
-          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% translate "Velocidad" %}</div><div class="wb-llm-spec-value">{% translate "Alta" %}</div></div>
-          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% translate "Proveedor" %}</div><div class="wb-llm-spec-value">OpenAI API</div></div>
-          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% translate "Coste" %}</div><div class="wb-llm-spec-value">{% translate "De pago" %}</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Contexto" %}</div><div class="wb-llm-spec-value">128K tokens</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Velocidad" %}</div><div class="wb-llm-spec-value">{% trans "Alta" %}</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Proveedor" %}</div><div class="wb-llm-spec-value">OpenAI API</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Coste" %}</div><div class="wb-llm-spec-value">{% trans "De pago" %}</div></div>
         </div>
       </div>
 
@@ -83,14 +83,14 @@
             <div class="wb-llm-detail-name">Claude Sonnet 4</div>
             <div class="wb-llm-detail-model">claude-sonnet-4 · Anthropic</div>
             <div class="wb-llm-detail-tags">
-              <span class="wb-llm-tag tag-reason">{% translate "razonamiento" %}</span>
-              <span class="wb-llm-tag tag-code">{% translate "código" %}</span>
-              <span class="wb-llm-tag tag-quality">{% translate "preciso" %}</span>
+              <span class="wb-llm-tag tag-reason">{% trans "razonamiento" %}</span>
+              <span class="wb-llm-tag tag-code">{% trans "código" %}</span>
+              <span class="wb-llm-tag tag-quality">{% trans "preciso" %}</span>
             </div>
           </div>
         </div>
-        <div class="wb-llm-section-title">{% translate "Descripción" %}</div>
-        <p class="wb-llm-overview">{% translate "Muy fuerte en comprensión de APIs, inferencia de tipos de datos y generación de código Python/Django limpio." %}</p>
+        <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
+        <p class="wb-llm-overview">{% trans "Muy fuerte en comprensión de APIs, inferencia de tipos de datos y generación de código Python/Django limpio." %}</p>
       </div>
 
       <div class="wb-llm-detail" id="llm-llama">
@@ -100,14 +100,14 @@
             <div class="wb-llm-detail-name">Llama 3.3 70B</div>
             <div class="wb-llm-detail-model">llama-3.3-70b-versatile · Meta via Groq</div>
             <div class="wb-llm-detail-tags">
-              <span class="wb-llm-tag tag-free">{% translate "gratuito" %}</span>
-              <span class="wb-llm-tag tag-speed">{% translate "muy rápido" %}</span>
+              <span class="wb-llm-tag tag-free">{% trans "gratuito" %}</span>
+              <span class="wb-llm-tag tag-speed">{% trans "muy rápido" %}</span>
               <span class="wb-llm-tag tag-code">open source</span>
             </div>
           </div>
         </div>
-        <div class="wb-llm-section-title">{% translate "Descripción" %}</div>
-        <p class="wb-llm-overview">{% translate "Una opción open source muy rápida para una generación económica y con buena latencia." %}</p>
+        <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
+        <p class="wb-llm-overview">{% trans "Una opción open source muy rápida para una generación económica y con buena latencia." %}</p>
       </div>
 
       <div class="wb-llm-detail" id="llm-gemini">
@@ -117,13 +117,13 @@
             <div class="wb-llm-detail-name">Gemini 2.5 Pro</div>
             <div class="wb-llm-detail-model">gemini-2.5-pro · Google</div>
             <div class="wb-llm-detail-tags">
-              <span class="wb-llm-tag tag-reason">{% translate "razonamiento" %}</span>
-              <span class="wb-llm-tag tag-quality">{% translate "multimodal" %}</span>
+              <span class="wb-llm-tag tag-reason">{% trans "razonamiento" %}</span>
+              <span class="wb-llm-tag tag-quality">{% trans "multimodal" %}</span>
             </div>
           </div>
         </div>
-        <div class="wb-llm-section-title">{% translate "Descripción" %}</div>
-        <p class="wb-llm-overview">{% translate "Especialmente útil cuando hay datasets largos o estructuras amplias que necesitan mucho contexto." %}</p>
+        <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
+        <p class="wb-llm-overview">{% trans "Especialmente útil cuando hay datasets largos o estructuras amplias que necesitan mucho contexto." %}</p>
       </div>
 
       <div class="wb-llm-detail" id="llm-qwen">
@@ -133,26 +133,26 @@
             <div class="wb-llm-detail-name">Qwen3 32B</div>
             <div class="wb-llm-detail-model">qwen/qwen3-32b · Alibaba via Groq</div>
             <div class="wb-llm-detail-tags">
-              <span class="wb-llm-tag tag-free">{% translate "gratuito" %}</span>
+              <span class="wb-llm-tag tag-free">{% trans "gratuito" %}</span>
               <span class="wb-llm-tag tag-reason">thinking</span>
-              <span class="wb-llm-tag tag-speed">{% translate "rápido" %}</span>
+              <span class="wb-llm-tag tag-speed">{% trans "rápido" %}</span>
             </div>
           </div>
         </div>
-        <div class="wb-llm-section-title">{% translate "Descripción" %}</div>
-        <p class="wb-llm-overview">{% translate "Buena relación calidad/coste y buen razonamiento para generar templates coherentes." %}</p>
+        <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
+        <p class="wb-llm-overview">{% trans "Buena relación calidad/coste y buen razonamiento para generar templates coherentes." %}</p>
       </div>
 
       <div class="wb-llm-custom-detail" id="llm-custom">
         <div class="wb-llm-detail-head">
           <div class="wb-llm-detail-logo wb-dashed">API</div>
           <div>
-            <div class="wb-llm-detail-name">{% translate "Conecta tu modelo" %}</div>
-            <div class="wb-llm-detail-model">{% translate "Compatible con OpenRouter y Groq" %}</div>
+            <div class="wb-llm-detail-name">{% trans "Conecta tu modelo" %}</div>
+            <div class="wb-llm-detail-model">{% trans "Compatible con OpenRouter y Groq" %}</div>
           </div>
         </div>
 
-        <p class="wb-custom-note">{% translate "WebBuilder es compatible con APIs estilo OpenAI. Pega tu clave y el modelo que quieras usar." %}</p>
+        <p class="wb-custom-note">{% trans "WebBuilder es compatible con APIs estilo OpenAI. Pega tu clave y el modelo que quieras usar." %}</p>
 
         <div class="wb-provider-tabs">
           <button type="button" class="wb-provider-tab active" data-provider="openrouter">OpenRouter</button>
@@ -166,7 +166,7 @@
             <input class="wb-custom-input" type="password" placeholder="sk-or-v1-...">
           </div>
           <div class="wb-custom-input-wrap">
-            <div class="wb-custom-label">{% translate "Modelo" %}</div>
+            <div class="wb-custom-label">{% trans "Modelo" %}</div>
             <input class="wb-custom-input" type="text" placeholder="meta-llama/llama-3.3-70b-instruct">
           </div>
         </div>
@@ -177,23 +177,23 @@
             <input class="wb-custom-input" type="password" placeholder="gsk_...">
           </div>
           <div class="wb-custom-input-wrap">
-            <div class="wb-custom-label">{% translate "Modelo" %}</div>
+            <div class="wb-custom-label">{% trans "Modelo" %}</div>
             <input class="wb-custom-input" type="text" placeholder="llama-3.3-70b-versatile">
           </div>
         </div>
 
         <div class="wb-provider-fields" id="fields-ollama">
           <div class="wb-custom-input-wrap">
-            <div class="wb-custom-label">{% translate "URL del servidor" %}</div>
+            <div class="wb-custom-label">{% trans "URL del servidor" %}</div>
             <input class="wb-custom-input" type="text" placeholder="http://localhost:11434">
           </div>
           <div class="wb-custom-input-wrap">
-            <div class="wb-custom-label">{% translate "Modelo" %}</div>
+            <div class="wb-custom-label">{% trans "Modelo" %}</div>
             <input class="wb-custom-input" type="text" placeholder="llama3.2, mistral, gemma3...">
           </div>
         </div>
 
-        <button class="wb-custom-save">{% translate "Guardar y usar este modelo" %} →</button>
+        <button class="wb-custom-save">{% trans "Guardar y usar este modelo" %} →</button>
       </div>
     </div>
   </div>

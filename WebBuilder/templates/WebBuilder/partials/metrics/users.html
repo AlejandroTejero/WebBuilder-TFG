@@ -1,36 +1,38 @@
+{% load i18n %}
 <!-- ══════════════════════════════════════════════
      PANEL: USUARIOS
 ══════════════════════════════════════════════ -->
 <div class="m-panel" id="m-panel-usuarios">
   <div class="m-phead">
-    <div class="m-phead-eyebrow">Panel de administración</div>
-    <h1 class="m-phead-title">Usuarios</h1>
-    <p class="m-phead-sub">Actividad y ranking de usuarios de la plataforma</p>
+    <div class="m-phead-eyebrow">{% trans "Panel de administración" %}</div>
+    <h1 class="m-phead-title">{% trans "Usuarios" %}</h1>
+    <p class="m-phead-sub">{% trans "Actividad y ranking de usuarios de la plataforma" %}</p>
   </div>
 
   <div class="m-kpi-grid">
     <div class="m-kpi">
-      <div class="m-kpi-label">Total registrados</div>
+      <div class="m-kpi-label">{% trans "Total registrados" %}</div>
       <div class="m-kpi-value">{{ total_users }}</div>
-      <span class="m-kpi-delta neutral">en total</span>
+      <span class="m-kpi-delta neutral">{% trans "en total" %}</span>
     </div>
     <div class="m-kpi">
-      <div class="m-kpi-label">Activos últimos 7 días</div>
+      <div class="m-kpi-label">{% trans "Activos últimos 7 días" %}</div>
       <div class="m-kpi-value">{{ active_users }}</div>
-      <span class="m-kpi-delta neutral">usuarios únicos</span>
+      <span class="m-kpi-delta neutral">{% trans "usuarios únicos" %}</span>
     </div>
     <div class="m-kpi">
-      <div class="m-kpi-label">Con sitios generados</div>
+      <div class="m-kpi-label">{% trans "Con sitios generados" %}</div>
       <div class="m-kpi-value">{{ users_with_sites }}</div>
       {% if total_users %}
-        <span class="m-kpi-delta neutral">{% widthratio users_with_sites total_users 100 %}% del total</span>
+        {% widthratio users_with_sites total_users 100 as users_with_sites_pct %}
+        <span class="m-kpi-delta neutral">{% blocktrans with pct=users_with_sites_pct %}{{ pct }}% del total{% endblocktrans %}</span>
       {% endif %}
     </div>
   </div>
 
   <div class="m-grid-2">
     <div class="m-card">
-      <div class="m-card-title">Top por análisis realizados</div>
+      <div class="m-card-title">{% trans "Top por análisis realizados" %}</div>
       {% if top_users_analyses %}
         <div class="m-user-rows">
           {% for u in top_users_analyses %}
@@ -38,17 +40,17 @@
             <span class="m-user-num">{{ forloop.counter }}</span>
             <div class="m-user-avatar">{{ u.username|slice:":2" }}</div>
             <span class="m-user-name">{{ u.username }}</span>
-            <span class="m-user-meta">{{ u.total }} análisis</span>
+            <span class="m-user-meta">{% blocktrans with total=u.total %}{{ total }} análisis{% endblocktrans %}</span>
           </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="m-empty">Sin datos</div>
+        <div class="m-empty">{% trans "Sin datos" %}</div>
       {% endif %}
     </div>
 
     <div class="m-card">
-      <div class="m-card-title">Top por sitios generados</div>
+      <div class="m-card-title">{% trans "Top por sitios generados" %}</div>
       {% if top_users_sites %}
         <div class="m-user-rows">
           {% for u in top_users_sites %}
@@ -56,12 +58,12 @@
             <span class="m-user-num">{{ forloop.counter }}</span>
             <div class="m-user-avatar">{{ u.username|slice:":2" }}</div>
             <span class="m-user-name">{{ u.username }}</span>
-            <span class="m-user-meta">{{ u.total }} sitios</span>
+            <span class="m-user-meta">{% blocktrans with total=u.total %}{{ total }} sitios{% endblocktrans %}</span>
           </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="m-empty">Sin datos</div>
+        <div class="m-empty">{% trans "Sin datos" %}</div>
       {% endif %}
     </div>
   </div>

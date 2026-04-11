@@ -31,19 +31,6 @@
   --m-sidebar-w: 220px;
   --m-green: #34d399;
   --m-red:   #f87171;
-
-  /* ── Design system variables (dark mode) ── */
-  --wb-bg:        #0e0e10;
-  --wb-bg-2:      #131315;
-  --wb-bg-3:      #1a1a1c;
-  --wb-bg-4:      #1f1f22;
-  --wb-border:    rgba(255,255,255,0.07);
-  --wb-border-md: rgba(255,255,255,0.12);
-  --wb-t1:        rgba(255,255,255,0.90);
-  --wb-t2:        rgba(255,255,255,0.55);
-  --wb-t3:        rgba(255,255,255,0.28);
-  --wb-t4:        rgba(255,255,255,0.12);
-  --wb-mono:      'Geist Mono', 'Fira Code', monospace;
 }
 
 /* ── Layout shell ── */

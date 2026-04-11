@@ -1,4 +1,5 @@
 {% extends 'WebBuilder/base.html' %}
+{% load i18n %}
 {% load static %}
 
 {% block extra_css %}
@@ -11,35 +12,35 @@
   <!-- ── HEADER ── -->
   <div class="hist-header">
     <div>
-      <h1 class="hist-header__title">Historial</h1>
+      <h1 class="hist-header__title">{% trans "Historial" %}</h1>
       <div class="hist-header__meta">
-        <span class="hist-header__stat"><strong>{{ total_count }}</strong> análisis</span>
-        <span class="hist-header__stat"><strong>{{ total_sites }}</strong> sitios publicados</span>
+        <span class="hist-header__stat"><strong>{{ total_count }}</strong> {% trans "análisis" %}</span>
+        <span class="hist-header__stat"><strong>{{ total_sites }}</strong> {% trans "sitios publicados" %}</span>
       </div>
     </div>
-    <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary">+ Nuevo análisis</a>
+    <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary">+ {% trans "Nuevo análisis" %}</a>
   </div>
 
   <!-- ── TOPBAR ── -->
   <div class="hist-topbar">
     <nav class="hist-tabs">
-      <a href="{% url 'history_analysis' %}" class="hist-tab hist-tab--active">Análisis</a>
-      <a href="{% url 'history_sites' %}" class="hist-tab">Sitios publicados</a>
+      <a href="{% url 'history_analysis' %}" class="hist-tab hist-tab--active">{% trans "Análisis" %}</a>
+      <a href="{% url 'history_sites' %}" class="hist-tab">{% trans "Sitios publicados" %}</a>
     </nav>
 
     <form method="get" class="hist-topbar-right">
       <div class="hist-search-wrap">
         <span class="hist-search-icon">⌕</span>
-        <input type="text" name="q" value="{{ search }}" placeholder="Buscar por URL..." class="hist-search-input">
+        <input type="text" name="q" value="{{ search }}" placeholder="{% trans 'Buscar por URL...' %}" class="hist-search-input">
       </div>
       <select name="status" class="hist-select" onchange="this.form.submit()">
-        <option value="">Todos</option>
-        <option value="processed" {% if status_filter == "processed" %}selected{% endif %}>Procesados</option>
-        <option value="error"     {% if status_filter == "error"     %}selected{% endif %}>Error</option>
-        <option value="pending"   {% if status_filter == "pending"   %}selected{% endif %}>Pendientes</option>
+        <option value="">{% trans "Todos" %}</option>
+        <option value="processed" {% if status_filter == "processed" %}selected{% endif %}>{% trans "Procesados" %}</option>
+        <option value="error"     {% if status_filter == "error"     %}selected{% endif %}>{% trans "Error" %}</option>
+        <option value="pending"   {% if status_filter == "pending"   %}selected{% endif %}>{% trans "Pendientes" %}</option>
       </select>
       {% if search or status_filter %}
-        <a href="{% url 'history_analysis' %}" class="hist-btn">Limpiar</a>
+        <a href="{% url 'history_analysis' %}" class="hist-btn">{% trans "Limpiar" %}</a>
       {% endif %}
     </form>
   </div>
@@ -87,15 +88,15 @@
                 {% if r.status == 'processed' %}hist-pill--ok
                 {% elif r.status == 'error' %}hist-pill--error
                 {% else %}hist-pill--pending{% endif %}">
-                {% if r.status == 'processed' %}Procesado
-                {% elif r.status == 'error' %}Error
-                {% else %}Pendiente{% endif %}
+                {% if r.status == 'processed' %}{% trans "Procesado" %}
+                {% elif r.status == 'error' %}{% trans "Error" %}
+                {% else %}{% trans "Pendiente" %}{% endif %}
               </span>
               {% if r.field_mapping %}
-                <span class="hist-pill hist-pill--purple">Schema</span>
+                <span class="hist-pill hist-pill--purple">{% trans "Schema" %}</span>
               {% endif %}
               {% if r.plan_accepted %}
-                <span class="hist-pill hist-pill--purple">Publicado</span>
+                <span class="hist-pill hist-pill--purple">{% trans "Publicado" %}</span>
               {% endif %}
             </div>
           </div>
@@ -105,15 +106,15 @@
 
           <!-- acciones -->
           <div class="hist-item__actions">
-            <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="hist-btn">Asistente</a>
+            <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="hist-btn">{% trans "Asistente" %}</a>
             {% if r.status == "processed" and r.field_mapping %}
-              <a href="{% url 'edit' r.id %}" class="hist-btn hist-btn--primary">Editar →</a>
+              <a href="{% url 'edit' r.id %}" class="hist-btn hist-btn--primary">{% trans "Editar" %} →</a>
             {% elif r.status == "processed" and r.parsed_data %}
-              <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="hist-btn hist-btn--primary">Schema →</a>
+              <a href="{% url 'assistant' %}?api_request_id={{ r.id }}" class="hist-btn hist-btn--primary">{% trans "Schema" %} →</a>
             {% endif %}
             <form method="post" action="{% url 'delete_analysis' r.id %}" onsubmit="return confirm('¿Eliminar este análisis?')">
               {% csrf_token %}
-              <button type="submit" class="hist-btn hist-btn--danger" title="Eliminar">✕</button>
+              <button type="submit" class="hist-btn hist-btn--danger" title="{% trans 'Eliminar' %}">✕</button>
             </form>
           </div>
 
@@ -123,9 +124,9 @@
 
   {% else %}
     <div class="hist-empty">
-      <div class="hist-empty__title">Aún no tienes análisis</div>
-      <div class="hist-empty__desc">Introduce una URL de API en el asistente para empezar.</div>
-      <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary" style="margin-top: 12px;">Ir al asistente</a>
+      <div class="hist-empty__title">{% trans "Aún no tienes análisis" %}</div>
+      <div class="hist-empty__desc">{% trans "Introduce una URL de API en el asistente para empezar." %}</div>
+      <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary" style="margin-top: 12px;">{% trans "Ir al asistente" %}</a>
     </div>
   {% endif %}
 
@@ -133,11 +134,11 @@
   {% if api_requests.paginator.num_pages > 1 %}
     <div class="hist-pagination">
       {% if api_requests.has_previous %}
-        <a href="?page={{ api_requests.previous_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Anterior</a>
+        <a href="?page={{ api_requests.previous_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">{% trans "Anterior" %}</a>
       {% endif %}
       <span class="hist-page-info">{{ api_requests.number }} / {{ api_requests.paginator.num_pages }}</span>
       {% if api_requests.has_next %}
-        <a href="?page={{ api_requests.next_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">Siguiente</a>
+        <a href="?page={{ api_requests.next_page_number }}&q={{ search }}&status={{ status_filter }}" class="hist-page-btn">{% trans "Siguiente" %}</a>
       {% endif %}
     </div>
   {% endif %}

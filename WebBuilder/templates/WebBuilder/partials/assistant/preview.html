@@ -1,8 +1,9 @@
+{% load i18n %}
 {% if llm_error %}
 <section class="asst-card asst-card--error">
   <div class="asst-card__header">
-    <div class="asst-card__step-badge asst-card__step-badge--error">Error IA</div>
-    <h2 class="asst-card__title">No se pudo generar el schema</h2>
+    <div class="asst-card__step-badge asst-card__step-badge--error">{% trans "Error IA" %}</div>
+    <h2 class="asst-card__title">{% trans "No se pudo generar el schema" %}</h2>
     <p class="asst-card__subtitle">{{ llm_error }}</p>
   </div>
 </section>
@@ -12,23 +13,23 @@
 {% with plan=llm_plan|default:api_request.field_mapping %}
 <section class="asst-card asst-card--schema" id="block-schema">
   <div class="asst-card__header">
-    <div class="asst-card__step-badge asst-card__step-badge--ai">Resultado IA</div>
-    <h2 class="asst-card__title">Esquema generado</h2>
-    <p class="asst-card__subtitle">La IA analizó tu dataset y propuso este schema. Puedes ajustarlo campo a campo en el boton de editar.</p>
+    <div class="asst-card__step-badge asst-card__step-badge--ai">{% trans "Resultado IA" %}</div>
+    <h2 class="asst-card__title">{% trans "Esquema generado" %}</h2>
+    <p class="asst-card__subtitle">{% trans "La IA analizó tu dataset y propuso este schema. Puedes ajustarlo campo a campo en el boton de editar." %}</p>
   </div>
 
   <div class="asst-schema-overview">
     <div class="asst-schema-meta">
       <div class="asst-meta-pill">
-        <span class="asst-meta-pill__label">Tipo</span>
+        <span class="asst-meta-pill__label">{% trans "Tipo" %}</span>
         <span class="asst-meta-pill__value">{{ plan.site_type }}</span>
       </div>
       <div class="asst-meta-pill">
-        <span class="asst-meta-pill__label">Título</span>
+        <span class="asst-meta-pill__label">{% trans "Título" %}</span>
         <span class="asst-meta-pill__value">{{ plan.site_title }}</span>
       </div>
       <div class="asst-meta-pill">
-        <span class="asst-meta-pill__label">Campos</span>
+        <span class="asst-meta-pill__label">{% trans "Campos" %}</span>
         <span class="asst-meta-pill__value">{{ plan.fields|length }}</span>
       </div>
     </div>
@@ -48,7 +49,7 @@
 
   <div class="asst-card__actions">
     <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--primary asst-btn--lg">
-      Editar y publicar
+      {% trans "Editar y publicar" %}
     </a>
   </div>
 </section>
@@ -57,8 +58,8 @@
 <section class="asst-card asst-card--empty" id="block-schema-empty">
   <div class="asst-empty-state">
     <div class="asst-empty-state__icon">✦</div>
-    <div class="asst-empty-state__title">Aquí aparecerá el schema</div>
-    <div class="asst-empty-state__desc">Introduce una URL y la IA generará automáticamente el schema de campos para tu sitio.</div>
+    <div class="asst-empty-state__title">{% trans "Aquí aparecerá el schema" %}</div>
+    <div class="asst-empty-state__desc">{% trans "Introduce una URL y la IA generará automáticamente el schema de campos para tu sitio." %}</div>
   </div>
 </section>
 {% endif %}

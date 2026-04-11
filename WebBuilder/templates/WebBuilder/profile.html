@@ -1,4 +1,5 @@
 {% extends 'WebBuilder/base.html' %}
+{% load i18n %}
 {% load static %}
 
 {% block extra_css %}
@@ -9,8 +10,8 @@
 <div class="profile-container">
 
   <div class="profile-header">
-    <h1 class="profile-title">Mi perfil</h1>
-    <p class="profile-subtitle">Configura tu modelo LLM personalizado</p>
+    <h1 class="profile-title">{% trans "Mi perfil" %}</h1>
+    <p class="profile-subtitle">{% trans "Configura tu modelo LLM personalizado" %}</p>
   </div>
 
   {% if messages %}
@@ -29,35 +30,37 @@
       {% csrf_token %}
 
       <div class="profile-section">
-        <h2 class="profile-section__title">🤖 Modelo LLM personalizado</h2>
+        <h2 class="profile-section__title">{% trans "🤖 Modelo LLM personalizado" %}</h2>
         <p class="profile-section__desc">
-          Si quieres usar tu propio proveedor, rellena estos campos. 
+          {% blocktrans trimmed %}
+          Si quieres usar tu propio proveedor, rellena estos campos.
           Debe ser compatible con la API de OpenAI (mismo formato de request).
           Si los dejas vacíos, se usará el modelo que elijas en el asistente.
+          {% endblocktrans %}
         </p>
 
         <div class="profile-field">
           <label class="profile-label">{{ form.custom_llm_base_url.label }}</label>
           {{ form.custom_llm_base_url }}
-          <span class="profile-hint">Ej: https://api.openai.com/v1</span>
+          <span class="profile-hint">{% trans "Ej: https://api.openai.com/v1" %}</span>
         </div>
 
         <div class="profile-field">
           <label class="profile-label">{{ form.custom_llm_model.label }}</label>
           {{ form.custom_llm_model }}
-          <span class="profile-hint">Ej: gpt-4o, claude-3-5-sonnet...</span>
+          <span class="profile-hint">{% trans "Ej: gpt-4o, claude-3-5-sonnet..." %}</span>
         </div>
 
         <div class="profile-field">
           <label class="profile-label">{{ form.custom_llm_api_key.label }}</label>
           {{ form.custom_llm_api_key }}
-          <span class="profile-hint">Se guarda cifrada. No se muestra una vez guardada.</span>
+          <span class="profile-hint">{% trans "Se guarda cifrada. No se muestra una vez guardada." %}</span>
         </div>
       </div>
 
       <div class="profile-footer">
-        <button type="submit" class="asst-btn asst-btn--primary">Guardar cambios</button>
-        <a href="{% url 'home' %}" class="asst-btn asst-btn--ghost">Cancelar</a>
+        <button type="submit" class="asst-btn asst-btn--primary">{% trans "Guardar cambios" %}</button>
+        <a href="{% url 'home' %}" class="asst-btn asst-btn--ghost">{% trans "Cancelar" %}</a>
       </div>
 
     </form>

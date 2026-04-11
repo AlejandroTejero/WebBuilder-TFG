@@ -1,5 +1,5 @@
-{% load static %}
 {% load i18n %}
+{% load static %}
 {% get_current_language as CURRENT_LANGUAGE %}
 
 
@@ -44,32 +44,32 @@
       <!-- Inicio - sin dropdown -->
       <a href="{% url 'home' %}"
          class="wb-nav-link {% if request.resolver_match.url_name == 'home' %}wb-nav-link--active{% endif %}">
-        Inicio
+        {% trans "Inicio" %}
       </a>
 
       <!-- Asistente - con dropdown -->
       <div class="wb-nav-item" data-dropdown="asistente">
         <div class="wb-nav-link {% if request.resolver_match.url_name == 'assistant' %}wb-nav-link--active{% endif %}">
-          Asistente
+          {% trans "Asistente" %}
           <span class="wb-nav-arrow"></span>
         </div>
         <div class="wb-dropdown">
           <a href="{% url 'assistant' %}" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Nuevo Proyecto</div>
-              <div class="wb-dropdown-description">Crear una nueva web desde cero</div>
+              <div class="wb-dropdown-title">{% trans "Nuevo Proyecto" %}</div>
+              <div class="wb-dropdown-description">{% trans "Crear una nueva web desde cero" %}</div>
             </div>
           </a>
           <a href="{% url 'assistant' %}" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Cargar API</div>
-              <div class="wb-dropdown-description">Importar datos desde una URL</div>
+              <div class="wb-dropdown-title">{% trans "Cargar API" %}</div>
+              <div class="wb-dropdown-description">{% trans "Importar datos desde una URL" %}</div>
             </div>
           </a>
           <a href="{% url 'history' %}" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Proyectos Recientes</div>
-              <div class="wb-dropdown-description">Ver tus últimos proyectos</div>
+              <div class="wb-dropdown-title">{% trans "Proyectos Recientes" %}</div>
+              <div class="wb-dropdown-description">{% trans "Ver tus últimos proyectos" %}</div>
             </div>
           </a>
         </div>
@@ -79,35 +79,35 @@
       {% if request.user.is_staff %}
       <a href="{% url 'metrics' %}"
          class="wb-nav-link {% if request.resolver_match.url_name == 'metrics' %}wb-nav-link--active{% endif %}">
-        Métricas
+        {% trans "Métricas" %}
       </a>
       {% endif %}
       <!-- Historial - con dropdown -->
       <div class="wb-nav-item" data-dropdown="historial">
         <div class="wb-nav-link {% if request.resolver_match.url_name == 'history' %}wb-nav-link--active{% endif %}">
-          Historial
+          {% trans "Historial" %}
           <span class="wb-nav-arrow"></span>
         </div>
         <div class="wb-dropdown">
           <a href="{% url 'history' %}" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Todos los Proyectos</div>
-              <div class="wb-dropdown-description">Ver historial completo</div>
+              <div class="wb-dropdown-title">{% trans "Todos los Proyectos" %}</div>
+              <div class="wb-dropdown-description">{% trans "Ver historial completo" %}</div>
             </div>
           </a>
           {% if api_request %}
           <a href="{% url 'edit' api_request.id %}" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Editar</div>
-              <div class="wb-dropdown-description">Vista previa del proyecto actual</div>
+              <div class="wb-dropdown-title">{% trans "Editar" %}</div>
+              <div class="wb-dropdown-description">{% trans "Vista previa del proyecto actual" %}</div>
             </div>
           </a>
           {% endif %}
           <div class="wb-dropdown-divider"></div>
           <a href="{% url 'history' %}" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Webs Recientes</div>
-              <div class="wb-dropdown-description">Últimas webs generadas</div>
+              <div class="wb-dropdown-title">{% trans "Webs Recientes" %}</div>
+              <div class="wb-dropdown-description">{% trans "Últimas webs generadas" %}</div>
             </div>
           </a>
         </div>
@@ -116,33 +116,33 @@
       <!-- Ayuda - con dropdown -->
       <div class="wb-nav-item" data-dropdown="ayuda">
         <div class="wb-nav-link">
-          Ayuda
+          {% trans "Ayuda" %}
           <span class="wb-nav-arrow"></span>
         </div>
         <div class="wb-dropdown">
           <a href="#" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Documentación</div>
-              <div class="wb-dropdown-description">Guías y tutoriales</div>
+              <div class="wb-dropdown-title">{% trans "Documentación" %}</div>
+              <div class="wb-dropdown-description">{% trans "Guías y tutoriales" %}</div>
             </div>
           </a>
           <a href="#" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">FAQ</div>
-              <div class="wb-dropdown-description">Preguntas frecuentes</div>
+              <div class="wb-dropdown-title">{% trans "FAQ" %}</div>
+              <div class="wb-dropdown-description">{% trans "Preguntas frecuentes" %}</div>
             </div>
           </a>
           <a href="#" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Contacto</div>
-              <div class="wb-dropdown-description">¿Necesitas ayuda?</div>
+              <div class="wb-dropdown-title">{% trans "Contacto" %}</div>
+              <div class="wb-dropdown-description">{% trans "¿Necesitas ayuda?" %}</div>
             </div>
           </a>
           <div class="wb-dropdown-divider"></div>
           <a href="#" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">Reportar un problema</div>
-              <div class="wb-dropdown-description">Feedback y sugerencias</div>
+              <div class="wb-dropdown-title">{% trans "Reportar un problema" %}</div>
+              <div class="wb-dropdown-description">{% trans "Feedback y sugerencias" %}</div>
             </div>
           </a>
         </div>
@@ -165,12 +165,12 @@
           <div class="wb-dropdown wb-dropdown--right">
             <a href="{% url 'history' %}" class="wb-dropdown-item">
               <div class="wb-dropdown-content">
-                <div class="wb-dropdown-title">Mis Proyectos</div>
+                <div class="wb-dropdown-title">{% trans "Mis Proyectos" %}</div>
               </div>
             </a>
             <a href="#" class="wb-dropdown-item">
               <div class="wb-dropdown-content">
-                <div class="wb-dropdown-title">Configuración</div>
+                <div class="wb-dropdown-title">{% trans "Configuración" %}</div>
               </div>
             </a>
             <div class="wb-dropdown-divider"></div>
@@ -178,7 +178,7 @@
               {% csrf_token %}
               <button type="submit" class="wb-dropdown-item wb-dropdown-item--btn">
                 <div class="wb-dropdown-content">
-                  <div class="wb-dropdown-title">Cerrar Sesión</div>
+                  <div class="wb-dropdown-title">{% trans "Cerrar Sesión" %}</div>
                 </div>
               </button>
             </form>
@@ -188,7 +188,7 @@
       <!-- 3b. Usuario no autenticado -->
       {% else %}
         <a href="{% url 'login' %}" class="wb-nav-btn wb-nav-btn--secondary">
-          Sign In
+          {% trans "Entrar" %}
         </a>
       {% endif %}
 
@@ -216,7 +216,7 @@
            Luna visible en modo oscuro, sol en modo claro.
            Gestiona la clase 'light' en <html> + localStorage. -->
       <button class="wb-theme-toggle" id="themeToggle"
-              onclick="toggleTheme()" aria-label="Cambiar tema">
+              onclick="toggleTheme()" aria-label="{% trans 'Cambiar tema' %}">
         <!-- Icono luna (modo oscuro) -->
         <svg class="wb-theme-icon wb-theme-icon--moon"
              viewBox="0 0 24 24" fill="none"
@@ -240,7 +240,7 @@
       </button>
 
       <!-- 3f. Botón hamburguesa — solo visible en móvil (≤768px) -->
-      <button class="wb-nav-toggle" id="navToggle" aria-label="Abrir menú">
+      <button class="wb-nav-toggle" id="navToggle" aria-label="{% trans 'Abrir menú' %}">
         <span></span>
         <span></span>
         <span></span>

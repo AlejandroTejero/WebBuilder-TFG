@@ -1,4 +1,5 @@
 {% extends 'WebBuilder/base.html' %}
+{% load i18n %}
 {% load static %}
 
 {% block extra_css %}
@@ -17,7 +18,7 @@
     <div class="asst-sidebar__inner">
 
       <div class="asst-brand">
-        <span class="asst-brand__text">Sitio generado</span>
+        <span class="asst-brand__text">{% trans "Sitio generado" %}</span>
       </div>
 
       <!-- Stepper -->
@@ -28,8 +29,8 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">URL analizada</div>
-            <div class="asst-step__desc">Dataset procesado</div>
+            <div class="asst-step__label">{% trans "URL analizada" %}</div>
+            <div class="asst-step__desc">{% trans "Dataset procesado" %}</div>
           </div>
         </div>
 
@@ -39,8 +40,8 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Schema aceptado</div>
-            <div class="asst-step__desc">Plan listo</div>
+            <div class="asst-step__label">{% trans "Schema aceptado" %}</div>
+            <div class="asst-step__desc">{% trans "Plan listo" %}</div>
           </div>
         </div>
 
@@ -52,8 +53,8 @@
             <div class="asst-step__line"></div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Código generado</div>
-            <div class="asst-step__desc">LLM escribe el proyecto</div>
+            <div class="asst-step__label">{% trans "Código generado" %}</div>
+            <div class="asst-step__desc">{% trans "LLM escribe el proyecto" %}</div>
           </div>
         </div>
 
@@ -64,23 +65,23 @@
             </div>
           </div>
           <div class="asst-step__info">
-            <div class="asst-step__label">Desplegado</div>
-            <div class="asst-step__desc">Contenedor Docker</div>
+            <div class="asst-step__label">{% trans "Desplegado" %}</div>
+            <div class="asst-step__desc">{% trans "Contenedor Docker" %}</div>
           </div>
         </div>
       </nav>
 
       <!-- Info proyecto -->
       <div class="asst-meta">
-        <div class="asst-meta__label">Proyecto</div>
+        <div class="asst-meta__label">{% trans "Proyecto" %}</div>
         <div class="asst-meta__url">{{ site.project_name|default:"generated_site" }}</div>
         <div class="sr-meta-pills">
           <div class="asst-meta-pill">
-            <span class="asst-meta-pill__label">archivos</span>
+            <span class="asst-meta-pill__label">{% trans "archivos" %}</span>
             <span class="asst-meta-pill__value">{% if site.project_files %}{{ site.project_files|length }}{% else %}0{% endif %}</span>
           </div>
           <div class="asst-meta-pill">
-            <span class="asst-meta-pill__label">estado</span>
+            <span class="asst-meta-pill__label">{% trans "estado" %}</span>
             <span class="asst-meta-pill__value">{{ site.generation_status }}</span>
           </div>
         </div>
@@ -91,28 +92,28 @@
         {% if site.generation_status == 'ready' %}
           {% if site.deploy_status == 'deploying' %}
             <button class="asst-btn asst-btn--primary" disabled style="width:100%;">
-              Desplegando…
+              {% trans "Desplegando…" %}
             </button>
           {% else %}
             <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;" id="deploy-form">
               {% csrf_token %}
               <button class="asst-btn asst-btn--primary" type="submit" style="width:100%;">
-                {% if site.deploy_status == 'done' %}Re-desplegar{% else %}Desplegar sitio{% endif %}
+                {% if site.deploy_status == 'done' %}{% trans "Re-desplegar" %}{% else %}{% trans "Desplegar sitio" %}{% endif %}
               </button>
             </form>
           {% endif %}
 
           <a class="asst-btn asst-btn--ghost" href="{% url 'site_download_zip' api_request.id %}" style="text-align:center;">
-            Descargar ZIP
+            {% trans "Descargar ZIP" %}
           </a>
 
           <a class="asst-btn asst-btn--ghost" href="{% url 'site_code_viewer' api_request.id %}" style="text-align:center; font-size:11px; opacity:.6;">
-            Ver código
+            {% trans "Ver código" %}
           </a>
 
         {% else %}
           <span class="asst-btn asst-btn--ghost" style="opacity:.4; cursor:not-allowed; text-align:center;">
-            Descargar ZIP
+            {% trans "Descargar ZIP" %}
           </span>
         {% endif %}
       </div>
@@ -121,14 +122,14 @@
       {% if site.deploy_status == 'done' %}
       <div class="sr-chat">
         <div class="sr-chat__header">
-          <span class="sr-chat__title">Refinar con IA</span>
-          <span class="sr-chat__badge">Beta</span>
+          <span class="sr-chat__title">{% trans "Refinar con IA" %}</span>
+          <span class="sr-chat__badge">{% trans "Beta" %}</span>
         </div>
         <div class="sr-chat__messages" id="chat-messages">
-          <div class="sr-chat__hint">Describe qué quieres cambiar. La IA modificará el archivo relevante.</div>
+          <div class="sr-chat__hint">{% trans "Describe qué quieres cambiar. La IA modificará el archivo relevante." %}</div>
         </div>
         <div class="sr-chat__input-row">
-          <textarea class="sr-chat__textarea" id="chat-input" placeholder="Ej: haz el hero más grande y cambia el color a azul..." rows="2"></textarea>
+          <textarea class="sr-chat__textarea" id="chat-input" placeholder="{% trans 'Ej: haz el hero más grande y cambia el color a azul...' %}" rows="2"></textarea>
           <button class="sr-chat__send" id="chat-send" type="button">↑</button>
         </div>
       </div>
@@ -137,16 +138,16 @@
       <!-- Versiones -->
       <div class="sr-versions" id="versions-panel">
         <div class="sr-versions__header">
-          <span class="sr-versions__title">Versiones</span>
+          <span class="sr-versions__title">{% trans "Versiones" %}</span>
           <span class="sr-versions__count" id="versions-count"></span>
         </div>
         <div class="sr-versions__list" id="versions-list">
-          <div class="sr-versions__empty">Sin versiones guardadas</div>
+          <div class="sr-versions__empty">{% trans "Sin versiones guardadas" %}</div>
         </div>
       </div>
 
       <a href="{% url 'edit' api_request.id %}" class="asst-history-link">
-        <span>←</span> Volver al editor
+        <span>←</span> {% trans "Volver al editor" %}
       </a>
 
     </div>
@@ -161,14 +162,14 @@
       <div class="asst-alerts" style="padding:24px 24px 0;">
         <div class="asst-alert asst-alert--error">
           <span class="asst-alert__icon">✗</span>
-          <div><strong>Error de generación</strong> — {{ site.generation_error }}</div>
+          <div><strong>{% trans "Error de generación" %}</strong> — {{ site.generation_error }}</div>
         </div>
       </div>
     {% endif %}
 
     <div class="asst-alert asst-alert--error" id="deploy-error-alert" style="display:none; margin:24px 24px 0;">
       <span class="asst-alert__icon">✗</span>
-      <div><strong>Error de despliegue</strong> — <span id="deploy-error-msg">{{ site.deploy_error }}</span></div>
+      <div><strong>{% trans "Error de despliegue" %}</strong> — <span id="deploy-error-msg">{{ site.deploy_error }}</span></div>
     </div>
 
     {% if site.deploy_status == 'done' and site.preview_url %}
@@ -181,7 +182,7 @@
             <span class="sr-browser__dot sr-browser__dot--green"></span>
           </div>
           <div class="sr-browser__url" id="browser-url">{{ site.preview_url }}</div>
-          <a class="sr-browser__open" href="{{ site.preview_url }}" target="_blank" rel="noopener">Abrir ↗</a>
+          <a class="sr-browser__open" href="{{ site.preview_url }}" target="_blank" rel="noopener">{% trans "Abrir" %} ↗</a>
         </div>
         <iframe
           class="sr-browser__iframe"
@@ -196,14 +197,14 @@
       <!-- Sitio generado pero no desplegado -->
       <div class="sr-ready-state">
         <div class="sr-ready-state__icon">✓</div>
-        <div class="sr-ready-state__title">Proyecto generado</div>
+        <div class="sr-ready-state__title">{% trans "Proyecto generado" %}</div>
         <div class="sr-ready-state__desc">
-          {{ site.project_files|length }} archivos listos. Despliega el sitio para verlo en el navegador.
+          {% blocktrans with file_count=site.project_files|length %}{{ file_count }} archivos listos. Despliega el sitio para verlo en el navegador.{% endblocktrans %}
         </div>
         <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;">
           {% csrf_token %}
           <button class="asst-btn asst-btn--primary asst-btn--lg" type="submit">
-            Desplegar y ver sitio
+            {% trans "Desplegar y ver sitio" %}
           </button>
         </form>
       </div>
@@ -212,12 +213,12 @@
       <!-- Aún no generado -->
       <div class="sr-ready-state">
         <div class="sr-ready-state__icon" style="opacity:.15;">⚙</div>
-        <div class="sr-ready-state__title">Aún no hay código</div>
+        <div class="sr-ready-state__title">{% trans "Aún no hay código" %}</div>
         <div class="sr-ready-state__desc">
-          Vuelve al editor y pulsa <strong>Generar y publicar sitio</strong> para que el LLM escriba el código.
+          {% trans "Vuelve al editor y pulsa" %} <strong>{% trans "Generar y publicar sitio" %}</strong> {% trans "para que el LLM escriba el código." %}
         </div>
         <a href="{% url 'edit' api_request.id %}" class="asst-btn asst-btn--ghost asst-btn--lg">
-          ← Ir al editor
+          ← {% trans "Ir al editor" %}
         </a>
       </div>
     {% endif %}
@@ -231,15 +232,15 @@
 <div class="asst-loading" id="gen-loading-overlay">
   <div class="asst-loading__box">
     <div class="asst-loading__spinner"></div>
-    <div class="asst-loading__title">Generando proyecto...</div>
-    <div class="asst-loading__sub">El LLM está escribiendo el código</div>
+    <div class="asst-loading__title">{% trans "Generando proyecto..." %}</div>
+    <div class="asst-loading__sub">{% trans "El LLM está escribiendo el código" %}</div>
     <div class="asst-loading__steps">
-      <div class="asst-loading__step" id="gs-1">Analizando estructura del sitio</div>
-      <div class="asst-loading__step" id="gs-2">Generando modelos de datos</div>
-      <div class="asst-loading__step" id="gs-3">Generando vistas y controladores</div>
-      <div class="asst-loading__step" id="gs-4">Generando plantilla base</div>
-      <div class="asst-loading__step" id="gs-5">Generando páginas</div>
-      <div class="asst-loading__step" id="gs-6">Ensamblando y validando</div>
+      <div class="asst-loading__step" id="gs-1">{% trans "Analizando estructura del sitio" %}</div>
+      <div class="asst-loading__step" id="gs-2">{% trans "Generando modelos de datos" %}</div>
+      <div class="asst-loading__step" id="gs-3">{% trans "Generando vistas y controladores" %}</div>
+      <div class="asst-loading__step" id="gs-4">{% trans "Generando plantilla base" %}</div>
+      <div class="asst-loading__step" id="gs-5">{% trans "Generando páginas" %}</div>
+      <div class="asst-loading__step" id="gs-6">{% trans "Ensamblando y validando" %}</div>
     </div>
   </div>
 </div>
@@ -251,14 +252,14 @@
 <div class="asst-loading" id="deploy-loading-overlay">
   <div class="asst-loading__box" style="max-width:420px;">
     <div class="asst-loading__spinner"></div>
-    <div class="asst-loading__title" id="deploy-overlay-title">Desplegando proyecto…</div>
-    <div class="asst-loading__sub">n8n está orquestando el contenedor Docker</div>
+    <div class="asst-loading__title" id="deploy-overlay-title">{% trans "Desplegando proyecto…" %}</div>
+    <div class="asst-loading__sub">{% trans "n8n está orquestando el contenedor Docker" %}</div>
     <div class="asst-loading__steps">
-      <div class="asst-loading__step" id="ds-zip">Preparando ZIP</div>
-      <div class="asst-loading__step" id="ds-unzip">Descomprimiendo en n8n</div>
-      <div class="asst-loading__step" id="ds-build">Construyendo imagen Docker</div>
-      <div class="asst-loading__step" id="ds-run">Arrancando contenedor</div>
-      <div class="asst-loading__step" id="ds-done">¡Listo!</div>
+      <div class="asst-loading__step" id="ds-zip">{% trans "Preparando ZIP" %}</div>
+      <div class="asst-loading__step" id="ds-unzip">{% trans "Descomprimiendo en n8n" %}</div>
+      <div class="asst-loading__step" id="ds-build">{% trans "Construyendo imagen Docker" %}</div>
+      <div class="asst-loading__step" id="ds-run">{% trans "Arrancando contenedor" %}</div>
+      <div class="asst-loading__step" id="ds-done">{% trans "¡Listo!" %}</div>
     </div>
     <div style="width:100%; background:rgba(255,255,255,0.06); border-radius:99px; height:4px; margin-top:.5rem; overflow:hidden;">
       <div id="deploy-progress-bar" style="height:100%; width:0%; background:linear-gradient(90deg,#3b82f6,#8b5cf6); border-radius:99px; transition:width 0.6s ease;"></div>
@@ -277,14 +278,14 @@
   <div class="sr-version-modal__box">
     <div class="sr-version-modal__header">
       <span id="version-modal-title"></span>
-      <button class="asst-btn asst-btn--ghost asst-btn--sm" id="version-modal-close">Cerrar</button>
+      <button class="asst-btn asst-btn--ghost asst-btn--sm" id="version-modal-close">{% trans "Cerrar" %}</button>
     </div>
     <div class="sr-version-modal__body">
-      Versión guardada el <strong><span id="version-modal-date"></span></strong>
+      {% trans "Versión guardada el" %} <strong><span id="version-modal-date"></span></strong>
     </div>
     <div class="sr-version-modal__footer">
-      <a class="asst-btn asst-btn--ghost asst-btn--sm" id="version-modal-download" href="#">Descargar ZIP</a>
-      <button class="asst-btn asst-btn--primary asst-btn--sm" id="version-modal-restore">Restaurar</button>
+      <a class="asst-btn asst-btn--ghost asst-btn--sm" id="version-modal-download" href="#">{% trans "Descargar ZIP" %}</a>
+      <button class="asst-btn asst-btn--primary asst-btn--sm" id="version-modal-restore">{% trans "Restaurar" %}</button>
     </div>
   </div>
 </div>

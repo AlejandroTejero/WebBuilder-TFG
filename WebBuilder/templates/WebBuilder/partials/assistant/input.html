@@ -1,8 +1,9 @@
+{% load i18n %}
 <section class="asst-card" id="block-url">
   <div class="asst-card__header">
-    <div class="asst-card__step-badge">Paso 1</div>
-    <h2 class="asst-card__title">Introduzca la la URL o fichero de datos</h2>
-    <p class="asst-card__subtitle">Soporta JSON y XML. La IA analizará la estructura y generará el schema automáticamente.</p>
+    <div class="asst-card__step-badge">{% trans "Paso 1" %}</div>
+    <h2 class="asst-card__title">{% trans "Introduzca la la URL o fichero de datos" %}</h2>
+    <p class="asst-card__subtitle">{% trans "Soporta JSON y XML. La IA analizará la estructura y generará el schema automáticamente." %}</p>
   </div>
 
   <form method="post" class="asst-form" id="form-analyze" enctype="multipart/form-data">
@@ -10,13 +11,13 @@
 
     <div class="asst-field">
       <div class="asst-input-toggle">
-        <button type="button" class="asst-toggle-btn active" id="btn-mode-url" onclick="switchInputMode('url')">URL</button>
-        <button type="button" class="asst-toggle-btn" id="btn-mode-file" onclick="switchInputMode('file')">Fichero</button>
+        <button type="button" class="asst-toggle-btn active" id="btn-mode-url" onclick="switchInputMode('url')">{% trans "URL" %}</button>
+        <button type="button" class="asst-toggle-btn" id="btn-mode-file" onclick="switchInputMode('file')">{% trans "Fichero" %}</button>
       </div>
     </div>
 
     <div class="asst-field" id="field-url">
-      <label class="asst-label" for="{{ form.api_url.id_for_label }}">URL de la API</label>
+      <label class="asst-label" for="{{ form.api_url.id_for_label }}">{% trans "URL de la API" %}</label>
       <div class="asst-input-group">
         <span class="asst-input-icon">🔗</span>
         {{ form.api_url }}
@@ -26,15 +27,15 @@
       {% endif %}
 
       <div class="asst-examples">
-        <span class="asst-examples__label">Prueba con:</span>
-        <button type="button" class="asst-example-chip" onclick="fillUrl('https://jsonplaceholder.typicode.com/posts')">Posts JSON</button>
-        <button type="button" class="asst-example-chip" onclick="fillUrl('https://www.w3schools.com/xml/plant_catalog.xml')">Plant Catalog XML</button>
-        <button type="button" class="asst-example-chip" onclick="fillUrl('https://fakestoreapi.com/products')">Products JSON</button>
+        <span class="asst-examples__label">{% trans "Prueba con:" %}</span>
+        <button type="button" class="asst-example-chip" onclick="fillUrl('https://jsonplaceholder.typicode.com/posts')">{% trans "Posts JSON" %}</button>
+        <button type="button" class="asst-example-chip" onclick="fillUrl('https://www.w3schools.com/xml/plant_catalog.xml')">{% trans "Plant Catalog XML" %}</button>
+        <button type="button" class="asst-example-chip" onclick="fillUrl('https://fakestoreapi.com/products')">{% trans "Products JSON" %}</button>
       </div>
     </div>
 
     <div class="asst-field" id="field-file" style="display:none;">
-      <label class="asst-label" for="{{ form.file_input.id_for_label }}">Fichero JSON o XML</label>
+      <label class="asst-label" for="{{ form.file_input.id_for_label }}">{% trans "Fichero JSON o XML" %}</label>
       <div class="asst-input-group">
         <span class="asst-input-icon">📂</span>
         {{ form.file_input }}
@@ -47,41 +48,41 @@
     <div class="asst-field">
       <div class="asst-label-row">
         <label class="asst-label" for="{{ form.user_prompt.id_for_label }}">
-          Describe el tipo de web que quieres
-          <span class="asst-label__optional">opcional</span>
+          {% trans "Describe el tipo de web que quieres" %}
+          <span class="asst-label__optional">{% trans "opcional" %}</span>
         </label>
         <div class="asst-input-toggle" id="prompt-mode-toggle">
-          <button type="button" class="asst-toggle-btn active" onclick="switchPromptMode('free')">Libre</button>
-          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('examples')">Ejemplos</button>
-          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('guided')">Guiado</button>
+          <button type="button" class="asst-toggle-btn active" onclick="switchPromptMode('free')">{% trans "Libre" %}</button>
+          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('examples')">{% trans "Ejemplos" %}</button>
+          <button type="button" class="asst-toggle-btn" onclick="switchPromptMode('guided')">{% trans "Guiado" %}</button>
         </div>
       </div>
 
       <div id="prompt-mode-free">
         {{ form.user_prompt }}
-        <p class="asst-hint">Cuanto más detallas colores, layout y estilo, mejor será el resultado.</p>
+        <p class="asst-hint">{% trans "Cuanto más detallas colores, layout y estilo, mejor será el resultado." %}</p>
       </div>
 
       <div id="prompt-mode-examples" style="display:none;">
         <div class="asst-wizard-examples">
           <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Estética minimalista y premium inspirada en Apple Store. Color de fondo: #fafafa, color de cards: #ffffff, color de texto: #111111, color de acento: #374151. Tipografía fina y elegante, precios en negro grande y bold. Grid de 3 columnas con mucho espacio entre cards. Botón de compra negro con texto blanco. Hover en cards con elevación ligera y sombra más pronunciada. Sin colores estridentes, paleta monocromática.')">
-            <span class="asst-wizard-example__label">Tienda</span>
-            <span class="asst-wizard-example__desc">Catálogo minimalista, grid 3 cols, precio destacado</span>
+            <span class="asst-wizard-example__label">{% trans "Tienda" %}</span>
+            <span class="asst-wizard-example__desc">{% trans "Catálogo minimalista, grid 3 cols, precio destacado" %}</span>
           </button>
           <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Estética editorial seria estilo Medium o The Economist. Color de fondo: #ffffff, color de texto: #111111, color de acento: #b91c1c. Tipografía serif para títulos, sans para cuerpo. Layout de columna central estrecha con mucho margen lateral. Cards solo con título, autor, fecha y primeras líneas, sin imágenes en el listado. Links y categorías en rojo oscuro. Hero con titular enorme y fecha destacada.')" >
-            <span class="asst-wizard-example__label">Blog</span>
-            <span class="asst-wizard-example__desc">Estilo periódico, tipografía grande, sobrio</span>
+            <span class="asst-wizard-example__label">{% trans "Blog" %}</span>
+            <span class="asst-wizard-example__desc">{% trans "Estilo periódico, tipografía grande, sobrio" %}</span>
           </button>
           <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Estética de agencia creativa oscura. Color de fondo: #000000, color de texto: #ffffff, color de acento: #22d3ee. Títulos con gradiente sutil de blanco a gris. Grid de 2 columnas con imágenes a pantalla completa en aspect-video. Hover en cards con overlay oscuro semitransparente y título apareciendo encima. Sin bordes visibles en cards. Badges de tecnología y botón CTA en verde neón. Hero a pantalla completa con texto enorme.')">
-            <span class="asst-wizard-example__label">Portfolio</span>
-            <span class="asst-wizard-example__desc">Fondo negro, hover effects, imágenes grandes</span>
+            <span class="asst-wizard-example__label">{% trans "Portfolio" %}</span>
+            <span class="asst-wizard-example__desc">{% trans "Fondo negro, hover effects, imágenes grandes" %}</span>
           </button>
           <button type="button" class="asst-wizard-example" onclick="fillPromptAndSwitch('Estética SaaS profesional estilo Vercel o Linear. Color de fondo: #0f0f0f, color de superficie: #161616, color de borde: #333333, color de acento: #7c3aed. Números de métricas grandes en blanco, labels en gris. Tablas con filas alternadas en #1a1a1a. Tipografía monoespaciada para números y datos. Botones primarios y elementos activos en violeta. Sin imágenes decorativas, todo datos y estructura con padding generoso entre secciones.')">
-            <span class="asst-wizard-example__label">Dashboard</span>
-            <span class="asst-wizard-example__desc">Tablas, métricas, azul y gris, profesional</span>
+            <span class="asst-wizard-example__label">{% trans "Dashboard" %}</span>
+            <span class="asst-wizard-example__desc">{% trans "Tablas, métricas, azul y gris, profesional" %}</span>
           </button>
         </div>
-        <p class="asst-hint">Pulsa un ejemplo para usarlo como punto de partida. Puedes editarlo en modo libre.</p>
+        <p class="asst-hint">{% trans "Pulsa un ejemplo para usarlo como punto de partida. Puedes editarlo en modo libre." %}</p>
       </div>
 
       <div id="prompt-mode-guided" style="display:none;">
@@ -96,119 +97,119 @@
           </div>
 
           <div class="asst-wizard__panel" id="wpanel-1">
-            <p class="asst-wizard__question">¿Qué estilo visual quieres?</p>
+            <p class="asst-wizard__question">{% trans "¿Qué estilo visual quieres?" %}</p>
 
             <div class="asst-wizard__group">
-              <span class="asst-wizard__group-label">Fondo</span>
+              <span class="asst-wizard__group-label">{% trans "Fondo" %}</span>
               <div class="asst-wizard__options">
                 <button type="button" class="asst-wizard__opt asst-wizard__opt--selected" data-group="bg" data-value="fondo oscuro">
-                  Oscuro
+                  {% trans "Oscuro" %}
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="bg" data-value="fondo claro y minimalista">
-                  Claro
+                  {% trans "Claro" %}
                 </button>
               </div>
             </div>
 
             <div class="asst-wizard__group">
-              <span class="asst-wizard__group-label">Color de acento</span>
+              <span class="asst-wizard__group-label">{% trans "Color de acento" %}</span>
               <div class="asst-wizard__options">
                 <button type="button" class="asst-wizard__opt asst-wizard__opt--selected" data-group="color" data-value="acento verde esmeralda">
-                  Verde
+                  {% trans "Verde" %}
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento azul eléctrico">
-                  Azul
+                  {% trans "Azul" %}
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento morado vibrante">
-                  Morado
+                  {% trans "Morado" %}
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento naranja cálido">
-                  Naranja
+                  {% trans "Naranja" %}
                 </button>
                 <button type="button" class="asst-wizard__opt" data-group="color" data-value="acento rojo intenso">
-                  Rojo
+                  {% trans "Rojo" %}
                 </button>
               </div>
             </div>
 
             <div class="asst-wizard__nav">
               <span></span>
-              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardNext(2)">Siguiente →</button>
+              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardNext(2)">{% trans "Siguiente" %} →</button>
             </div>
           </div>
 
           <div class="asst-wizard__panel" id="wpanel-2" style="display:none;">
-            <p class="asst-wizard__question">¿Qué elementos quieres destacar?</p>
+            <p class="asst-wizard__question">{% trans "¿Qué elementos quieres destacar?" %}</p>
 
             <div class="asst-wizard__checks">
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="imágenes grandes y destacadas" checked>
                 <span class="asst-wizard__check-box"></span>
-                <span>Imágenes grandes</span>
+                <span>{% trans "Imágenes grandes" %}</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="precios visibles y en tipografía grande">
                 <span class="asst-wizard__check-box"></span>
-                <span>Precios</span>
+                <span>{% trans "Precios" %}</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="valoraciones con estrellas o badge numérico">
                 <span class="asst-wizard__check-box"></span>
-                <span>Valoraciones</span>
+                <span>{% trans "Valoraciones" %}</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="badges de categoría con colores">
                 <span class="asst-wizard__check-box"></span>
-                <span>Categorías</span>
+                <span>{% trans "Categorías" %}</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="fechas visibles en las cards">
                 <span class="asst-wizard__check-box"></span>
-                <span>Fechas</span>
+                <span>{% trans "Fechas" %}</span>
               </label>
               <label class="asst-wizard__check">
                 <input type="checkbox" data-hint="botones de enlace externo o CTA">
                 <span class="asst-wizard__check-box"></span>
-                <span>Botones de acción</span>
+                <span>{% trans "Botones de acción" %}</span>
               </label>
             </div>
 
             <div class="asst-wizard__nav">
-              <button type="button" class="asst-btn asst-btn--ghost asst-btn--sm" onclick="wizardNext(1)">← Atrás</button>
-              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardNext(3)">Siguiente →</button>
+              <button type="button" class="asst-btn asst-btn--ghost asst-btn--sm" onclick="wizardNext(1)">← {% trans "Atrás" %}</button>
+              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardNext(3)">{% trans "Siguiente" %} →</button>
             </div>
           </div>
 
           <div class="asst-wizard__panel" id="wpanel-3" style="display:none;">
-            <p class="asst-wizard__question">¿Qué personalidad tiene el sitio?</p>
+            <p class="asst-wizard__question">{% trans "¿Qué personalidad tiene el sitio?" %}</p>
 
             <div class="asst-wizard__options asst-wizard__options--grid">
               <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño minimalista, mucho espacio en blanco, tipografía limpia">
-                <span class="asst-wizard__opt-name">Minimalista</span>
-                <span class="asst-wizard__opt-sub">Limpio, espaciado, sobrio</span>
+                <span class="asst-wizard__opt-name">{% trans "Minimalista" %}</span>
+                <span class="asst-wizard__opt-sub">{% trans "Limpio, espaciado, sobrio" %}</span>
               </button>
               <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño moderno con gradientes, sombras y efectos hover dinámicos">
-                <span class="asst-wizard__opt-name">Moderno</span>
-                <span class="asst-wizard__opt-sub">Gradientes, sombras, dinámico</span>
+                <span class="asst-wizard__opt-name">{% trans "Moderno" %}</span>
+                <span class="asst-wizard__opt-sub">{% trans "Gradientes, sombras, dinámico" %}</span>
               </button>
               <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño elegante y sofisticado, tipografía serif, colores neutros">
-                <span class="asst-wizard__opt-name">Elegante</span>
-                <span class="asst-wizard__opt-sub">Sofisticado, serif, neutros</span>
+                <span class="asst-wizard__opt-name">{% trans "Elegante" %}</span>
+                <span class="asst-wizard__opt-sub">{% trans "Sofisticado, serif, neutros" %}</span>
               </button>
               <button type="button" class="asst-wizard__opt asst-wizard__opt--card" data-group="style" data-value="diseño colorido y vibrante, colores saturados, energético">
-                <span class="asst-wizard__opt-name">Colorido</span>
-                <span class="asst-wizard__opt-sub">Vibrante, saturado, energético</span>
+                <span class="asst-wizard__opt-name">{% trans "Colorido" %}</span>
+                <span class="asst-wizard__opt-sub">{% trans "Vibrante, saturado, energético" %}</span>
               </button>
             </div>
 
             <div class="asst-wizard__group" style="margin-top: 1rem;">
-              <span class="asst-wizard__group-label">Algo más que añadir <span class="asst-label__optional">opcional</span></span>
-              <textarea class="asst-wizard__extra" id="wizard-extra" placeholder="Ej: quiero que las cards tengan bordes redondeados y la navbar sea transparente..."></textarea>
+              <span class="asst-wizard__group-label">{% trans "Algo más que añadir" %} <span class="asst-label__optional">{% trans "opcional" %}</span></span>
+              <textarea class="asst-wizard__extra" id="wizard-extra" placeholder="{% trans 'Ej: quiero que las cards tengan bordes redondeados y la navbar sea transparente...' %}"></textarea>
             </div>
 
             <div class="asst-wizard__nav">
-              <button type="button" class="asst-btn asst-btn--ghost asst-btn--sm" onclick="wizardNext(2)">← Atrás</button>
-              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardBuild()">Generar prompt</button>
+              <button type="button" class="asst-btn asst-btn--ghost asst-btn--sm" onclick="wizardNext(2)">← {% trans "Atrás" %}</button>
+              <button type="button" class="asst-btn asst-btn--primary asst-btn--sm" onclick="wizardBuild()">{% trans "Generar prompt" %}</button>
             </div>
           </div>
 
@@ -222,22 +223,22 @@
     {% endif %}
 
     <div id="url-error" style="display:none" class="asst-error-msg">
-      Introduce una URL válida (debe empezar por http:// o https://).
+      {% trans "Introduce una URL válida (debe empezar por http:// o https://)." %}
     </div>
     <div class="asst-form-footer">
       <button type="button" class="asst-btn asst-btn--ghost" id="btn-llm-selector"
               onclick="openLLMModal()">
         <span class="llm-btn-dot"></span>
-        Modelo: <span id="llm-label-display">Predeterminado</span>
+        {% trans "Modelo:" %} <span id="llm-label-display">{% trans "Predeterminado" %}</span>
       </button>
       <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze"
               onclick="showLoading()">
-        Analizar URL
+        {% trans "Analizar URL" %}
       </button>
       {% if api_request and llm_plan %}
       <button type="submit" class="asst-btn asst-btn--ghost" name="action"
               value="regenerate" onclick="showLoading()">
-        Regenerar mapa
+        {% trans "Regenerar mapa" %}
       </button>
       {% endif %}
     </div>

@@ -1,38 +1,39 @@
+{% load i18n %}
 <!-- ══════════════════════════════════════════════
      PANEL: LLM
 ══════════════════════════════════════════════ -->
 <div class="m-panel" id="m-panel-llm">
   <div class="m-phead">
-    <div class="m-phead-eyebrow">Panel de administración</div>
-    <h1 class="m-phead-title">LLM</h1>
-    <p class="m-phead-sub">Rendimiento y salud del sistema de generación con IA</p>
+    <div class="m-phead-eyebrow">{% trans "Panel de administración" %}</div>
+    <h1 class="m-phead-title">{% trans "LLM" %}</h1>
+    <p class="m-phead-sub">{% trans "Rendimiento y salud del sistema de generación con IA" %}</p>
   </div>
 
   <div class="m-kpi-grid">
     <div class="m-kpi">
-      <div class="m-kpi-label">Llamadas totales</div>
+      <div class="m-kpi-label">{% trans "Llamadas totales" %}</div>
       <div class="m-kpi-value">{{ total_logs }}</div>
-      <span class="m-kpi-delta neutral">desde el inicio</span>
+      <span class="m-kpi-delta neutral">{% trans "desde el inicio" %}</span>
     </div>
     <div class="m-kpi">
-      <div class="m-kpi-label">Errores de consistencia</div>
+      <div class="m-kpi-label">{% trans "Errores de consistencia" %}</div>
       <div class="m-kpi-value">{{ consistency_errors_total }}</div>
       {% if consistency_rate <= 5 %}
-        <span class="m-kpi-delta up">{{ consistency_rate }}% del total</span>
+        <span class="m-kpi-delta up">{% blocktrans with pct=consistency_rate %}{{ pct }}% del total{% endblocktrans %}</span>
       {% else %}
-        <span class="m-kpi-delta down">{{ consistency_rate }}% del total</span>
+        <span class="m-kpi-delta down">{% blocktrans with pct=consistency_rate %}{{ pct }}% del total{% endblocktrans %}</span>
       {% endif %}
     </div>
     <div class="m-kpi">
-      <div class="m-kpi-label">Media llamadas / sitio</div>
+      <div class="m-kpi-label">{% trans "Media llamadas / sitio" %}</div>
       <div class="m-kpi-value">{{ avg_calls_per_site }}</div>
-      <span class="m-kpi-delta neutral">pasos por generación</span>
+      <span class="m-kpi-delta neutral">{% trans "pasos por generación" %}</span>
     </div>
   </div>
 
   <div class="m-grid-2">
     <div class="m-card">
-      <div class="m-card-title">Uso por modelo</div>
+      <div class="m-card-title">{% trans "Uso por modelo" %}</div>
       {% if model_stats %}
         <div class="m-bar-rows">
           {% for m in model_stats %}
@@ -46,19 +47,19 @@
           {% endfor %}
         </div>
       {% else %}
-        <div class="m-empty">Sin datos</div>
+        <div class="m-empty">{% trans "Sin datos" %}</div>
       {% endif %}
     </div>
 
     <div class="m-card">
-      <div class="m-card-title">Tasa de reintento por modelo</div>
+      <div class="m-card-title">{% trans "Tasa de reintento por modelo" %}</div>
       {% if model_stats %}
         <table class="m-table">
           <thead>
             <tr>
-              <th>Modelo</th>
-              <th>Llamadas</th>
-              <th>Tasa</th>
+              <th>{% trans "Modelo" %}</th>
+              <th>{% trans "Llamadas" %}</th>
+              <th>{% trans "Tasa" %}</th>
             </tr>
           </thead>
           <tbody>
@@ -68,9 +69,9 @@
               <td class="m-mono">{{ m.total }}</td>
               <td>
                 {% if m.retry_rate <= 10 %}
-                  <span class="m-kpi-delta up" style="font-size:12px">{{ m.retry_rate }}%</span>
+                  <span class="m-kpi-delta up" style="font-size:12px">{% blocktrans with pct=m.retry_rate %}{{ pct }}%{% endblocktrans %}</span>
                 {% else %}
-                  <span class="m-kpi-delta down" style="font-size:12px">{{ m.retry_rate }}%</span>
+                  <span class="m-kpi-delta down" style="font-size:12px">{% blocktrans with pct=m.retry_rate %}{{ pct }}%{% endblocktrans %}</span>
                 {% endif %}
               </td>
             </tr>
@@ -78,14 +79,14 @@
           </tbody>
         </table>
       {% else %}
-        <div class="m-empty">Sin datos</div>
+        <div class="m-empty">{% trans "Sin datos" %}</div>
       {% endif %}
     </div>
   </div>
 
   <div class="m-grid-1">
     <div class="m-card">
-      <div class="m-card-title">Pasos con más errores de consistencia</div>
+      <div class="m-card-title">{% trans "Pasos con más errores de consistencia" %}</div>
       {% if error_steps %}
         <div class="m-bar-rows">
           {% for e in error_steps %}
@@ -99,7 +100,7 @@
           {% endfor %}
         </div>
       {% else %}
-        <div class="m-empty">Sin errores de consistencia registrados</div>
+        <div class="m-empty">{% trans "Sin errores de consistencia registrados" %}</div>
       {% endif %}
     </div>
   </div>

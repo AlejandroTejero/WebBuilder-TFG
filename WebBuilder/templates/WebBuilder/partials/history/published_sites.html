@@ -1,4 +1,5 @@
 {% extends 'WebBuilder/base.html' %}
+{% load i18n %}
 {% load static %}
 
 {% block extra_css %}
@@ -11,29 +12,29 @@
   <!-- ── HEADER ── -->
   <div class="hist-header">
     <div>
-      <h1 class="hist-header__title">Historial</h1>
+      <h1 class="hist-header__title">{% trans "Historial" %}</h1>
       <div class="hist-header__meta">
-        <span class="hist-header__stat"><strong>{{ total_analysis }}</strong> análisis</span>
-        <span class="hist-header__stat"><strong>{{ total_count }}</strong> sitios publicados</span>
+        <span class="hist-header__stat"><strong>{{ total_analysis }}</strong> {% trans "análisis" %}</span>
+        <span class="hist-header__stat"><strong>{{ total_count }}</strong> {% trans "sitios publicados" %}</span>
       </div>
     </div>
-    <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary">+ Nuevo análisis</a>
+    <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary">+ {% trans "Nuevo análisis" %}</a>
   </div>
 
   <!-- ── TOPBAR ── -->
   <div class="hist-topbar">
     <nav class="hist-tabs">
-      <a href="{% url 'history_analysis' %}" class="hist-tab">Análisis</a>
-      <a href="{% url 'history_sites' %}" class="hist-tab hist-tab--active">Sitios publicados</a>
+      <a href="{% url 'history_analysis' %}" class="hist-tab">{% trans "Análisis" %}</a>
+      <a href="{% url 'history_sites' %}" class="hist-tab hist-tab--active">{% trans "Sitios publicados" %}</a>
     </nav>
 
     <form method="get" class="hist-topbar-right">
       <div class="hist-search-wrap">
         <span class="hist-search-icon">⌕</span>
-        <input type="text" name="q" value="{{ search }}" placeholder="Buscar por título..." class="hist-search-input">
+        <input type="text" name="q" value="{{ search }}" placeholder="{% trans 'Buscar por título...' %}" class="hist-search-input">
       </div>
       {% if search %}
-        <a href="{% url 'history_sites' %}" class="hist-btn">Limpiar</a>
+        <a href="{% url 'history_sites' %}" class="hist-btn">{% trans "Limpiar" %}</a>
       {% endif %}
     </form>
   </div>
@@ -69,16 +70,24 @@
           <!-- contenido principal -->
           <div class="hist-item__main">
             <div class="hist-item__name">
-              {{ w.accepted_plan.site_title|default:w.accepted_plan.site_type|default:"Sitio sin título" }}
+              {% if w.accepted_plan.site_title %}
+                {{ w.accepted_plan.site_title }}
+              {% elif w.accepted_plan.site_type %}
+                {{ w.accepted_plan.site_type }}
+              {% else %}
+                {% trans "Sitio sin título" %}
+              {% endif %}
             </div>
             <div class="hist-item__url">{{ w.project_source.api_url|truncatechars:70 }}</div>
             <div class="hist-item__meta">
-              <span class="hist-pill hist-pill--purple">Publicado</span>
-              <span class="hist-pill hist-pill--gray">{{ w.accepted_plan.site_type|default:"other" }}</span>
-              <span class="hist-pill hist-pill--gray">{{ w.accepted_plan.fields|length }} campos</span>
+              <span class="hist-pill hist-pill--purple">{% trans "Publicado" %}</span>
+              <span class="hist-pill hist-pill--gray">{% if w.accepted_plan.site_type %}{{ w.accepted_plan.site_type }}{% else %}{% trans "other" %}{% endif %}</span>
+              <span class="hist-pill hist-pill--gray">{% blocktrans with fields_count=w.accepted_plan.fields|length %}{{ fields_count }} campos{% endblocktrans %}</span>
               {% with version_count=w.versions.count %}
                 {% if version_count > 0 %}
-                  <span class="hist-pill hist-pill--gray">{{ version_count }} versión{{ version_count|pluralize:"es" }}</span>
+                  <span class="hist-pill hist-pill--gray">
+                    {% blocktrans count counter=version_count %}{{ counter }} versión{% plural %}{{ counter }} versiones{% endblocktrans %}
+                  </span>
                 {% endif %}
               {% endwith %}
             </div>
@@ -89,11 +98,11 @@
 
           <!-- acciones -->
           <div class="hist-item__actions">
-            <a href="{% url 'edit' w.project_source.id %}" class="hist-btn">Editar</a>
-            <a href="{% url 'site_render' w.project_source.id %}" class="hist-btn hist-btn--primary">Ver sitio →</a>
+            <a href="{% url 'edit' w.project_source.id %}" class="hist-btn">{% trans "Editar" %}</a>
+            <a href="{% url 'site_render' w.project_source.id %}" class="hist-btn hist-btn--primary">{% trans "Ver sitio" %} →</a>
             <form method="post" action="{% url 'delete_site' w.id %}" onsubmit="return confirm('¿Eliminar este sitio?')">
               {% csrf_token %}
-              <button type="submit" class="hist-btn hist-btn--danger" title="Eliminar">✕</button>
+              <button type="submit" class="hist-btn hist-btn--danger" title="{% trans 'Eliminar' %}">✕</button>
             </form>
           </div>
 
@@ -103,9 +112,9 @@
 
   {% else %}
     <div class="hist-empty">
-      <div class="hist-empty__title">Aún no has publicado ningún sitio</div>
-      <div class="hist-empty__desc">Cuando aceptes un schema en el editor, aparecerá aquí.</div>
-      <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary" style="margin-top: 12px;">Ir al asistente</a>
+      <div class="hist-empty__title">{% trans "Aún no has publicado ningún sitio" %}</div>
+      <div class="hist-empty__desc">{% trans "Cuando aceptes un schema en el editor, aparecerá aquí." %}</div>
+      <a href="{% url 'assistant' %}" class="hist-btn hist-btn--primary" style="margin-top: 12px;">{% trans "Ir al asistente" %}</a>
     </div>
   {% endif %}
 
@@ -113,11 +122,11 @@
   {% if generated_sites.paginator.num_pages > 1 %}
     <div class="hist-pagination">
       {% if generated_sites.has_previous %}
-        <a href="?page={{ generated_sites.previous_page_number }}&q={{ search }}" class="hist-page-btn">Anterior</a>
+        <a href="?page={{ generated_sites.previous_page_number }}&q={{ search }}" class="hist-page-btn">{% trans "Anterior" %}</a>
       {% endif %}
       <span class="hist-page-info">{{ generated_sites.number }} / {{ generated_sites.paginator.num_pages }}</span>
       {% if generated_sites.has_next %}
-        <a href="?page={{ generated_sites.next_page_number }}&q={{ search }}" class="hist-page-btn">Siguiente</a>
+        <a href="?page={{ generated_sites.next_page_number }}&q={{ search }}" class="hist-page-btn">{% trans "Siguiente" %}</a>
       {% endif %}
     </div>
   {% endif %}

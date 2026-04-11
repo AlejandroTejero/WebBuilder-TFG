@@ -1,4 +1,5 @@
 {% extends 'WebBuilder/base.html' %}
+{% load i18n %}
 {% load static %}
 
 {% block extra_css %}
@@ -12,12 +13,12 @@
   <!-- SIDEBAR — árbol de archivos -->
   <aside class="cv-sidebar">
     <div class="cv-sidebar__back">
-      <a href="{% url 'site_render' api_request.id %}">← Volver al sitio</a>
+      <a href="{% url 'site_render' api_request.id %}">{% trans "Volver al sitio" %}</a>
     </div>
     <div class="cv-sidebar__header">
-      <span class="cv-sidebar__title">{{ site.project_name|default:"Proyecto" }}</span>
+      <span class="cv-sidebar__title">{% if site.project_name %}{{ site.project_name }}{% else %}{% trans "Proyecto" %}{% endif %}</span>
       <span class="cv-sidebar__count">
-        {% if site.project_files %}{{ site.project_files|length }} archivos{% endif %}
+        {% if site.project_files %}{% blocktrans with count=site.project_files|length %}{{ count }} archivos{% endblocktrans %}{% endif %}
       </span>
     </div>
     <div class="cv-tree-wrap">
@@ -33,7 +34,7 @@
         <div class="sr-viewer__empty" id="sr-empty">
           <div style="text-align:center; color:var(--wb-t3);">
             <div style="font-size:32px; opacity:.15; margin-bottom:10px;">&#128196;</div>
-            <div style="font-size:13px;">Selecciona un archivo del árbol</div>
+            <div style="font-size:13px;">{% trans "Selecciona un archivo del árbol" %}</div>
           </div>
         </div>
 
@@ -41,7 +42,7 @@
           <span class="sr-viewer__filename" id="sr-filename"></span>
           <div class="sr-viewer__actions">
             <span class="sr-save-feedback" id="sr-save-feedback" style="display:none;"></span>
-            <button class="sr-btn sr-btn--edit" id="sr-btn-edit" type="button">Editar</button>
+            <button class="sr-btn sr-btn--edit" id="sr-btn-edit" type="button">{% trans "Editar" %}</button>
           </div>
         </div>
 
@@ -70,14 +71,424 @@
     </div>
     <div class="sr-modal__actions">
       <span class="sr-save-feedback sr-save-feedback--inline" id="sr-save-feedback-modal" style="display:none;"></span>
-      <button class="sr-btn sr-btn--cancel" id="sr-btn-cancel" type="button">Cancelar</button>
-      <button class="sr-btn sr-btn--save" id="sr-btn-save" type="button">Guardar</button>
+      <button class="sr-btn sr-btn--cancel" id="sr-btn-cancel" type="button">{% trans "Cancelar" %}</button>
+      <button class="sr-btn sr-btn--save" id="sr-btn-save" type="button">{% trans "Guardar" %}</button>
     </div>
   </div>
   <div class="sr-modal__body">
     <div id="monaco-container"></div>
   </div>
-</div>
+</div>/* =============================================================
+   WebBuilder — Historial (history.css)
+   ============================================================= */
+
+/* ── PAGE WRAPPER ── */
+.hist-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+/* ── HEADER ── */
+.hist-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 6px;
+}
+
+.hist-header__title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--wb-title);
+  letter-spacing: -0.03em;
+  margin: 0 0 4px;
+  line-height: 1.1;
+}
+
+.hist-header__meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hist-header__stat {
+  font-size: 12px;
+  color: var(--wb-t3);
+}
+
+.hist-header__stat strong {
+  color: var(--wb-t1);
+  font-weight: 500;
+}
+
+/* ── TOPBAR: tabs + search + filtro ── */
+.hist-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--wb-border);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.hist-tabs {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.hist-tab {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  color: var(--wb-t3);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  cursor: pointer;
+  background: transparent;
+  font-family: inherit;
+}
+
+.hist-tab:hover {
+  color: var(--wb-t1);
+  background: var(--wb-bg-3);
+}
+
+.hist-tab--active {
+  color: var(--wb-t1);
+  background: var(--wb-bg-3);
+  border-color: var(--wb-border-md);
+}
+
+/* search + select en topbar */
+.hist-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.hist-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.hist-search-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 11px;
+  color: var(--wb-t3);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.hist-search-input {
+  padding: 7px 10px 7px 28px;
+  background: var(--wb-bg-3);
+  border: 1px solid var(--wb-border-md);
+  border-radius: 8px;
+  color: var(--wb-t1);
+  font-size: 12px;
+  font-family: inherit;
+  width: 200px;
+  transition: border-color 0.15s, width 0.2s;
+}
+
+.hist-search-input:focus {
+  outline: none;
+  border-color: rgba(99,102,241,0.4);
+  width: 240px;
+}
+
+.hist-search-input::placeholder {
+  color: var(--wb-t4);
+}
+
+.hist-select {
+  padding: 7px 10px;
+  background: var(--wb-bg-3);
+  border: 1px solid var(--wb-border-md);
+  border-radius: 8px;
+  color: var(--wb-t2);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.hist-select:focus {
+  outline: none;
+  border-color: rgba(99,102,241,0.4);
+}
+
+/* ── LISTA DE ITEMS ── */
+.hist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── ITEM ── */
+.hist-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--wb-bg-2);
+  border: 1px solid var(--wb-border);
+  border-radius: 12px;
+  padding: 13px 16px;
+  transition: border-color 0.15s, transform 0.15s;
+  animation: histFadeUp 0.22s ease;
+}
+
+.hist-item:hover {
+  border-color: var(--wb-border-md);
+  transform: translateY(-1px);
+}
+
+.hist-item--error {
+  border-color: rgba(239,68,68,0.15);
+  background: rgba(239,68,68,0.03);
+}
+
+.hist-item--site {
+  border-color: var(--wb-border);
+}
+
+@keyframes histFadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── STATUS COL ── */
+.hist-item__status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.hist-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hist-dot--ok      { background: rgba(52,211,153,0.85); }
+.hist-dot--error   { background: rgba(248,113,113,0.85); }
+.hist-dot--pending { background: rgba(251,146,60,0.85); }
+
+.hist-item__id {
+  font-size: 9px;
+  color: var(--wb-t4);
+  font-family: var(--wb-mono);
+  line-height: 1;
+}
+
+/* ── DIVIDER ── */
+.hist-item__divider {
+  width: 1px;
+  height: 36px;
+  background: var(--wb-border);
+  flex-shrink: 0;
+}
+
+/* ── MAIN CONTENT ── */
+.hist-item__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hist-item__name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--wb-t1);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hist-item__url {
+  font-size: 11px;
+  color: var(--wb-t3);
+  font-family: var(--wb-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hist-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+/* ── PILLS ── */
+.hist-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid;
+  font-family: var(--wb-mono);
+  flex-shrink: 0;
+}
+
+.hist-pill--ok      { background: rgba(52,211,153,0.08);  color: rgba(52,211,153,0.80);  border-color: rgba(52,211,153,0.18); }
+.hist-pill--error   { background: rgba(239,68,68,0.08);   color: rgba(248,113,113,0.85); border-color: rgba(239,68,68,0.18); }
+.hist-pill--pending { background: rgba(251,146,60,0.08);  color: rgba(251,146,60,0.85);  border-color: rgba(251,146,60,0.18); }
+.hist-pill--purple  { background: rgba(99,102,241,0.08);  color: rgba(129,140,248,0.90); border-color: rgba(99,102,241,0.18); }
+.hist-pill--gray    { background: var(--wb-bg-3); color: var(--wb-t3); border-color: var(--wb-border); }
+
+/* ── FECHA ── */
+.hist-item__date {
+  font-size: 10px;
+  color: var(--wb-t1);
+  font-family: var(--wb-mono);
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ── ACCIONES ── */
+.hist-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.hist-btn {
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--wb-border-md);
+  color: var(--wb-t2);
+  background: transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hist-btn:hover {
+  color: var(--wb-t1);
+  border-color: var(--wb-border-md);
+  background: var(--wb-bg-3);
+}
+
+.hist-btn--primary {
+  background: var(--wb-t1);
+  color: var(--wb-bg);
+  border-color: transparent;
+}
+
+.hist-btn--primary:hover {
+  opacity: 0.88;
+  color: var(--wb-bg);
+}
+
+.hist-btn--danger {
+  color: var(--wb-t4);
+  border-color: transparent;
+  padding: 5px 7px;
+}
+
+.hist-btn--danger:hover {
+  color: rgba(248,113,113,0.80);
+  background: rgba(239,68,68,0.06);
+  border-color: rgba(239,68,68,0.2);
+}
+
+/* ── EMPTY STATE ── */
+.hist-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  border: 1px dashed var(--wb-border-md);
+  border-radius: 12px;
+  gap: 8px;
+  text-align: center;
+}
+
+.hist-empty__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--wb-t2);
+}
+
+.hist-empty__desc {
+  font-size: 12px;
+  color: var(--wb-t3);
+  max-width: 280px;
+  line-height: 1.55;
+}
+
+/* ── PAGINACIÓN ── */
+.hist-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.hist-page-btn {
+  padding: 6px 13px;
+  background: var(--wb-bg-3);
+  border: 1px solid var(--wb-border-md);
+  border-radius: 8px;
+  color: var(--wb-t2);
+  font-size: 12px;
+  font-family: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.hist-page-btn:hover {
+  border-color: var(--wb-border-md);
+  color: var(--wb-t1);
+}
+
+.hist-page-info {
+  font-size: 11px;
+  color: var(--wb-t3);
+  font-family: var(--wb-mono);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .hist-page { padding: 20px 16px 48px; }
+  .hist-topbar { gap: 8px; }
+  .hist-topbar-right { width: 100%; }
+  .hist-search-input { width: 100%; }
+  .hist-search-input:focus { width: 100%; }
+  .hist-item { flex-wrap: wrap; }
+  .hist-item__actions { width: 100%; padding-top: 8px; border-top: 1px solid var(--wb-border); margin-top: 2px; }
+}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>

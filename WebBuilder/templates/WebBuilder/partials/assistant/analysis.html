@@ -1,37 +1,40 @@
+{% load i18n %}
 {% if analysis %}
 <section class="asst-card asst-card--result" id="block-analysis">
   <div class="asst-card__header">
-    <div class="asst-card__step-badge asst-card__step-badge--done">Paso 2 — Completado</div>
-    <h2 class="asst-card__title">Dataset analizado</h2>
+    <div class="asst-card__step-badge asst-card__step-badge--done">{% trans "Paso 2 — Completado" %}</div>
+    <h2 class="asst-card__title">{% trans "Dataset analizado" %}</h2>
   </div>
 
   <div class="asst-analysis-grid">
     {% if analysis.main_collection.found %}
       <div class="asst-stat">
         <div class="asst-stat__value">{{ analysis.main_collection.count }}</div>
-        <div class="asst-stat__label">Items encontrados</div>
+        <div class="asst-stat__label">{% trans "Items encontrados" %}</div>
       </div>
       <div class="asst-stat">
         <div class="asst-stat__value">{{ analysis.keys.top|length|default:"—" }}</div>
-        <div class="asst-stat__label">Campos disponibles</div>
+        <div class="asst-stat__label">{% trans "Campos disponibles" %}</div>
       </div>
       {% if analysis.main_collection.path %}
       <div class="asst-stat asst-stat--wide">
         <div class="asst-stat__value asst-stat__value--mono">{{ analysis.main_collection.path }}</div>
-        <div class="asst-stat__label">Ruta colección principal</div>
+        <div class="asst-stat__label">{% trans "Ruta colección principal" %}</div>
       </div>
       {% endif %}
     {% else %}
       <div class="asst-stat asst-stat--wide">
-        <div class="asst-stat__value asst-stat__value--muted">{{ analysis.message|default:"No se encontraron items" }}</div>
-        <div class="asst-stat__label">Estado</div>
+        <div class="asst-stat__value asst-stat__value--muted">
+          {% if analysis.message %}{{ analysis.message }}{% else %}{% trans "No se encontraron items" %}{% endif %}
+        </div>
+        <div class="asst-stat__label">{% trans "Estado" %}</div>
       </div>
     {% endif %}
 
     {% if api_request.response_summary %}
       <div class="asst-stat asst-stat--wide">
         <div class="asst-stat__value asst-stat__value--sm">{{ api_request.response_summary }}</div>
-        <div class="asst-stat__label">Resumen</div>
+        <div class="asst-stat__label">{% trans "Resumen" %}</div>
       </div>
     {% endif %}
   </div>

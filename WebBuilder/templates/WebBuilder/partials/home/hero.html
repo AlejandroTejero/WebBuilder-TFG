@@ -3,18 +3,18 @@
 <!-- HERO -->
 <section class="wb-hero">
   <div class="wb-hero-copy">
-    <div class="wb-eyebrow">{% translate "Generación con IA · Django · APIs públicas" %}</div>
+    <div class="wb-eyebrow">{% trans "Generación con IA · Django · APIs públicas" %}</div>
     <h1 class="wb-hero-title">
-      {% translate "Convierte" %} <span class="muted">{% translate "datos crudos" %}</span><br>
-      {% translate "en un proyecto Django" %} <span class="muted">{% translate "real" %}</span>
+      {% trans "Convierte" %} <span class="muted">{% trans "datos crudos" %}</span><br>
+      {% trans "en un proyecto Django" %} <span class="muted">{% trans "real" %}</span>
     </h1>
     <p class="wb-hero-sub">
-      {% translate "Pega una URL o arrastra un archivo, WebBuilder lo analiza y se encarga de todo." %}
+      {% trans "Pega una URL o arrastra un archivo, WebBuilder lo analiza y se encarga de todo." %}
     </p>
     <div class="wb-hero-actions">
-      <a href="{% url 'assistant' %}" class="wb-cta-primary">{% translate "Empezar ahora" %}</a>
+      <a href="{% url 'assistant' %}" class="wb-cta-primary">{% trans "Empezar ahora" %}</a>
       <a href="#how-section" class="wb-cta-link">
-        {% translate "Ver cómo funciona" %}
+        {% trans "Ver cómo funciona" %}
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -27,12 +27,12 @@
 
       <div class="wb-vsc-titlebar">
         <div class="wb-vsc-menu-icons">
-          <span class="wb-vsc-menu-icon">{% translate "File" %}</span>
-          <span class="wb-vsc-menu-icon">{% translate "Edit" %}</span>
-          <span class="wb-vsc-menu-icon">{% translate "View" %}</span>
-          <span class="wb-vsc-menu-icon">{% translate "Run" %}</span>
+          <span class="wb-vsc-menu-icon">{% trans "File" %}</span>
+          <span class="wb-vsc-menu-icon">{% trans "Edit" %}</span>
+          <span class="wb-vsc-menu-icon">{% trans "View" %}</span>
+          <span class="wb-vsc-menu-icon">{% trans "Run" %}</span>
         </div>
-        <span class="wb-vsc-title-text">WebBuilder — {% translate "asistente de análisis" %}</span>
+        <span class="wb-vsc-title-text">WebBuilder — {% trans "asistente de análisis" %}</span>
       </div>
 
       <div class="wb-vsc-tabs">
@@ -43,7 +43,7 @@
         <div class="wb-vsc-tab" data-tab="sites" onclick="switchTab(this,'sites')">sites/</div>
         <div class="wb-vsc-tab" data-tab="new" onclick="switchTab(this,'new')">
           <span style="font-size:11px;color:var(--wb-t4)">+</span>
-          {% translate "nuevo" %}
+          {% trans "nuevo" %}
         </div>
       </div>
 
@@ -52,7 +52,7 @@
         <div class="wb-sidebar">
           <div class="wb-sidebar-section">
             <div class="wb-sidebar-group-header">
-              <span>{% translate "Análisis" %}</span>
+              <span>{% trans "Análisis" %}</span>
               <span class="wb-sg-arrow">▼</span>
             </div>
 
@@ -83,7 +83,7 @@
 
           <div class="wb-sidebar-section">
             <div class="wb-sidebar-group-header">
-              <span>{% translate "Generados" %}</span>
+              <span>{% trans "Generados" %}</span>
               <span class="wb-sg-arrow">▼</span>
             </div>
 
@@ -103,7 +103,7 @@
 
           <div class="wb-sidebar-section">
             <div class="wb-sidebar-group-header">
-              <span>{% translate "Workspace" %}</span>
+              <span>{% trans "Workspace" %}</span>
               <span class="wb-sg-arrow">▼</span>
             </div>
 
@@ -113,7 +113,7 @@
                   <path d="M5 1v8M1 5h8" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" stroke-linecap="round"/>
                 </svg>
               </span>
-              <span class="wb-si-label">{% translate "Nuevo análisis" %}</span>
+              <span class="wb-si-label">{% trans "Nuevo análisis" %}</span>
             </div>
           </div>
         </div>
@@ -125,9 +125,9 @@
               <div class="wb-panel-head-top">
                 <div>
                   <div class="wb-panel-title">openweathermap · weather</div>
-                  <div class="wb-panel-meta">api.openweathermap.org · {% translate "hace 2 horas" %}</div>
+                  <div class="wb-panel-meta">api.openweathermap.org · {% trans "hace 2 horas" %}</div>
                 </div>
-                <span class="wb-status-badge wb-s-ok">{% translate "procesado" %}</span>
+                <span class="wb-status-badge wb-s-ok">{% trans "procesado" %}</span>
               </div>
               <div class="wb-url-row">
                 <span class="wb-url-method">GET</span>
@@ -136,16 +136,16 @@
               </div>
             </div>
             <div class="wb-panel-body">
-              <div class="wb-section-label">{% translate "Campos detectados" %} — <span id="wc-count">6</span> {% translate "de 8 seleccionados" %}</div>
+              <div class="wb-section-label">{% trans "Campos detectados" %} — <span id="wc-count">6</span> {% trans "de 8 seleccionados" %}</div>
               <div class="wb-fields-grid">
-                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name</div><div class="wb-field-desc">{% translate "Nombre ciudad" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">main.temp</div><div class="wb-field-desc">{% translate "Temperatura" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">main.humidity</div><div class="wb-field-desc">{% translate "Humedad" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">weather[0].description</div><div class="wb-field-desc">{% translate "Descripción" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">wind</div><div class="wb-field-desc">{% translate "Datos de viento" %}</div></div><span class="wb-field-type wb-t-obj">object</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">visibility</div><div class="wb-field-desc">{% translate "Visibilidad" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
-                <div class="wb-field-card" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">sys.country</div><div class="wb-field-desc">{% translate "País" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">coord</div><div class="wb-field-desc">{% translate "Coordenadas" %}</div></div><span class="wb-field-type wb-t-obj">object</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name</div><div class="wb-field-desc">{% trans "Nombre ciudad" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">main.temp</div><div class="wb-field-desc">{% trans "Temperatura" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">main.humidity</div><div class="wb-field-desc">{% trans "Humedad" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">weather[0].description</div><div class="wb-field-desc">{% trans "Descripción" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">wind</div><div class="wb-field-desc">{% trans "Datos de viento" %}</div></div><span class="wb-field-type wb-t-obj">object</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">visibility</div><div class="wb-field-desc">{% trans "Visibilidad" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                <div class="wb-field-card" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">sys.country</div><div class="wb-field-desc">{% trans "País" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card" onclick="toggleField(this,'wc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">coord</div><div class="wb-field-desc">{% trans "Coordenadas" %}</div></div><span class="wb-field-type wb-t-obj">object</span></div>
               </div>
             </div>
           </div>
@@ -155,9 +155,9 @@
               <div class="wb-panel-head-top">
                 <div>
                   <div class="wb-panel-title">pokeapi · pokemon</div>
-                  <div class="wb-panel-meta">pokeapi.co · {% translate "hace 1 día" %}</div>
+                  <div class="wb-panel-meta">pokeapi.co · {% trans "hace 1 día" %}</div>
                 </div>
-                <span class="wb-status-badge wb-s-pub">{% translate "publicado" %}</span>
+                <span class="wb-status-badge wb-s-pub">{% trans "publicado" %}</span>
               </div>
               <div class="wb-url-row">
                 <span class="wb-url-method">GET</span>
@@ -166,15 +166,15 @@
               </div>
             </div>
             <div class="wb-panel-body">
-              <div class="wb-section-label">{% translate "Campos detectados" %} — <span id="pc-count">5</span> {% translate "de 7 seleccionados" %}</div>
+              <div class="wb-section-label">{% trans "Campos detectados" %} — <span id="pc-count">5</span> {% trans "de 7 seleccionados" %}</div>
               <div class="wb-fields-grid">
-                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name</div><div class="wb-field-desc">{% translate "Nombre" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">base_experience</div><div class="wb-field-desc">{% translate "Exp. base" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">types</div><div class="wb-field-desc">{% translate "Tipos" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">stats</div><div class="wb-field-desc">{% translate "Estadísticas" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">sprites.front_default</div><div class="wb-field-desc">{% translate "Imagen" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">abilities</div><div class="wb-field-desc">{% translate "Habilidades" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
-                <div class="wb-field-card" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">moves</div><div class="wb-field-desc">{% translate "Movimientos" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name</div><div class="wb-field-desc">{% trans "Nombre" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">base_experience</div><div class="wb-field-desc">{% trans "Exp. base" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">types</div><div class="wb-field-desc">{% trans "Tipos" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">stats</div><div class="wb-field-desc">{% trans "Estadísticas" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">sprites.front_default</div><div class="wb-field-desc">{% trans "Imagen" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">abilities</div><div class="wb-field-desc">{% trans "Habilidades" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                <div class="wb-field-card" onclick="toggleField(this,'pc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">moves</div><div class="wb-field-desc">{% trans "Movimientos" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
               </div>
             </div>
           </div>
@@ -184,9 +184,9 @@
               <div class="wb-panel-head-top">
                 <div>
                   <div class="wb-panel-title">restcountries · all</div>
-                  <div class="wb-panel-meta">restcountries.com · {% translate "hace 3 días" %}</div>
+                  <div class="wb-panel-meta">restcountries.com · {% trans "hace 3 días" %}</div>
                 </div>
-                <span class="wb-status-badge wb-s-pend">{% translate "pendiente" %}</span>
+                <span class="wb-status-badge wb-s-pend">{% trans "pendiente" %}</span>
               </div>
               <div class="wb-url-row">
                 <span class="wb-url-method">GET</span>
@@ -195,14 +195,14 @@
               </div>
             </div>
             <div class="wb-panel-body">
-              <div class="wb-section-label">{% translate "Campos detectados" %} — <span id="cc-count">4</span> {% translate "de 6 seleccionados" %}</div>
+              <div class="wb-section-label">{% trans "Campos detectados" %} — <span id="cc-count">4</span> {% trans "de 6 seleccionados" %}</div>
               <div class="wb-fields-grid">
-                <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name.common</div><div class="wb-field-desc">{% translate "Nombre país" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">capital</div><div class="wb-field-desc">{% translate "Capital" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">population</div><div class="wb-field-desc">{% translate "Población" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">flags.svg</div><div class="wb-field-desc">{% translate "Bandera" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">region</div><div class="wb-field-desc">{% translate "Región" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">languages</div><div class="wb-field-desc">{% translate "Idiomas" %}</div></div><span class="wb-field-type wb-t-obj">object</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">name.common</div><div class="wb-field-desc">{% trans "Nombre país" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">capital</div><div class="wb-field-desc">{% trans "Capital" %}</div></div><span class="wb-field-type wb-t-arr">array</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">population</div><div class="wb-field-desc">{% trans "Población" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">flags.svg</div><div class="wb-field-desc">{% trans "Bandera" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">region</div><div class="wb-field-desc">{% trans "Región" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card" onclick="toggleField(this,'cc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">languages</div><div class="wb-field-desc">{% trans "Idiomas" %}</div></div><span class="wb-field-type wb-t-obj">object</span></div>
               </div>
             </div>
           </div>
@@ -212,9 +212,9 @@
               <div class="wb-panel-head-top">
                 <div>
                   <div class="wb-panel-title">jsonplaceholder · posts</div>
-                  <div class="wb-panel-meta">jsonplaceholder.typicode.com · {% translate "hace 1 semana" %}</div>
+                  <div class="wb-panel-meta">jsonplaceholder.typicode.com · {% trans "hace 1 semana" %}</div>
                 </div>
-                <span class="wb-status-badge wb-s-ok">{% translate "procesado" %}</span>
+                <span class="wb-status-badge wb-s-ok">{% trans "procesado" %}</span>
               </div>
               <div class="wb-url-row">
                 <span class="wb-url-method">GET</span>
@@ -223,12 +223,12 @@
               </div>
             </div>
             <div class="wb-panel-body">
-              <div class="wb-section-label">{% translate "Campos detectados" %} — <span id="poc-count">3</span> {% translate "de 4 seleccionados" %}</div>
+              <div class="wb-section-label">{% trans "Campos detectados" %} — <span id="poc-count">3</span> {% trans "de 4 seleccionados" %}</div>
               <div class="wb-fields-grid">
-                <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">title</div><div class="wb-field-desc">{% translate "Título" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">body</div><div class="wb-field-desc">{% translate "Contenido" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
-                <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">userId</div><div class="wb-field-desc">{% translate "ID usuario" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
-                <div class="wb-field-card" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">id</div><div class="wb-field-desc">{% translate "Identificador" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">title</div><div class="wb-field-desc">{% trans "Título" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">body</div><div class="wb-field-desc">{% trans "Contenido" %}</div></div><span class="wb-field-type wb-t-str">string</span></div>
+                <div class="wb-field-card selected" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">userId</div><div class="wb-field-desc">{% trans "ID usuario" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
+                <div class="wb-field-card" onclick="toggleField(this,'poc-count')"><div class="wb-field-check"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3.5l2 2 3-3" stroke="#0e0e10" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="wb-field-info"><div class="wb-field-name">id</div><div class="wb-field-desc">{% trans "Identificador" %}</div></div><span class="wb-field-type wb-t-num">number</span></div>
               </div>
             </div>
           </div>
@@ -237,28 +237,28 @@
             <div class="wb-panel-head">
               <div class="wb-panel-head-top">
                 <div>
-                  <div class="wb-panel-title">{% translate "sitios generados" %}</div>
-                  <div class="wb-panel-meta">3 {% translate "proyectos Django · listos para descargar" %}</div>
+                  <div class="wb-panel-title">{% trans "sitios generados" %}</div>
+                  <div class="wb-panel-meta">3 {% trans "proyectos Django · listos para descargar" %}</div>
                 </div>
               </div>
             </div>
             <div class="wb-panel-body">
-              <div class="wb-section-label">{% translate "Proyectos generados" %}</div>
+              <div class="wb-section-label">{% trans "Proyectos generados" %}</div>
               <div class="wb-sites-list">
                 <div class="wb-site-card">
                   <div class="wb-site-thumb"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="1" width="14" height="10" rx="1" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><rect x="2" y="2" width="12" height="2" rx="0.5" fill="rgba(96,165,250,0.15)"/><rect x="2" y="5.5" width="5" height="1" rx="0.5" fill="rgba(255,255,255,0.06)"/><rect x="2" y="7.5" width="8" height="1" rx="0.5" fill="rgba(255,255,255,0.04)"/></svg></div>
-                  <div class="wb-site-info"><div class="wb-site-name">Weather Dashboard</div><div class="wb-site-meta">openweathermap · 6 {% translate "campos" %} · {% translate "hace 2h" %}</div></div>
+                  <div class="wb-site-info"><div class="wb-site-name">Weather Dashboard</div><div class="wb-site-meta">openweathermap · 6 {% trans "campos" %} · {% trans "hace 2h" %}</div></div>
                   <span class="wb-site-tag">dashboard</span>
                 </div>
                 <div class="wb-site-card">
                   <div class="wb-site-thumb"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="1" width="14" height="10" rx="1" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><rect x="2" y="2" width="3" height="4" rx="0.5" fill="rgba(74,222,128,0.12)"/><rect x="6" y="2" width="3" height="4" rx="0.5" fill="rgba(74,222,128,0.12)"/><rect x="10" y="2" width="3" height="4" rx="0.5" fill="rgba(74,222,128,0.12)"/></svg></div>
-                  <div class="wb-site-info"><div class="wb-site-name">Countries Explorer</div><div class="wb-site-meta">restcountries · 4 {% translate "campos" %} · {% translate "hace 3d" %}</div></div>
+                  <div class="wb-site-info"><div class="wb-site-name">Countries Explorer</div><div class="wb-site-meta">restcountries · 4 {% trans "campos" %} · {% trans "hace 3d" %}</div></div>
                   <span class="wb-site-tag">explorer</span>
                 </div>
                 <div class="wb-site-card">
                   <div class="wb-site-thumb"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="1" width="14" height="10" rx="1" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="4.5" cy="5.5" r="2" stroke="rgba(248,113,113,0.2)" stroke-width="1"/><rect x="8" y="3.5" width="6" height="1" rx="0.5" fill="rgba(255,255,255,0.06)"/><rect x="8" y="5.5" width="4" height="1" rx="0.5" fill="rgba(255,255,255,0.04)"/></svg></div>
-                  <div class="wb-site-info"><div class="wb-site-name">Pokédex App</div><div class="wb-site-meta">pokeapi · 5 {% translate "campos" %} · {% translate "hace 1d" %}</div></div>
-                  <span class="wb-site-tag">{% translate "listado" %}</span>
+                  <div class="wb-site-info"><div class="wb-site-name">Pokédex App</div><div class="wb-site-meta">pokeapi · 5 {% trans "campos" %} · {% trans "hace 1d" %}</div></div>
+                  <span class="wb-site-tag">{% trans "listado" %}</span>
                 </div>
               </div>
             </div>
@@ -267,17 +267,17 @@
           <div class="wb-panel-view" id="panel-new">
             <div class="wb-new-panel">
               <div class="wb-new-input-wrap">
-                <div class="wb-new-label">{% translate "URL de la API" %}</div>
+                <div class="wb-new-label">{% trans "URL de la API" %}</div>
                 <div style="display:flex;gap:6px;">
-                  <input class="wb-new-input" id="new-url" type="text" placeholder="{% translate 'https://api.example.com/v1/data' %}" style="flex:1;">
-                  <button class="wb-btn-generate wb-btn-small" onclick="goAnalyze()">{% translate "Analizar" %} →</button>
+                  <input class="wb-new-input" id="new-url" type="text" placeholder="{% trans 'https://api.example.com/v1/data' %}" style="flex:1;">
+                  <button class="wb-btn-generate wb-btn-small" onclick="goAnalyze()">{% trans "Analizar" %} →</button>
                 </div>
               </div>
 
               <div class="wb-upload-box">
                 <div class="wb-upload-sep">
                   <div class="line"></div>
-                  <span>{% translate "o adjunta un archivo" %}</span>
+                  <span>{% trans "o adjunta un archivo" %}</span>
                   <div class="line"></div>
                 </div>
 
@@ -287,24 +287,24 @@
                      ondrop="handleDrop(event)"
                      onclick="document.getElementById('file-input').click()">
                   <div class="wb-drop-icon">📂</div>
-                  <div class="wb-drop-title">{% translate "Arrastra un archivo JSON, CSV o XML" %}</div>
-                  <div class="wb-drop-sub">{% translate "o haz click para seleccionar" %}</div>
+                  <div class="wb-drop-title">{% trans "Arrastra un archivo JSON, CSV o XML" %}</div>
+                  <div class="wb-drop-sub">{% trans "o haz click para seleccionar" %}</div>
                   <div id="drop-filename" class="wb-drop-filename"></div>
                 </div>
                 <input type="file" id="file-input" accept=".json,.csv,.xml" style="display:none;" onchange="handleFileSelect(event)">
               </div>
 
               <div class="wb-new-suggestions">
-                <div class="wb-new-sugg-label">{% translate "Sugerencias rápidas" %}</div>
+                <div class="wb-new-sugg-label">{% trans "Sugerencias rápidas" %}</div>
                 <div class="wb-new-sugg" onclick="fillAndGo('https://api.openweathermap.org/data/2.5/weather?q=Madrid')">
                   <span>🌧</span>
                   <span class="wb-new-sugg-url">api.openweathermap.org/data/2.5/weather</span>
-                  <span class="wb-new-sugg-type">{% translate "meteorología" %}</span>
+                  <span class="wb-new-sugg-type">{% trans "meteorología" %}</span>
                 </div>
                 <div class="wb-new-sugg" onclick="fillAndGo('https://pokeapi.co/api/v2/pokemon/ditto')">
                   <span>⚡</span>
                   <span class="wb-new-sugg-url">pokeapi.co/api/v2/pokemon</span>
-                  <span class="wb-new-sugg-type">{% translate "listado" %}</span>
+                  <span class="wb-new-sugg-type">{% trans "listado" %}</span>
                 </div>
                 <div class="wb-new-sugg" onclick="fillAndGo('https://restcountries.com/v3.1/all')">
                   <span>🌍</span>
@@ -319,28 +319,28 @@
       </div>
 
       <div class="wb-frame-bottom" id="bot-weather">
-        <span class="wb-bottom-info">{% translate "Detectado:" %} <span>{% translate "Dashboard meteorológico" %}</span> · <span>6 {% translate "campos" %}</span> · {% translate "listo para generar" %}</span>
-        <a href="{% url 'assistant' %}" class="wb-btn-generate">{% translate "Generar sitio" %} →</a>
+        <span class="wb-bottom-info">{% trans "Detectado:" %} <span>{% trans "Dashboard meteorológico" %}</span> · <span>6 {% trans "campos" %}</span> · {% trans "listo para generar" %}</span>
+        <a href="{% url 'assistant' %}" class="wb-btn-generate">{% trans "Generar sitio" %} →</a>
       </div>
       <div class="wb-frame-bottom" id="bot-pokemon" style="display:none">
-        <span class="wb-bottom-info">{% translate "Detectado:" %} <span>{% translate "Pokédex / listado" %}</span> · <span>5 {% translate "campos" %}</span> · <span style="color:rgba(52,211,153,.6)">{% translate "publicado" %}</span></span>
-        <a href="{% url 'history' %}" class="wb-btn-generate">{% translate "Ver sitio" %} →</a>
+        <span class="wb-bottom-info">{% trans "Detectado:" %} <span>{% trans "Pokédex / listado" %}</span> · <span>5 {% trans "campos" %}</span> · <span style="color:rgba(52,211,153,.6)">{% trans "publicado" %}</span></span>
+        <a href="{% url 'history' %}" class="wb-btn-generate">{% trans "Ver sitio" %} →</a>
       </div>
       <div class="wb-frame-bottom" id="bot-countries" style="display:none">
-        <span class="wb-bottom-info">{% translate "Detectado:" %} <span>Countries explorer</span> · <span>4 {% translate "campos" %}</span> · <span style="color:rgba(245,158,11,.55)">{% translate "pendiente de confirmar" %}</span></span>
-        <a href="{% url 'assistant' %}" class="wb-btn-generate">{% translate "Generar sitio" %} →</a>
+        <span class="wb-bottom-info">{% trans "Detectado:" %} <span>Countries explorer</span> · <span>4 {% trans "campos" %}</span> · <span style="color:rgba(245,158,11,.55)">{% trans "pendiente de confirmar" %}</span></span>
+        <a href="{% url 'assistant' %}" class="wb-btn-generate">{% trans "Generar sitio" %} →</a>
       </div>
       <div class="wb-frame-bottom" id="bot-posts" style="display:none">
-        <span class="wb-bottom-info">{% translate "Detectado:" %} <span>{% translate "Blog / posts" %}</span> · <span>3 {% translate "campos" %}</span> · {% translate "listo para generar" %}</span>
-        <a href="{% url 'assistant' %}" class="wb-btn-generate">{% translate "Generar sitio" %} →</a>
+        <span class="wb-bottom-info">{% trans "Detectado:" %} <span>{% trans "Blog / posts" %}</span> · <span>3 {% trans "campos" %}</span> · {% trans "listo para generar" %}</span>
+        <a href="{% url 'assistant' %}" class="wb-btn-generate">{% trans "Generar sitio" %} →</a>
       </div>
       <div class="wb-frame-bottom" id="bot-sites" style="display:none">
-        <span class="wb-bottom-info"><span>3 {% translate "proyectos" %}</span> Django {% translate "generados · listos para descargar" %}</span>
-        <a href="{% url 'history' %}" class="wb-btn-generate">{% translate "Ver historial" %} →</a>
+        <span class="wb-bottom-info"><span>3 {% trans "proyectos" %}</span> Django {% trans "generados · listos para descargar" %}</span>
+        <a href="{% url 'history' %}" class="wb-btn-generate">{% trans "Ver historial" %} →</a>
       </div>
       <div class="wb-frame-bottom" id="bot-new" style="display:none">
-        <span class="wb-bottom-info">{% translate "Introduce una URL o arrastra un archivo para comenzar" %}</span>
-        <button class="wb-btn-generate" onclick="goAnalyze()">{% translate "Analizar" %} →</button>
+        <span class="wb-bottom-info">{% trans "Introduce una URL o arrastra un archivo para comenzar" %}</span>
+        <button class="wb-btn-generate" onclick="goAnalyze()">{% trans "Analizar" %} →</button>
       </div>
 
       <div class="wb-vsc-statusbar">

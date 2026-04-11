@@ -1,24 +1,25 @@
+{% load i18n %}
 <!-- ══════════════════════════════════════════════
      PANEL: ACTIVIDAD
 ══════════════════════════════════════════════ -->
 <div class="m-panel" id="m-panel-actividad">
   <div class="m-phead">
-    <div class="m-phead-eyebrow">Panel de administración</div>
-    <h1 class="m-phead-title">Actividad</h1>
-    <p class="m-phead-sub">Evolución de análisis y generaciones en los últimos 30 días</p>
+    <div class="m-phead-eyebrow">{% trans "Panel de administración" %}</div>
+    <h1 class="m-phead-title">{% trans "Actividad" %}</h1>
+    <p class="m-phead-sub">{% trans "Evolución de análisis y generaciones en los últimos 30 días" %}</p>
   </div>
 
   <div class="m-grid-1">
     <div class="m-card">
-      <div class="m-card-title">Análisis y sitios generados — últimos 30 días</div>
+      <div class="m-card-title">{% trans "Análisis y sitios generados — últimos 30 días" %}</div>
       <div class="m-chart-legend">
         <div class="m-chart-legend-item">
           <div class="m-chart-legend-line" style="background:rgba(255,255,255,0.65)"></div>
-          Análisis
+          {% trans "Análisis" %}
         </div>
         <div class="m-chart-legend-item">
           <div class="m-chart-legend-line" style="background:rgba(255,255,255,0.25)"></div>
-          Sitios generados
+          {% trans "Sitios generados" %}
         </div>
       </div>
       <div class="m-chart-wrap">
@@ -33,18 +34,18 @@
 
   <div class="m-grid-2">
     <div class="m-card">
-      <div class="m-card-title">Análisis por formato de entrada</div>
+      <div class="m-card-title">{% trans "Análisis por formato de entrada" %}</div>
       {% if total_analyses %}
         <div class="m-bar-rows">
           <div class="m-bar-row">
-            <span class="m-bar-label">URL (JSON/XML)</span>
+            <span class="m-bar-label">{% trans "URL (JSON/XML)" %}</span>
             <div class="m-bar-track">
               <div class="m-bar-fill" style="width:{% widthratio json_count total_analyses 100 %}%"></div>
             </div>
             <span class="m-bar-num">{% widthratio json_count total_analyses 100 %}%</span>
           </div>
           <div class="m-bar-row">
-            <span class="m-bar-label">Fichero subido</span>
+            <span class="m-bar-label">{% trans "Fichero subido" %}</span>
             <div class="m-bar-track">
               <div class="m-bar-fill" style="width:{% widthratio file_count total_analyses 100 %}%"></div>
             </div>
@@ -52,12 +53,12 @@
           </div>
         </div>
       {% else %}
-        <div class="m-empty">Sin datos</div>
+        <div class="m-empty">{% trans "Sin datos" %}</div>
       {% endif %}
     </div>
 
     <div class="m-card">
-      <div class="m-card-title">Llamadas LLM por paso</div>
+      <div class="m-card-title">{% trans "Llamadas LLM por paso" %}</div>
       {% if steps_stats and total_logs %}
         <div class="m-bar-rows">
           {% for s in steps_stats %}
@@ -71,7 +72,7 @@
           {% endfor %}
         </div>
       {% else %}
-        <div class="m-empty">Sin datos</div>
+        <div class="m-empty">{% trans "Sin datos" %}</div>
       {% endif %}
     </div>
   </div>
