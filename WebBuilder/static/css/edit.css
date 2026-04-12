@@ -241,8 +241,8 @@
   align-items: center;
   gap: 0.6rem;
   padding: 0.55rem 0.75rem;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(52, 211, 153, 0.10);
+  background: var(--wb-bg-3);
+  border: 1px solid var(--wb-success-border);
   border-radius: 8px;
   transition: border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
   user-select: none;
@@ -254,7 +254,7 @@
 
 .edit-field-row.drag-over {
   border-color: var(--wb-border-md);
-  background: rgba(96, 165, 250, 0.06);
+  background: var(--wb-blue-bg);
 }
 
 .edit-field-row.dragging {
@@ -315,13 +315,13 @@
 
 .edit-field-row__label:hover {
   border-color: var(--wb-border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--wb-overlay-xs);
 }
 
 .edit-field-row__label:focus {
   outline: none;
   border-color: var(--wb-border-md);
-  background: rgba(96, 165, 250, 0.05);
+  background: var(--wb-blue-bg);
   color: var(--wb-t1);
 }
 
@@ -331,7 +331,7 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.85rem 1rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--wb-overlay-xs);
   border: 1px dashed var(--wb-border);
   border-radius: 10px;
 }
@@ -354,7 +354,7 @@
   padding: 3px 10px;
   border-radius: 20px;
   border: 1px solid var(--wb-border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--wb-overlay-xs);
   color: var(--wb-t2);
   font-size: 0.72rem;
   font-family: inherit;
@@ -365,7 +365,7 @@
 .edit-key-chip:hover {
   border-color: var(--wb-border-md);
   color: var(--wb-t1);
-  background: rgba(96, 165, 250, 0.06);
+  background: var(--wb-blue-bg);
 }
 
 .edit-key-chip:disabled {
@@ -428,14 +428,14 @@
 }
 
 .edit-card--editor {
-  background: linear-gradient(135deg, rgba(52, 211, 153, 0.22) 0%, rgba(16, 185, 129, 0.12) 100%);
-  border-color: rgba(52, 211, 153, 0.50);
+  background: linear-gradient(135deg, var(--wb-success-bg) 0%, var(--wb-success-bg) 100%);
+  border-color: var(--wb-success-border);
 }
 
 .edit-card--editor .asst-card__step-badge {
-  background: rgba(52, 211, 153, 0.12);
-  border-color: rgba(52, 211, 153, 0.35);
-  color: rgba(52, 211, 153, 0.90);
+  background: var(--wb-success-bg);
+  border-color: var(--wb-success-border);
+  color: var(--wb-success-text);
 }
 
 /* ── PAGINADOR PREVIEW ── */
@@ -449,7 +449,7 @@
 .pager-num {
   font-size: 11px;
   font-family: var(--wb-mono);
-  color: rgba(52, 211, 153, 0.80);
+  color: var(--wb-success-text);
 }
 
 .pager-dots {
@@ -461,18 +461,18 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--wb-overlay-sm);
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .pager-dot--on {
-  background: rgba(52, 211, 153, 0.70);
+  background: var(--wb-success-bg);
 }
 
 .pager-card {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(52, 211, 153, 0.10);
+  background: var(--wb-bg-3);
+  border: 1px solid var(--wb-success-border);
   border-radius: 10px;
   padding: 18px;
   min-height: 180px;
@@ -491,7 +491,7 @@
 .pager-index {
   font-size: 11px;
   font-family: var(--wb-mono);
-  color: rgba(52, 211, 153, 0.75);
+  color: var(--wb-success-text);
   font-weight: 500;
 }
 
@@ -533,17 +533,17 @@
   border-radius: 7px;
   font-size: 12px;
   font-family: var(--wb-mono);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: var(--wb-overlay-sm);
+  border: 1px solid var(--wb-border);
   color: var(--wb-t2);
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .pager-btn:hover {
-  background: rgba(52, 211, 153, 0.08);
-  color: rgba(52, 211, 153, 0.90);
-  border-color: rgba(52, 211, 153, 0.25);
+  background: var(--wb-success-bg);
+  color: var(--wb-success-text);
+  border-color: var(--wb-success-border);
 }
 
 .pager-btn--disabled {
@@ -577,9 +577,9 @@
 }
 
 .edit-badge--users {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.28);
-  color: rgba(129, 140, 248, 0.90);
+  background: var(--wb-indigo-bg);
+  border-color: var(--wb-indigo-border);
+  color: var(--wb-indigo-text);
 }
 
 .users-table {
@@ -601,7 +601,7 @@
 
 .users-table td {
   padding: 6px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--wb-overlay-hover);
 }
 
 .users-table tr:last-child td {
@@ -612,22 +612,22 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: var(--wb-indigo-bg);
+  border: 1px solid var(--wb-indigo-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(129, 140, 248, 0.90);
+  color: var(--wb-indigo-text);
   font-family: var(--wb-mono);
   flex-shrink: 0;
 }
 
 .user-input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--wb-bg-3);
+  border: 1px solid var(--wb-border);
   border-radius: 6px;
   padding: 6px 10px;
   font-size: 12px;
@@ -638,13 +638,13 @@
 
 .user-input:focus {
   outline: none;
-  border-color: rgba(99, 102, 241, 0.35);
+  border-color: var(--wb-indigo-border);
 }
 
 .user-select {
   width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--wb-bg-3);
+  border: 1px solid var(--wb-border);
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 12px;
@@ -656,7 +656,7 @@
 
 .user-select:focus {
   outline: none;
-  border-color: rgba(99, 102, 241, 0.35);
+  border-color: var(--wb-indigo-border);
 }
 
 .user-del-btn {
@@ -664,7 +664,7 @@
   height: 22px;
   border-radius: 4px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--wb-border);
   color: var(--wb-t4);
   font-size: 11px;
   display: flex;
@@ -675,8 +675,8 @@
 }
 
 .user-del-btn:hover {
-  border-color: rgba(239, 68, 68, 0.35);
-  color: rgba(239, 68, 68, 0.70);
+  border-color: var(--wb-error-border);
+  color: var(--wb-error-text);
 }
 
 .users-footer {

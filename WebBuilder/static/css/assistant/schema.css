@@ -107,7 +107,7 @@
 }
 
 .asst-field-chip__key {
-  color: rgba(129, 140, 248, 0.90);
+  color: var(--wb-indigo-text);
   font-family: var(--wb-mono);
   font-size: 11px;
 }

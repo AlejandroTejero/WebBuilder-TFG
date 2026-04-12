@@ -31,15 +31,15 @@
 }
 
 .edit-publish-status--pending {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--wb-overlay-sm);
   border-color: var(--wb-border);
   color: var(--wb-t2);
 }
 
 .edit-publish-status--published {
-  background: rgba(52, 211, 153, 0.08);
-  border-color: rgba(52, 211, 153, 0.14);
-  color: rgba(52, 211, 153, 0.62);
+  background: var(--wb-success-bg); 
+  border-color: var(--wb-success-border); 
+  color: var(--wb-success-text);
 }
 
 .edit-publish-status__icon {
@@ -63,7 +63,7 @@
 }
 
 .edit-publish-status--published .edit-publish-status__desc {
-  color: rgba(220, 252, 231, 0.62);
+  color: var(--wb-success-text-2);
 }
 
 .edit-publish-status__link {
@@ -82,6 +82,7 @@
 .edit-card--publish {
   border-color: var(--wb-border);
 }
+
 
 .edit-meta-row {
   display: grid;
@@ -214,7 +215,7 @@
 }
 
 .edit-field-row__key {
-  color: var(--wb-t2);
+  color: var(--wb-accent);
   font-family: var(--wb-mono);
   font-size: 0.75rem;
   flex-shrink: 0;
@@ -240,7 +241,7 @@
 
 .edit-field-row__label:hover {
   border-color: var(--wb-border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--wb-overlay-xs);
 }
 
 .edit-field-row__label:focus {
@@ -334,4 +335,14 @@
   .edit-meta-row {
     grid-template-columns: 1fr;
   }
+}
+
+:root .edit-field-row__label:focus {
+  background: rgba(52, 211, 153, 0.041);
+  border-color: rgba(52, 211, 153, 0.205);
+}
+
+:root.light .edit-field-row__label:focus {
+  background: rgba(22, 163, 74, 0.12);
+  border-color: rgba(22, 163, 74, 0.40);
 }

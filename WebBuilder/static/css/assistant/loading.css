@@ -77,9 +77,9 @@
 }
 
 .asst-loading__step.done {
-  background: rgba(52, 211, 153, 0.08);
-  border-color: rgba(52, 211, 153, 0.14);
-  color: rgba(52, 211, 153, 0.62);
+  background: var(--wb-success-bg); 
+  border-color: var(--wb-success-border); 
+  color: var(--wb-success-text);
 }
 
 @keyframes asstSpin {

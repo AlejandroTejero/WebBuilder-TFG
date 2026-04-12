@@ -326,11 +326,12 @@
 
 .hist-btn--primary:hover {
   opacity: 0.88;
+  background: var(--wb-t1);
   color: var(--wb-bg);
 }
 
 .hist-btn--danger {
-  color: var(--wb-t4);
+  color: var(--wb-t2);
   border-color: transparent;
   padding: 5px 7px;
 }
@@ -408,4 +409,33 @@
   .hist-search-input:focus { width: 100%; }
   .hist-item { flex-wrap: wrap; }
   .hist-item__actions { width: 100%; padding-top: 8px; border-top: 1px solid var(--wb-border); margin-top: 2px; }
+}
+
+:root.light .hist-pill--ok {
+  background: rgba(22, 163, 74, 0.14);
+  color: rgba(15, 118, 55, 1);
+  border-color: rgba(22, 163, 74, 0.45);
+}
+
+:root.light .hist-pill--purple {
+  background: rgba(99, 102, 241, 0.18);
+  color: rgba(49, 46, 129, 1);
+  border-color: rgba(99, 102, 241, 0.50);
+}
+
+:root.light .hist-dot--ok {
+  background: rgba(22, 163, 74, 1);
+}
+
+
+:root.light .hist-btn--primary:hover {
+  background: var(--wb-t1);
+  color: var(--wb-bg);
+  opacity: 0.80;
+}
+
+:root.light .hist-btn--danger:hover {
+  color: rgba(185, 28, 28, 1);
+  background: rgba(220, 38, 38, 0.10);
+  border-color: rgba(220, 38, 38, 0.30);
 }

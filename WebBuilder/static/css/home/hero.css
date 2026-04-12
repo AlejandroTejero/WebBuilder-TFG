@@ -73,6 +73,7 @@
 .wb-btn-generate:hover {
   opacity: .86;
   color: #0e0e10;
+  color: var(--wb-bg);
 }
 
 .wb-cta-link {
@@ -165,7 +166,7 @@
 }
 
 .wb-vsc-tab:hover {
-  background: rgba(255,255,255,0.03);
+  background: var(--wb-overlay-hover);
   color: var(--wb-t2);
 }
 
@@ -231,14 +232,14 @@
 }
 
 .wb-sidebar-item:hover {
-  background: rgba(255,255,255,0.03);
+  background: var(--wb-overlay-hover);
   color: var(--wb-t2);
 }
 
 .wb-sidebar-item.active {
   color: var(--wb-t1);
-  background: rgba(255,255,255,0.05);
-  border-left-color: rgba(255,255,255,0.25);
+  background: var(--wb-overlay-sm);
+  border-left-color: var(--wb-border-md);
 }
 
 .wb-si-color-dot {
@@ -315,7 +316,7 @@
   white-space: nowrap;
 }
 
-.wb-s-ok { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+.wb-s-ok { background: var(--wb-overlay-sm); color: var(--wb-t3); }
 .wb-s-pub { background: rgba(52,211,153,0.08); color: rgba(52,211,153,0.6); }
 .wb-s-pend { background: rgba(245,158,11,0.08); color: rgba(245,158,11,0.5); }
 
@@ -393,15 +394,15 @@
 }
 
 .wb-field-card.selected {
-  border-color: rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.025);
+  border-color: var(--wb-border-md);
+  background: var(--wb-overlay-xs);
 }
 
 .wb-field-check {
   width: 12px;
   height: 12px;
   border-radius: 2px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--wb-border);
   flex-shrink: 0;
   margin-top: 1px;
   display: flex;
@@ -416,7 +417,7 @@
 }
 
 .wb-field-card.selected .wb-field-check {
-  background: rgba(255,255,255,0.82);
+  background: var(--wb-t1);
   border-color: transparent;
 }
 
@@ -515,8 +516,8 @@
   font-size: 10px;
   padding: 2px 7px;
   border-radius: 3px;
-  background: rgba(255,255,255,0.05);
-  color: rgba(255,255,255,0.28);
+  background: var(--wb-overlay-sm);
+  color: var(--wb-t3);
   font-family: var(--wb-mono);
   flex-shrink: 0;
 }
@@ -580,7 +581,7 @@
 
 .wb-drop-zone {
   width: 100%;
-  border: 1px dashed rgba(255,255,255,0.12);
+  border: 1px dashed var(--wb-border-md);
   border-radius: 6px;
   padding: 20px;
   text-align: center;

@@ -32,9 +32,34 @@
   --wb-title-muted: rgba(255,255,255,0.22);
   --wb-gradient-fade: var(--wb-bg);
 
-  --wb-accent: #4ade807e;
-  --wb-accent-bg: rgba(74, 222, 128, 0.08);
-  --wb-accent-border: rgba(74, 222, 128, 0.18);
+  --wb-accent:        rgba(15, 118, 55, 1);
+  --wb-accent-bg:     rgba(22, 163, 74, 0.14);
+  --wb-accent-border: rgba(22, 163, 74, 0.45);
+
+  /* Semánticos: success */
+  --wb-success-bg:     rgba(52, 211, 153, 0.08);
+  --wb-success-border: rgba(52, 211, 153, 0.14);
+  --wb-success-text:   rgba(52, 211, 153, 0.72);
+  --wb-success-text-2: rgba(220, 252, 231, 0.82);
+
+  /* Semánticos: error */
+  --wb-error-bg:       rgba(239, 68, 68, 0.08);
+  --wb-error-border:   rgba(239, 68, 68, 0.14);
+  --wb-error-text:     rgba(248, 113, 113, 0.72);
+  --wb-error-text-2:   rgba(254, 202, 202, 0.86);
+
+  /* Semánticos: indigo/azul */
+  --wb-indigo-bg:      rgba(99, 102, 241, 0.12);
+  --wb-indigo-border:  rgba(99, 102, 241, 0.28);
+  --wb-indigo-text:    rgba(129, 140, 248, 0.90);
+  --wb-blue-bg:        rgba(96, 165, 250, 0.08);
+  --wb-blue-border:    rgba(96, 165, 250, 0.18);
+  --wb-blue-text:      rgba(96, 165, 250, 0.80);
+
+  /* Overlays */
+  --wb-overlay-sm:     rgba(255, 255, 255, 0.04);
+  --wb-overlay-xs:     rgba(255, 255, 255, 0.02);
+  --wb-overlay-hover:  rgba(255, 255, 255, 0.03);
 }
 
 :root.light {
@@ -51,4 +76,29 @@
   --wb-title: #0f172a;
   --wb-title-muted: rgba(15, 23, 42, 0.28);
   --wb-gradient-fade: #f5f7fb;
+
+  /* Semánticos: success */
+  --wb-success-bg:     rgba(22, 163, 74, 0.288);
+  --wb-success-border: rgba(22, 163, 74, 0.45);
+  --wb-success-text:   rgba(15, 118, 55, 1);
+  --wb-success-text-2: rgba(15, 118, 55, 1);
+
+  /* Semánticos: error */
+  --wb-error-bg:       rgba(220, 38, 38, 0.07);
+  --wb-error-border:   rgba(220, 38, 38, 0.16);
+  --wb-error-text:     rgba(185, 28, 28, 0.85);
+  --wb-error-text-2:   rgba(185, 28, 28, 0.82);
+
+  /* Semánticos: indigo/azul */
+  --wb-indigo-bg:      rgba(84, 86, 221, 0.555);
+  --wb-indigo-border:  rgba(99, 102, 241, 0.60);
+  --wb-indigo-text:    rgb(65, 60, 214);
+  --wb-blue-bg:        rgba(35, 88, 201, 0.315);
+  --wb-blue-border:    rgba(37, 99, 235, 0.50);
+  --wb-blue-text:      rgba(29, 78, 216, 1);
+
+  /* Overlays — flip a negro semitransparente */
+  --wb-overlay-sm:     rgba(0, 0, 0, 0.04);
+  --wb-overlay-xs:     rgba(0, 0, 0, 0.02);
+  --wb-overlay-hover:  rgba(0, 0, 0, 0.03);
 }

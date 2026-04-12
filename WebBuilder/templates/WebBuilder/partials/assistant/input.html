@@ -19,7 +19,6 @@
     <div class="asst-field" id="field-url">
       <label class="asst-label" for="{{ form.api_url.id_for_label }}">{% trans "URL de la API" %}</label>
       <div class="asst-input-group">
-        <span class="asst-input-icon">🔗</span>
         {{ form.api_url }}
       </div>
       {% if form.api_url.errors %}
@@ -37,7 +36,6 @@
     <div class="asst-field" id="field-file" style="display:none;">
       <label class="asst-label" for="{{ form.file_input.id_for_label }}">{% trans "Fichero JSON o XML" %}</label>
       <div class="asst-input-group">
-        <span class="asst-input-icon">📂</span>
         {{ form.file_input }}
       </div>
       {% if form.file_input.errors %}

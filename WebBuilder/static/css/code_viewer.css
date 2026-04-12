@@ -249,15 +249,15 @@
 }
 
 .sr-save-feedback--success {
-  background: rgba(52, 211, 153, 0.08);
-  color: rgba(52, 211, 153, 0.8);
-  border: 1px solid rgba(52, 211, 153, 0.14);
+  background: var(--wb-success-bg);
+  color:  var(--wb-success-text);
+  border: 1px solid var(--wb-success-border);
 }
 
 .sr-save-feedback--error {
-  background: rgba(239, 68, 68, 0.08);
-  color: rgba(248, 113, 113, 0.8);
-  border: 1px solid rgba(239, 68, 68, 0.14);
+  background:  var(--wb-error-bg);
+  color:  var(--wb-error-text);
+  border: 1px solid var(--wb-error-border);
 }
 
 /* ── MODAL MONACO ── */

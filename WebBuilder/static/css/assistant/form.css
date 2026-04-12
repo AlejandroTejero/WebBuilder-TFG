@@ -67,7 +67,7 @@
 
 .asst-input-group input[type="url"],
 .asst-input-group input[type="text"] {
-  padding: 12px 14px 12px 38px;
+  padding: 12px 14px 12px 14px;
   font-size: 13px;
 }
 
@@ -164,7 +164,7 @@
 .asst-field-error {
   font-size: 12px;
   line-height: 1.5;
-  color: rgba(248, 113, 113, 0.8);
+  color: var(--wb-error-text);
 }
 
 .asst-form-footer {
@@ -201,7 +201,7 @@
 
 .asst-toggle-btn:hover {
   color: var(--wb-t2);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--wb-overlay-hover);
 }
 
 .asst-toggle-btn.active {
@@ -259,9 +259,9 @@
 }
 
 .asst-wizard__step-dot.done {
-  background: rgba(52, 211, 153, 0.08);
-  border-color: rgba(52, 211, 153, 0.14);
-  color: rgba(52, 211, 153, 0.62);
+  background: var(--wb-success-bg); 
+  border-color: var(--wb-success-border); 
+  color: var(--wb-success-text);
 }
 
 .asst-wizard__step-line {
@@ -691,8 +691,8 @@
 }
 
 #llm-opt-default.llm-modal__option--selected {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.10) 0%, rgba(59, 130, 246, 0.06) 100%);
-  border-color: rgba(99, 102, 241, 0.25);
+  background: linear-gradient(135deg, var(--wb-indigo-bg) 0%, var(--wb-blue-bg) 100%); 
+  border-color: var(--wb-indigo-border);
 }
 
 .llm-modal__option--selected {
@@ -726,15 +726,15 @@
   font-family: var(--wb-mono);
   padding: 2px 7px;
   border-radius: 5px;
-  background: rgba(99, 102, 241, 0.10);
-  border-color: rgba(99, 102, 241, 0.25);
-  color: rgba(129, 140, 248, 0.90);
+  background: var(--wb-indigo-bg); 
+  border-color: var(--wb-indigo-border); 
+  color: var(--wb-indigo-text);
 }
 
 .llm-modal__opt-badge--ok {
-  background: rgba(52, 211, 153, 0.08);
-  border-color: rgba(52, 211, 153, 0.14);
-  color: rgba(52, 211, 153, 0.7);
+  background: var(--wb-success-bg); 
+  border-color: var(--wb-success-border); 
+  color: var(--wb-success-text);
 }
 
 .llm-modal__opt-badge--empty {
@@ -801,9 +801,9 @@
   flex-shrink: 0;
   padding: 2px 6px;
   border-radius: 5px;
-  background: rgba(99, 102, 241, 0.10);
-  border: 1px solid rgba(99, 102, 241, 0.22);
-  color: rgba(129, 140, 248, 0.90);
+  background: var(--wb-indigo-bg); 
+  border: 1px solid var(--wb-indigo-border); 
+  color: var(--wb-indigo-text);
   font-size: 10px;
   line-height: 1.4;
   font-family: var(--wb-mono);

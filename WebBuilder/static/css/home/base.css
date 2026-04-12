@@ -31,25 +31,6 @@
   --wb-gradient-fade: var(--wb-bg);
 }
 
-/*
-:root.light {
-  --wb-bg: #f8f8f9;
-  --wb-bg-2: #ffffff;
-  --wb-bg-3: #f0f0f2;
-  --wb-bg-4: #e8e8ea;
-  --wb-border: rgba(0,0,0,0.07);
-  --wb-border-md: rgba(0,0,0,0.12);
-  --wb-t1: rgba(0,0,0,0.90);
-  --wb-t2: rgba(0,0,0,0.55);
-  --wb-t3: rgba(0,0,0,0.40);
-  --wb-t4: rgba(0,0,0,0.18);
-
-  --wb-title: #0e0e10;
-  --wb-title-muted: rgba(0,0,0,0.22);
-  --wb-gradient-fade: #f8f8f9;
-}
-*/
-
 :root.light {
   --wb-bg: #f5f7fb;                         /* fondo principal de la página */
   --wb-bg-2: #ffffff;                       /* fondo de bloques/cards principales */

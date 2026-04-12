@@ -196,24 +196,24 @@
   font-weight: 500;
   font-family: var(--wb-mono);
   border: 1px solid var(--wb-border);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--wb-overlay-sm);
   color: var(--wb-t2);
 }
 
 .asst-meta__status--processed {
-  background: rgba(52, 211, 153, 0.08);
-  border-color: rgba(52, 211, 153, 0.14);
-  color: rgba(52, 211, 153, 0.62);
+  background: var(--wb-success-bg);
+  border-color: var(--wb-success-border);
+  color: var(--wb-success-text);
 }
 
 .asst-meta__status--error {
-  background: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.14);
-  color: rgba(248, 113, 113, 0.72);
+  background: var(--wb-error-bg);
+  border-color: var(--wb-error-border);
+  color: var(--wb-error-text);
 }
 
 .asst-meta__status--pending {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--wb-overlay-sm);
   border-color: var(--wb-border);
   color: var(--wb-t2);
 }
@@ -271,15 +271,15 @@
 }
 
 .asst-alert--success {
-  background: rgba(52, 211, 153, 0.06);
-  border-color: rgba(52, 211, 153, 0.12);
-  color: rgba(220, 252, 231, 0.82);
+  background: var(--wb-success-bg);
+  border-color: var(--wb-success-border);
+  color: var(--wb-success-text-2);
 }
 
 .asst-alert--error {
-  background: rgba(239, 68, 68, 0.06);
-  border-color: rgba(239, 68, 68, 0.12);
-  color: rgba(254, 202, 202, 0.86);
+  background: var(--wb-error-bg);
+  border-color: var(--wb-error-border);
+  color: var(--wb-error-text-2);
 }
 
 .asst-alert--warning,
@@ -318,13 +318,13 @@
 }
 
 .asst-card--schema {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(59, 130, 246, 0.10) 100%);
-  border-color: rgba(99, 102, 241, 0.30);
+  background: linear-gradient(135deg, var(--wb-indigo-bg) 0%, var(--wb-blue-bg) 100%);
+  border-color: var(--wb-indigo-border);
 }
 
 .asst-card--error {
-  background: rgba(239, 68, 68, 0.04);
-  border-color: rgba(239, 68, 68, 0.12);
+  background: var(--wb-error-bg);
+  border-color: var(--wb-error-border);
 }
 
 .asst-card--preview {
@@ -348,9 +348,9 @@
   margin-bottom: 10px;
   padding: 3px 8px;
   border-radius: 20px;
-  border: 1px solid rgba(96, 165, 250, 0.18);
-  background: rgba(96, 165, 250, 0.08);
-  color: rgba(96, 165, 250, 0.8);
+  border: 1px solid var(--wb-blue-border);
+  background: var(--wb-blue-bg);
+  color: var(--wb-blue-text);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -359,23 +359,35 @@
   white-space: nowrap;
 }
 
+:root.light .asst-card__step-badge {
+  background: rgba(29, 78, 216, 0.10);
+  border-color: rgba(29, 78, 216, 0.40);
+  color: rgb(29, 78, 216);
+}
+
+:root.light .asst-card__step-badge--done {
+  background: var(--wb-success-bg);
+  border-color: var(--wb-success-border);
+  color: var(--wb-success-text);
+}
+
 .asst-card__step-badge--done {
-  background: rgba(52, 211, 153, 0.08);
-  border-color: rgba(52, 211, 153, 0.14);
-  color: rgba(52, 211, 153, 0.62);
+  background: var(--wb-success-bg);
+  border-color: var(--wb-success-border);
+  color: var(--wb-success-text);
 }
 
 .asst-card__step-badge--ai,
 .asst-card__step-badge--preview {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.28);
-  color: rgba(129, 140, 248, 0.90);
+  background: var(--wb-indigo-bg);
+  border-color: var(--wb-indigo-border);
+  color: var(--wb-indigo-text);
 }
 
 .asst-card__step-badge--error {
-  background: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.14);
-  color: rgba(248, 113, 113, 0.72);
+  background: var(--wb-error-bg);
+  border-color: var(--wb-error-border);
+  color: var(--wb-error-text);
 }
 
 .asst-card__title {
@@ -500,9 +512,9 @@
   margin-bottom: 8px;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(239, 68, 68, 0.14);
-  background: rgba(239, 68, 68, 0.06);
-  color: rgba(254, 202, 202, 0.86);
+  border: 1px solid var(--wb-error-border);
+  background: var(--wb-error-bg);
+  color: var(--wb-error-text-2);
   font-size: 12px;
   line-height: 1.5;
 }
