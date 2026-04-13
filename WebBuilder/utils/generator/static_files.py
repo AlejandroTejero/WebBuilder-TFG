@@ -117,6 +117,7 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "django>=4.2,<6.0\n"
         "requests>=2.28\n"
         "gunicorn>=21.0\n"
+        "xmltodict>=0.13\n"
     )
 
     # Dockerfile
@@ -139,9 +140,9 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
     )
 
     # entrypoint.sh — incluye seed_users
+    # entrypoint.sh — incluye seed_users
     files[f"{project}/entrypoint.sh"] = (
         "#!/bin/sh\n"
-        "set -e\n"
         "\n"
         "echo '--- Generando migraciones ---'\n"
         "python manage.py makemigrations siteapp --noinput\n"
@@ -150,10 +151,10 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "python manage.py migrate --noinput\n"
         "\n"
         "echo '--- Cargando datos ---'\n"
-        "python manage.py load_data\n"
+        "python manage.py load_data || echo 'AVISO: load_data falló, el sitio arrancará sin datos'\n"
         "\n"
         "echo '--- Creando usuarios ---'\n"
-        "python manage.py seed_users\n"
+        "python manage.py seed_users || echo 'AVISO: seed_users falló, continuando'\n"
         "\n"
         "echo '--- Arrancando servidor ---'\n"
         f"gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 120 "

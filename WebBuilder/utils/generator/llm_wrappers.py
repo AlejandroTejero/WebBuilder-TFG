@@ -100,3 +100,23 @@ def strip_markdown_fences(code: str) -> str:
         final_lines.pop()
 
     return "\n".join(final_lines).strip()
+
+
+def extract_requirements(code: str) -> tuple[str, list[str]]:
+    """
+    Extrae las librerías extra que el LLM indica con ##REQUIREMENTS:
+    Devuelve (código_limpio, lista_de_requirements)
+    """
+    requirements = []
+    clean_lines = []
+    
+    for line in code.splitlines():
+        if line.strip().startswith("##REQUIREMENTS:"):
+            value = line.strip().replace("##REQUIREMENTS:", "").strip()
+            if value and value.lower() != "none":
+                reqs = [r.strip() for r in value.split(",") if r.strip()]
+                requirements.extend(reqs)
+        else:
+            clean_lines.append(line)
+    
+    return "\n".join(clean_lines).strip(), requirements

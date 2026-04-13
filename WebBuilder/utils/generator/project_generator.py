@@ -29,7 +29,7 @@ from ..llm.field_extractor import extract_model_fields
 from ..llm.consistency_checker import check_consistency, check_django_syntax
 from ..llm.enrich_prompt import enrich_user_prompt
 
-from .llm_wrappers import llm_call_logged, llm_json_call, strip_markdown_fences
+from .llm_wrappers import llm_call_logged, llm_json_call, strip_markdown_fences, extract_requirements
 from .fallbacks import (
     fallback_pages,
     fallback_models,
@@ -205,8 +205,18 @@ def generate_project_files(site) -> dict[str, str]:
     load_data_code = llm_call_logged(system, user_text, "load_data", temperature=0.05, site=site)
     if not load_data_code.strip():
         load_data_code = fallback_load_data(fields, api_url)
-    files[f"{project}/{app}/management/commands/load_data.py"] = strip_markdown_fences(load_data_code)
+    
+    load_data_code, extra_reqs = extract_requirements(strip_markdown_fences(load_data_code))
+    files[f"{project}/{app}/management/commands/load_data.py"] = load_data_code
 
+    if extra_reqs:
+        logger.info(f"[generator] Librerías extra detectadas: {extra_reqs}")
+        current_reqs = files.get(f"{project}/requirements.txt", "")
+        for req in extra_reqs:
+            if req not in current_reqs:
+                current_reqs += f"{req}\n"
+        files[f"{project}/requirements.txt"] = current_reqs
+        
     # ── PASO 6b: seed_users.py ───────────────────────────────────────────────
     logger.info("[generator] Paso 6b: seed_users.py")
     site_users = list(site.site_users.values('username', 'password', 'role'))

@@ -223,6 +223,7 @@ _VISUAL_REQUIREMENTS = {
         "OBLIGATORIO: Hover en cards: hover:-translate-y-1 hover:shadow-2xl transition-all duration-300.",
         "OBLIGATORIO: Empty state visual con icono SVG y mensaje cuando no hay items ({% empty %}).",
         "RECOMENDADO: Mini hero (py-12) con título y subtítulo antes del grid.",
+        "OBLIGATORIO: Controles de paginación al final del grid. Usa page_obj para navegar: {% if page_obj.has_other_pages %}<div class='flex justify-center gap-2 mt-10'>{% if page_obj.has_previous %}<a href='?page={{ page_obj.previous_page_number }}' class='px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700'>← Anterior</a>{% endif %}<span class='px-4 py-2 text-gray-400'>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href='?page={{ page_obj.next_page_number }}' class='px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700'>Siguiente →</a>{% endif %}</div>{% endif %}.",
     ],
     "detail": [
         "OBLIGATORIO: Breadcrumb arriba: Inicio › Listado › Nombre del item.",
@@ -380,6 +381,8 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
         "Si falla la conversión → None (no romper el comando).",
         "Informa del progreso con self.stdout.write().",
         "try/except general para no romper si la API falla.",
+        "CRÍTICO: al final de tu respuesta, después del código, añade una línea exactamente así: ##REQUIREMENTS:libreria1,libreria2 listando SOLO las librerías externas que hayas importado que NO sean de la librería estándar de Python ni django ni requests. Si no necesitas ninguna extra escribe ##REQUIREMENTS:none",
+        "Ejemplo: si usas xmltodict escribe ##REQUIREMENTS:xmltodict>=0.13 — si usas solo json o xml.etree escribe ##REQUIREMENTS:none",
         "Clase 'Command(BaseCommand)', help descriptivo.",
     ]
 
