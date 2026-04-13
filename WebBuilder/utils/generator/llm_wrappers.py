@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) -> str:
     """Llamada básica al LLM. Devuelve '' si falla."""
     try:
-        time.sleep(10)
+        time.sleep(12)
         return chat_completion(
             user_text=user_text,
             system_text=system,

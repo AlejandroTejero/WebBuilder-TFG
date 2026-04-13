@@ -172,45 +172,150 @@
       <div><strong>{% trans "Error de despliegue" %}</strong> — <span id="deploy-error-msg">{{ site.deploy_error }}</span></div>
     </div>
 
-    {% if site.deploy_status == 'done' and site.preview_url %}
-      <!-- iframe del sitio desplegado -->
-      <div class="sr-browser">
-        <div class="sr-browser__bar">
-          <div class="sr-browser__dots">
-            <span class="sr-browser__dot sr-browser__dot--red"></span>
-            <span class="sr-browser__dot sr-browser__dot--yellow"></span>
-            <span class="sr-browser__dot sr-browser__dot--green"></span>
-          </div>
-          <div class="sr-browser__url" id="browser-url">{{ site.preview_url }}</div>
-          <a class="sr-browser__open" href="{{ site.preview_url }}" target="_blank" rel="noopener">{% trans "Abrir" %} ↗</a>
-        </div>
-        <iframe
-          class="sr-browser__iframe"
-          id="site-iframe"
-          src="{{ site.preview_url }}"
-          frameborder="0"
-          allowfullscreen>
-        </iframe>
-      </div>
+    {% if site.generation_status == 'ready' %}
+      <div class="sr-panel">
 
-    {% elif site.generation_status == 'ready' %}
-      <!-- Sitio generado pero no desplegado -->
-      <div class="sr-ready-state">
-        <div class="sr-ready-state__icon">✓</div>
-        <div class="sr-ready-state__title">{% trans "Proyecto generado" %}</div>
-        <div class="sr-ready-state__desc">
-          {% blocktrans with file_count=site.project_files|length %}{{ file_count }} archivos listos. Despliega el sitio para verlo en el navegador.{% endblocktrans %}
+        {% if site.deploy_status == 'done' and site.preview_url %}
+        <div class="sr-panel__urlbar">
+          <span class="sr-panel__dot sr-panel__dot--green"></span>
+          <span class="sr-panel__url">{{ site.preview_url }}</span>
+          <a class="sr-panel__open" href="{{ site.preview_url }}" target="_blank" rel="noopener">
+            {% trans "Abrir" %} ↗
+          </a>
         </div>
-        <form method="post" action="{% url 'site_deploy' api_request.id %}" style="margin:0;">
-          {% csrf_token %}
-          <button class="asst-btn asst-btn--primary asst-btn--lg" type="submit">
-            {% trans "Desplegar y ver sitio" %}
-          </button>
-        </form>
+        {% endif %}
+
+        <div class="sr-panel__stats">
+          <div class="sr-panel__stat">
+            <span class="sr-panel__stat-value">{% if site.project_files %}{{ site.project_files|length }}{% else %}0{% endif %}</span>
+            <span class="sr-panel__stat-label">{% trans "Archivos" %}</span>
+          </div>
+          <div class="sr-panel__stat">
+            <span class="sr-panel__stat-value">{{ pages|length }}</span>
+            <span class="sr-panel__stat-label">{% trans "Páginas" %}</span>
+          </div>
+          <div class="sr-panel__stat">
+            <span class="sr-panel__stat-value">{{ model_fields|length }}</span>
+            <span class="sr-panel__stat-label">{% trans "Campos" %}</span>
+          </div>
+          <div class="sr-panel__stat">
+            <span class="sr-panel__stat-value">{{ total_calls }}</span>
+            <span class="sr-panel__stat-label">{% trans "Llamadas LLM" %}</span>
+          </div>
+        </div>
+
+        <div class="sr-panel__row">
+          <div class="sr-panel__block">
+            <div class="sr-panel__block-title">{% trans "Info del sitio" %}</div>
+            <div class="sr-panel__info-list">
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Título" %}</span>
+                <span class="sr-panel__info-value">{{ plan.site_title|default:"—" }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Tipo" %}</span>
+                <span class="sr-panel__info-value">{{ plan.site_type|default:"—" }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "URL origen" %}</span>
+                <span class="sr-panel__info-value sr-panel__info-value--mono">{{ api_request.api_url|truncatechars:40 }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Prompt" %}</span>
+                <span class="sr-panel__info-value">{{ plan.user_prompt|default:"—"|truncatechars:80 }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Generado" %}</span>
+                <span class="sr-panel__info-value">{{ site.created_at|date:"d/m/Y H:i" }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Modelo LLM" %}</span>
+                <span class="sr-panel__info-value sr-panel__info-value--mono">{{ llm_model }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sr-panel__block">
+            <div class="sr-panel__block-title">{% trans "Páginas generadas" %}</div>
+            <div class="sr-panel__pages">
+              {% for page in pages %}
+              <div class="sr-panel__page">
+                <span class="sr-panel__page-name">{{ page.name }}</span>
+                <span class="sr-panel__page-url">{{ page.url }}</span>
+                {% if site.deploy_status == 'done' and site.preview_url %}
+                <a class="sr-panel__page-link" href="{{ site.preview_url }}{{ page.url }}" target="_blank">↗</a>
+                {% endif %}
+              </div>
+              {% empty %}
+              <span class="sr-panel__empty">{% trans "Sin páginas" %}</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="sr-panel__row">
+          <div class="sr-panel__block">
+            <div class="sr-panel__block-title">{% trans "Modelo de datos" %}</div>
+            <div class="sr-panel__fields">
+              {% for field in model_fields %}
+              <div class="sr-panel__field-row">
+                <span class="sr-panel__field-name">{{ field.name }}</span>
+                <span class="sr-panel__field-type">{{ field.type }}</span>
+              </div>
+              {% empty %}
+              <span class="sr-panel__empty">{% trans "Sin campos" %}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="sr-panel__block">
+            <div class="sr-panel__block-title">{% trans "Proceso de generación" %}</div>
+            <div class="sr-panel__info-list">
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Llamadas al LLM" %}</span>
+                <span class="sr-panel__info-value">{{ total_calls }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Reintentos" %}</span>
+                <span class="sr-panel__info-value">{{ retries }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Errores corregidos" %}</span>
+                <span class="sr-panel__info-value">{{ consistency_errors }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Archivos .py" %}</span>
+                <span class="sr-panel__info-value">{{ files_py }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Archivos .html" %}</span>
+                <span class="sr-panel__info-value">{{ files_html }}</span>
+              </div>
+              <div class="sr-panel__info-row">
+                <span class="sr-panel__info-label">{% trans "Otros archivos" %}</span>
+                <span class="sr-panel__info-value">{{ files_other }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sr-panel__block sr-panel__block--full">
+          <div class="sr-panel__block-title">{% trans "Usuarios del sitio" %}</div>
+          <div class="sr-panel__users">
+            {% for u in site_users %}
+            <div class="sr-panel__user">
+              <span class="sr-panel__user-name">{{ u.username }}</span>
+              <span class="sr-panel__user-role sr-panel__user-role--{{ u.role }}">{{ u.role }}</span>
+            </div>
+            {% empty %}
+            <span class="sr-panel__empty">{% trans "Sin usuarios configurados" %}</span>
+            {% endfor %}
+          </div>
+        </div>
+
       </div>
 
     {% else %}
-      <!-- Aún no generado -->
       <div class="sr-ready-state">
         <div class="sr-ready-state__icon" style="opacity:.15;">⚙</div>
         <div class="sr-ready-state__title">{% trans "Aún no hay código" %}</div>

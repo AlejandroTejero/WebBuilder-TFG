@@ -41,15 +41,61 @@ def _run_generation(site_id: int):
             pass
 
 
+# Recojo los campos necesarios para las estadisitcas
 @login_required
 def site_render(request, api_request_id: int):
+    import re
     api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site = get_object_or_404(GeneratedSite, project_source=api_request)
     site, _ = GeneratedSite.objects.get_or_create(project_source=api_request)
+
+    plan = site.accepted_plan or {}
+
+    # — Campos del modelo (parseando models.py generado)
+    model_fields = []
+    models_code = next((v for k, v in (site.project_files or {}).items() if k.endswith("models.py")), "")
+    if models_code:
+        for match in re.finditer(r'^\s+(\w+)\s*=\s*models\.(\w+)', models_code, re.MULTILINE):
+            name, field_type = match.group(1), match.group(2)
+            if name not in ("id", "created_at", "updated_at"):
+                model_fields.append({"name": name, "type": field_type})
+
+    # — Páginas generadas (parseando urls.py de la app)
+    pages = []
+    urls_code = next((v for k, v in (site.project_files or {}).items()
+                      if k.endswith("siteapp/urls.py") or k.endswith("urls.py")), "")
+    if urls_code:
+        for match in re.finditer(r"path\('([^']*)',\s*views\.(\w+),\s*name='(\w+)'", urls_code):
+            url, view, name = match.group(1), match.group(2), match.group(3)
+            if name != "register":
+                pages.append({"url": "/" + url, "view": view, "name": name})
+
+    # — Stats de generación (desde los logs)
+    logs = site.generation_logs.all().order_by("created_at")
+    llm_model = logs.first().llm_model if logs.exists() else "—"
+    total_calls = logs.count()
+    retries = logs.filter(had_retry=True).count()
+    consistency_errors = sum(len(l.consistency_errors) for l in logs)
+
+    # — Desglose de archivos por tipo
+    files = site.project_files or {}
+    files_py   = sum(1 for k in files if k.endswith(".py"))
+    files_html = sum(1 for k in files if k.endswith(".html"))
+    files_other = len(files) - files_py - files_html
+
     return render(request, "WebBuilder/site_render.html", {
-        "api_request": api_request,
-        "site": site,
-        "site_users": site.site_users.all(),
+        "api_request":         api_request,
+        "site":                site,
+        "site_users":          site.site_users.all(),
+        "plan":                plan,
+        "model_fields":        model_fields,
+        "pages":               pages,
+        "llm_model":           llm_model,
+        "total_calls":         total_calls,
+        "retries":             retries,
+        "consistency_errors":  consistency_errors,
+        "files_py":            files_py,
+        "files_html":          files_html,
+        "files_other":         files_other,
     })
 
 @login_required
