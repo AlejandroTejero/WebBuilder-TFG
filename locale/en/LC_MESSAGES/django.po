@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-11 16:11+0000\n"
+"POT-Creation-Date: 2026-04-13 11:49+0000\n"
 "PO-Revision-Date: 2026-04-11 15:55+0000\n"
 "Last-Translator: ChatGPT <noreply@example.com>\n"
 "Language-Team: English\n"
@@ -68,11 +68,12 @@ msgid "Ver historial"
 msgstr "View history"
 
 #: WebBuilder/templates/WebBuilder/assistant.html:111
+#: WebBuilder/templates/WebBuilder/site_render.html:232
 msgid "Modelo LLM"
 msgstr "LLM model"
 
 #: WebBuilder/templates/WebBuilder/assistant.html:121
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:232
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:230
 msgid "Predeterminado"
 msgstr "Default"
 
@@ -152,7 +153,7 @@ msgid "Selecciona un archivo del árbol"
 msgstr "Select a file from the tree"
 
 #: WebBuilder/templates/WebBuilder/code_viewer.html:45
-#: WebBuilder/templates/WebBuilder/navbar.html:101
+#: WebBuilder/templates/WebBuilder/navbar_old.html:101
 #: WebBuilder/templates/WebBuilder/partials/history/published_sites.html:101
 #: WebBuilder/templates/WebBuilder/partials/history/recent_analysis.html:111
 msgid "Editar"
@@ -310,8 +311,8 @@ msgid "Reset"
 msgstr "Reset"
 
 #: WebBuilder/templates/WebBuilder/edit.html:223
-#: WebBuilder/templates/WebBuilder/metrics.html:51
-#: WebBuilder/templates/WebBuilder/metrics.html:59
+#: WebBuilder/templates/WebBuilder/metrics.html:52
+#: WebBuilder/templates/WebBuilder/metrics.html:60
 #: WebBuilder/templates/WebBuilder/partials/metrics/users.html:8
 msgid "Usuarios"
 msgstr "Users"
@@ -328,16 +329,16 @@ msgstr "Define the users when launching the project for the first time."
 #: WebBuilder/templates/WebBuilder/edit.html:242
 #: WebBuilder/templates/WebBuilder/edit.html:255
 #: WebBuilder/templates/WebBuilder/partials/metrics/generations.html:21
-#: WebBuilder/templates/registration/login.html:64
-#: WebBuilder/templates/registration/register.html:76
+#: WebBuilder/templates/registration/login.html:66
+#: WebBuilder/templates/registration/register.html:78
 msgid "Usuario"
 msgstr "User"
 
 #: WebBuilder/templates/WebBuilder/edit.html:233
 #: WebBuilder/templates/WebBuilder/edit.html:243
 #: WebBuilder/templates/WebBuilder/edit.html:256
-#: WebBuilder/templates/registration/login.html:65
-#: WebBuilder/templates/registration/register.html:78
+#: WebBuilder/templates/registration/login.html:67
+#: WebBuilder/templates/registration/register.html:80
 msgid "Contraseña"
 msgstr "Password"
 
@@ -387,8 +388,8 @@ msgid "Anterior"
 msgstr "Previous"
 
 #: WebBuilder/templates/WebBuilder/edit.html:330
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:137
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:179
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:135
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:177
 #: WebBuilder/templates/WebBuilder/partials/history/published_sites.html:129
 #: WebBuilder/templates/WebBuilder/partials/history/recent_analysis.html:141
 msgid "Siguiente"
@@ -424,7 +425,7 @@ msgstr ""
 "When the schema is ready, AI will generate the HTML/CSS for the entire site."
 
 #: WebBuilder/templates/WebBuilder/edit.html:370
-#: WebBuilder/templates/WebBuilder/site_render.html:218
+#: WebBuilder/templates/WebBuilder/site_render.html:323
 msgid "Generar y publicar sitio"
 msgstr "Generate and publish site"
 
@@ -447,193 +448,247 @@ msgid "La IA está creando el diseño completo"
 msgstr "AI is creating the full design"
 
 #: WebBuilder/templates/WebBuilder/edit.html:405
-#: WebBuilder/templates/WebBuilder/site_render.html:238
+#: WebBuilder/templates/WebBuilder/site_render.html:343
 msgid "Analizando estructura del sitio"
 msgstr "Analyzing site structure"
 
 #: WebBuilder/templates/WebBuilder/edit.html:406
-#: WebBuilder/templates/WebBuilder/site_render.html:239
+#: WebBuilder/templates/WebBuilder/site_render.html:344
 msgid "Generando modelos de datos"
 msgstr "Generating data models"
 
 #: WebBuilder/templates/WebBuilder/edit.html:407
-#: WebBuilder/templates/WebBuilder/site_render.html:240
+#: WebBuilder/templates/WebBuilder/site_render.html:345
 msgid "Generando vistas y controladores"
 msgstr "Generating views and controllers"
 
 #: WebBuilder/templates/WebBuilder/edit.html:408
-#: WebBuilder/templates/WebBuilder/site_render.html:241
+#: WebBuilder/templates/WebBuilder/site_render.html:346
 msgid "Generando plantilla base"
 msgstr "Generating base template"
 
 #: WebBuilder/templates/WebBuilder/edit.html:409
-#: WebBuilder/templates/WebBuilder/site_render.html:242
+#: WebBuilder/templates/WebBuilder/site_render.html:347
 msgid "Generando páginas"
 msgstr "Generating pages"
 
 #: WebBuilder/templates/WebBuilder/edit.html:410
-#: WebBuilder/templates/WebBuilder/site_render.html:243
+#: WebBuilder/templates/WebBuilder/site_render.html:348
 msgid "Ensamblando y validando"
 msgstr "Assembling and validating"
 
-#: WebBuilder/templates/WebBuilder/metrics.html:16
+#: WebBuilder/templates/WebBuilder/metrics.html:17
 msgid "General"
 msgstr "General"
 
-#: WebBuilder/templates/WebBuilder/metrics.html:22
+#: WebBuilder/templates/WebBuilder/metrics.html:23
 #: WebBuilder/templates/WebBuilder/partials/assistant/analysis.html:37
 #: WebBuilder/templates/WebBuilder/partials/metrics/summary.html:8
 msgid "Resumen"
 msgstr "Summary"
 
-#: WebBuilder/templates/WebBuilder/metrics.html:29
+#: WebBuilder/templates/WebBuilder/metrics.html:30
 #: WebBuilder/templates/WebBuilder/partials/metrics/activity.html:8
 msgid "Actividad"
 msgstr "Activity"
 
-#: WebBuilder/templates/WebBuilder/metrics.html:32
+#: WebBuilder/templates/WebBuilder/metrics.html:33
 msgid "Sistema"
 msgstr "System"
 
-#: WebBuilder/templates/WebBuilder/metrics.html:37
+#: WebBuilder/templates/WebBuilder/metrics.html:38
 #: WebBuilder/templates/WebBuilder/partials/metrics/llm.html:8
 msgid "LLM"
 msgstr "LLM"
 
-#: WebBuilder/templates/WebBuilder/metrics.html:45
+#: WebBuilder/templates/WebBuilder/metrics.html:46
 #: WebBuilder/templates/WebBuilder/partials/metrics/alerts.html:8
 msgid "Alertas"
 msgstr "Alerts"
 
-#: WebBuilder/templates/WebBuilder/metrics.html:62
-#: WebBuilder/templates/WebBuilder/metrics.html:68
+#: WebBuilder/templates/WebBuilder/metrics.html:63
+#: WebBuilder/templates/WebBuilder/metrics.html:69
 #: WebBuilder/templates/WebBuilder/partials/metrics/generations.html:8
 msgid "Generaciones"
 msgstr "Generations"
 
 #: WebBuilder/templates/WebBuilder/navbar.html:47
+#: WebBuilder/templates/WebBuilder/navbar_old.html:47
 msgid "Inicio"
 msgstr "Home"
 
 #: WebBuilder/templates/WebBuilder/navbar.html:53
+#: WebBuilder/templates/WebBuilder/navbar_old.html:53
 #: WebBuilder/templates/WebBuilder/partials/history/recent_analysis.html:109
 msgid "Asistente"
 msgstr "Assistant"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:59
-msgid "Nuevo Proyecto"
-msgstr "New Project"
-
 #: WebBuilder/templates/WebBuilder/navbar.html:60
-msgid "Crear una nueva web desde cero"
-msgstr "Create a new website from scratch"
-
-#: WebBuilder/templates/WebBuilder/navbar.html:65
-msgid "Cargar API"
-msgstr "Load API"
-
-#: WebBuilder/templates/WebBuilder/navbar.html:66
-msgid "Importar datos desde una URL"
-msgstr "Import data from a URL"
-
-#: WebBuilder/templates/WebBuilder/navbar.html:71
-msgid "Proyectos Recientes"
-msgstr "Recent Projects"
-
-#: WebBuilder/templates/WebBuilder/navbar.html:72
-msgid "Ver tus últimos proyectos"
-msgstr "View your latest projects"
-
-#: WebBuilder/templates/WebBuilder/navbar.html:82
+#: WebBuilder/templates/WebBuilder/navbar_old.html:82
 msgid "Métricas"
 msgstr "Metrics"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:88
+#: WebBuilder/templates/WebBuilder/navbar.html:67
+#: WebBuilder/templates/WebBuilder/navbar_old.html:88
 #: WebBuilder/templates/WebBuilder/partials/history/published_sites.html:15
 #: WebBuilder/templates/WebBuilder/partials/history/recent_analysis.html:15
 msgid "Historial"
 msgstr "History"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:94
-msgid "Todos los Proyectos"
-msgstr "All Projects"
+#: WebBuilder/templates/WebBuilder/navbar.html:73
+#: WebBuilder/templates/WebBuilder/partials/history/published_sites.html:27
+#: WebBuilder/templates/WebBuilder/partials/history/recent_analysis.html:27
+#: WebBuilder/templates/WebBuilder/partials/home/hero.html:55
+#: WebBuilder/templates/WebBuilder/partials/metrics/activity.html:18
+msgid "Análisis"
+msgstr "Analysis"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:95
-msgid "Ver historial completo"
-msgstr "View full history"
-
-#: WebBuilder/templates/WebBuilder/navbar.html:102
-msgid "Vista previa del proyecto actual"
+#: WebBuilder/templates/WebBuilder/navbar.html:74
+#, fuzzy
+#| msgid "Vista previa del proyecto actual"
+msgid "Historial de proyectos analizados"
 msgstr "Preview of the current project"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:109
-msgid "Webs Recientes"
-msgstr "Recent Websites"
+#: WebBuilder/templates/WebBuilder/navbar.html:79
+#, fuzzy
+#| msgid "Sitios generados"
+msgid "Sitios Generados"
+msgstr "Generated sites"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:110
-msgid "Últimas webs generadas"
-msgstr "Latest generated websites"
+#: WebBuilder/templates/WebBuilder/navbar.html:80
+msgid "Webs generadas y desplegadas"
+msgstr ""
 
-#: WebBuilder/templates/WebBuilder/navbar.html:119
+#: WebBuilder/templates/WebBuilder/navbar.html:89
+#: WebBuilder/templates/WebBuilder/navbar_old.html:119
 msgid "Ayuda"
 msgstr "Help"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:125
+#: WebBuilder/templates/WebBuilder/navbar.html:95
+#: WebBuilder/templates/WebBuilder/navbar_old.html:125
 #: WebBuilder/templates/WebBuilder/partials/home/cta.html:15
 msgid "Documentación"
 msgstr "Documentation"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:126
+#: WebBuilder/templates/WebBuilder/navbar.html:96
+#: WebBuilder/templates/WebBuilder/navbar_old.html:126
 msgid "Guías y tutoriales"
 msgstr "Guides and tutorials"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:131
+#: WebBuilder/templates/WebBuilder/navbar.html:101
+#: WebBuilder/templates/WebBuilder/navbar_old.html:131
 msgid "FAQ"
 msgstr "FAQ"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:132
+#: WebBuilder/templates/WebBuilder/navbar.html:102
+#: WebBuilder/templates/WebBuilder/navbar_old.html:132
 msgid "Preguntas frecuentes"
 msgstr "Frequently asked questions"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:137
+#: WebBuilder/templates/WebBuilder/navbar.html:107
+#: WebBuilder/templates/WebBuilder/navbar_old.html:137
 msgid "Contacto"
 msgstr "Contact"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:138
+#: WebBuilder/templates/WebBuilder/navbar.html:108
+#: WebBuilder/templates/WebBuilder/navbar_old.html:138
 msgid "¿Necesitas ayuda?"
 msgstr "Need help?"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:144
+#: WebBuilder/templates/WebBuilder/navbar.html:114
+#: WebBuilder/templates/WebBuilder/navbar_old.html:144
 msgid "Reportar un problema"
 msgstr "Report a problem"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:145
+#: WebBuilder/templates/WebBuilder/navbar.html:115
+#: WebBuilder/templates/WebBuilder/navbar_old.html:145
 msgid "Feedback y sugerencias"
 msgstr "Feedback and suggestions"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:168
+#: WebBuilder/templates/WebBuilder/navbar.html:137
+#: WebBuilder/templates/WebBuilder/navbar_old.html:168
 msgid "Mis Proyectos"
 msgstr "My Projects"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:173
+#: WebBuilder/templates/WebBuilder/navbar.html:142
+#: WebBuilder/templates/WebBuilder/navbar_old.html:173
 msgid "Configuración"
 msgstr "Settings"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:181
+#: WebBuilder/templates/WebBuilder/navbar.html:150
+#: WebBuilder/templates/WebBuilder/navbar_old.html:181
 msgid "Cerrar Sesión"
 msgstr "Log out"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:191
-msgid "Entrar"
-msgstr "Sign In"
+#: WebBuilder/templates/WebBuilder/navbar.html:160
+#: WebBuilder/templates/registration/login.html:8
+#: WebBuilder/templates/registration/login.html:52
+msgid "Iniciar sesión"
+msgstr "Log in"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:219
+#: WebBuilder/templates/WebBuilder/navbar.html:163
+#, fuzzy
+#| msgid "Regístrate"
+msgid "Registrarse"
+msgstr "Sign up"
+
+#: WebBuilder/templates/WebBuilder/navbar.html:191
+#: WebBuilder/templates/WebBuilder/navbar_old.html:219
 msgid "Cambiar tema"
 msgstr "Change theme"
 
-#: WebBuilder/templates/WebBuilder/navbar.html:243
+#: WebBuilder/templates/WebBuilder/navbar.html:215
+#: WebBuilder/templates/WebBuilder/navbar_old.html:243
 msgid "Abrir menú"
 msgstr "Open menu"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:59
+msgid "Nuevo Proyecto"
+msgstr "New Project"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:60
+msgid "Crear una nueva web desde cero"
+msgstr "Create a new website from scratch"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:65
+msgid "Cargar API"
+msgstr "Load API"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:66
+msgid "Importar datos desde una URL"
+msgstr "Import data from a URL"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:71
+msgid "Proyectos Recientes"
+msgstr "Recent Projects"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:72
+msgid "Ver tus últimos proyectos"
+msgstr "View your latest projects"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:94
+msgid "Todos los Proyectos"
+msgstr "All Projects"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:95
+msgid "Ver historial completo"
+msgstr "View full history"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:102
+msgid "Vista previa del proyecto actual"
+msgstr "Preview of the current project"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:109
+msgid "Webs Recientes"
+msgstr "Recent Websites"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:110
+msgid "Últimas webs generadas"
+msgstr "Latest generated websites"
+
+#: WebBuilder/templates/WebBuilder/navbar_old.html:191
+msgid "Entrar"
+msgstr "Sign In"
 
 #: WebBuilder/templates/WebBuilder/partials/assistant/analysis.html:5
 msgid "Paso 2 — Completado"
@@ -693,208 +748,208 @@ msgstr "File"
 msgid "URL de la API"
 msgstr "API URL"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:30
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:29
 msgid "Prueba con:"
 msgstr "Try with:"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:31
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:30
 msgid "Posts JSON"
 msgstr "JSON Posts"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:32
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:31
 msgid "Plant Catalog XML"
 msgstr "Plant Catalog XML"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:33
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:32
 msgid "Products JSON"
 msgstr "JSON Products"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:38
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:37
 msgid "Fichero JSON o XML"
 msgstr "JSON or XML file"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:51
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:49
 msgid "Describe el tipo de web que quieres"
 msgstr "Describe the type of website you want"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:52
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:206
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:50
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:204
 msgid "opcional"
 msgstr "optional"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:55
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:53
 msgid "Libre"
 msgstr "Free"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:56
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:54
 #: WebBuilder/templates/WebBuilder/partials/home/cta.html:17
 #: WebBuilder/templates/WebBuilder/partials/home/examples.html:7
 msgid "Ejemplos"
 msgstr "Examples"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:57
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:55
 msgid "Guiado"
 msgstr "Guided"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:63
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:61
 msgid "Cuanto más detallas colores, layout y estilo, mejor será el resultado."
 msgstr ""
 "The more detail you give about colors, layout, and style, the better the "
 "result will be."
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:69
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:67
 msgid "Tienda"
 msgstr "Store"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:70
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:68
 msgid "Catálogo minimalista, grid 3 cols, precio destacado"
 msgstr "Minimal catalog, 3-column grid, highlighted price"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:73
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:71
 msgid "Blog"
 msgstr "Blog"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:74
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:72
 msgid "Estilo periódico, tipografía grande, sobrio"
 msgstr "Newspaper style, large typography, sober look"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:77
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:75
 msgid "Portfolio"
 msgstr "Portfolio"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:78
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:76
 msgid "Fondo negro, hover effects, imágenes grandes"
 msgstr "Black background, hover effects, large images"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:81
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:79
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:82
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:80
 msgid "Tablas, métricas, azul y gris, profesional"
 msgstr "Tables, metrics, blue and gray, professional"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:85
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:83
 msgid ""
 "Pulsa un ejemplo para usarlo como punto de partida. Puedes editarlo en modo "
 "libre."
 msgstr ""
 "Click an example to use it as a starting point. You can edit it in free mode."
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:100
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:98
 msgid "¿Qué estilo visual quieres?"
 msgstr "What visual style do you want?"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:103
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:101
 msgid "Fondo"
 msgstr "Background"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:106
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:104
 msgid "Oscuro"
 msgstr "Dark"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:109
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:107
 msgid "Claro"
 msgstr "Light"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:115
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:113
 msgid "Color de acento"
 msgstr "Accent color"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:118
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:116
 msgid "Verde"
 msgstr "Green"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:121
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:119
 msgid "Azul"
 msgstr "Blue"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:124
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:122
 msgid "Morado"
 msgstr "Purple"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:127
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:125
 msgid "Naranja"
 msgstr "Orange"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:130
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:128
 msgid "Rojo"
 msgstr "Red"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:142
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:140
 msgid "¿Qué elementos quieres destacar?"
 msgstr "Which elements do you want to highlight?"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:148
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:146
 msgid "Imágenes grandes"
 msgstr "Large images"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:153
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:151
 msgid "Precios"
 msgstr "Prices"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:158
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:156
 msgid "Valoraciones"
 msgstr "Ratings"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:163
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:161
 msgid "Categorías"
 msgstr "Categories"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:168
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:166
 msgid "Fechas"
 msgstr "Dates"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:173
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:171
 msgid "Botones de acción"
 msgstr "Action buttons"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:178
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:211
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:176
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:209
 msgid "Atrás"
 msgstr "Back"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:184
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:182
 msgid "¿Qué personalidad tiene el sitio?"
 msgstr "What personality does the site have?"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:188
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:186
 msgid "Minimalista"
 msgstr "Minimalist"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:189
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:187
 msgid "Limpio, espaciado, sobrio"
 msgstr "Clean, spacious, understated"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:192
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:190
 msgid "Moderno"
 msgstr "Modern"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:193
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:191
 msgid "Gradientes, sombras, dinámico"
 msgstr "Gradients, shadows, dynamic"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:196
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:194
 msgid "Elegante"
 msgstr "Elegant"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:197
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:195
 msgid "Sofisticado, serif, neutros"
 msgstr "Sophisticated, serif, neutral"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:200
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:198
 msgid "Colorido"
 msgstr "Colorful"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:201
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:199
 msgid "Vibrante, saturado, energético"
 msgstr "Vibrant, saturated, energetic"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:206
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:204
 msgid "Algo más que añadir"
 msgstr "Anything else to add"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:207
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:205
 msgid ""
 "Ej: quiero que las cards tengan bordes redondeados y la navbar sea "
 "transparente..."
@@ -902,23 +957,23 @@ msgstr ""
 "E.g.: I want the cards to have rounded corners and the navbar to be "
 "transparent..."
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:212
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:210
 msgid "Generar prompt"
 msgstr "Generate prompt"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:226
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:224
 msgid "Introduce una URL válida (debe empezar por http:// o https://)."
 msgstr "Enter a valid URL (it must start with http:// or https://)."
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:232
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:230
 msgid "Modelo:"
 msgstr "Model:"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:236
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:234
 msgid "Analizar URL"
 msgstr "Analyze URL"
 
-#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:241
+#: WebBuilder/templates/WebBuilder/partials/assistant/input.html:239
 msgid "Regenerar mapa"
 msgstr "Regenerate map"
 
@@ -947,15 +1002,18 @@ msgstr ""
 "by field in the edit button."
 
 #: WebBuilder/templates/WebBuilder/partials/assistant/preview.html:24
+#: WebBuilder/templates/WebBuilder/site_render.html:216
 msgid "Tipo"
 msgstr "Type"
 
 #: WebBuilder/templates/WebBuilder/partials/assistant/preview.html:28
 #: WebBuilder/templates/WebBuilder/partials/home/hero.html:228
+#: WebBuilder/templates/WebBuilder/site_render.html:212
 msgid "Título"
 msgstr "Title"
 
 #: WebBuilder/templates/WebBuilder/partials/assistant/preview.html:32
+#: WebBuilder/templates/WebBuilder/site_render.html:199
 msgid "Campos"
 msgstr "Fields"
 
@@ -990,13 +1048,6 @@ msgstr "published sites"
 #: WebBuilder/templates/WebBuilder/partials/home/hero.html:116
 msgid "Nuevo análisis"
 msgstr "New analysis"
-
-#: WebBuilder/templates/WebBuilder/partials/history/published_sites.html:27
-#: WebBuilder/templates/WebBuilder/partials/history/recent_analysis.html:27
-#: WebBuilder/templates/WebBuilder/partials/home/hero.html:55
-#: WebBuilder/templates/WebBuilder/partials/metrics/activity.html:18
-msgid "Análisis"
-msgstr "Analysis"
 
 #: WebBuilder/templates/WebBuilder/partials/history/published_sites.html:28
 #: WebBuilder/templates/WebBuilder/partials/history/recent_analysis.html:28
@@ -1832,6 +1883,7 @@ msgid "Todos los sitios"
 msgstr "All sites"
 
 #: WebBuilder/templates/WebBuilder/partials/metrics/generations.html:22
+#: WebBuilder/templates/WebBuilder/site_render.html:191
 msgid "Archivos"
 msgstr "Files"
 
@@ -2108,7 +2160,7 @@ msgstr "Deploy site"
 
 #: WebBuilder/templates/WebBuilder/site_render.html:107
 #: WebBuilder/templates/WebBuilder/site_render.html:116
-#: WebBuilder/templates/WebBuilder/site_render.html:287
+#: WebBuilder/templates/WebBuilder/site_render.html:392
 msgid "Descargar ZIP"
 msgstr "Download ZIP"
 
@@ -2152,124 +2204,221 @@ msgstr "Generation error"
 msgid "Error de despliegue"
 msgstr "Deployment error"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:185
+#: WebBuilder/templates/WebBuilder/site_render.html:183
 msgid "Abrir"
 msgstr "Open"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:200
-msgid "Proyecto generado"
-msgstr "Generated project"
+#: WebBuilder/templates/WebBuilder/site_render.html:195
+msgid "Páginas"
+msgstr ""
 
-#: WebBuilder/templates/WebBuilder/site_render.html:202
-#, python-format
-msgid ""
-"%(file_count)s archivos listos. Despliega el sitio para verlo en el "
-"navegador."
-msgstr "%(file_count)s files ready. Deploy the site to view it in the browser."
+#: WebBuilder/templates/WebBuilder/site_render.html:203
+#, fuzzy
+#| msgid "Llamadas"
+msgid "Llamadas LLM"
+msgstr "Calls"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:207
-msgid "Desplegar y ver sitio"
-msgstr "Deploy and view site"
+#: WebBuilder/templates/WebBuilder/site_render.html:209
+#, fuzzy
+#| msgid "Tipo de sitio"
+msgid "Info del sitio"
+msgstr "Site type"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:216
+#: WebBuilder/templates/WebBuilder/site_render.html:220
+msgid "URL origen"
+msgstr ""
+
+#: WebBuilder/templates/WebBuilder/site_render.html:224
+msgid "Prompt"
+msgstr ""
+
+#: WebBuilder/templates/WebBuilder/site_render.html:228
+#, fuzzy
+#| msgid "Generados"
+msgid "Generado"
+msgstr "Generated"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:239
+#, fuzzy
+#| msgid "Últimas webs generadas"
+msgid "Páginas generadas"
+msgstr "Latest generated websites"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:250
+#, fuzzy
+#| msgid "Generando páginas"
+msgid "Sin páginas"
+msgstr "Generating pages"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:258
+#, fuzzy
+#| msgid "Muestra de datos"
+msgid "Modelo de datos"
+msgstr "Data sample"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:266
+#, fuzzy
+#| msgid "campos"
+msgid "Sin campos"
+msgstr "fields"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:272
+#, fuzzy
+#| msgid "Error de generación"
+msgid "Proceso de generación"
+msgstr "Generation error"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:275
+#, fuzzy
+#| msgid "Llamadas totales"
+msgid "Llamadas al LLM"
+msgstr "Total calls"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:279
+msgid "Reintentos"
+msgstr ""
+
+#: WebBuilder/templates/WebBuilder/site_render.html:283
+msgid "Errores corregidos"
+msgstr ""
+
+#: WebBuilder/templates/WebBuilder/site_render.html:287
+#, fuzzy
+#| msgid "Archivos"
+msgid "Archivos .py"
+msgstr "Files"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:291
+#, fuzzy
+#| msgid "Archivos"
+msgid "Archivos .html"
+msgstr "Files"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:295
+#, fuzzy
+#| msgid "archivos"
+msgid "Otros archivos"
+msgstr "files"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:303
+#, fuzzy
+#| msgid "Usuarios de la app"
+msgid "Usuarios del sitio"
+msgstr "App users"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:311
+#, fuzzy
+#| msgid "No configurado"
+msgid "Sin usuarios configurados"
+msgstr "Not configured"
+
+#: WebBuilder/templates/WebBuilder/site_render.html:321
 msgid "Aún no hay código"
 msgstr "There is no code yet"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:218
+#: WebBuilder/templates/WebBuilder/site_render.html:323
 msgid "Vuelve al editor y pulsa"
 msgstr "Go back to the editor and click"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:218
+#: WebBuilder/templates/WebBuilder/site_render.html:323
 msgid "para que el LLM escriba el código."
 msgstr "so the LLM can write the code."
 
-#: WebBuilder/templates/WebBuilder/site_render.html:221
+#: WebBuilder/templates/WebBuilder/site_render.html:326
 msgid "Ir al editor"
 msgstr "Go to editor"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:235
+#: WebBuilder/templates/WebBuilder/site_render.html:340
 msgid "Generando proyecto..."
 msgstr "Generating project..."
 
-#: WebBuilder/templates/WebBuilder/site_render.html:236
+#: WebBuilder/templates/WebBuilder/site_render.html:341
 msgid "El LLM está escribiendo el código"
 msgstr "The LLM is writing the code"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:255
+#: WebBuilder/templates/WebBuilder/site_render.html:360
 msgid "Desplegando proyecto…"
 msgstr "Deploying project…"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:256
+#: WebBuilder/templates/WebBuilder/site_render.html:361
 msgid "n8n está orquestando el contenedor Docker"
 msgstr "n8n is orchestrating the Docker container"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:258
+#: WebBuilder/templates/WebBuilder/site_render.html:363
 msgid "Preparando ZIP"
 msgstr "Preparing ZIP"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:259
+#: WebBuilder/templates/WebBuilder/site_render.html:364
 msgid "Descomprimiendo en n8n"
 msgstr "Unzipping in n8n"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:260
+#: WebBuilder/templates/WebBuilder/site_render.html:365
 msgid "Construyendo imagen Docker"
 msgstr "Building Docker image"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:261
+#: WebBuilder/templates/WebBuilder/site_render.html:366
 msgid "Arrancando contenedor"
 msgstr "Starting container"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:262
+#: WebBuilder/templates/WebBuilder/site_render.html:367
 msgid "¡Listo!"
 msgstr "Done!"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:281
+#: WebBuilder/templates/WebBuilder/site_render.html:386
 msgid "Cerrar"
 msgstr "Close"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:284
+#: WebBuilder/templates/WebBuilder/site_render.html:389
 msgid "Versión guardada el"
 msgstr "Version saved on"
 
-#: WebBuilder/templates/WebBuilder/site_render.html:288
+#: WebBuilder/templates/WebBuilder/site_render.html:393
 msgid "Restaurar"
 msgstr "Restore"
 
-#: WebBuilder/templates/registration/login.html:8
-#: WebBuilder/templates/registration/login.html:50
-msgid "Iniciar sesión"
-msgstr "Log in"
-
-#: WebBuilder/templates/registration/login.html:23
+#: WebBuilder/templates/registration/login.html:25
 msgid "Bienvenido a WebBuilder"
 msgstr "Welcome to WebBuilder"
 
-#: WebBuilder/templates/registration/login.html:55
+#: WebBuilder/templates/registration/login.html:57
 msgid "¿No tienes cuenta?"
 msgstr "Don't have an account?"
 
-#: WebBuilder/templates/registration/login.html:55
+#: WebBuilder/templates/registration/login.html:57
 msgid "Regístrate"
 msgstr "Sign up"
 
 #: WebBuilder/templates/registration/register.html:8
-#: WebBuilder/templates/registration/register.html:23
-#: WebBuilder/templates/registration/register.html:64
+#: WebBuilder/templates/registration/register.html:25
+#: WebBuilder/templates/registration/register.html:66
 msgid "Crear cuenta"
 msgstr "Create account"
 
-#: WebBuilder/templates/registration/register.html:69
+#: WebBuilder/templates/registration/register.html:71
 msgid "¿Ya tienes cuenta?"
 msgstr "Already have an account?"
 
-#: WebBuilder/templates/registration/register.html:69
+#: WebBuilder/templates/registration/register.html:71
 msgid "Inicia sesión"
 msgstr "Log in"
 
-#: WebBuilder/templates/registration/register.html:77
+#: WebBuilder/templates/registration/register.html:79
 msgid "Email"
 msgstr "Email"
 
-#: WebBuilder/templates/registration/register.html:79
+#: WebBuilder/templates/registration/register.html:81
 msgid "Repite la contraseña"
 msgstr "Repeat password"
+
+#~ msgid "Proyecto generado"
+#~ msgstr "Generated project"
+
+#, python-format
+#~ msgid ""
+#~ "%(file_count)s archivos listos. Despliega el sitio para verlo en el "
+#~ "navegador."
+#~ msgstr ""
+#~ "%(file_count)s files ready. Deploy the site to view it in the browser."
+
+#~ msgid "Desplegar y ver sitio"
+#~ msgstr "Deploy and view site"
