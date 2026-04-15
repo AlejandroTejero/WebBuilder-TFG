@@ -1,30 +1,62 @@
 """
 enrich_prompt.py — Enriquece el prompt del usuario con contexto del dataset.
-Analiza los campos y datos reales para dar instrucciones visuales concretas al LLM.
+
+Objetivo:
+- Ayudar al LLM a entender mejor qué datos existen.
+- Sugerir usos razonables de esos datos.
+- Nunca contradecir la instrucción explícita del usuario.
 """
 
-# ── DETECCIÓN DE TIPOS DE CAMPO ───────────────────────────────────────────────
-
-_IMAGE_KEYS    = {"image", "img", "photo", "thumbnail", "picture", "avatar", "cover",
-                  "poster", "imagen", "foto", "miniatura", "portada", "thumb"}
-_PRICE_KEYS    = {"price", "cost", "amount", "fee", "salary", "budget", "rate",
-                  "precio", "coste", "importe", "tarifa", "salario"}
-_DATE_KEYS     = {"date", "created_at", "updated_at", "published", "timestamp",
-                  "year", "time", "fecha", "año", "tiempo", "publicado"}
-_RATING_KEYS   = {"rating", "score", "stars", "votes", "rank", "puntuacion",
-                  "valoracion", "estrellas", "votos", "nota"}
-_CATEGORY_KEYS = {"category", "type", "genre", "tag", "label", "group", "kind",
-                  "categoria", "tipo", "genero", "etiqueta", "grupo"}
-_LOCATION_KEYS = {"location", "city", "country", "address", "place", "region",
-                  "ubicacion", "ciudad", "pais", "direccion", "lugar", "region"}
-_URL_KEYS      = {"url", "link", "website", "href", "enlace", "web", "sitio"}
-_TEXT_KEYS     = {"description", "content", "body", "summary", "bio", "about",
-                  "text", "descripcion", "contenido", "resumen", "biografia", "texto"}
-_TITLE_KEYS    = {"title", "name", "nombre", "titulo", "common", "label",
-                  "etiqueta", "heading", "encabezado"}
+from __future__ import annotations
 
 
-def _matches(key: str, keyword_set: set) -> bool:
+# ── DETECCIÓN DE TIPOS DE CAMPO ──────────────────────────────────────────────
+
+_IMAGE_KEYS = {
+    "image", "img", "photo", "thumbnail", "picture", "avatar", "cover",
+    "poster", "imagen", "foto", "miniatura", "portada", "thumb",
+}
+_PRICE_KEYS = {
+    "price", "cost", "amount", "fee", "salary", "budget", "rate",
+    "precio", "coste", "importe", "tarifa", "salario",
+}
+_DATE_KEYS = {
+    "date", "created_at", "updated_at", "published", "timestamp",
+    "year", "time", "fecha", "año", "tiempo", "publicado",
+}
+_RATING_KEYS = {
+    "rating", "score", "stars", "votes", "rank", "puntuacion",
+    "valoracion", "estrellas", "votos", "nota",
+}
+_CATEGORY_KEYS = {
+    "category", "type", "genre", "tag", "label", "group", "kind",
+    "categoria", "tipo", "genero", "etiqueta", "grupo",
+}
+_LOCATION_KEYS = {
+    "location", "city", "country", "address", "place", "region",
+    "ubicacion", "ciudad", "pais", "direccion", "lugar", "region",
+}
+_URL_KEYS = {"url", "link", "website", "href", "enlace", "web", "sitio"}
+_TEXT_KEYS = {
+    "description", "content", "body", "summary", "bio", "about",
+    "text", "descripcion", "contenido", "resumen", "biografia", "texto",
+}
+_TITLE_KEYS = {
+    "title", "name", "nombre", "titulo", "common", "label",
+    "etiqueta", "heading", "encabezado",
+}
+
+_DATASET_PRIORITY_RULES = [
+    "La instrucción explícita del usuario tiene prioridad absoluta.",
+    "Las sugerencias derivadas del dataset son orientativas y nunca obligatorias.",
+    "Nunca uses una sugerencia del dataset para contradecir una restricción del usuario.",
+    "Si el usuario pide una estética concreta, el dataset solo debe complementar esa dirección.",
+]
+
+
+# ── HELPERS DE DETECCIÓN ─────────────────────────────────────────────────────
+
+def _matches(key: str, keyword_set: set[str]) -> bool:
     """Comprueba si el key del campo contiene alguna de las palabras clave."""
     key_lower = key.lower()
     return key_lower in keyword_set or any(k in key_lower for k in keyword_set)
@@ -35,15 +67,13 @@ def _detect_title_field(fields: list[dict], sample_items: list[dict]) -> str | N
     Intenta identificar el campo más representativo para usar como título.
     Primero busca por nombre semántico, luego por valores cortos en los ejemplos.
     """
-    # 1. Buscar por nombre semántico
-    for f in fields:
-        if _matches(f["key"], _TITLE_KEYS):
-            return f["key"]
+    for field in fields:
+        if _matches(field["key"], _TITLE_KEYS):
+            return field["key"]
 
-    # 2. Buscar el primer campo con valores de texto corto en los ejemplos
     if sample_items:
-        for f in fields:
-            key = f["key"]
+        for field in fields:
+            key = field["key"]
             values = [str(item.get(key, "")) for item in sample_items[:3] if item.get(key)]
             if values and all(5 < len(v) < 80 for v in values):
                 return key
@@ -60,7 +90,116 @@ def _sample_value(key: str, sample_items: list[dict]) -> str | None:
     return None
 
 
-# ── FUNCIÓN PRINCIPAL ─────────────────────────────────────────────────────────
+# ── HELPERS DE CONTEXTO ──────────────────────────────────────────────────────
+
+def _build_priority_rules_text() -> str:
+    return "\n".join(f"- {rule}" for rule in _DATASET_PRIORITY_RULES)
+
+
+def _build_field_context(fields: list[dict], sample_items: list[dict]) -> str:
+    parts: list[str] = []
+    for field in fields[:10]:
+        key = field["key"]
+        label = field.get("label", key)
+        value = _sample_value(key, sample_items)
+        if value:
+            parts.append(f'  - {key} ({label}): ej. "{value}"')
+        else:
+            parts.append(f"  - {key} ({label})")
+    return "\n".join(parts)
+
+
+def _build_dataset_hints(fields: list[dict], sample_items: list[dict]) -> list[str]:
+    hints: list[str] = []
+
+    has_images = any(_matches(f["key"], _IMAGE_KEYS) for f in fields)
+    has_price = any(_matches(f["key"], _PRICE_KEYS) for f in fields)
+    has_date = any(_matches(f["key"], _DATE_KEYS) for f in fields)
+    has_rating = any(_matches(f["key"], _RATING_KEYS) for f in fields)
+    has_category = any(_matches(f["key"], _CATEGORY_KEYS) for f in fields)
+    has_location = any(_matches(f["key"], _LOCATION_KEYS) for f in fields)
+    has_url = any(_matches(f["key"], _URL_KEYS) for f in fields)
+    has_long_text = any(_matches(f["key"], _TEXT_KEYS) for f in fields)
+
+    title_field = _detect_title_field(fields, sample_items)
+    if title_field:
+        sample = _sample_value(title_field, sample_items)
+        suffix = f' (ej: "{sample}")' if sample else ""
+        hints.append(
+            f'El campo "{title_field}" parece ser un buen candidato para título principal o referencia textual del item{suffix}.'
+        )
+
+    if has_images:
+        img_field = next((f["key"] for f in fields if _matches(f["key"], _IMAGE_KEYS)), None)
+        hints.append(
+            f'Hay imágenes (campo "{img_field}"); puedes usarlas si aportan valor y si el prompt del usuario permite un listado, detalle o portada más visual.'
+        )
+
+    if has_price:
+        price_field = next((f["key"] for f in fields if _matches(f["key"], _PRICE_KEYS)), None)
+        sample = _sample_value(price_field, sample_items) if price_field else None
+        suffix = f' (ej: "{sample}")' if sample else ""
+        hints.append(
+            f'Hay precios o importes (campo "{price_field}"){suffix}; puedes destacarlos cuando ese dato sea importante para el tipo de sitio.'
+        )
+
+    if has_rating:
+        hints.append(
+            "Hay valoraciones o puntuaciones; puedes mostrarlas como metadato útil, badge o dato secundario si encaja con la estética solicitada."
+        )
+
+    if has_category:
+        category_field = next((f["key"] for f in fields if _matches(f["key"], _CATEGORY_KEYS)), None)
+        hints.append(
+            f'Hay categorías o tipos (campo "{category_field}"); puedes usarlos para clasificar, etiquetar o contextualizar los items cuando aporte claridad.'
+        )
+
+    if has_date:
+        hints.append(
+            "Hay fechas; puedes mostrarlas en formato legible en listados o detalles si el contenido lo pide."
+        )
+
+    if has_location:
+        hints.append(
+            "Hay datos de ubicación; puedes mostrar ciudad, país o lugar como metadato cuando sea útil."
+        )
+
+    if has_url:
+        hints.append(
+            "Hay URLs externas; puedes añadir enlaces de salida o referencias externas si encajan con la experiencia del sitio."
+        )
+
+    if has_long_text:
+        hints.append(
+            "Hay texto largo; puedes resumirlo en listados y mostrarlo completo en detalle."
+        )
+
+    return hints
+
+
+def _default_style_for_site_type(site_type: str) -> str:
+    """Estilo por defecto suave, sin imponer una estética agresiva."""
+    defaults = {
+        "catalog": (
+            "Catálogo claro y ordenado. Jerarquía visual limpia, navegación fácil y fichas bien estructuradas."
+        ),
+        "blog": (
+            "Blog legible y sobrio. Buena tipografía, ritmo de lectura cómodo y metadatos claros."
+        ),
+        "portfolio": (
+            "Portfolio limpio y cuidado. Mucho aire, buena jerarquía y foco en el contenido principal."
+        ),
+        "dashboard": (
+            "Dashboard claro y funcional. Datos bien organizados, contraste correcto y lectura rápida."
+        ),
+        "other": (
+            "Sitio web limpio y bien estructurado. Navegación clara y diseño coherente con el contenido."
+        ),
+    }
+    return defaults.get(site_type, defaults["other"])
+
+
+# ── FUNCIÓN PRINCIPAL ────────────────────────────────────────────────────────
 
 def enrich_user_prompt(
     user_prompt: str,
@@ -70,97 +209,34 @@ def enrich_user_prompt(
 ) -> str:
     """
     Combina el prompt del usuario con contexto real del dataset.
-    Devuelve un prompt enriquecido con instrucciones visuales concretas para el LLM.
+
+    Regla principal:
+    - El prompt del usuario siempre manda.
+    - El contexto del dataset solo complementa, nunca sustituye.
     """
     base_prompt = (user_prompt or "").strip()
+    field_context = _build_field_context(fields, sample_items)
+    dataset_hints = _build_dataset_hints(fields, sample_items)
+    priority_rules_text = _build_priority_rules_text()
 
-    # ── Detectar tipos de campo presentes ────────────────────────────────────
-    has_images   = any(_matches(f["key"], _IMAGE_KEYS)    for f in fields)
-    has_price    = any(_matches(f["key"], _PRICE_KEYS)    for f in fields)
-    has_date     = any(_matches(f["key"], _DATE_KEYS)     for f in fields)
-    has_rating   = any(_matches(f["key"], _RATING_KEYS)   for f in fields)
-    has_category = any(_matches(f["key"], _CATEGORY_KEYS) for f in fields)
-    has_location = any(_matches(f["key"], _LOCATION_KEYS) for f in fields)
-    has_url      = any(_matches(f["key"], _URL_KEYS)      for f in fields)
-    has_long_text= any(_matches(f["key"], _TEXT_KEYS)     for f in fields)
-
-    # ── Identificar campo principal (título) ─────────────────────────────────
-    title_field = _detect_title_field(fields, sample_items)
-
-    # ── Construir contexto de campos con valores reales ──────────────────────
-    field_context_parts = []
-    for f in fields[:10]:
-        key   = f["key"]
-        label = f.get("label", key)
-        val   = _sample_value(key, sample_items)
-        if val:
-            field_context_parts.append(f'  - {key} ({label}): ej. "{val}"')
-        else:
-            field_context_parts.append(f'  - {key} ({label})')
-
-    field_context = "\n".join(field_context_parts)
-
-    # ── Construir instrucciones visuales según lo detectado ──────────────────
-    visual_hints = []
-
-    if title_field:
-        ex = _sample_value(title_field, sample_items)
-        ex_str = f' (ej: "{ex}")' if ex else ""
-        visual_hints.append(f'El campo "{title_field}" es el título principal de cada item{ex_str} — úsalo como heading en las cards')
-
-    if has_images:
-        img_field = next((f["key"] for f in fields if _matches(f["key"], _IMAGE_KEYS)), None)
-        visual_hints.append(f'Hay imágenes (campo "{img_field}") — úsalas como elemento visual principal con object-cover y aspect-video')
-
-    if has_price:
-        price_field = next((f["key"] for f in fields if _matches(f["key"], _PRICE_KEYS)), None)
-        ex = _sample_value(price_field, sample_items) if price_field else None
-        ex_str = f' (ej: "{ex}")' if ex else ""
-        visual_hints.append(f'Hay precios (campo "{price_field}"){ex_str} — destácalos con tipografía grande y color de acento')
-
-    if has_rating:
-        visual_hints.append('Hay valoraciones/ratings — muéstralos con estrellas SVG o badge numérico destacado')
-
-    if has_category:
-        cat_field = next((f["key"] for f in fields if _matches(f["key"], _CATEGORY_KEYS)), None)
-        visual_hints.append(f'Hay categorías (campo "{cat_field}") — añade badges de color por categoría en las cards')
-
-    if has_date:
-        visual_hints.append('Hay fechas — muéstralas en formato legible y destacadas en las cards')
-
-    if has_location:
-        visual_hints.append('Hay datos de ubicación — muestra ciudad o país en las cards')
-
-    if has_url:
-        visual_hints.append('Hay URLs externas — añade botones "Ver enlace" o "Visitar"')
-
-    if has_long_text:
-        visual_hints.append('Hay texto largo — usa truncatechars en listados, muestra completo en la página de detalle')
-
-    # ── Ensamblar contexto final ──────────────────────────────────────────────
     context_lines = [
+        "REGLAS DE PRIORIDAD DEL CONTEXTO:",
+        priority_rules_text,
+        "",
         f"Tipo de sitio: {site_type}",
         "",
         "Campos del dataset con valores reales:",
         field_context,
     ]
 
-    if visual_hints:
-        context_lines += ["", "Instrucciones visuales basadas en el dataset:"]
-        context_lines += [f"  - {h}" for h in visual_hints]
+    if dataset_hints:
+        context_lines += ["", "Sugerencias basadas en el dataset (opcionales):"]
+        context_lines += [f"  - {hint}" for hint in dataset_hints]
 
     context = "\n".join(context_lines)
 
-    # ── Combinar con el prompt del usuario ───────────────────────────────────
     if base_prompt:
         return f"{base_prompt}\n\n---\nContexto del dataset:\n{context}"
-    else:
-        defaults = {
-            "catalog":   "Catálogo moderno y elegante. Cards con imagen grande, precio destacado, hover effects suaves. Diseño oscuro con acento de color vibrante.",
-            "blog":      "Blog limpio y legible. Tipografía cuidada, fechas y categorías visibles, artículo destacado en la home.",
-            "portfolio": "Portfolio minimalista y elegante. Imágenes grandes, mucho espacio, tipografía grande y llamativa.",
-            "dashboard": "Dashboard profesional y compacto. Stat cards, tablas limpias, datos legibles de un vistazo. Azul y gris.",
-            "other":     "Sitio web moderno y bien estructurado. Diseño oscuro con acentos de color, fácil de navegar.",
-        }
-        base = defaults.get(site_type, defaults["other"])
-        return f"{base}\n\n---\nContexto del dataset:\n{context}"
+
+    default_prompt = _default_style_for_site_type(site_type)
+    return f"{default_prompt}\n\n---\nContexto del dataset:\n{context}"

@@ -11,7 +11,8 @@ Nuevo schema (field_mapping):
   {
     "site_type": str,
     "site_title": str,
-    "fields": [{"key": str, "label": str}, ...]
+    "fields": [{"key": str, "label": str}, ...],
+    "user_prompt": str,
   }
 """
 
@@ -19,27 +20,25 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.http import HttpResponseNotAllowed
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from datetime import timedelta
 
 from ..forms import APIRequestForm
 from ..models import APIRequest
-from ..utils.ingest.url_reader import fetch_url, read_file
-from ..utils.ingest.parsers import parse_raw, summarize_data
 from ..utils.analysis import build_analysis
 from ..utils.analysis.helpers import get_by_path
-
+from ..utils.ingest.parsers import parse_raw, summarize_data
+from ..utils.ingest.url_reader import fetch_url, read_file
 from ..utils.llm.client import LLMError
-from ..utils.llm.planner import generate_site_plan, PlanError
-
 from ..utils.llm.llm_catalog import LLM_CATALOG
+from ..utils.llm.planner import PlanError, generate_site_plan
 
 
 # ────────────────────────── CONFIG ──────────────────────────────────
@@ -58,8 +57,9 @@ def _resolve_llm(user, llm_choice: str) -> tuple[str, str, str]:
     """
     if llm_choice == "default" or not llm_choice:
         llm_choice = LLM_CATALOG[0]["id"]
+
     if llm_choice == "custom":
-        profile = getattr(user, 'profile', None)
+        profile = getattr(user, "profile", None)
         if not profile or not profile.custom_llm_model:
             raise ValueError("No tienes un modelo personalizado configurado en tu perfil.")
         return (
@@ -73,6 +73,7 @@ def _resolve_llm(user, llm_choice: str) -> tuple[str, str, str]:
         raise ValueError(f"Modelo '{llm_choice}' no encontrado en el catálogo.")
 
     from django.conf import settings
+
     return (
         catalog_entry["id"],
         catalog_entry["base_url"],
@@ -90,9 +91,15 @@ def _call_llm_plan(
     llm_base_url: str,
     llm_api_key: str,
 ) -> tuple[dict | None, str | None]:
-    """Genera el schema dinámico y lo guarda en api_request.field_mapping."""
-    main = (analysis_result.get("main_collection") or {})
-    keys = (analysis_result.get("keys") or {})
+    """
+    Genera el schema dinámico y lo guarda en api_request.field_mapping.
+
+    Importante:
+    - El prompt del usuario se persiste dentro del plan para que la fase de
+      generación final pueda reutilizarlo.
+    """
+    main = analysis_result.get("main_collection") or {}
+    keys = analysis_result.get("keys") or {}
 
     available_keys = (keys.get("all") or [])[:50]
     main_path = main.get("path")
@@ -109,6 +116,9 @@ def _call_llm_plan(
             base_url=llm_base_url,
             api_key=llm_api_key,
         )
+
+        if isinstance(plan, dict):
+            plan["user_prompt"] = (user_prompt or "").strip()
 
         api_request_obj.field_mapping = plan
         if hasattr(api_request_obj, "plan_accepted"):
@@ -152,9 +162,11 @@ def _build_examples(
 ) -> list[dict]:
     if not main_path:
         return []
+
     items = get_by_path(parsed_payload, main_path)
     if not isinstance(items, list):
         return []
+
     out: list[dict] = []
     for item in items[:3]:
         if not isinstance(item, dict):
@@ -277,9 +289,16 @@ def get_assistant(request):
         return render_assistant(request, form=form)
 
     analysis = None
+    saved_prompt = ""
+    if api_request.field_mapping and isinstance(api_request.field_mapping, dict):
+        saved_prompt = (api_request.field_mapping.get("user_prompt") or "").strip()
+
     if api_request.parsed_data:
         analysis = build_analysis(api_request.parsed_data, raw_text=api_request.raw_data or "")
-        form = APIRequestForm(initial={"api_url": api_request.api_url})
+        form = APIRequestForm(initial={
+            "api_url": api_request.api_url,
+            "user_prompt": saved_prompt,
+        })
 
     llm_plan_text = None
     if api_request.field_mapping:
@@ -386,8 +405,7 @@ def analyze_url(request):
 
         one_hour_ago = timezone.now() - timedelta(hours=1)
         api_request_obj = (
-            APIRequest.objects
-            .filter(user=request.user, api_url=api_url, date__gte=one_hour_ago)
+            APIRequest.objects.filter(user=request.user, api_url=api_url, date__gte=one_hour_ago)
             .order_by("-date")
             .first()
         )

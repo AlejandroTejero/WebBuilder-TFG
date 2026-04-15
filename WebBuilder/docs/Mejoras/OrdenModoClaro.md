@@ -1,5 +1,0 @@
-1 · Assistant (y sus sub-CSS) — Usa variables --wb-* en general, pero tiene 26 rgba(...) hardcodeados repartidos entre badges, alerts y status pills (los colores semánticos verde/rojo/azul para estados). Hay que decidir: o los dejamos como están (son colores semánticos que no deberían cambiar mucho) o los suavizamos en modo claro para que no desentonen sobre fondo blanco.
-
-2 · Edit — Hereda casi todo de assistant, así que al arreglar el 5 este mejora solo. Solo tiene un par de colores de estado (rgba(251,146,60,...) para pending y rgba(34,197,94,...) para published) que hay que verificar que se vean bien en claro.
-
-3 · Navbar — La mejor situada: ya tiene un bloque .light con variables propias. Solo hay que revisar que el toggle de tema, el dropdown y los links activos se vean bien en modo claro, porque algunos detalles del hover y del neumorphic button pueden quedar raros.

@@ -26,10 +26,15 @@ from ..llm.generator_prompts import (
     prompt_load_data,
 )
 from ..llm.field_extractor import extract_model_fields
-from ..llm.consistency_checker import check_consistency, check_django_syntax
+from ..llm.consistency_checker import fix_template, run_all_checks
 from ..llm.enrich_prompt import enrich_user_prompt
 
-from .llm_wrappers import llm_call_logged, llm_json_call, strip_markdown_fences, extract_requirements
+from .llm_wrappers import (
+    llm_call_logged,
+    llm_json_call,
+    strip_markdown_fences,
+    extract_requirements,
+)
 from .fallbacks import (
     fallback_pages,
     fallback_models,
@@ -72,14 +77,14 @@ def generate_project_files(site) -> dict[str, str]:
 
     Devuelve dict {ruta_relativa: contenido} listo para guardar en project_files.
     """
-    plan         = site.accepted_plan or {}
-    fields       = plan.get("fields") or []
+    plan = site.accepted_plan or {}
+    fields = plan.get("fields") or []
     sample_items = (plan.get("_meta") or {}).get("sample_items") or []
-    main_path    = (plan.get("_meta") or {}).get("main_collection_path")
-    site_type    = plan.get("site_type") or "other"
-    site_title   = plan.get("site_title") or "Mi Sitio"
-    user_prompt  = plan.get("user_prompt") or ""
-    api_url      = site.project_source.api_url
+    main_path = (plan.get("_meta") or {}).get("main_collection_path")
+    site_type = plan.get("site_type") or "other"
+    site_title = plan.get("site_title") or "Mi Sitio"
+    user_prompt = plan.get("user_prompt") or ""
+    api_url = site.project_source.api_url
 
     # Enriquecer el prompt del usuario con contexto del dataset
     enriched_prompt = enrich_user_prompt(
@@ -88,10 +93,10 @@ def generate_project_files(site) -> dict[str, str]:
         fields=fields,
         sample_items=sample_items,
     )
-    logger.info(f"[generator] Prompt enriquecido: {enriched_prompt[:100]}...")
+    logger.info("[generator] Prompt enriquecido: %s...", enriched_prompt[:100])
 
     project = slugify(site.project_name or site_title).replace("-", "_") or "generated_site"
-    app     = "siteapp"
+    app = "siteapp"
 
     files: dict[str, str] = {}
 
@@ -108,7 +113,7 @@ def generate_project_files(site) -> dict[str, str]:
     pages_data = llm_json_call(system, user_text, "pages_structure")
     pages = pages_data.get("pages") or []
 
-    has_list   = any(p.get("is_list")   for p in pages)
+    has_list = any(p.get("is_list") for p in pages)
     has_detail = any(p.get("is_detail") for p in pages)
     if not pages or not has_list or not has_detail:
         logger.warning("[generator] Páginas inválidas, usando fallback")
@@ -126,10 +131,11 @@ def generate_project_files(site) -> dict[str, str]:
     if not models_code.strip():
         models_code = fallback_models(fields)
 
-    files[f"{project}/{app}/models.py"] = strip_markdown_fences(models_code)
+    models_code = strip_markdown_fences(models_code)
+    files[f"{project}/{app}/models.py"] = models_code
 
     real_fields = extract_model_fields(models_code)
-    logger.info(f"[generator] Campos reales extraídos: {real_fields}")
+    logger.info("[generator] Campos reales extraídos: %s", real_fields)
 
     files[f"{project}/{app}/migrations/__init__.py"] = ""
     files[f"{project}/{app}/migrations/0001_initial.py"] = generate_initial_migration(models_code, app)
@@ -153,7 +159,7 @@ def generate_project_files(site) -> dict[str, str]:
     files[f"{project}/{app}/urls.py"] = build_app_urls(pages, app)
 
     real_url_names = {page["name"]: page["view_name"] for page in pages}
-    logger.info(f"[generator] URLs reales: {real_url_names}")
+    logger.info("[generator] URLs reales: %s", real_url_names)
 
     # ── PASO 4: base.html ────────────────────────────────────────────────────
     _update_step(site, "Generando plantilla base...")
@@ -168,12 +174,12 @@ def generate_project_files(site) -> dict[str, str]:
     if not base_html.strip():
         base_html = fallback_base_html(site_title, pages)
 
-    files[f"{project}/{app}/templates/base.html"] = base_html
+    files[f"{project}/{app}/templates/base.html"] = fix_template(base_html)
 
     # ── PASO 5: template por página ──────────────────────────────────────────
     for page in pages:
         _update_step(site, f"Generando pagina '{page['name']}'...")
-        logger.info(f"[generator] Paso 5: template '{page['name']}'")
+        logger.info("[generator] Paso 5: template '%s'", page["name"])
         system, user_text = prompt_template(
             page=page,
             fields=fields,
@@ -185,11 +191,16 @@ def generate_project_files(site) -> dict[str, str]:
             real_fields=real_fields,
             real_url_names=real_url_names,
         )
-        html = llm_call_logged(system, user_text, f"template_{page['name']}", temperature=0.4, site=site)
+        html = llm_call_logged(
+            system,
+            user_text,
+            f"template_{page['name']}",
+            temperature=0.4,
+            site=site,
+        )
         if not html.strip():
             html = fallback_template(page)
 
-        from ..llm.consistency_checker import fix_template
         files[f"{project}/{app}/templates/{page['template']}"] = fix_template(html)
 
     # ── PASO 6: load_data.py ─────────────────────────────────────────────────
@@ -205,21 +216,21 @@ def generate_project_files(site) -> dict[str, str]:
     load_data_code = llm_call_logged(system, user_text, "load_data", temperature=0.05, site=site)
     if not load_data_code.strip():
         load_data_code = fallback_load_data(fields, api_url)
-    
+
     load_data_code, extra_reqs = extract_requirements(strip_markdown_fences(load_data_code))
     files[f"{project}/{app}/management/commands/load_data.py"] = load_data_code
 
     if extra_reqs:
-        logger.info(f"[generator] Librerías extra detectadas: {extra_reqs}")
+        logger.info("[generator] Librerías extra detectadas: %s", extra_reqs)
         current_reqs = files.get(f"{project}/requirements.txt", "")
         for req in extra_reqs:
             if req not in current_reqs:
                 current_reqs += f"{req}\n"
         files[f"{project}/requirements.txt"] = current_reqs
-        
+
     # ── PASO 6b: seed_users.py ───────────────────────────────────────────────
     logger.info("[generator] Paso 6b: seed_users.py")
-    site_users = list(site.site_users.values('username', 'password', 'role'))
+    site_users = list(site.site_users.values("username", "password", "role"))
     if site_users:
         seed_lines = []
         for u in site_users:
@@ -244,13 +255,13 @@ def generate_project_files(site) -> dict[str, str]:
             '    def handle(self, *args, **kwargs):\n'
             '        for username, password, role in USERS:\n'
             '            if User.objects.filter(username=username).exists():\n'
-            '                self.stdout.write(f"  \u26a0 Usuario {username} ya existe, omitido.")\n'
+            '                self.stdout.write(f"  ⚠ Usuario {username} ya existe, omitido.")\n'
             '                continue\n'
             '            if role == "super":\n'
             '                User.objects.create_superuser(username=username, password=password)\n'
             '            else:\n'
             '                User.objects.create_user(username=username, password=password)\n'
-            '            self.stdout.write(f"  \u2714 Creado: {username} ({role})")\n'
+            '            self.stdout.write(f"  ✔ Creado: {username} ({role})")\n'
         )
         files[f"{project}/{app}/management/commands/seed_users.py"] = seed_users_code
 
@@ -262,11 +273,13 @@ def generate_project_files(site) -> dict[str, str]:
     # ── PASO 8: Validación de consistencia y autocorrección ─────────────────
     _update_step(site, "Validando consistencia entre archivos...")
     logger.info("[generator] Paso 8: validando consistencia entre archivos")
-    issues = check_consistency(files) + check_django_syntax(files)
+    issues = run_all_checks(files, user_prompt=user_prompt)
+
     if issues:
-        logger.warning(f"[generator] {len(issues)} inconsistencias detectadas:")
+        logger.warning("[generator] %s inconsistencias detectadas:", len(issues))
         for issue in issues:
-            logger.warning(f"  - {issue}")
+            logger.warning("  - %s", issue)
+
         _update_step(site, "Corrigiendo inconsistencias detectadas...")
         logger.info("[generator] Intentando autocorrección...")
         files = _regenerate_with_errors(
@@ -274,6 +287,7 @@ def generate_project_files(site) -> dict[str, str]:
             issues=issues,
             pages=pages,
             fields=fields,
+            sample_items=sample_items,
             site_type=site_type,
             site_title=site_title,
             user_prompt=enriched_prompt,
@@ -287,7 +301,7 @@ def generate_project_files(site) -> dict[str, str]:
         logger.info("[generator] Sin inconsistencias detectadas")
 
     _update_step(site, "Generacion completada.")
-    logger.info(f"[generator] Completado: {len(files)} archivos generados")
+    logger.info("[generator] Completado: %s archivos generados", len(files))
     return files
 
 
@@ -296,12 +310,21 @@ def generate_project_files(site) -> dict[str, str]:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _regenerate_with_errors(
-    files, issues, pages, fields, site_type, site_title,
-    user_prompt, real_fields, real_url_names, project, app,
+    files,
+    issues,
+    pages,
+    fields,
+    sample_items,
+    site_type,
+    site_title,
+    user_prompt,
+    real_fields,
+    real_url_names,
+    project,
+    app,
     site=None,
 ):
     """Regenera los archivos con errores pasando el contexto de corrección al LLM."""
-
     error_context = "\n".join(f" - {e}" for e in issues)
 
     # ── Regenerar views.py si tiene errores ─────────────────────────
@@ -322,9 +345,15 @@ def _regenerate_with_errors(
             f"Los campos reales del modelo son: {real_fields}\n"
             f"Corrige views.py usando SOLO esos campos."
         )
-        new_views = llm_call_logged(system, user_text, "views_retry", temperature=0.05, site=site)
+        new_views = llm_call_logged(
+            system,
+            user_text,
+            "views_retry",
+            temperature=0.05,
+            site=site,
+        )
         if new_views.strip():
-            files[f"{project}/{app}/views.py"] = new_views
+            files[f"{project}/{app}/views.py"] = strip_markdown_fences(new_views)
             logger.info("[generator] views.py regenerado")
 
     # ── Regenerar templates con errores ─────────────────────────────
@@ -334,12 +363,13 @@ def _regenerate_with_errors(
         if not template_errors:
             continue
 
-        logger.info(f"[generator] Regenerando template '{page['name']}' con correcciones...")
+        logger.info("[generator] Regenerando template '%s' con correcciones...", page["name"])
         template_error_context = "\n".join(f" - {e}" for e in template_errors)
+
         system, user_text = prompt_template(
             page=page,
             fields=fields,
-            sample_items=(fields or []),
+            sample_items=sample_items,
             site_type=site_type,
             site_title=site_title,
             user_prompt=user_prompt,
@@ -353,9 +383,15 @@ def _regenerate_with_errors(
             f"Los campos reales del modelo son: {real_fields}\n"
             f"Corrige el template usando SOLO esos campos y URLs."
         )
-        new_html = llm_call_logged(system, user_text, f"template_{page['name']}_retry", temperature=0.4, site=site)
+        new_html = llm_call_logged(
+            system,
+            user_text,
+            f"template_{page['name']}_retry",
+            temperature=0.4,
+            site=site,
+        )
         if new_html.strip():
-            files[template_path] = new_html
-            logger.info(f"[generator] Template '{page['name']}' regenerado")
+            files[template_path] = fix_template(new_html)
+            logger.info("[generator] Template '%s' regenerado", page["name"])
 
     return files
