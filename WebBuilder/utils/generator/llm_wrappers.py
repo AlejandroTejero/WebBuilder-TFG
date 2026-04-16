@@ -130,6 +130,11 @@ def translate_prompt_to_english(user_prompt: str) -> str:
     if not user_prompt or not user_prompt.strip():
         return user_prompt
 
+    # Heurística: si >95% de los caracteres son ASCII, ya está en inglés
+    ascii_ratio = sum(1 for c in user_prompt if ord(c) < 128) / len(user_prompt)
+    if ascii_ratio > 0.95:
+        return user_prompt
+    
     system = (
         "You are a translator. Your only job is to translate the user's text to English. "
         "Return ONLY the translated text, nothing else. "
@@ -143,3 +148,52 @@ def translate_prompt_to_english(user_prompt: str) -> str:
     except LLMError:
         logger.warning("[generator] Traducción del prompt falló, usando original")
         return user_prompt
+    
+
+def llm_design_system_call(*, user_prompt: str, site_type: str) -> dict:
+    """
+    Genera el design system de clases Tailwind para el proyecto.
+    Devuelve un dict con los keys fijos del sistema de diseño.
+    Si falla, devuelve un fallback genérico neutro.
+    """
+    from ..llm.generator_prompts import prompt_design_system
+
+    _DESIGN_SYSTEM_FALLBACK = {
+        "container": "max-w-7xl mx-auto px-6 sm:px-8",
+        "card": "rounded-2xl border border-gray-200 bg-white p-4",
+        "h1": "text-4xl font-bold tracking-tight text-gray-900",
+        "h2": "text-2xl font-semibold text-gray-900",
+        "h3": "text-lg font-bold text-gray-900",
+        "text_muted": "text-sm text-gray-500",
+        "badge_positive": "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-green-100 text-green-700",
+        "badge_negative": "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-red-100 text-red-700",
+        "badge_neutral": "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600",
+        "btn_primary": "inline-block px-4 py-2 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-700 transition-colors",
+        "btn_secondary": "inline-block px-4 py-2 rounded-xl border border-gray-900 text-gray-900 font-semibold hover:bg-gray-100 transition-colors",
+        "input": "w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900",
+        "link": "text-gray-900 underline underline-offset-4 hover:text-gray-600 transition-colors",
+        "divider": "border-t border-gray-200 my-8",
+    }
+
+    try:
+        system, user_text = prompt_design_system(
+            site_type=site_type,
+            user_prompt=user_prompt,
+        )
+        result = llm_json_call(system, user_text, "design_system")
+
+        # Validar que tiene todos los keys esperados
+        expected_keys = set(_DESIGN_SYSTEM_FALLBACK.keys())
+        if not expected_keys.issubset(result.keys()):
+            missing = expected_keys - result.keys()
+            logger.warning("[generator] Design system incompleto, keys faltantes: %s", missing)
+            # Rellenar los que faltan con el fallback
+            for key in missing:
+                result[key] = _DESIGN_SYSTEM_FALLBACK[key]
+
+        logger.info("[generator] Design system generado correctamente")
+        return result
+
+    except Exception as e:
+        logger.warning("[generator] Design system falló (%s), usando fallback neutro", e)
+        return _DESIGN_SYSTEM_FALLBACK

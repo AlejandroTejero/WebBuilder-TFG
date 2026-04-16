@@ -29,6 +29,15 @@ _INVALID_TAILWIND_PATTERNS = [
     r'\bhover:border-#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})(?:/\d+)?\b',
 ]
 
+_INVENTED_CLASS_PATTERNS = [
+    r'\b\w+_base\b',       # card_base, input_base, button_base...
+    r'\b\w+_soft\b',       # card_soft...
+    r'\b\w+_dark\b',       # muted_text_dark...
+    r'\b\w+_medium\b',     # title_medium...
+    r'\b\w+_strong\b',     # title_strong...
+    r'\bcontainer_\w+\b',  # container_base, container_narrow...
+    r'\bsection_\w+\b',    # section_spacing...
+]
 
 def _find_first_matching_file(files: dict[str, str], suffix: str) -> str:
     return next((v for k, v in files.items() if k.endswith(suffix)), "")
@@ -167,15 +176,26 @@ def check_tailwind_validity(files: dict[str, str]) -> list[str]:
         matches: list[str] = []
         for pattern in _INVALID_TAILWIND_PATTERNS:
             matches.extend(re.findall(pattern, content))
-
         if matches:
             unique_matches = sorted(set(matches))
             errors.append(
                 f"{path}: clases Tailwind HEX inválidas o sospechosas detectadas: {', '.join(unique_matches)}"
             )
 
-    return errors
+    for path, content in _iter_html_files(files):
+        invented = []
+        class_attrs = re.findall(r'class=["\']([^"\']+)["\']', content)
+        for class_attr in class_attrs:
+            for pattern in _INVENTED_CLASS_PATTERNS:
+                matches = re.findall(pattern, class_attr)
+                invented.extend(matches)
+        if invented:
+            unique = sorted(set(invented))
+            errors.append(
+                f"{path}: posibles clases CSS inventadas detectadas: {', '.join(unique)}"
+            )
 
+    return errors
 
 # ── ESTRUCTURA MÍNIMA DE TEMPLATES ─────────────────────────────────────────
 
@@ -201,8 +221,15 @@ def check_template_structure(files: dict[str, str]) -> list[str]:
 
         if page_type == "list":
             content_normalized = re.sub(r'\s+', ' ', content)
-            if "{% for item in items %}" not in content_normalized:
-                errors.append(f"{path}: página de listado sin bucle claro sobre items")
+            has_valid_loop = (
+                "{% for item in page_obj %}" in content_normalized
+                or "{% for item in featured %}" in content_normalized
+            )
+            has_invalid_loop = "{% for item in items %}" in content_normalized
+            if not has_valid_loop:
+                errors.append(f"{path}: página de listado sin bucle sobre page_obj")
+            if has_invalid_loop:
+                errors.append(f"{path}: página de listado usa {{% for item in items %}} en vez de page_obj")
             if "{% empty %}" not in content:
                 errors.append(f"{path}: página de listado sin {{% empty %}} para estado vacío")
 
@@ -279,29 +306,38 @@ def check_prompt_contradictions(files: dict[str, str], user_prompt: str | None =
 
 # ── FUNCIÓN PRINCIPAL PARA EJECUTAR TODOS LOS CHECKS ───────────────────────
 
-def run_all_checks(files: dict[str, str], user_prompt: str | None = None, valid_url_names: set[str] | None = None) -> list[str]:
+def run_all_checks(
+    files: dict[str, str],
+    user_prompt: str | None = None,
+    valid_url_names: set[str] | None = None,
+) -> dict[str, list[str]]:
     """
-    Ejecuta todos los chequeos disponibles y devuelve una lista unificada de errores/warnings.
+    Ejecuta todos los chequeos disponibles y devuelve un dict con dos listas:
+      - "blocking": problemas que rompen el proyecto en runtime (disparan regeneracion)
+      - "warning":  avisos de calidad (se loggean pero no disparan regeneracion)
     """
-    all_errors: list[str] = []
-
-    checks = [
+    blocking_checks = [
         check_consistency(files),
         check_django_syntax(files, valid_url_names=valid_url_names),
-        check_tailwind_validity(files),
         check_template_structure(files),
+    ]
+
+    warning_checks = [
+        check_tailwind_validity(files),
         check_prompt_contradictions(files, user_prompt=user_prompt),
     ]
 
-    for result in checks:
-        all_errors.extend(result)
+    def _flatten_dedup(groups: list[list[str]]) -> list[str]:
+        result: list[str] = []
+        seen: set[str] = set()
+        for group in groups:
+            for item in group:
+                if item not in seen:
+                    result.append(item)
+                    seen.add(item)
+        return result
 
-    # Eliminar duplicados preservando orden
-    deduped: list[str] = []
-    seen: set[str] = set()
-    for err in all_errors:
-        if err not in seen:
-            deduped.append(err)
-            seen.add(err)
-
-    return deduped
+    return {
+        "blocking": _flatten_dedup(blocking_checks),
+        "warning": _flatten_dedup(warning_checks),
+    }

@@ -75,7 +75,7 @@ CATALOG_HOME_DARK = """{% extends 'base.html' %}
         </div>
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {% for item in items|slice:":6" %}
+			{% for item in featured %}
                 <article class="overflow-hidden rounded-3xl border border-gray-800 bg-gray-900 shadow-xl">
                     {% if item.CAMPO_IMAGEN %}
                         <div class="aspect-[16/10] overflow-hidden bg-gray-800">
@@ -186,7 +186,7 @@ CATALOG_HOME_LIGHT = """{% extends 'base.html' %}
         </div>
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {% for item in items|slice:":6" %}
+			{% for item in featured %}
                 <article class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200">
                     {% if item.CAMPO_IMAGEN %}
                         <div class="aspect-[16/10] overflow-hidden bg-gray-100">
@@ -298,7 +298,7 @@ CATALOG_HOME_EDITORIAL = """{% extends 'base.html' %}
             </div>
 
             <div class="divide-y divide-stone-200 border-y border-stone-200">
-                {% for item in items|slice:":6" %}
+				{% for item in featured %}
                     <article class="py-8">
                         <div class="grid gap-4 md:grid-cols-12">
                             <div class="md:col-span-3">
@@ -383,7 +383,7 @@ CATALOG_LIST_DARK = """{% extends 'base.html' %}
         </div>
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article
                     class="search-item overflow-hidden rounded-3xl border border-gray-800 bg-gray-900 shadow-xl"
                     data-search="{{ item.CAMPO_TITULO }} {% if item.CAMPO_CATEGORIA %}{{ item.CAMPO_CATEGORIA }}{% endif %} {% if item.CAMPO_EXTRA %}{{ item.CAMPO_EXTRA }}{% endif %} {% if item.CAMPO_DESCRIPCION %}{{ item.CAMPO_DESCRIPCION }}{% endif %}"
@@ -529,7 +529,7 @@ CATALOG_LIST_LIGHT = """{% extends 'base.html' %}
         </div>
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article
                     class="search-item overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200"
                     data-search="{{ item.CAMPO_TITULO }} {% if item.CAMPO_CATEGORIA %}{{ item.CAMPO_CATEGORIA }}{% endif %} {% if item.CAMPO_EXTRA %}{{ item.CAMPO_EXTRA }}{% endif %} {% if item.CAMPO_DESCRIPCION %}{{ item.CAMPO_DESCRIPCION }}{% endif %}"
@@ -662,7 +662,7 @@ CATALOG_LIST_EDITORIAL = """{% extends 'base.html' %}
         </div>
 
         <div class="divide-y divide-stone-200">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article class="py-8">
                     <div class="grid gap-4 md:grid-cols-12">
                         <div class="md:col-span-3">

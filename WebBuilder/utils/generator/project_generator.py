@@ -35,6 +35,7 @@ from .llm_wrappers import (
     strip_markdown_fences,
     extract_requirements,
     translate_prompt_to_english,
+    llm_design_system_call,
 )
 
 from .fallbacks import (
@@ -122,6 +123,15 @@ def generate_project_files(site) -> dict[str, str]:
         logger.warning("[generator] Páginas inválidas, usando fallback")
         pages = fallback_pages(site_type)
 
+    # ── PASO 1b: Design system ───────────────────────────────────────────────
+    _update_step(site, "Generando sistema de diseño...")
+    logger.info("[generator] Paso 1b: design system")
+    design_system = llm_design_system_call(
+        user_prompt=enriched_prompt,
+        site_type=site_type,
+    )
+    logger.info("[generator] Design system: %s", design_system)
+
     # ── PASO 2: models.py ────────────────────────────────────────────────────
     _update_step(site, "Generando modelos de datos...")
     logger.info("[generator] Paso 2: models.py")
@@ -172,6 +182,7 @@ def generate_project_files(site) -> dict[str, str]:
         site_type=site_type,
         user_prompt=enriched_prompt,
         all_pages=pages,
+        design_system=design_system,
     )
     base_html = llm_call_logged(system, user_text, "base.html", temperature=0.1, site=site)
     if not base_html.strip():
@@ -193,6 +204,7 @@ def generate_project_files(site) -> dict[str, str]:
             all_pages=pages,
             real_fields=real_fields,
             real_url_names=real_url_names,
+            design_system=design_system,
         )
         html = llm_call_logged(
             system,
@@ -271,24 +283,33 @@ def generate_project_files(site) -> dict[str, str]:
     # ── PASO 7: archivos estáticos ───────────────────────────────────────────
     _update_step(site, "Ensamblando archivos del proyecto...")
     logger.info("[generator] Paso 7: archivos estáticos")
-    files.update(build_static_files(project, app))
+    files.update(build_static_files(project, app, design_system=design_system))
 
     # ── PASO 8: Validación de consistencia y autocorrección ─────────────────
     _update_step(site, "Validando consistencia entre archivos...")
     logger.info("[generator] Paso 8: validando consistencia entre archivos")
-    valid_url_names = set(real_url_names.values()) | {"login", "logout", "register"}
-    issues = run_all_checks(files, user_prompt=user_prompt, valid_url_names=valid_url_names)
+    valid_url_names = set(real_url_names.keys()) | {"login", "logout", "register"}
+    issues = run_all_checks(files, user_prompt=user_prompt_normalized, valid_url_names=valid_url_names)
 
-    if issues:
-        logger.warning("[generator] %s inconsistencias detectadas:", len(issues))
-        for issue in issues:
+    blocking_issues = issues["blocking"]
+    warning_issues = issues["warning"]
+
+    # Los warnings solo se loggean, no disparan regeneracion
+    if warning_issues:
+        logger.info("[generator] %s avisos de calidad (no bloquean):", len(warning_issues))
+        for warn in warning_issues:
+            logger.info("  - %s", warn)
+
+    if blocking_issues:
+        logger.warning("[generator] %s inconsistencias bloqueantes detectadas:", len(blocking_issues))
+        for issue in blocking_issues:
             logger.warning("  - %s", issue)
 
         _update_step(site, "Corrigiendo inconsistencias detectadas...")
         logger.info("[generator] Intentando autocorrección...")
         files = _regenerate_with_errors(
             files=files,
-            issues=issues,
+            issues=blocking_issues,
             pages=pages,
             fields=fields,
             sample_items=sample_items,
@@ -300,14 +321,14 @@ def generate_project_files(site) -> dict[str, str]:
             project=project,
             app=app,
             site=site,
+            design_system=design_system,
         )
     else:
-        logger.info("[generator] Sin inconsistencias detectadas")
+        logger.info("[generator] Sin inconsistencias bloqueantes")
 
     _update_step(site, "Generacion completada.")
     logger.info("[generator] Completado: %s archivos generados", len(files))
     return files
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 # AUTOCORRECCIÓN DE ERRORES LLM
@@ -327,6 +348,7 @@ def _regenerate_with_errors(
     project,
     app,
     site=None,
+    design_system=None,
 ):
     """Regenera los archivos con errores pasando el contexto de corrección al LLM."""
     error_context = "\n".join(f" - {e}" for e in issues)
@@ -380,6 +402,7 @@ def _regenerate_with_errors(
             all_pages=pages,
             real_fields=real_fields,
             real_url_names=real_url_names,
+            design_system=design_system,
         )
         user_text += (
             f"\n\nCORRECCION OBLIGATORIA — tu template anterior tenia estos errores:\n"

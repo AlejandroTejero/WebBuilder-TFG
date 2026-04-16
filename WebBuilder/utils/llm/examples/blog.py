@@ -93,7 +93,7 @@ BLOG_HOME_DARK = """{% extends 'base.html' %}
                                 Recientes
                             </p>
                             <div class="mt-6 space-y-6">
-                                {% for item in items|slice:"1:6" %}
+								{% for item in featured %}
                                     <article class="border-b border-gray-800 pb-6 last:border-b-0 last:pb-0">
                                         <div class="flex flex-wrap items-center gap-3 text-sm text-gray-400">
                                             {% if item.CAMPO_FECHA %}
@@ -223,7 +223,7 @@ BLOG_HOME_LIGHT = """{% extends 'base.html' %}
                                 Recientes
                             </p>
                             <div class="mt-6 space-y-6">
-                                {% for item in items|slice:"1:6" %}
+								{% for item in featured %}
                                     <article class="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
                                         <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
                                             {% if item.CAMPO_FECHA %}
@@ -347,7 +347,7 @@ BLOG_HOME_EDITORIAL = """{% extends 'base.html' %}
                             Recientes
                         </p>
                         <div class="mt-6 divide-y divide-stone-200 border-y border-stone-200">
-                            {% for item in items|slice:"1:6" %}
+							{% for item in featured %}
                                 <article class="py-6">
                                     <div class="flex flex-wrap items-center gap-3 text-sm text-stone-500">
                                         {% if item.CAMPO_FECHA %}
@@ -417,7 +417,7 @@ BLOG_LIST_DARK = """{% extends 'base.html' %}
         </header>
 
         <div class="mt-8 divide-y divide-gray-800">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article class="py-8">
                     <div class="flex flex-wrap items-center gap-3 text-sm text-gray-400">
                         {% if item.CAMPO_FECHA %}
@@ -512,7 +512,7 @@ BLOG_LIST_LIGHT = """{% extends 'base.html' %}
         </header>
 
         <div class="mt-8 space-y-6">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
                     <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
                         {% if item.CAMPO_FECHA %}
@@ -607,7 +607,7 @@ BLOG_LIST_EDITORIAL = """{% extends 'base.html' %}
         </header>
 
         <div class="mt-8 divide-y divide-stone-200">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article class="py-8">
                     <div class="flex flex-wrap items-center gap-4 text-sm text-stone-500">
                         {% if item.CAMPO_FECHA %}

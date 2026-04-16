@@ -76,8 +76,11 @@ def fallback_views(pages: list[dict]) -> str:
         elif page.get("is_list"):
             lines += [
                 f"def {page['view_name']}(request):",
-                "    items = Item.objects.all().order_by('-id')",
-                f"    return render(request, '{page['template']}', {{'items': items, 'site_title': 'Mi Sitio'}})",
+                "    from django.core.paginator import Paginator",
+                "    queryset = Item.objects.all().order_by('-id')",
+                "    paginator = Paginator(queryset, 12)",
+                "    page_obj = paginator.get_page(request.GET.get('page', 1))",
+                f"    return render(request, '{page['template']}', {{'page_obj': page_obj, 'site_title': 'Mi Sitio'}})",
                 "",
             ]
         else:

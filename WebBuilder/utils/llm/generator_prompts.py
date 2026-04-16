@@ -48,6 +48,8 @@ _PAGE_REQUIREMENTS = {
             "Incluye empty state claro cuando no haya items ({% empty %}).",
             "Si existe page_obj, añade paginación funcional y bien integrada visualmente.",
             "El diseño del listado debe seguir funcionando correctamente con o sin imágenes.",
+            "IMÁGENES en cards: usa siempre aspect-square o aspect-video con object-cover en vez de altura fija (h-48, h-64...). Ejemplo correcto: class='w-full aspect-square object-cover rounded-t-2xl'. PROHIBIDO usar h-48, h-56, h-64 o cualquier altura fija en imágenes de cards.",
+
         ],
         "visual": [
             "El buscador es opcional. Añádelo solo cuando aporte valor al tipo de sitio.",
@@ -70,7 +72,7 @@ _PAGE_REQUIREMENTS = {
             "El layout puede ser de una o dos columnas según el contenido y el prompt del usuario.",
         ],
         "visual": [
-            "Si existe imagen y encaja con la estética, muéstrala de forma destacada.",
+            "Si existe imagen y encaja con la estética, muéstrala de forma destacada. Usa aspect-square o aspect-video con object-cover, nunca altura fija. Ejemplo: class='w-full aspect-square object-cover rounded-2xl'.",
             "Si no existe imagen o el prompt no la favorece, no inventes bloques visuales innecesarios.",
             "Destaca el dato principal si existe, pero sin imponer colores o tamaños que contradigan el prompt del usuario.",
             "RECOMENDADO: añadir items relacionados o contenido complementario al final si existe la variable 'items' y aporta valor.",
@@ -304,19 +306,20 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
         "Importa: from .models import Item",
         "Importa: from django.core.paginator import Paginator",
         "Una view por cada página en PÁGINAS.",
-        "La view de listado acepta búsqueda server-side: q = request.GET.get('q', ''); si q no está vacío, filtra con Item.objects.filter(pk__isnull=False) y añade Q objects para cada campo de texto disponible. Pasa 'q' al contexto para que el template pueda mostrar el valor en el input.",
+        "La view de listado acepta búsqueda server-side: q = request.GET.get('q', ''); si q no está vacío, filtra con Item.objects.filter(pk__isnull=False) y añade Q objects para cada campo de texto disponible. Pasa 'q' al contexto para que el template pueda mostrar el valor en el input. CRÍTICO: todos los campos son simples (CharField, URLField, etc.), NUNCA uses lookups relacionales como campo__name__icontains. Usa siempre campo__icontains directamente.",
         "La view de listado DEBE usar paginación:",
         "  from django.core.paginator import Paginator",
         "  queryset = Item.objects.all().order_by('-id')",
         "  paginator = Paginator(queryset, 12)",
         "  page_number = request.GET.get('page', 1)",
-        "  items = paginator.get_page(page_number)",
-        "  Pasar 'items' y 'page_obj' (= items) al contexto.",
+        "  page_obj = paginator.get_page(page_number)",
+        "Pasar SOLO 'page_obj' al contexto. NUNCA uses 'items' como nombre de variable.",
         "La view de detalle: recibe pk y usa get_object_or_404(Item, pk=pk).",
         "La view de detalle ADEMÁS pasa 'related' al contexto: related = Item.objects.exclude(pk=item.pk).order_by('?')[:3]",
-        "Páginas no-listado no-detalle (home, about...): pasa items[:6] como featured usando Item.objects.all().order_by('-id')[:6].",
+        "Páginas no-listado no-detalle (home, about...): pasa SIEMPRE la variable con nombre exacto 'featured' al contexto: featured = Item.objects.all().order_by('-id')[:6]. NUNCA uses 'items' como nombre de variable.",        
         "Cada view pasa 'site_title' al contexto.",
         "Sin autenticación, sin formularios complejos.",
+        "CRÍTICO: usa ÚNICAMENTE function-based views. PROHIBIDO usar clases, métodos como get_context_data, o cualquier herencia de View, ListView, DetailView o similar.",
     ]
 
     if real_fields:
@@ -352,7 +355,7 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
 
 # ── 4) BASE.HTML ───────────────────────────────────────────────────────────
 
-def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
+def prompt_base_template(*, site_title, site_type, user_prompt, all_pages, design_system=None):
     nav_pages = [p for p in all_pages if not p.get("is_detail")]
     nav_info = json.dumps(
         [{"name": p["name"], "url": p["url"], "view_name": p["view_name"]} for p in nav_pages],
@@ -362,6 +365,7 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
     theme_rules_text = build_theme_rules_text()
     
     rules = [
+        "CRÍTICO: usa EXCLUSIVAMENTE clases Tailwind CSS estándar válidas para CDN. PROHIBIDO inventar clases custom como 'card_base', 'container_narrow', 'badge_base' o cualquier nombre que no sea una utilidad Tailwind real.",
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con '<!doctype html>'. Sin nada antes.",
         "CRÍTICO: PROHIBIDO usar ```, ```html o cualquier bloque Markdown. HTML puro.",
         "Incluye <script src='https://cdn.tailwindcss.com'></script> en <head>.",
@@ -374,11 +378,35 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
         "Links del navbar usan {% url 'view_name' %}.",
         "COLORES: si el usuario da colores HEX o paleta concreta, aplícalos explícitamente en fondo, texto, links, botones y estados activos usando clases Tailwind y/o valores arbitrarios como bg-[#111111].",
         "Si no hay indicación de colores, usa una base neutra y coherente con el tipo de sitio; no fuerces oscuro por defecto salvo que tenga sentido.",
-        "Incluye {% block content %}{% endblock %} dentro de un <main> bien proporcionado. El ancho puede ser estrecho, medio o amplio según el prompt del usuario.",
-        "FOOTER OBLIGATORIO: nombre del sitio + navegación básica + copyright con © {% now 'Y' %} {{ site_title }}.",
+        "LAYOUT OBLIGATORIO: el <body> debe tener las clases 'min-h-screen flex flex-col'. El <main> debe tener la clase 'flex-1'. Esto garantiza que el footer siempre queda pegado al fondo aunque el contenido no llene la pantalla.",
+        "Incluye {% block content %}{% endblock %} dentro del <main class='flex-1'> bien proporcionado. El ancho del contenido interior puede ser estrecho, medio o amplio según el prompt del usuario.",        "FOOTER OBLIGATORIO: nombre del sitio + navegación básica + copyright con © {% now 'Y' %} {{ site_title }}.",
         "ANIMACIONES: si las usas, deben ser discretas. Puedes añadir utilidades CSS mínimas para fade-in suave, pero evita efectos llamativos si el prompt es sobrio o editorial.",
         "NO uses JavaScript propio salvo necesidad mínima estructural.",
     ]
+
+    design_system_text = ""
+    if design_system:
+        lines = ["SISTEMA DE CLASES (úsalos exactamente para estos elementos, sin inventar alternativas):"]
+        labels = {
+            "container": "Contenedor principal",
+            "card": "Tarjeta",
+            "h1": "Título H1",
+            "h2": "Título H2",
+            "h3": "Título H3",
+            "text_muted": "Texto secundario/metadatos",
+            "badge_positive": "Badge positivo/activo",
+            "badge_negative": "Badge negativo/error",
+            "badge_neutral": "Badge neutro",
+            "btn_primary": "Botón primario",
+            "btn_secondary": "Botón secundario",
+            "input": "Input de formulario",
+            "link": "Enlace",
+            "divider": "Separador",
+        }
+        for key, label in labels.items():
+            if key in design_system:
+                lines.append(f"  - {label}: {design_system[key]}")
+        design_system_text = "\n".join(lines)
 
     user_text = "\n".join(
         [
@@ -386,6 +414,8 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages):
             "",
             "REGLAS DE PRIORIDAD:",
             priority_rules_text,
+            "",
+            design_system_text,
             "",
             "═══ INSTRUCCIÓN DEL USUARIO (prioridad máxima) ═══",
             f"{user_prompt or '(sin instrucciones — usa tu criterio según el dataset)'}",
@@ -442,6 +472,7 @@ def prompt_template(
     all_pages,
     real_fields=None,
     real_url_names=None,
+    design_system=None,
 ):
     is_list = page.get("is_list", False)
     is_detail = page.get("is_detail", False)
@@ -458,8 +489,8 @@ def prompt_template(
 
     if is_list:
         context_hint = (
-            "CONTEXTO: 'items' (queryset paginado de Item), 'site_title' y opcionalmente 'q'.\n"
-            "Usa {% for item in items %} para iterar.\n"
+            "CONTEXTO: 'page_obj' (queryset paginado de Item), 'site_title' y opcionalmente 'q'.\n"
+            "CRÍTICO: usa SIEMPRE {% for item in page_obj %} para iterar. NUNCA uses 'items'.\n"
             f"Enlace a detalle: {{% url '{detail_url_name}' item.pk %}}"
         )
     elif is_detail:
@@ -470,7 +501,8 @@ def prompt_template(
         )
     else:
         context_hint = (
-            "CONTEXTO: 'site_title' e 'items' (primeros 6 para featured).\n"
+            "CONTEXTO: 'site_title' y 'featured' (lista de los primeros 6 items para destacados).\n"
+            "CRÍTICO: usa SIEMPRE {% for item in featured %} para iterar los destacados. NUNCA uses 'items'.\n"
             "Es la portada del sitio. Debe presentar el proyecto y facilitar la exploración del contenido."
         )
 
@@ -482,6 +514,7 @@ def prompt_template(
 
     rules = [
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con {% extends 'base.html' %}. Sin nada antes.",
+        "CRÍTICO: base.html ya contiene navbar y footer. PROHIBIDO añadir <header>, <nav>, <footer> o cualquier navbar/footer propio dentro del {% block content %}. Solo mete contenido de página.",
         "CRÍTICO: PROHIBIDO usar ```, ```html o cualquier bloque Markdown. HTML puro.",
         "USA {% extends 'base.html' %} y {% block content %}...{% endblock %}.",
         "USA Tailwind CSS (CDN ya en base.html). Sin <style> extenso.",
@@ -490,7 +523,10 @@ def prompt_template(
         context_hint,
         "Usa condicionales Django para campos opcionales cuando haga falta.",
         "Nombres de campo: usa los 'key' del schema directamente como atributos del modelo.",
-        "CRÍTICO: todos los campos del modelo son strings o tipos simples. NUNCA uses item.campo.subcampo.",
+        "CRÍTICO: usa EXCLUSIVAMENTE clases Tailwind CSS estándar válidas para CDN. PROHIBIDO inventar clases custom como 'card_base', 'container_narrow', 'badge_base' o cualquier nombre que no sea una utilidad Tailwind real.",
+        "CRÍTICO ABSOLUTO: el SISTEMA DE CLASES proporcionado arriba es OBLIGATORIO. Para cada elemento (tarjeta, contenedor, título, badge, botón, input, enlace) debes usar EXACTAMENTE las clases indicadas en el sistema, sin excepción. No las sustituyas, no las combines con inventos, no las ignores.",
+        "VERIFICACIÓN MENTAL OBLIGATORIA: antes de escribir cualquier clase CSS, pregúntate '¿es esta una utilidad Tailwind real?'. Si no estás seguro, usa las clases del SISTEMA DE CLASES o utilidades básicas como flex, grid, p-4, text-sm, font-bold.",
+        "CRÍTICO: todos los campos del modelo son strings o tipos simples, NUNCA objetos. NUNCA uses item.campo.subcampo ni item.campo.atributo. Si origin, location o cualquier campo similar existe, accede como {{ item.origin }}, nunca como {{ item.origin.name }}.",
         "Usa iconos SVG inline solo cuando sumen claridad real.",
         "Las animaciones, si existen, deben ser discretas y coherentes con el prompt del usuario.",
     ]
@@ -516,6 +552,30 @@ def prompt_template(
         rules.append(url_rules)
         rules.append("NUNCA inventes nombres de URL que no estén en esa lista.")
 
+    design_system_text = ""
+    if design_system:
+        lines = ["SISTEMA DE CLASES (úsalos exactamente para estos elementos, sin inventar alternativas):"]
+        labels = {
+            "container": "Contenedor principal",
+            "card": "Tarjeta",
+            "h1": "Título H1",
+            "h2": "Título H2",
+            "h3": "Título H3",
+            "text_muted": "Texto secundario/metadatos",
+            "badge_positive": "Badge positivo/activo",
+            "badge_negative": "Badge negativo/error",
+            "badge_neutral": "Badge neutro",
+            "btn_primary": "Botón primario",
+            "btn_secondary": "Botón secundario",
+            "input": "Input de formulario",
+            "link": "Enlace",
+            "divider": "Separador",
+        }
+        for key, label in labels.items():
+            if key in design_system:
+                lines.append(f"  - {label}: {design_system[key]}")
+        design_system_text = "\n".join(lines)
+
     user_text = "\n".join(
         [
             f"SITIO: {site_title}  |  TIPO: {site_type}",
@@ -523,6 +583,7 @@ def prompt_template(
             "REGLAS DE PRIORIDAD:",
             priority_rules_text,
             "",
+
             "═══ INSTRUCCIÓN DEL USUARIO (prioridad máxima) ═══",
             f"{user_prompt or '(sin instrucciones — usa tu criterio según el dataset)'}",
             "═══════════════════════════════════════════════════",
@@ -581,12 +642,14 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
         "from siteapp.models import Item",
         "import requests",
         f"El comando hace GET a '{api_url}'.",
-        "Parsea el JSON y encuentra la lista principal de items (puede estar anidada).",
+        "PAGINACIÓN: muchas APIs devuelven los datos paginados con un campo 'next' (u otro nombre) que contiene la URL de la siguiente página. Si existe ese campo en la respuesta, itera siguiendo esa URL hasta que sea null/None para cargar todos los datos, no solo la primera página.",
         "CRITICO: usa get_or_create separando campos en defaults:",
         "Item.objects.get_or_create(campo_id=valor, defaults={'campo1': val1, 'campo2': val2})",
         "Si no hay campo único identificador, usa update_or_create o simplemente create().",
         "Si un campo del dataset es un OBJETO ANIDADO (dict), extrae solo el valor más representativo como string.",
-        "  Ejemplo: rating = {'rate': 4.5, 'count': 120} → guardar str(item['rating']['rate'])",
+        "CRÍTICO: el JSON ya viene parseado como dict Python. NUNCA uses json.loads() sobre un campo que ya es dict.",
+        "Accede directamente: raw_item['origin']['name'], NO json.loads(raw_item['origin'])['name'].",
+        "Ejemplo: rating = {'rate': 4.5, 'count': 120} → guardar str(raw_item['rating']['rate'])",
         "Limpia valores: precios → Decimal(str(valor).replace('$','').strip()), el precio puede venir como float o como string con '$', usa siempre str() primero para evitar errores. Fechas → parsear, enteros → int().",
         "Si falla la conversión → None (no romper el comando).",
         "Informa del progreso con self.stdout.write().",
@@ -629,3 +692,108 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
         ]
     )
     return _base_system(), user_text
+
+
+# ── 7) DESIGN SYSTEM ───────────────────────────────────────────────────────
+
+def prompt_design_system(*, site_type, user_prompt):
+    system = (
+        "Eres un experto en diseño web y Tailwind CSS. "
+        "Devuelves SOLO un objeto JSON válido, sin Markdown ni texto extra. "
+        "PROHIBIDO usar ```. Tu respuesta empieza directamente con { y termina con }."
+    )
+
+    keys = [
+        "container", "card", "h1", "h2", "h3", "text_muted",
+        "badge_positive", "badge_negative", "badge_neutral",
+        "btn_primary", "btn_secondary", "input", "link", "divider",
+    ]
+
+    examples = [
+        {
+            "user_prompt": "Dark background, pure black (#0a0a0a), white text, emerald green accents (#10b981), bold typography",
+            "site_type": "catalog",
+            "output": {
+                "container": "max-w-7xl mx-auto px-6 sm:px-8",
+                "card": "rounded-2xl border border-[#222222] bg-[#111111] p-4",
+                "h1": "text-4xl font-bold tracking-tight text-white",
+                "h2": "text-2xl font-semibold text-white",
+                "h3": "text-lg font-bold text-white",
+                "text_muted": "text-sm text-[#6b7280]",
+                "badge_positive": "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-[#10b981] text-white",
+                "badge_negative": "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-red-500 text-white",
+                "badge_neutral": "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-blue-500 text-white",
+                "btn_primary": "inline-block px-4 py-2 rounded-xl bg-[#10b981] text-white font-semibold hover:bg-[#0f9d65] transition-colors",
+                "btn_secondary": "inline-block px-4 py-2 rounded-xl border border-[#10b981] text-[#10b981] font-semibold hover:bg-[#10b981] hover:text-white transition-colors",
+                "input": "w-full rounded-xl border border-[#222222] bg-[#111111] px-4 py-2 text-sm text-white placeholder:text-[#6b7280] focus:outline-none focus:border-[#10b981]",
+                "link": "text-[#10b981] hover:text-[#0f9d65] transition-colors",
+                "divider": "border-t border-[#222222] my-8",
+            }
+        },
+        {
+            "user_prompt": "Minimal editorial style, white background, serif typography, no colors, clean and sober",
+            "site_type": "blog",
+            "output": {
+                "container": "max-w-3xl mx-auto px-6",
+                "card": "border-b border-gray-200 py-8",
+                "h1": "text-5xl font-serif font-bold tracking-tight text-gray-900",
+                "h2": "text-3xl font-serif font-bold text-gray-900",
+                "h3": "text-xl font-serif font-semibold text-gray-900",
+                "text_muted": "text-sm text-gray-500",
+                "badge_positive": "text-xs uppercase tracking-widest text-green-700",
+                "badge_negative": "text-xs uppercase tracking-widest text-red-700",
+                "badge_neutral": "text-xs uppercase tracking-widest text-gray-500",
+                "btn_primary": "inline-block px-6 py-2 border border-gray-900 text-sm font-medium text-gray-900 hover:bg-gray-900 hover:text-white transition-colors",
+                "btn_secondary": "inline-block text-sm underline underline-offset-4 text-gray-700 hover:text-black",
+                "input": "w-full border-b border-gray-300 bg-transparent px-0 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900",
+                "link": "underline underline-offset-4 text-gray-800 hover:text-black",
+                "divider": "border-t border-gray-200 my-10",
+            }
+        },
+        {
+            "user_prompt": "Modern dashboard, dark slate (#1e293b), electric blue accents (#3b82f6), cards with shadow, data-heavy",
+            "site_type": "dashboard",
+            "output": {
+                "container": "max-w-7xl mx-auto px-8",
+                "card": "rounded-xl bg-[#0f172a] shadow-lg border border-slate-700 p-6",
+                "h1": "text-3xl font-bold text-white",
+                "h2": "text-xl font-semibold text-white",
+                "h3": "text-base font-semibold text-slate-200",
+                "text_muted": "text-sm text-slate-400",
+                "badge_positive": "inline-flex items-center rounded-md px-2 py-1 text-xs font-mono bg-green-500/20 text-green-400",
+                "badge_negative": "inline-flex items-center rounded-md px-2 py-1 text-xs font-mono bg-red-500/20 text-red-400",
+                "badge_neutral": "inline-flex items-center rounded-md px-2 py-1 text-xs font-mono bg-blue-500/20 text-blue-400",
+                "btn_primary": "inline-block px-4 py-2 rounded-lg bg-[#3b82f6] text-white text-sm font-medium hover:bg-blue-700 transition-colors",
+                "btn_secondary": "inline-block px-4 py-2 rounded-lg border border-slate-600 text-slate-300 text-sm font-medium hover:border-blue-500 hover:text-blue-400 transition-colors",
+                "input": "w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#3b82f6]",
+                "link": "text-[#3b82f6] hover:text-blue-400 transition-colors",
+                "divider": "border-t border-slate-700 my-6",
+            }
+        },
+    ]
+
+    examples_text = json.dumps(examples, ensure_ascii=False, indent=2)
+    keys_text = ", ".join(f'"{k}"' for k in keys)
+
+    user_text = "\n".join([
+        f"TIPO DE SITIO: {site_type}",
+        "",
+        "INSTRUCCIÓN DEL USUARIO:",
+        f"{user_prompt or '(sin instrucciones — usa criterio según el tipo de sitio)'}",
+        "",
+        f"KEYS OBLIGATORIOS (devuelve exactamente estos, ni más ni menos): {keys_text}",
+        "",
+        "REGLAS:",
+        "- Todas las clases deben ser utilidades Tailwind CSS válidas para CDN.",
+        "- PROHIBIDO inventar clases custom como 'card_base', 'container_narrow' o similares.",
+        "- Usa valores arbitrarios Tailwind como bg-[#111111] cuando el usuario especifique colores HEX.",
+        "- El sistema debe ser coherente: colores, radios y tipografía deben ser consistentes entre keys.",
+        "- Si el usuario no especifica colores, usa una paleta neutra coherente con el tipo de sitio.",
+        "",
+        "EJEMPLOS (prompt → JSON de output):",
+        examples_text,
+        "",
+        "Genera el design system para el sitio descrito ahora:",
+    ])
+
+    return system, user_text

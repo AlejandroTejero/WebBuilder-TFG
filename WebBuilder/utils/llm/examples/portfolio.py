@@ -71,7 +71,7 @@ PORTFOLIO_HOME_DARK = """{% extends 'base.html' %}
             </div>
 
             <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {% for item in items|slice:":6" %}
+				{% for item in featured %}
                     <article class="group overflow-hidden rounded-3xl border border-gray-800 bg-gray-900">
                         <a href="{% url 'NOMBRE_URL_DETALLE' item.pk %}" class="block">
                             <div class="relative aspect-[4/3] overflow-hidden bg-gray-800">
@@ -174,7 +174,7 @@ PORTFOLIO_HOME_LIGHT = """{% extends 'base.html' %}
             </div>
 
             <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {% for item in items|slice:":6" %}
+				{% for item in featured %}
                     <article class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200">
                         <a href="{% url 'NOMBRE_URL_DETALLE' item.pk %}" class="block">
                             <div class="aspect-[4/3] overflow-hidden bg-gray-100">
@@ -259,7 +259,7 @@ PORTFOLIO_HOME_EDITORIAL = """{% extends 'base.html' %}
             </div>
 
             <div class="divide-y divide-stone-200 border-y border-stone-200">
-                {% for item in items|slice:":6" %}
+				{% for item in featured %}
                     <article class="py-8">
                         <div class="grid gap-4 md:grid-cols-12">
                             <div class="md:col-span-3">
@@ -324,7 +324,7 @@ PORTFOLIO_LIST_DARK = """{% extends 'base.html' %}
         </header>
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article class="group overflow-hidden rounded-3xl border border-gray-800 bg-gray-900">
                     <a href="{% url 'NOMBRE_URL_DETALLE' item.pk %}" class="block">
                         <div class="relative aspect-[4/3] overflow-hidden bg-gray-800">
@@ -411,7 +411,7 @@ PORTFOLIO_LIST_LIGHT = """{% extends 'base.html' %}
         </header>
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200">
                     <a href="{% url 'NOMBRE_URL_DETALLE' item.pk %}" class="block">
                         <div class="aspect-[4/3] overflow-hidden bg-gray-100">
@@ -497,7 +497,7 @@ PORTFOLIO_LIST_EDITORIAL = """{% extends 'base.html' %}
         </header>
 
         <div class="mt-8 divide-y divide-stone-200">
-            {% for item in items %}
+			{% for item in page_obj %}
                 <article class="py-8">
                     <div class="grid gap-4 md:grid-cols-12">
                         <div class="md:col-span-3">

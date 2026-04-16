@@ -489,7 +489,7 @@ DASHBOARD_LIST_DARK = """{% extends 'base.html' %}
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-800">
-                        {% for item in items %}
+						{% for item in page_obj %}
                             <tr class="transition hover:bg-gray-800/50">
                                 <td class="px-6 py-4 align-top">
                                     <a href="{% url 'NOMBRE_URL_DETALLE' item.pk %}" class="font-semibold text-white transition hover:text-blue-300">
@@ -610,7 +610,7 @@ DASHBOARD_LIST_LIGHT = """{% extends 'base.html' %}
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        {% for item in items %}
+						{% for item in page_obj %}
                             <tr class="transition hover:bg-gray-50">
                                 <td class="px-6 py-4 align-top">
                                     <a href="{% url 'NOMBRE_URL_DETALLE' item.pk %}" class="font-semibold text-gray-900 transition hover:text-gray-700">
@@ -730,7 +730,7 @@ DASHBOARD_LIST_EDITORIAL = """{% extends 'base.html' %}
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-200">
-                    {% for item in items %}
+					{% for item in page_obj %}
                         <tr>
                             <td class="px-4 py-5 align-top">
                                 <a href="{% url 'NOMBRE_URL_DETALLE' item.pk %}" class="font-semibold text-stone-900 transition hover:text-stone-700">

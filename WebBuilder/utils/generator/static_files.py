@@ -8,10 +8,19 @@ Contiene todo lo que no requiere LLM:
 from __future__ import annotations
 
 
-def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
+def build_static_files(project: str, app: str = "siteapp", design_system: dict = None) -> dict[str, str]:
     """Archivos de infraestructura que son siempre iguales."""
 
     files = {}
+
+    # ── Design system para templates de auth ─────────────────────────────────
+    ds = design_system or {}
+    card       = ds.get("card",           "bg-gray-900 border border-gray-700 rounded-2xl p-8")
+    input_cls  = ds.get("input",          "w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500")
+    btn        = ds.get("btn_primary",    "w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg transition")
+    link       = ds.get("link",           "text-blue-400 hover:underline")
+    text_muted = ds.get("text_muted",     "text-gray-400 text-sm")
+    h1         = ds.get("h1",             "text-2xl font-bold text-white mb-6 text-center")
 
     # manage.py
     files[f"{project}/manage.py"] = (
@@ -140,7 +149,6 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
     )
 
     # entrypoint.sh — incluye seed_users
-    # entrypoint.sh — incluye seed_users
     files[f"{project}/entrypoint.sh"] = (
         "#!/bin/sh\n"
         "\n"
@@ -191,8 +199,8 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "{% extends 'base.html' %}\n"
         "{% block content %}\n"
         "<div class='min-h-screen flex items-center justify-center'>\n"
-        "  <div class='bg-gray-900 border border-gray-700 rounded-2xl p-8 w-full max-w-md'>\n"
-        "    <h1 class='text-2xl font-bold text-white mb-6 text-center'>Iniciar sesión</h1>\n"
+        f"  <div class='{card} w-full max-w-md'>\n"
+        f"    <h1 class='{h1}'>Iniciar sesión</h1>\n"
         "    {% if form.errors %}\n"
         "      <div class='bg-red-900/40 border border-red-700 text-red-300 rounded-lg p-3 mb-4 text-sm'>\n"
         "        Usuario o contraseña incorrectos.\n"
@@ -201,23 +209,18 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "    <form method='post'>\n"
         "      {% csrf_token %}\n"
         "      <div class='mb-4'>\n"
-        "        <label class='block text-gray-400 text-sm mb-1'>Usuario</label>\n"
-        "        <input type='text' name='username' autofocus\n"
-        "               class='w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500'>\n"
+        f"        <label class='block {text_muted} mb-1'>Usuario</label>\n"
+        f"        <input type='text' name='username' autofocus class='{input_cls}'>\n"
         "      </div>\n"
         "      <div class='mb-6'>\n"
-        "        <label class='block text-gray-400 text-sm mb-1'>Contraseña</label>\n"
-        "        <input type='password' name='password'\n"
-        "               class='w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500'>\n"
+        f"        <label class='block {text_muted} mb-1'>Contraseña</label>\n"
+        f"        <input type='password' name='password' class='{input_cls}'>\n"
         "      </div>\n"
         "      <input type='hidden' name='next' value='{{ next }}'>\n"
-        "      <button type='submit'\n"
-        "              class='w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg transition'>\n"
-        "        Entrar\n"
-        "      </button>\n"
+        f"      <button type='submit' class='{btn} w-full mt-2'>Entrar</button>\n"
         "    </form>\n"
-        "    <p class='text-center text-gray-500 text-sm mt-4'>\n"
-        "      ¿No tienes cuenta? <a href='{% url \"register\" %}' class='text-blue-400 hover:underline'>Regístrate</a>\n"
+        f"    <p class='text-center {text_muted} mt-4'>\n"
+        f"      ¿No tienes cuenta? <a href='{{% url \"register\" %}}' class='{link}'>Regístrate</a>\n"
         "    </p>\n"
         "  </div>\n"
         "</div>\n"
@@ -228,13 +231,10 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "{% extends 'base.html' %}\n"
         "{% block content %}\n"
         "<div class='min-h-screen flex items-center justify-center'>\n"
-        "  <div class='bg-gray-900 border border-gray-700 rounded-2xl p-8 w-full max-w-md text-center'>\n"
-        "    <h1 class='text-2xl font-bold text-white mb-4'>Sesión cerrada</h1>\n"
-        "    <p class='text-gray-400 mb-6'>Has cerrado sesión correctamente.</p>\n"
-        "    <a href='{% url \"login\" %}'\n"
-        "       class='bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg transition'>\n"
-        "      Volver a entrar\n"
-        "    </a>\n"
+        f"  <div class='{card} w-full max-w-md text-center'>\n"
+        f"    <h1 class='{h1}'>Sesión cerrada</h1>\n"
+        f"    <p class='{text_muted} mb-6'>Has cerrado sesión correctamente.</p>\n"
+        f"    <a href='{{% url \"login\" %}}' class='{btn} inline-block px-6'>Volver a entrar</a>\n"
         "  </div>\n"
         "</div>\n"
         "{% endblock %}\n"
@@ -244,8 +244,8 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "{% extends 'base.html' %}\n"
         "{% block content %}\n"
         "<div class='min-h-screen flex items-center justify-center'>\n"
-        "  <div class='bg-gray-900 border border-gray-700 rounded-2xl p-8 w-full max-w-md'>\n"
-        "    <h1 class='text-2xl font-bold text-white mb-6 text-center'>Crear cuenta</h1>\n"
+        f"  <div class='{card} w-full max-w-md'>\n"
+        f"    <h1 class='{h1}'>Crear cuenta</h1>\n"
         "    {% if form.errors %}\n"
         "      <div class='bg-red-900/40 border border-red-700 text-red-300 rounded-lg p-3 mb-4 text-sm'>\n"
         "        Corrige los errores del formulario.\n"
@@ -255,22 +255,19 @@ def build_static_files(project: str, app: str = "siteapp") -> dict[str, str]:
         "      {% csrf_token %}\n"
         "      {% for field in form %}\n"
         "        <div class='mb-4'>\n"
-        "          <label class='block text-gray-400 text-sm mb-1'>{{ field.label }}</label>\n"
-        "          <input type='{{ field.field.widget.input_type }}' name='{{ field.html_name }}'\n"
+        f"          <label class='block {text_muted} mb-1'>{{{{ field.label }}}}</label>\n"
+        f"          <input type='{{{{ field.field.widget.input_type }}}}' name='{{{{ field.html_name }}}}'\n"
         "                 value='{{ field.value|default:\"\" }}'\n"
-        "                 class='w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500'>\n"
+        f"                 class='{input_cls}'>\n"
         "          {% if field.errors %}\n"
         "            <p class='text-red-400 text-xs mt-1'>{{ field.errors|join:', ' }}</p>\n"
         "          {% endif %}\n"
         "        </div>\n"
         "      {% endfor %}\n"
-        "      <button type='submit'\n"
-        "              class='w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg transition mt-2'>\n"
-        "        Registrarse\n"
-        "      </button>\n"
+        f"      <button type='submit' class='{btn} w-full mt-2'>Registrarse</button>\n"
         "    </form>\n"
-        "    <p class='text-center text-gray-500 text-sm mt-4'>\n"
-        "      ¿Ya tienes cuenta? <a href='{% url \"login\" %}' class='text-blue-400 hover:underline'>Inicia sesión</a>\n"
+        f"    <p class='text-center {text_muted} mt-4'>\n"
+        f"      ¿Ya tienes cuenta? <a href='{{% url \"login\" %}}' class='{link}'>Inicia sesión</a>\n"
         "    </p>\n"
         "  </div>\n"
         "</div>\n"
