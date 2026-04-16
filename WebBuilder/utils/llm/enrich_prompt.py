@@ -9,6 +9,7 @@ Objetivo:
 
 from __future__ import annotations
 
+_MAX_ENRICHED_CHARS = 1500
 
 # ── DETECCIÓN DE TIPOS DE CAMPO ──────────────────────────────────────────────
 
@@ -57,9 +58,11 @@ _DATASET_PRIORITY_RULES = [
 # ── HELPERS DE DETECCIÓN ─────────────────────────────────────────────────────
 
 def _matches(key: str, keyword_set: set[str]) -> bool:
-    """Comprueba si el key del campo contiene alguna de las palabras clave."""
     key_lower = key.lower()
-    return key_lower in keyword_set or any(k in key_lower for k in keyword_set)
+    if key_lower in keyword_set:
+        return True
+    key_parts = set(key_lower.split("_"))
+    return bool(key_parts & keyword_set)
 
 
 def _detect_title_field(fields: list[dict], sample_items: list[dict]) -> str | None:
@@ -217,12 +220,8 @@ def enrich_user_prompt(
     base_prompt = (user_prompt or "").strip()
     field_context = _build_field_context(fields, sample_items)
     dataset_hints = _build_dataset_hints(fields, sample_items)
-    priority_rules_text = _build_priority_rules_text()
 
     context_lines = [
-        "REGLAS DE PRIORIDAD DEL CONTEXTO:",
-        priority_rules_text,
-        "",
         f"Tipo de sitio: {site_type}",
         "",
         "Campos del dataset con valores reales:",
@@ -236,7 +235,12 @@ def enrich_user_prompt(
     context = "\n".join(context_lines)
 
     if base_prompt:
-        return f"{base_prompt}\n\n---\nContexto del dataset:\n{context}"
+        result = f"{base_prompt}\n\n---\nContexto del dataset:\n{context}"
+    else:
+        default_prompt = _default_style_for_site_type(site_type)
+        result = f"{default_prompt}\n\n---\nContexto del dataset:\n{context}"
 
-    default_prompt = _default_style_for_site_type(site_type)
-    return f"{default_prompt}\n\n---\nContexto del dataset:\n{context}"
+    if len(result) > _MAX_ENRICHED_CHARS:
+        result = result[:_MAX_ENRICHED_CHARS] + "\n[contexto truncado por longitud]"
+
+    return result

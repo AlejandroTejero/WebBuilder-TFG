@@ -34,7 +34,9 @@ from .llm_wrappers import (
     llm_json_call,
     strip_markdown_fences,
     extract_requirements,
+    translate_prompt_to_english,
 )
+
 from .fallbacks import (
     fallback_pages,
     fallback_models,
@@ -84,11 +86,12 @@ def generate_project_files(site) -> dict[str, str]:
     site_type = plan.get("site_type") or "other"
     site_title = plan.get("site_title") or "Mi Sitio"
     user_prompt = plan.get("user_prompt") or ""
+    user_prompt_normalized = translate_prompt_to_english(user_prompt)
     api_url = site.project_source.api_url
 
     # Enriquecer el prompt del usuario con contexto del dataset
     enriched_prompt = enrich_user_prompt(
-        user_prompt=user_prompt,
+        user_prompt=user_prompt_normalized,
         site_type=site_type,
         fields=fields,
         sample_items=sample_items,
@@ -273,7 +276,8 @@ def generate_project_files(site) -> dict[str, str]:
     # ── PASO 8: Validación de consistencia y autocorrección ─────────────────
     _update_step(site, "Validando consistencia entre archivos...")
     logger.info("[generator] Paso 8: validando consistencia entre archivos")
-    issues = run_all_checks(files, user_prompt=user_prompt)
+    valid_url_names = set(real_url_names.values()) | {"login", "logout", "register"}
+    issues = run_all_checks(files, user_prompt=user_prompt, valid_url_names=valid_url_names)
 
     if issues:
         logger.warning("[generator] %s inconsistencias detectadas:", len(issues))

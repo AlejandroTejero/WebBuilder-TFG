@@ -79,8 +79,7 @@ def fix_template(html: str) -> str:
         match = re.search(r'\{%\s*extends\s+[\'"][^\'"]+[\'"]\s*%\}', html)
         if match:
             extends_tag = match.group(0)
-            html = html[:match.start()].replace(extends_tag, '')
-            html = extends_tag + '\n' + html
+            html = extends_tag + '\n' + html[:match.start()] + html[match.end():]
 
     # 3. Corregir cierres Django incompletos
     html = re.sub(r'\{%-?\s*(endif|endfor|endblock|endwith)\s*\n', r'{% \1 %}\n', html)
@@ -108,7 +107,9 @@ def check_consistency(files: dict[str, str]) -> list[str]:
 
     views_code = _find_first_matching_file(files, "views.py")
     view_refs = re.findall(r'item\.(\w+)', views_code)
-    for ref in sorted(set(view_refs)):
+    filter_refs = re.findall(r'\.filter\([^)]*?(\w+)__', views_code)
+
+    for ref in sorted(set(view_refs) | set(filter_refs)):
         if ref not in model_fields and ref not in _DJANGO_ATTRS:
             errors.append(f"views.py usa item.{ref} pero no existe en models.py")
 
@@ -123,7 +124,7 @@ def check_consistency(files: dict[str, str]) -> list[str]:
 
 # ── CHEQUEO BÁSICO DE SINTAXIS DJANGO ──────────────────────────────────────
 
-def check_django_syntax(files: dict[str, str]) -> list[str]:
+def check_django_syntax(files: dict[str, str], valid_url_names: set[str] | None = None) -> list[str]:
     errors: list[str] = []
 
     for path, content in _iter_html_files(files):
@@ -144,6 +145,12 @@ def check_django_syntax(files: dict[str, str]) -> list[str]:
 
         if '```' in content:
             errors.append(f"{path}: contiene bloques Markdown (```)")
+
+        if valid_url_names:
+            url_refs = re.findall(r'\{%\s*url\s+[\'"](\w+)[\'"]', content)
+            for url_ref in url_refs:
+                if url_ref not in valid_url_names:
+                    errors.append(f"{path}: usa {{% url '{url_ref}' %}} pero esa URL no existe en el proyecto")
 
     return errors
 
@@ -193,7 +200,8 @@ def check_template_structure(files: dict[str, str]) -> list[str]:
             errors.append(f"{path}: falta {{% block content %}}")
 
         if page_type == "list":
-            if "{% for item in items %}" not in content and "{% for item in items %}" not in content.replace("  ", " "):
+            content_normalized = re.sub(r'\s+', ' ', content)
+            if "{% for item in items %}" not in content_normalized:
                 errors.append(f"{path}: página de listado sin bucle claro sobre items")
             if "{% empty %}" not in content:
                 errors.append(f"{path}: página de listado sin {{% empty %}} para estado vacío")
@@ -205,34 +213,30 @@ def check_template_structure(files: dict[str, str]) -> list[str]:
     return errors
 
 
+# ── SETS DE PALABRAS CLAVE (añadir arriba junto a _DJANGO_ATTRS) ────────────
+# Solo palabras en ingles, ya que se traduce el prompt
+_NEGATION_WORDS = {"without", "no", "avoid", "remove", "eliminate", "none", "don't", "dont", "exclude"}
+_IMAGE_WORDS = {"image", "images", "photo", "photos", "picture", "pictures", "img"}
+_PRICE_WORDS = {"price", "prices", "cost", "costs", "fee", "fees", "rate"}
+
+def _prompt_bans(prompt: str, target_words: set[str]) -> bool:
+    words = set(prompt.lower().split())
+    has_target = bool(words & target_words)
+    has_negation = bool(words & _NEGATION_WORDS)
+    return has_target and has_negation
+
+
 # ── CONTRADICCIONES SIMPLES CONTRA EL PROMPT DEL USUARIO ───────────────────
 
 def check_prompt_contradictions(files: dict[str, str], user_prompt: str | None = None) -> list[str]:
-    """
-    Detecta contradicciones simples entre el HTML generado y restricciones explícitas del prompt.
-    Es deliberadamente conservador: mejor pocos checks fiables que muchos checks ruidosos.
-    """
     errors: list[str] = []
     prompt = _normalize_prompt(user_prompt)
 
     if not prompt:
         return errors
 
-    prompt_bans_images = (
-        "sin imágenes" in prompt
-        or "sin imagenes" in prompt
-        or "no usar imágenes" in prompt
-        or "no usar imagenes" in prompt
-        or "sin imágenes en el listado" in prompt
-        or "sin imagenes en el listado" in prompt
-    )
-
-    prompt_bans_prices = (
-        "sin precios" in prompt
-        or "sin precio" in prompt
-        or "no mostrar precios" in prompt
-        or "no uses precios" in prompt
-    )
+    prompt_bans_images = _prompt_bans(prompt, _IMAGE_WORDS)
+    prompt_bans_prices = _prompt_bans(prompt, _PRICE_WORDS)
 
     prompt_wants_four_cols = (
         "4 columnas" in prompt
@@ -267,7 +271,6 @@ def check_prompt_contradictions(files: dict[str, str], user_prompt: str | None =
                 errors.append(f"{path}: el prompt pide grid de 4 columnas, pero no se detecta una clase clara de 4 columnas")
 
         if prompt_mentions_hex:
-            # No exigimos todos los colores, pero sí comprobamos al menos que aparezca algún HEX en el HTML
             if not re.search(r'#[0-9a-fA-F]{6}\b', content):
                 errors.append(f"{path}: el prompt incluye colores HEX, pero no se detecta ningún HEX en el template generado")
 
@@ -276,7 +279,7 @@ def check_prompt_contradictions(files: dict[str, str], user_prompt: str | None =
 
 # ── FUNCIÓN PRINCIPAL PARA EJECUTAR TODOS LOS CHECKS ───────────────────────
 
-def run_all_checks(files: dict[str, str], user_prompt: str | None = None) -> list[str]:
+def run_all_checks(files: dict[str, str], user_prompt: str | None = None, valid_url_names: set[str] | None = None) -> list[str]:
     """
     Ejecuta todos los chequeos disponibles y devuelve una lista unificada de errores/warnings.
     """
@@ -284,7 +287,7 @@ def run_all_checks(files: dict[str, str], user_prompt: str | None = None) -> lis
 
     checks = [
         check_consistency(files),
-        check_django_syntax(files),
+        check_django_syntax(files, valid_url_names=valid_url_names),
         check_tailwind_validity(files),
         check_template_structure(files),
         check_prompt_contradictions(files, user_prompt=user_prompt),

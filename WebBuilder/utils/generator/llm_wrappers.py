@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) -> str:
     """Llamada básica al LLM. Devuelve '' si falla."""
     try:
-        time.sleep(12)
+        time.sleep(20)
         return chat_completion(
             user_text=user_text,
             system_text=system,
@@ -120,3 +120,26 @@ def extract_requirements(code: str) -> tuple[str, list[str]]:
             clean_lines.append(line)
     
     return "\n".join(clean_lines).strip(), requirements
+
+
+def translate_prompt_to_english(user_prompt: str) -> str:
+    """
+    Traduce el prompt del usuario a inglés usando el LLM.
+    Si falla o el prompt ya está en inglés, devuelve el original.
+    """
+    if not user_prompt or not user_prompt.strip():
+        return user_prompt
+
+    system = (
+        "You are a translator. Your only job is to translate the user's text to English. "
+        "Return ONLY the translated text, nothing else. "
+        "No explanations, no preamble, no quotes. "
+        "If the text is already in English, return it exactly as is."
+    )
+
+    try:
+        result = llm_call(system, user_prompt, "translate_prompt", temperature=0.0)
+        return result.strip() if result.strip() else user_prompt
+    except LLMError:
+        logger.warning("[generator] Traducción del prompt falló, usando original")
+        return user_prompt

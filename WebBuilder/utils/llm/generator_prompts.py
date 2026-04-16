@@ -237,9 +237,6 @@ def prompt_pages_structure(*, site_type, site_title, user_prompt, fields, sample
             "CAMPOS:",
             _fields_info(fields),
             "",
-            "DATOS DE EJEMPLO:",
-            _samples_info(sample_items, 2),
-            "",
             "REGLAS:",
             "\n".join(f"- {r}" for r in rules),
             "",
@@ -300,7 +297,6 @@ def prompt_models(*, fields, sample_items, site_title):
 def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fields=None):
     fields_list = ", ".join(f["key"] for f in fields)
     priority_rules_text = build_priority_rules_text()
-    theme_rules_text = build_theme_rules_text()
     
     rules = [
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con 'from django.shortcuts import render, get_object_or_404'. Sin nada antes.",
@@ -341,9 +337,6 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
             "\n".join(f"- {r}" for r in _GLOBAL_STYLE_RULES),
             "",
             f"CAMPOS DEL MODELO: {fields_list}",
-            "",
-            "TEMA Y BASE VISUAL RECOMENDADA:",
-            theme_rules_text,
             "",
             "PÁGINAS:",
             json.dumps(pages, ensure_ascii=False, indent=2),
@@ -563,10 +556,13 @@ def prompt_template(
     )
 
     example_kind = "list" if is_list else ("detail" if is_detail else "home")
-    example_html = get_example(site_type, example_kind)
+    example_html = get_example(site_type, example_kind, user_prompt)
     if example_html:
+        example_html = example_html[:1500]
         user_text += (
-            "\n\nEJEMPLO DE REFERENCIA (inspiración estructural y visual secundaria — adapta los campos reales y NO contradigas el prompt del usuario; NO copies esto tal cual):\n"
+            "\n\nEJEMPLO DE REFERENCIA (inspiración estructural y visual secundaria — "
+            "adapta los campos reales y NO contradigas el prompt del usuario; "
+            "NO copies esto tal cual):\n"
         )
         user_text += example_html
 
