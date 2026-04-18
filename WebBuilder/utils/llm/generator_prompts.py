@@ -174,8 +174,31 @@ def prompt_pages_structure(*, site_type, site_title, user_prompt, fields, sample
     )
     priority_rules_text = build_priority_rules_text()
 
-    example = json.dumps(
-        {
+    if site_type == "portfolio":
+        example = json.dumps({
+            "pages": [
+                {
+                    "name": "home",
+                    "url": "/",
+                    "template": "siteapp/home.html",
+                    "view_name": "home",
+                    "description": "Landing principal: presentación, proyectos destacados y contacto",
+                    "is_list": False,
+                    "is_detail": False,
+                },
+                {
+                    "name": "project_detail",
+                    "url": "/project/<pk>/",
+                    "template": "siteapp/project_detail.html",
+                    "view_name": "project_detail",
+                    "description": "Detalle completo de un proyecto individual",
+                    "is_list": False,
+                    "is_detail": True,
+                },
+            ]
+        }, ensure_ascii=False, indent=2)
+    else:
+        example = json.dumps({
             "pages": [
                 {
                     "name": "home",
@@ -205,23 +228,46 @@ def prompt_pages_structure(*, site_type, site_title, user_prompt, fields, sample
                     "is_detail": True,
                 },
             ]
-        },
-        ensure_ascii=False,
-        indent=2,
-    )
+        }, ensure_ascii=False, indent=2)
 
-    rules = [
-        "Devuelve SOLO JSON con key 'pages' (lista de páginas).",
-        "MÍNIMO OBLIGATORIO: home + listado + detalle. Siempre estas tres.",
-        "CRÍTICO: la página 'home' es una portada o landing; no debe ser el listado completo.",
-        "CRÍTICO: el listado completo va SIEMPRE en una página separada con is_list=true.",
-        "Opcionales según el prompt: about, contact, categorías, búsqueda, faq, landing secundaria.",
-        "Máximo 6 páginas en total.",
-        "Cada página: name, url, template, view_name, description, is_list, is_detail.",
-        "Solo UNA página con is_list=true. Solo UNA con is_detail=true.",
-        "La de detalle siempre con url que contenga <pk>.",
-        "Nombres en snake_case. URLs en kebab-case.",
-    ]
+    if site_type == "portfolio":
+        rules = [
+            "Devuelve SOLO JSON con key 'pages' (lista de páginas).",
+            "CRÍTICO: esto es un PORTFOLIO, no un catálogo. La estructura es completamente diferente.",
+            "MÍNIMO OBLIGATORIO: landing (home) + detalle de proyecto. Solo estas dos.",
+            "La landing es una página única que contiene TODO: hero con presentación, grid de proyectos, skills y contacto. NO existe página de listado separada.",
+            "is_list=false en TODAS las páginas sin excepción.",
+            "Solo UNA página con is_detail=true para ver un proyecto individual.",
+            "Opcional según el prompt: about o contact como página separada. Máximo 3 páginas en total.",
+            "La de detalle siempre con url que contenga <pk>.",
+            "Nombres en snake_case. URLs en kebab-case.",
+            "Cada página: name, url, template, view_name, description, is_list, is_detail.",
+        ]
+    elif site_type == "dashboard":
+        rules = [
+            "Devuelve SOLO JSON con key 'pages' (lista de páginas).",
+            "MÍNIMO OBLIGATORIO: panel principal (home) + listado de datos + detalle.",
+            "CRÍTICO: la página home es el panel de control, no el listado completo.",
+            "El listado completo va SIEMPRE en página separada con is_list=true.",
+            "Solo UNA página con is_list=true. Solo UNA con is_detail=true.",
+            "La de detalle siempre con url que contenga <pk>.",
+            "Opcionales según el prompt: estadísticas, reportes, configuración. Máximo 5 páginas.",
+            "Nombres en snake_case. URLs en kebab-case.",
+            "Cada página: name, url, template, view_name, description, is_list, is_detail.",
+        ]
+    else:
+        # catalog, blog, other
+        rules = [
+            "Devuelve SOLO JSON con key 'pages' (lista de páginas).",
+            "MÍNIMO OBLIGATORIO: home + listado + detalle. Siempre estas tres.",
+            "CRÍTICO: la página 'home' es una portada o landing; no debe ser el listado completo.",
+            "CRÍTICO: el listado completo va SIEMPRE en una página separada con is_list=true.",
+            "Opcionales según el prompt: about, contact, categorías, búsqueda, faq. Máximo 6 páginas.",
+            "Cada página: name, url, template, view_name, description, is_list, is_detail.",
+            "Solo UNA página con is_list=true. Solo UNA con is_detail=true.",
+            "La de detalle siempre con url que contenga <pk>.",
+            "Nombres en snake_case. URLs en kebab-case.",
+        ]
 
     user_text = "\n".join(
         [
@@ -260,6 +306,7 @@ def prompt_models(*, fields, sample_items, site_title):
         "Un modelo llamado 'Item' con los campos del schema.",
         "Infiere el tipo Django correcto con los ejemplos:",
         "  URL/imagen → URLField(blank=True)",
+        "  Si un campo se llama '*_url' pero hay otro campo con el mismo prefijo sin '_url' que contiene el valor legible (ej: 'language' vs 'languages_url'), usa el campo sin '_url' como CharField y descarta el que acaba en '_url'.",
         "  Texto largo o HTML → TextField(blank=True)",
         "  Texto corto → CharField(max_length=500, blank=True)",
         "  Entero → IntegerField(null=True, blank=True)",
@@ -267,12 +314,14 @@ def prompt_models(*, fields, sample_items, site_title):
         "  Fecha → DateField(null=True, blank=True)",
         "  Booleano → BooleanField(null=True, blank=True)",
         "  OBJETO ANIDADO (dict con subkeys) → CharField(max_length=500, blank=True) guardando solo el valor más representativo como string.",
+        "  LISTA de valores (array) → crea UN SOLO campo IntegerField(null=True, blank=True) con el nombre original más sufijo '_count' (ej: episode → episode_count, characters → characters_count). ELIMINA el campo original, NO lo dupliques. NUNCA uses CharField ni JSONField para una lista.",
         "Todos los campos opcionales (blank=True / null=True).",
+        "Si existe un campo que actúe como identificador único del registro (url, isbn, código, id externo...), añádele unique=True para evitar duplicados al ejecutar load_data varias veces.",
         "Añade created_at = models.DateTimeField(auto_now_add=True).",
         "__str__ devuelve el campo más representativo.",
         "Nombres de campo en snake_case. NO uses 'id' como nombre.",
         "Solo importa 'from django.db import models'.",
-        "NUNCA uses JSONField para ningún campo.",
+        "NUNCA uses JSONField para ningún campo. NUNCA uses CharField para guardar una lista — usa siempre IntegerField con el count.",
     ]
 
     user_text = "\n".join(
@@ -306,7 +355,7 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
         "Importa: from .models import Item",
         "Importa: from django.core.paginator import Paginator",
         "Una view por cada página en PÁGINAS.",
-        "La view de listado acepta búsqueda server-side: q = request.GET.get('q', ''); si q no está vacío, filtra con Item.objects.filter(pk__isnull=False) y añade Q objects para cada campo de texto disponible. Pasa 'q' al contexto para que el template pueda mostrar el valor en el input. CRÍTICO: todos los campos son simples (CharField, URLField, etc.), NUNCA uses lookups relacionales como campo__name__icontains. Usa siempre campo__icontains directamente.",
+        "La view de listado acepta búsqueda server-side: q = request.GET.get('q', ''). Si q no está vacío, filtra usando Q objects (from django.db.models import Q) combinados con |. Ejemplo: Item.objects.filter(Q(name__icontains=q) | Q(status__icontains=q)). NUNCA uses el operador | entre querysets completos (filter(...) | filter(...)). NUNCA uses lookups relacionales como campo__name__icontains. Usa siempre campo__icontains directamente. Pasa 'q' al contexto.",
         "La view de listado DEBE usar paginación:",
         "  from django.core.paginator import Paginator",
         "  queryset = Item.objects.all().order_by('-id')",
@@ -365,6 +414,13 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages, desig
     theme_rules_text = build_theme_rules_text()
     
     rules = [
+        f"CRÍTICO ABSOLUTO: el tipo de sitio es '{site_type}'. " + (
+            "Es un PORTFOLIO PÚBLICO. PROHIBIDO incluir cualquier elemento de autenticación: "
+            "sin login, sin logout, sin registro, sin {% if user.is_authenticated %}. "
+            "La nav solo tiene links a las secciones del portfolio. IGNORA cualquier regla posterior sobre auth."
+            if site_type == "portfolio" else
+            "Incluye login y logout en la navegación."
+        ),
         "CRÍTICO: usa EXCLUSIVAMENTE clases Tailwind CSS estándar válidas para CDN. PROHIBIDO inventar clases custom como 'card_base', 'container_narrow', 'badge_base' o cualquier nombre que no sea una utilidad Tailwind real.",
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con '<!doctype html>'. Sin nada antes.",
         "CRÍTICO: PROHIBIDO usar ```, ```html o cualquier bloque Markdown. HTML puro.",
@@ -374,12 +430,15 @@ def prompt_base_template(*, site_title, site_type, user_prompt, all_pages, desig
         "FAVICON: añade <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>'.",
         "NAVBAR: clara, usable y coherente con la estética del usuario. Puede ser sobria, minimalista, editorial o visual, pero debe incluir navegación funcional.",
         "NAVBAR ACTIVO: usa request.path para marcar el link activo con el tratamiento visual que mejor encaje con el estilo pedido.",
+    ] + ([
         f"NAVBAR AUTH: incluye SIEMPRE esta lógica Django exacta, pero adapta sus clases al diseño pedido por el usuario:\n{_AUTH_BLOCK}",
+    ] if site_type != "portfolio" else []) + [
         "Links del navbar usan {% url 'view_name' %}.",
         "COLORES: si el usuario da colores HEX o paleta concreta, aplícalos explícitamente en fondo, texto, links, botones y estados activos usando clases Tailwind y/o valores arbitrarios como bg-[#111111].",
         "Si no hay indicación de colores, usa una base neutra y coherente con el tipo de sitio; no fuerces oscuro por defecto salvo que tenga sentido.",
         "LAYOUT OBLIGATORIO: el <body> debe tener las clases 'min-h-screen flex flex-col'. El <main> debe tener la clase 'flex-1'. Esto garantiza que el footer siempre queda pegado al fondo aunque el contenido no llene la pantalla.",
-        "Incluye {% block content %}{% endblock %} dentro del <main class='flex-1'> bien proporcionado. El ancho del contenido interior puede ser estrecho, medio o amplio según el prompt del usuario.",        "FOOTER OBLIGATORIO: nombre del sitio + navegación básica + copyright con © {% now 'Y' %} {{ site_title }}.",
+        "Incluye {% block content %}{% endblock %} dentro del <main class='flex-1'> bien proporcionado. El ancho del contenido interior puede ser estrecho, medio o amplio según el prompt del usuario.",
+        "FOOTER OBLIGATORIO: nombre del sitio + navegación básica + copyright con © {% now 'Y' %} {{ site_title }}.",
         "ANIMACIONES: si las usas, deben ser discretas. Puedes añadir utilidades CSS mínimas para fade-in suave, pero evita efectos llamativos si el prompt es sobrio o editorial.",
         "NO uses JavaScript propio salvo necesidad mínima estructural.",
     ]
@@ -524,6 +583,7 @@ def prompt_template(
         "Usa condicionales Django para campos opcionales cuando haga falta.",
         "Nombres de campo: usa los 'key' del schema directamente como atributos del modelo.",
         "CRÍTICO: usa EXCLUSIVAMENTE clases Tailwind CSS estándar válidas para CDN. PROHIBIDO inventar clases custom como 'card_base', 'container_narrow', 'badge_base' o cualquier nombre que no sea una utilidad Tailwind real.",
+        "CRÍTICO: PROHIBIDO inventar clases Tailwind que no existen. En concreto: hover:glow-*, hover:shimmer, hover:neon-*, hover:pulse-*, hover:float, hover:levitate NO son clases Tailwind reales. Para efectos hover usa exclusivamente: hover:opacity-*, hover:scale-*, hover:shadow-*, hover:ring-*, hover:bg-*, hover:text-*.",
         "CRÍTICO ABSOLUTO: el SISTEMA DE CLASES proporcionado arriba es OBLIGATORIO. Para cada elemento (tarjeta, contenedor, título, badge, botón, input, enlace) debes usar EXACTAMENTE las clases indicadas en el sistema, sin excepción. No las sustituyas, no las combines con inventos, no las ignores.",
         "VERIFICACIÓN MENTAL OBLIGATORIA: antes de escribir cualquier clase CSS, pregúntate '¿es esta una utilidad Tailwind real?'. Si no estás seguro, usa las clases del SISTEMA DE CLASES o utilidades básicas como flex, grid, p-4, text-sm, font-bold.",
         "CRÍTICO: todos los campos del modelo son strings o tipos simples, NUNCA objetos. NUNCA uses item.campo.subcampo ni item.campo.atributo. Si origin, location o cualquier campo similar existe, accede como {{ item.origin }}, nunca como {{ item.origin.name }}.",
@@ -641,19 +701,20 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
         "CRÍTICO: PROHIBIDO usar ```, ```python o cualquier bloque Markdown. Código puro.",
         "from siteapp.models import Item",
         "import requests",
-        f"El comando hace GET a '{api_url}'.",
+        f"CRÍTICO: el comando hace GET EXACTAMENTE a esta URL: '{api_url}'. No uses otra URL aunque conozcas APIs similares. Esta URL es la fuente de datos real del proyecto.",
         "PAGINACIÓN: muchas APIs devuelven los datos paginados con un campo 'next' (u otro nombre) que contiene la URL de la siguiente página. Si existe ese campo en la respuesta, itera siguiendo esa URL hasta que sea null/None para cargar todos los datos, no solo la primera página.",
         "CRITICO: usa get_or_create separando campos en defaults:",
         "Item.objects.get_or_create(campo_id=valor, defaults={'campo1': val1, 'campo2': val2})",
         "Si no hay campo único identificador, usa update_or_create o simplemente create().",
-        "Si un campo del dataset es un OBJETO ANIDADO (dict), extrae solo el valor más representativo como string.",
+        "Si un campo del dataset es una LISTA (array), guarda solo la longitud como entero: len(raw_item['campo']) o 0 si es None. El campo en el modelo se llamará con sufijo '_count' si así lo define el modelo (ej: episode_count = len(raw_item.get('episode') or [])).",
         "CRÍTICO: el JSON ya viene parseado como dict Python. NUNCA uses json.loads() sobre un campo que ya es dict.",
         "Accede directamente: raw_item['origin']['name'], NO json.loads(raw_item['origin'])['name'].",
         "Ejemplo: rating = {'rate': 4.5, 'count': 120} → guardar str(raw_item['rating']['rate'])",
         "Limpia valores: precios → Decimal(str(valor).replace('$','').strip()), el precio puede venir como float o como string con '$', usa siempre str() primero para evitar errores. Fechas → parsear, enteros → int().",
         "Si falla la conversión → None (no romper el comando).",
-        "Informa del progreso con self.stdout.write().",
-        "try/except general para no romper si la API falla.",
+        "CRÍTICO: para campos CharField/TextField NUNCA guardes None. Usa string vacío como fallback: raw_item.get('campo') or ''. Reserva None solo para IntegerField, DecimalField, DateField o BooleanField.",
+        "Informa del progreso: dentro del bucle usa self.stdout.write() para indicar cuántos registros se han procesado en esa página (ej: f'Página procesada: {len(results)} registros'). Al FINAL del handle(), fuera del bucle, escribe un mensaje de éxito con el total acumulado.",
+        "try/except general que capture CUALQUIER excepción (except Exception as e), no solo requests.RequestException. Así si falla una conversión de tipo o un get_or_create, el error se muestra pero no rompe el comando entero.",
         "CRÍTICO: al final de tu respuesta, después del código, añade una línea exactamente así: ##REQUIREMENTS:libreria1,libreria2 listando SOLO las librerías externas que hayas importado que NO sean de la librería estándar de Python ni django ni requests. Si no necesitas ninguna extra escribe ##REQUIREMENTS:none",
         "Ejemplo: si usas xmltodict escribe ##REQUIREMENTS:xmltodict>=0.13 — si usas solo json o xml.etree escribe ##REQUIREMENTS:none",
         "Clase 'Command(BaseCommand)', help descriptivo.",

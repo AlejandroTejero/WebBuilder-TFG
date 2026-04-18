@@ -173,7 +173,7 @@ def _build_prompt(
         "site_type: elige el más adecuado según el dataset y el objetivo del usuario.",
         "  - lista de productos/plantas/libros → catalog",
         "  - entradas con fecha/texto largo → blog",
-        "  - proyectos/personas/trabajos → portfolio",
+        "  - proyectos/repositorios/trabajos/personas/obras → portfolio. CRÍTICO: si el prompt del usuario menciona explícitamente 'portfolio', usa SIEMPRE portfolio.",
         "  - métricas/estadísticas → dashboard",
         "  - si no encaja → other",
         "site_title: nombre corto y descriptivo para el sitio (máx 80 chars).",

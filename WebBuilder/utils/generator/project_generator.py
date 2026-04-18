@@ -119,10 +119,21 @@ def generate_project_files(site) -> dict[str, str]:
 
     has_list = any(p.get("is_list") for p in pages)
     has_detail = any(p.get("is_detail") for p in pages)
-    if not pages or not has_list or not has_detail:
-        logger.warning("[generator] Páginas inválidas, usando fallback")
-        pages = fallback_pages(site_type)
 
+    if site_type == "portfolio":
+        # Portfolio no necesita is_list — solo home + detalle
+        if not pages or not has_detail:
+            logger.warning("[generator] Páginas de portfolio inválidas, usando fallback")
+            pages = fallback_pages(site_type)
+        elif has_list:
+            # El LLM generó un listado aunque no debía — eliminarlo
+            logger.warning("[generator] Portfolio con is_list detectado, eliminando página de listado")
+            pages = [p for p in pages if not p.get("is_list")]
+    else:
+        if not pages or not has_list or not has_detail:
+            logger.warning("[generator] Páginas inválidas, usando fallback")
+            pages = fallback_pages(site_type)
+            
     # ── PASO 1b: Design system ───────────────────────────────────────────────
     _update_step(site, "Generando sistema de diseño...")
     logger.info("[generator] Paso 1b: design system")
@@ -169,8 +180,7 @@ def generate_project_files(site) -> dict[str, str]:
         views_code = fallback_views(pages)
 
     files[f"{project}/{app}/views.py"] = strip_markdown_fences(views_code)
-    files[f"{project}/{app}/urls.py"] = build_app_urls(pages, app)
-
+    files[f"{project}/{app}/urls.py"] = build_app_urls(pages, app, site_type=site_type)
     real_url_names = {page["name"]: page["view_name"] for page in pages}
     logger.info("[generator] URLs reales: %s", real_url_names)
 
@@ -283,13 +293,13 @@ def generate_project_files(site) -> dict[str, str]:
     # ── PASO 7: archivos estáticos ───────────────────────────────────────────
     _update_step(site, "Ensamblando archivos del proyecto...")
     logger.info("[generator] Paso 7: archivos estáticos")
-    files.update(build_static_files(project, app, design_system=design_system))
+    files.update(build_static_files(project, app, design_system=design_system, site_type=site_type))
 
     # ── PASO 8: Validación de consistencia y autocorrección ─────────────────
     _update_step(site, "Validando consistencia entre archivos...")
     logger.info("[generator] Paso 8: validando consistencia entre archivos")
     valid_url_names = set(real_url_names.keys()) | {"login", "logout", "register"}
-    issues = run_all_checks(files, user_prompt=user_prompt_normalized, valid_url_names=valid_url_names)
+    issues = run_all_checks(files, user_prompt=user_prompt_normalized, valid_url_names=valid_url_names, api_url=api_url)
 
     blocking_issues = issues["blocking"]
     warning_issues = issues["warning"]

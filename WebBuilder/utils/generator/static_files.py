@@ -8,7 +8,7 @@ Contiene todo lo que no requiere LLM:
 from __future__ import annotations
 
 
-def build_static_files(project: str, app: str = "siteapp", design_system: dict = None) -> dict[str, str]:
+def build_static_files(project: str, app: str = "siteapp", design_system: dict = None, site_type: str = "other") -> dict[str, str]:
     """Archivos de infraestructura que son siempre iguales."""
 
     files = {}
@@ -109,17 +109,28 @@ def build_static_files(project: str, app: str = "siteapp", design_system: dict =
     # __init__.py del proyecto
     files[f"{project}/{project}/__init__.py"] = ""
 
-    # urls.py del proyecto — incluye auth de Django
-    files[f"{project}/{project}/urls.py"] = (
-        "from django.contrib import admin\n"
-        "from django.urls import path, include\n"
-        "\n"
-        "urlpatterns = [\n"
-        "    path('admin/', admin.site.urls),\n"
-        "    path('accounts/', include('django.contrib.auth.urls')),\n"
-        f"    path('', include('{app}.urls')),\n"
-        "]\n"
-    )
+    # urls.py del proyecto
+    if site_type == "portfolio":
+        files[f"{project}/{project}/urls.py"] = (
+            "from django.contrib import admin\n"
+            "from django.urls import path, include\n"
+            "\n"
+            "urlpatterns = [\n"
+            "    path('admin/', admin.site.urls),\n"
+            f"    path('', include('{app}.urls')),\n"
+            "]\n"
+        )
+    else:
+        files[f"{project}/{project}/urls.py"] = (
+            "from django.contrib import admin\n"
+            "from django.urls import path, include\n"
+            "\n"
+            "urlpatterns = [\n"
+            "    path('admin/', admin.site.urls),\n"
+            "    path('accounts/', include('django.contrib.auth.urls')),\n"
+            f"    path('', include('{app}.urls')),\n"
+            "]\n"
+        )
 
     # requirements.txt
     files[f"{project}/requirements.txt"] = (
@@ -148,9 +159,16 @@ def build_static_files(project: str, app: str = "siteapp", design_system: dict =
         'CMD ["/entrypoint.sh"]\n'
     )
 
-    # entrypoint.sh — incluye seed_users
+    # entrypoint.sh — seed_users solo para tipos con auth
+    _seed_users_block = (
+        "echo '--- Creando usuarios ---'\n"
+        "python manage.py seed_users || echo 'AVISO: seed_users falló, continuando'\n"
+        "\n"
+    ) if site_type != "portfolio" else ""
+
     files[f"{project}/entrypoint.sh"] = (
         "#!/bin/sh\n"
+        "set -e\n"
         "\n"
         "echo '--- Generando migraciones ---'\n"
         "python manage.py makemigrations siteapp --noinput\n"
@@ -159,11 +177,21 @@ def build_static_files(project: str, app: str = "siteapp", design_system: dict =
         "python manage.py migrate --noinput\n"
         "\n"
         "echo '--- Cargando datos ---'\n"
-        "python manage.py load_data || echo 'AVISO: load_data falló, el sitio arrancará sin datos'\n"
+        "if python manage.py load_data; then\n"
+        "    echo '--- Verificando datos cargados ---'\n"
+        "    COUNT=$(python manage.py shell -c \"from siteapp.models import Item; print(Item.objects.count())\" 2>/dev/null)\n"
+        "    if [ \"$COUNT\" = \"0\" ] || [ -z \"$COUNT\" ]; then\n"
+        "        echo 'ERROR CRITICO: load_data se ejecutó pero no hay datos en la BD.'\n"
+        "        echo 'Posibles causas: URL de API incorrecta, API sin datos, error silencioso en la carga.'\n"
+        "        exit 1\n"
+        "    fi\n"
+        "    echo \"OK: $COUNT registros cargados correctamente.\"\n"
+        "else\n"
+        "    echo 'ERROR CRITICO: load_data falló. El sitio no arrancará sin datos.'\n"
+        "    exit 1\n"
+        "fi\n"
         "\n"
-        "echo '--- Creando usuarios ---'\n"
-        "python manage.py seed_users || echo 'AVISO: seed_users falló, continuando'\n"
-        "\n"
+        + _seed_users_block +
         "echo '--- Arrancando servidor ---'\n"
         f"gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 120 "
         f"{project}.wsgi:application\n"
@@ -195,116 +223,124 @@ def build_static_files(project: str, app: str = "siteapp", design_system: dict =
     # Django busca registration/login.html y registration/logged_out.html
     # en DIRS, así que los ponemos en la carpeta raíz templates/
 
-    files[f"{project}/templates/registration/login.html"] = (
-        "{% extends 'base.html' %}\n"
-        "{% block content %}\n"
-        "<div class='min-h-screen flex items-center justify-center'>\n"
-        f"  <div class='{card} w-full max-w-md'>\n"
-        f"    <h1 class='{h1}'>Iniciar sesión</h1>\n"
-        "    {% if form.errors %}\n"
-        "      <div class='bg-red-900/40 border border-red-700 text-red-300 rounded-lg p-3 mb-4 text-sm'>\n"
-        "        Usuario o contraseña incorrectos.\n"
-        "      </div>\n"
-        "    {% endif %}\n"
-        "    <form method='post'>\n"
-        "      {% csrf_token %}\n"
-        "      <div class='mb-4'>\n"
-        f"        <label class='block {text_muted} mb-1'>Usuario</label>\n"
-        f"        <input type='text' name='username' autofocus class='{input_cls}'>\n"
-        "      </div>\n"
-        "      <div class='mb-6'>\n"
-        f"        <label class='block {text_muted} mb-1'>Contraseña</label>\n"
-        f"        <input type='password' name='password' class='{input_cls}'>\n"
-        "      </div>\n"
-        "      <input type='hidden' name='next' value='{{ next }}'>\n"
-        f"      <button type='submit' class='{btn} w-full mt-2'>Entrar</button>\n"
-        "    </form>\n"
-        f"    <p class='text-center {text_muted} mt-4'>\n"
-        f"      ¿No tienes cuenta? <a href='{{% url \"register\" %}}' class='{link}'>Regístrate</a>\n"
-        "    </p>\n"
-        "  </div>\n"
-        "</div>\n"
-        "{% endblock %}\n"
-    )
+    # Auth — solo para tipos que lo necesitan
+    if site_type != "portfolio":
+        files[f"{project}/templates/registration/login.html"] = (
+            "{% extends 'base.html' %}\n"
+            "{% block content %}\n"
+            "<div class='min-h-screen flex items-center justify-center'>\n"
+            f"  <div class='{card} w-full max-w-md'>\n"
+            f"    <h1 class='{h1}'>Iniciar sesión</h1>\n"
+            "    {% if form.errors %}\n"
+            "      <div class='bg-red-900/40 border border-red-700 text-red-300 rounded-lg p-3 mb-4 text-sm'>\n"
+            "        Usuario o contraseña incorrectos.\n"
+            "      </div>\n"
+            "    {% endif %}\n"
+            "    <form method='post'>\n"
+            "      {% csrf_token %}\n"
+            "      <div class='mb-4'>\n"
+            f"        <label class='block {text_muted} mb-1'>Usuario</label>\n"
+            f"        <input type='text' name='username' autofocus class='{input_cls}'>\n"
+            "      </div>\n"
+            "      <div class='mb-6'>\n"
+            f"        <label class='block {text_muted} mb-1'>Contraseña</label>\n"
+            f"        <input type='password' name='password' class='{input_cls}'>\n"
+            "      </div>\n"
+            "      <input type='hidden' name='next' value='{{ next }}'>\n"
+            f"      <button type='submit' class='{btn} w-full mt-2'>Entrar</button>\n"
+            "    </form>\n"
+            f"    <p class='text-center {text_muted} mt-4'>\n"
+            f"      ¿No tienes cuenta? <a href='{{% url \"register\" %}}' class='{link}'>Regístrate</a>\n"
+            "    </p>\n"
+            "  </div>\n"
+            "</div>\n"
+            "{% endblock %}\n"
+        )
 
-    files[f"{project}/templates/registration/logged_out.html"] = (
-        "{% extends 'base.html' %}\n"
-        "{% block content %}\n"
-        "<div class='min-h-screen flex items-center justify-center'>\n"
-        f"  <div class='{card} w-full max-w-md text-center'>\n"
-        f"    <h1 class='{h1}'>Sesión cerrada</h1>\n"
-        f"    <p class='{text_muted} mb-6'>Has cerrado sesión correctamente.</p>\n"
-        f"    <a href='{{% url \"login\" %}}' class='{btn} inline-block px-6'>Volver a entrar</a>\n"
-        "  </div>\n"
-        "</div>\n"
-        "{% endblock %}\n"
-    )
+        files[f"{project}/templates/registration/logged_out.html"] = (
+            "{% extends 'base.html' %}\n"
+            "{% block content %}\n"
+            "<div class='min-h-screen flex items-center justify-center'>\n"
+            f"  <div class='{card} w-full max-w-md text-center'>\n"
+            f"    <h1 class='{h1}'>Sesión cerrada</h1>\n"
+            f"    <p class='{text_muted} mb-6'>Has cerrado sesión correctamente.</p>\n"
+            f"    <a href='{{% url \"login\" %}}' class='{btn} inline-block px-6'>Volver a entrar</a>\n"
+            "  </div>\n"
+            "</div>\n"
+            "{% endblock %}\n"
+        )
 
-    files[f"{project}/templates/registration/register.html"] = (
-        "{% extends 'base.html' %}\n"
-        "{% block content %}\n"
-        "<div class='min-h-screen flex items-center justify-center'>\n"
-        f"  <div class='{card} w-full max-w-md'>\n"
-        f"    <h1 class='{h1}'>Crear cuenta</h1>\n"
-        "    {% if form.errors %}\n"
-        "      <div class='bg-red-900/40 border border-red-700 text-red-300 rounded-lg p-3 mb-4 text-sm'>\n"
-        "        Corrige los errores del formulario.\n"
-        "      </div>\n"
-        "    {% endif %}\n"
-        "    <form method='post'>\n"
-        "      {% csrf_token %}\n"
-        "      {% for field in form %}\n"
-        "        <div class='mb-4'>\n"
-        f"          <label class='block {text_muted} mb-1'>{{{{ field.label }}}}</label>\n"
-        f"          <input type='{{{{ field.field.widget.input_type }}}}' name='{{{{ field.html_name }}}}'\n"
-        "                 value='{{ field.value|default:\"\" }}'\n"
-        f"                 class='{input_cls}'>\n"
-        "          {% if field.errors %}\n"
-        "            <p class='text-red-400 text-xs mt-1'>{{ field.errors|join:', ' }}</p>\n"
-        "          {% endif %}\n"
-        "        </div>\n"
-        "      {% endfor %}\n"
-        f"      <button type='submit' class='{btn} w-full mt-2'>Registrarse</button>\n"
-        "    </form>\n"
-        f"    <p class='text-center {text_muted} mt-4'>\n"
-        f"      ¿Ya tienes cuenta? <a href='{{% url \"login\" %}}' class='{link}'>Inicia sesión</a>\n"
-        "    </p>\n"
-        "  </div>\n"
-        "</div>\n"
-        "{% endblock %}\n"
-    )
+        files[f"{project}/templates/registration/register.html"] = (
+            "{% extends 'base.html' %}\n"
+            "{% block content %}\n"
+            "<div class='min-h-screen flex items-center justify-center'>\n"
+            f"  <div class='{card} w-full max-w-md'>\n"
+            f"    <h1 class='{h1}'>Crear cuenta</h1>\n"
+            "    {% if form.errors %}\n"
+            "      <div class='bg-red-900/40 border border-red-700 text-red-300 rounded-lg p-3 mb-4 text-sm'>\n"
+            "        Corrige los errores del formulario.\n"
+            "      </div>\n"
+            "    {% endif %}\n"
+            "    <form method='post'>\n"
+            "      {% csrf_token %}\n"
+            "      {% for field in form %}\n"
+            "        <div class='mb-4'>\n"
+            f"          <label class='block {text_muted} mb-1'>{{{{ field.label }}}}</label>\n"
+            f"          <input type='{{{{ field.field.widget.input_type }}}}' name='{{{{ field.html_name }}}}'\n"
+            "                 value='{{ field.value|default:\"\" }}'\n"
+            f"                 class='{input_cls}'>\n"
+            "          {% if field.errors %}\n"
+            "            <p class='text-red-400 text-xs mt-1'>{{ field.errors|join:', ' }}</p>\n"
+            "          {% endif %}\n"
+            "        </div>\n"
+            "      {% endfor %}\n"
+            f"      <button type='submit' class='{btn} w-full mt-2'>Registrarse</button>\n"
+            "    </form>\n"
+            f"    <p class='text-center {text_muted} mt-4'>\n"
+            f"      ¿Ya tienes cuenta? <a href='{{% url \"login\" %}}' class='{link}'>Inicia sesión</a>\n"
+            "    </p>\n"
+            "  </div>\n"
+            "</div>\n"
+            "{% endblock %}\n"
+        )
 
-    # Vista de registro en la app
-    files[f"{project}/{app}/auth_views.py"] = (
-        "from django.shortcuts import render, redirect\n"
-        "from django.contrib.auth.forms import UserCreationForm\n"
-        "from django.contrib.auth import login\n"
-        "\n"
-        "def register(request):\n"
-        "    if request.method == 'POST':\n"
-        "        form = UserCreationForm(request.POST)\n"
-        "        if form.is_valid():\n"
-        "            user = form.save()\n"
-        "            login(request, user)\n"
-        "            return redirect('home')\n"
-        "    else:\n"
-        "        form = UserCreationForm()\n"
-        "    return render(request, 'registration/register.html', {'form': form})\n"
-    )
+        files[f"{project}/{app}/auth_views.py"] = (
+            "from django.shortcuts import render, redirect\n"
+            "from django.contrib.auth.forms import UserCreationForm\n"
+            "from django.contrib.auth import login\n"
+            "\n"
+            "def register(request):\n"
+            "    if request.method == 'POST':\n"
+            "        form = UserCreationForm(request.POST)\n"
+            "        if form.is_valid():\n"
+            "            user = form.save()\n"
+            "            login(request, user)\n"
+            "            return redirect('home')\n"
+            "    else:\n"
+            "        form = UserCreationForm()\n"
+            "    return render(request, 'registration/register.html', {'form': form})\n"
+        )
 
     return files
 
-
-def build_app_urls(pages: list[dict], app: str = "siteapp") -> str:
+def build_app_urls(pages: list[dict], app: str = "siteapp", site_type: str = "other") -> str:
     """Genera urls.py de la app a partir de las páginas decididas por el LLM."""
-    lines = [
-        "from django.urls import path",
-        "from . import views",
-        "from .auth_views import register",
-        "",
-        "urlpatterns = [",
-        "    path('register/', register, name='register'),",
-    ]
+    if site_type == "portfolio":
+        lines = [
+            "from django.urls import path",
+            "from . import views",
+            "",
+            "urlpatterns = [",
+        ]
+    else:
+        lines = [
+            "from django.urls import path",
+            "from . import views",
+            "from .auth_views import register",
+            "",
+            "urlpatterns = [",
+            "    path('register/', register, name='register'),",
+        ]
     for page in pages:
         url = page["url"].lstrip("/")
         view_name = page["view_name"]

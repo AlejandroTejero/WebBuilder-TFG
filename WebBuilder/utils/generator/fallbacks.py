@@ -11,6 +11,27 @@ from django.utils.text import slugify
 
 def fallback_pages(site_type: str) -> list[dict]:
     """Estructura de páginas mínima si el LLM falla."""
+    if site_type == "portfolio":
+        return [
+            {
+                "name": "home",
+                "url": "/",
+                "template": "siteapp/home.html",
+                "view_name": "home",
+                "description": "Landing principal con proyectos y contacto",
+                "is_list": False,
+                "is_detail": False,
+            },
+            {
+                "name": "project_detail",
+                "url": "/project/<pk>/",
+                "template": "siteapp/project_detail.html",
+                "view_name": "project_detail",
+                "description": "Detalle de un proyecto",
+                "is_list": False,
+                "is_detail": True,
+            },
+        ]
     return [
         {
             "name": "home",
@@ -40,7 +61,6 @@ def fallback_pages(site_type: str) -> list[dict]:
             "is_detail": True,
         },
     ]
-
 
 def fallback_models(fields: list[dict]) -> str:
     """models.py mínimo si el LLM falla."""

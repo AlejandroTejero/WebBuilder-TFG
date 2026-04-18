@@ -37,6 +37,13 @@ _INVENTED_CLASS_PATTERNS = [
     r'\b\w+_strong\b',     # title_strong...
     r'\bcontainer_\w+\b',  # container_base, container_narrow...
     r'\bsection_\w+\b',    # section_spacing...
+    # Efectos visuales inventados con prefijo de estado (hover:glow-violet, lg:shimmer, etc.)
+    r'\bhover:glow-\w+\b',
+    r'\bhover:shimmer\b',
+    r'\bhover:neon-\w+\b',
+    r'\bhover:pulse-\w+\b',
+    r'\bhover:float\b',
+    r'\bhover:levitate\b',
 ]
 
 def _find_first_matching_file(files: dict[str, str], suffix: str) -> str:
@@ -303,6 +310,76 @@ def check_prompt_contradictions(files: dict[str, str], user_prompt: str | None =
 
     return errors
 
+# ── CHEQUEO DE LOAD_DATA.PY ─────────────────────────────────────────────────
+
+def check_load_data_integrity(files: dict[str, str], api_url: str | None = None) -> list[str]:
+    """
+    Valida que load_data.py tenga una estructura mínima fiable:
+      1. La URL que usa coincide con la API real del proyecto.
+      2. El except captura Exception (no solo RequestException).
+      3. Hay al menos un get_or_create o create real.
+      4. No guarda str(...) en campos IntegerField.
+    """
+    errors: list[str] = []
+
+    load_data_code = _find_first_matching_file(files, "load_data.py")
+    models_code    = _find_first_matching_file(files, "models.py")
+
+    if not load_data_code:
+        return errors
+
+    # ── 1. URL correcta ──────────────────────────────────────────────────────
+    if api_url:
+        urls_in_code = re.findall(r"https?://[^\s'\"]+", load_data_code)
+        # Extraer el path de la api_url para comparación parcial
+        # ej: 'https://rickandmortyapi.com/api/episode' → '/api/episode'
+        api_path = re.sub(r"https?://[^/]+", "", api_url).rstrip("/")
+        if urls_in_code:
+            url_match = any(
+                api_url in u or u in api_url or (api_path and api_path in u)
+                for u in urls_in_code
+            )
+            if not url_match:
+                errors.append(
+                    f"load_data.py: la URL del comando ({urls_in_code[0]!r}) no coincide "
+                    f"con la API del proyecto ({api_url!r}). El comando cargará datos incorrectos."
+                )
+        else:
+            errors.append(
+                f"load_data.py: no se detecta ninguna URL hardcodeada. "
+                f"Asegúrate de que el comando apunta a {api_url!r}."
+            )
+
+    # ── 2. Except suficientemente amplio ────────────────────────────────────
+    if "except Exception" not in load_data_code and "except requests.RequestException" in load_data_code:
+        errors.append(
+            "load_data.py: el except solo captura requests.RequestException. "
+            "Usa 'except Exception' para no silenciar errores de conversión de tipos."
+        )
+
+    # ── 3. Hay al menos un insert real ──────────────────────────────────────
+    has_insert = bool(re.search(r'\.(get_or_create|update_or_create|create)\(', load_data_code))
+    if not has_insert:
+        errors.append(
+            "load_data.py: no se detecta ningún get_or_create, update_or_create ni create. "
+            "El comando no insertará datos en la BD."
+        )
+
+    # ── 4. str() guardado en IntegerField ───────────────────────────────────
+    if models_code:
+        integer_fields = set(re.findall(
+            r'^\s+(\w+)\s*=\s*models\.IntegerField',
+            models_code, re.MULTILINE
+        ))
+        str_assignments = re.findall(r"'(\w+)'\s*:\s*str\(", load_data_code)
+        for field in str_assignments:
+            if field in integer_fields:
+                errors.append(
+                    f"load_data.py: guarda str(...) en '{field}' pero el modelo "
+                    f"lo define como IntegerField. Usa int() o len() según corresponda."
+                )
+
+    return errors
 
 # ── FUNCIÓN PRINCIPAL PARA EJECUTAR TODOS LOS CHECKS ───────────────────────
 
@@ -310,6 +387,7 @@ def run_all_checks(
     files: dict[str, str],
     user_prompt: str | None = None,
     valid_url_names: set[str] | None = None,
+    api_url: str | None = None,
 ) -> dict[str, list[str]]:
     """
     Ejecuta todos los chequeos disponibles y devuelve un dict con dos listas:
@@ -320,6 +398,7 @@ def run_all_checks(
         check_consistency(files),
         check_django_syntax(files, valid_url_names=valid_url_names),
         check_template_structure(files),
+        check_load_data_integrity(files, api_url=api_url),
     ]
 
     warning_checks = [
