@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 
-from .examples import get_example
+#from .examples import get_example
 from .design.theme_rules import build_theme_rules_text
 
 # ── CONSTANTES GENERALES ──────────────────────────────────────────────────
@@ -676,16 +676,16 @@ def prompt_template(
         ]
     )
 
-    example_kind = "list" if is_list else ("detail" if is_detail else "home")
-    example_html = get_example(site_type, example_kind, user_prompt)
-    if example_html:
-        example_html = example_html[:1500]
-        user_text += (
-            "\n\nEJEMPLO DE REFERENCIA (inspiración estructural y visual secundaria — "
-            "adapta los campos reales y NO contradigas el prompt del usuario; "
-            "NO copies esto tal cual):\n"
-        )
-        user_text += example_html
+    #example_kind = "list" if is_list else ("detail" if is_detail else "home")
+    #example_html = get_example(site_type, example_kind, user_prompt)
+    #if example_html:
+    #    example_html = example_html[:1500]
+    #    user_text += (
+    #        "\n\nEJEMPLO DE REFERENCIA (inspiración estructural y visual secundaria — "
+    #        "adapta los campos reales y NO contradigas el prompt del usuario; "
+    #        "NO copies esto tal cual):\n"
+    #    )
+    #    user_text += example_html
 
     return _base_system(), user_text
 

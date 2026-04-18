@@ -19,20 +19,37 @@ from ..llm.llm_utils import parse_llm_json
 logger = logging.getLogger(__name__)
 
 
-def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) -> str:
-    """Llamada básica al LLM. Devuelve '' si falla."""
-    try:
-        time.sleep(20)
-        return chat_completion(
-            user_text=user_text,
-            system_text=system,
-            temperature=temperature,
-        )
-    except LLMError as e:
-        logger.error(f"[generator] LLM falló en '{label}': {e}")
-        # propagar en vez de pasar
-        raise   
+#def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) -> str:
+#    """Llamada básica al LLM. Devuelve '' si falla."""
+#    try:
+#        time.sleep(20)
+#        return chat_completion(
+#            user_text=user_text,
+#            system_text=system,
+#            temperature=temperature,
+#        )
+#    except LLMError as e:
+#        logger.error(f"[generator] LLM falló en '{label}': {e}")
+#        # propagar en vez de pasar
+#        raise   
 
+# INCREMENTAL EN TIEMPO POR CADA ERROR
+def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) -> str:
+    delays = [5, 15, 30]  # esperas entre reintentos si hay 429
+    for attempt, delay in enumerate(delays, 1):
+        try:
+            return chat_completion(
+                user_text=user_text,
+                system_text=system,
+                temperature=temperature,
+            )
+        except LLMError as e:
+            is_rate_limit = "429" in str(e) or "rate" in str(e).lower()
+            if is_rate_limit and attempt < len(delays):
+                logger.warning(f"[generator] Rate limit en '{label}', reintentando en {delay}s (intento {attempt})")
+                time.sleep(delay)
+            else:
+                raise
 
 def llm_json_call(system: str, user_text: str, label: str) -> dict:
     """Llama al LLM esperando JSON. Devuelve {} si falla o si el JSON es inválido."""
