@@ -49,6 +49,8 @@ from .fallbacks import (
 from .static_files import build_static_files, build_app_urls
 from .migrations_generator import generate_initial_migration
 
+from ..llm.design.presets import get_preset, describe_preset
+
 logger = logging.getLogger(__name__)
 
 
@@ -89,6 +91,11 @@ def generate_project_files(site) -> dict[str, str]:
     user_prompt = plan.get("user_prompt") or ""
     user_prompt_normalized = translate_prompt_to_english(user_prompt)
     api_url = site.project_source.api_url
+
+    # Seleccionar preset visual
+    preset = get_preset(user_prompt_normalized)
+    preset_description = describe_preset(preset)
+    logger.info("[generator] Preset seleccionado: %s", preset.get("name"))
 
     # Enriquecer el prompt del usuario con contexto del dataset
     enriched_prompt = enrich_user_prompt(
@@ -140,6 +147,7 @@ def generate_project_files(site) -> dict[str, str]:
     design_system = llm_design_system_call(
         user_prompt=enriched_prompt,
         site_type=site_type,
+        preset_description=preset_description,
     )
     logger.info("[generator] Design system: %s", design_system)
 
@@ -215,6 +223,7 @@ def generate_project_files(site) -> dict[str, str]:
             real_fields=real_fields,
             real_url_names=real_url_names,
             design_system=design_system,
+            preset_description=preset_description,
         )
         html = llm_call_logged(
             system,
@@ -332,6 +341,8 @@ def generate_project_files(site) -> dict[str, str]:
             app=app,
             site=site,
             design_system=design_system,
+            preset_description=preset_description,
+            preset=preset,
         )
     else:
         logger.info("[generator] Sin inconsistencias bloqueantes")
@@ -359,6 +370,8 @@ def _regenerate_with_errors(
     app,
     site=None,
     design_system=None,
+    preset=None,
+    preset_description="",
 ):
     """Regenera los archivos con errores pasando el contexto de corrección al LLM."""
     error_context = "\n".join(f" - {e}" for e in issues)
@@ -413,6 +426,8 @@ def _regenerate_with_errors(
             real_fields=real_fields,
             real_url_names=real_url_names,
             design_system=design_system,
+            preset_description=preset_description,
+            preset_id=preset.get("id", ""),
         )
         user_text += (
             f"\n\nCORRECCION OBLIGATORIA — tu template anterior tenia estos errores:\n"

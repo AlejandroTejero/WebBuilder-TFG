@@ -167,7 +167,7 @@ def translate_prompt_to_english(user_prompt: str) -> str:
         return user_prompt
     
 
-def llm_design_system_call(*, user_prompt: str, site_type: str) -> dict:
+def llm_design_system_call(*, user_prompt: str, site_type: str, preset_description: str = "") -> dict:
     """
     Genera el design system de clases Tailwind para el proyecto.
     Devuelve un dict con los keys fijos del sistema de diseño.
@@ -196,6 +196,7 @@ def llm_design_system_call(*, user_prompt: str, site_type: str) -> dict:
         system, user_text = prompt_design_system(
             site_type=site_type,
             user_prompt=user_prompt,
+            preset_description=preset_description,
         )
         result = llm_json_call(system, user_text, "design_system")
 

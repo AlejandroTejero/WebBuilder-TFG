@@ -19,6 +19,8 @@ import json
 #from .examples import get_example
 from .design.theme_rules import build_theme_rules_text
 
+from .design.snippets import get_snippet
+
 # ── CONSTANTES GENERALES ──────────────────────────────────────────────────
 
 _PAGE_REQUIREMENTS = {
@@ -532,6 +534,8 @@ def prompt_template(
     real_fields=None,
     real_url_names=None,
     design_system=None,
+    preset_description="",
+    preset_id="",
 ):
     is_list = page.get("is_list", False)
     is_detail = page.get("is_detail", False)
@@ -648,6 +652,8 @@ def prompt_template(
             f"{user_prompt or '(sin instrucciones — usa tu criterio según el dataset)'}",
             "═══════════════════════════════════════════════════",
             "",
+            preset_description,
+            "",
             "PRIORIDADES GLOBALES:",
             "\n".join(f"- {r}" for r in _GLOBAL_STYLE_RULES),
             "",
@@ -686,6 +692,17 @@ def prompt_template(
     #        "NO copies esto tal cual):\n"
     #    )
     #    user_text += example_html
+
+    # Snippets de referencia
+    preset_id = preset_id or ""
+    page_kind = "list_row" if is_list else ("card" if is_detail else "hero")
+    snippet = get_snippet(preset_id, page_kind)
+    if snippet:
+        user_text += (
+            "\n\nSNIPPET DE REFERENCIA (patrón visual del preset — "
+            "adapta los campos reales, NO COPIES ESTO TAL CUAL):\n"
+        )
+        user_text += snippet
 
     return _base_system(), user_text
 
@@ -757,7 +774,7 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
 
 # ── 7) DESIGN SYSTEM ───────────────────────────────────────────────────────
 
-def prompt_design_system(*, site_type, user_prompt):
+def prompt_design_system(*, site_type, user_prompt, preset_description=""):
     system = (
         "Eres un experto en diseño web y Tailwind CSS. "
         "Devuelves SOLO un objeto JSON válido, sin Markdown ni texto extra. "
@@ -841,6 +858,8 @@ def prompt_design_system(*, site_type, user_prompt):
         "",
         "INSTRUCCIÓN DEL USUARIO:",
         f"{user_prompt or '(sin instrucciones — usa criterio según el tipo de sitio)'}",
+        "",
+        preset_description,
         "",
         f"KEYS OBLIGATORIOS (devuelve exactamente estos, ni más ni menos): {keys_text}",
         "",
