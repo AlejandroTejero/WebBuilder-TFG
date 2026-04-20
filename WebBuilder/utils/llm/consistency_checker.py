@@ -381,6 +381,35 @@ def check_load_data_integrity(files: dict[str, str], api_url: str | None = None)
 
     return errors
 
+
+def check_views_urls_consistency(files: dict[str, str]) -> list[str]:
+    """
+    Detecta funciones definidas en views.py que no tienen
+    su URL registrada en urls.py.
+    """
+    errors = []
+
+    views_code = _find_first_matching_file(files, "views.py")
+    urls_code = _find_first_matching_file(files, "urls.py")
+
+    if not views_code or not urls_code:
+        return errors
+
+    # Extraer nombres de funciones definidas en views.py
+    view_funcs = set(re.findall(r'^def (\w+)\(request', views_code, re.MULTILINE))
+
+    # Extraer nombres registrados en urls.py
+    url_names = set(re.findall(r"name=['\"](\w+)['\"]", urls_code))
+    url_views = set(re.findall(r'views\.(\w+)', urls_code))
+
+    for func in view_funcs:
+        if func not in url_views:
+            errors.append(
+                f"views.py define '{func}' pero no está registrada en urls.py"
+            )
+
+    return errors
+
 # ── FUNCIÓN PRINCIPAL PARA EJECUTAR TODOS LOS CHECKS ───────────────────────
 
 def run_all_checks(
@@ -399,6 +428,7 @@ def run_all_checks(
         check_django_syntax(files, valid_url_names=valid_url_names),
         check_template_structure(files),
         check_load_data_integrity(files, api_url=api_url),
+        check_views_urls_consistency(files),
     ]
 
     warning_checks = [

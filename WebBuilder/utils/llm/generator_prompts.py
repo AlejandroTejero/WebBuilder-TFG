@@ -590,7 +590,9 @@ def prompt_template(
         "CRÍTICO: PROHIBIDO inventar clases Tailwind que no existen. En concreto: hover:glow-*, hover:shimmer, hover:neon-*, hover:pulse-*, hover:float, hover:levitate NO son clases Tailwind reales. Para efectos hover usa exclusivamente: hover:opacity-*, hover:scale-*, hover:shadow-*, hover:ring-*, hover:bg-*, hover:text-*.",
         "CRÍTICO ABSOLUTO: el SISTEMA DE CLASES proporcionado arriba es OBLIGATORIO. Para cada elemento (tarjeta, contenedor, título, badge, botón, input, enlace) debes usar EXACTAMENTE las clases indicadas en el sistema, sin excepción. No las sustituyas, no las combines con inventos, no las ignores.",
         "VERIFICACIÓN MENTAL OBLIGATORIA: antes de escribir cualquier clase CSS, pregúntate '¿es esta una utilidad Tailwind real?'. Si no estás seguro, usa las clases del SISTEMA DE CLASES o utilidades básicas como flex, grid, p-4, text-sm, font-bold.",
+        f"CRÍTICO ABSOLUTO: la URL para volver al listado desde el detalle es EXACTAMENTE {{% url '{list_url_name}' %}}. PROHIBIDO usar 'catalog', 'list', 'items' o cualquier otro nombre inventado.",
         "CRÍTICO: todos los campos del modelo son strings o tipos simples, NUNCA objetos. NUNCA uses item.campo.subcampo ni item.campo.atributo. Si origin, location o cualquier campo similar existe, accede como {{ item.origin }}, nunca como {{ item.origin.name }}.",
+        "CRÍTICO: antes de aplicar len() a un campo, comprueba en los DATOS DE EJEMPLO que ese campo es realmente una lista. Si es una URL string o un entero, nunca uses len().",
         "Usa iconos SVG inline solo cuando sumen claridad real.",
         "Las animaciones, si existen, deben ser discretas y coherentes con el prompt del usuario.",
     ]
@@ -695,8 +697,15 @@ def prompt_template(
 
     # Snippets de referencia
     preset_id = preset_id or ""
-    page_kind = "list_row" if is_list else ("card" if is_detail else "hero")
-    snippet = get_snippet(preset_id, page_kind)
+    if not is_list and not is_detail:
+        snippet = get_snippet(preset_id, "hero")
+        card_snippet = get_snippet(preset_id, "card")
+        if snippet and card_snippet:
+            snippet = snippet + "\n\n{# Patrón de card para items destacados: #}\n" + card_snippet
+    else:
+        page_kind = "list_row" if is_list else "card"
+        snippet = get_snippet(preset_id, page_kind)
+
     if snippet:
         user_text += (
             "\n\nSNIPPET DE REFERENCIA (patrón visual del preset — "
@@ -724,6 +733,7 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
         "Item.objects.get_or_create(campo_id=valor, defaults={'campo1': val1, 'campo2': val2})",
         "Si no hay campo único identificador, usa update_or_create o simplemente create().",
         "Si un campo del dataset es una LISTA (array), guarda solo la longitud como entero: len(raw_item['campo']) o 0 si es None. El campo en el modelo se llamará con sufijo '_count' si así lo define el modelo (ej: episode_count = len(raw_item.get('episode') or [])).",
+        "CRÍTICO: si el campo termina en '_count', '_total', '_num' o similar, es ya un entero en el JSON — úsalo directamente con int(raw_item.get('campo') or 0). NUNCA apliques len() sobre un campo que no sea claramente una lista Python.",
         "CRÍTICO: el JSON ya viene parseado como dict Python. NUNCA uses json.loads() sobre un campo que ya es dict.",
         "Accede directamente: raw_item['origin']['name'], NO json.loads(raw_item['origin'])['name'].",
         "Ejemplo: rating = {'rate': 4.5, 'count': 120} → guardar str(raw_item['rating']['rate'])",

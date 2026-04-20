@@ -103,10 +103,12 @@ def build_theme_rules_text() -> str:
     lines = ["REGLAS SEGURAS DE TEMA Y COLOR:"]
     lines.extend(f"- {rule}" for rule in SAFE_COLOR_USAGE_RULES)
     lines.append("")
-    lines.append("BASE VISUAL REUTILIZABLE:")
-    for key, value in BASE_THEME_RULES.items():
-        lines.append(f"- {key}: {value}")
-    lines.append("")
+
+    #lines.append("BASE VISUAL REUTILIZABLE:")
+    #for key, value in BASE_THEME_RULES.items():
+    #    lines.append(f"- {key}: {value}")
+    #lines.append("")
+    
     lines.append("VARIANTES DE ESTILO ORIENTATIVAS:")
     for variant, rules in STYLE_VARIANTS.items():
         lines.append(f"- {variant}:")
