@@ -373,6 +373,10 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
         "CRÍTICO: usa ÚNICAMENTE function-based views. PROHIBIDO usar clases, métodos como get_context_data, o cualquier herencia de View, ListView, DetailView o similar.",
     ]
 
+    if site_type == "portfolio":
+        rules.append("CRÍTICO: esto es un PORTFOLIO. PROHIBIDO generar una vista de listado (project_list, catalog, list o similar). Solo genera las vistas que aparecen en PÁGINAS: home y la de detalle con pk.")
+        rules.append("CRÍTICO: la vista de detalle vuelve a 'home', no a ningún listado.")
+
     if real_fields:
         rules.append(f"CAMPOS EXACTOS del modelo Item (úsalos tal cual): {real_fields}")
         rules.append("NUNCA uses un nombre de campo que no esté en esa lista.")
@@ -536,6 +540,7 @@ def prompt_template(
     design_system=None,
     preset_description="",
     preset_id="",
+    generated_context=None,
 ):
     is_list = page.get("is_list", False)
     is_detail = page.get("is_detail", False)
@@ -550,6 +555,8 @@ def prompt_template(
     list_page = next((p for p in all_pages if p.get("is_list")), None)
     list_url_name = list_page["name"] if list_page else "catalog"
 
+    back_url = list_url_name if site_type != "portfolio" else "home"
+    
     if is_list:
         context_hint = (
             "CONTEXTO: 'page_obj' (queryset paginado de Item), 'site_title' y opcionalmente 'q'.\n"
@@ -560,21 +567,48 @@ def prompt_template(
         context_hint = (
             "CONTEXTO: 'item' (objeto Item individual), 'site_title' y opcionalmente 'related'.\n"
             "Muestra los campos relevantes del item de forma clara y ordenada.\n"
-            f"Enlace de vuelta: {{% url '{list_url_name}' %}}."
+            f"Enlace de vuelta: {{% url '{back_url}' %}}."
         )
     else:
+        portfolio_hint = (
+            "\nPORTFOLIO: añade una sección de presentación personal ANTES del grid de proyectos: "
+            "H1 con nombre del autor o del sitio, párrafo de descripción breve y links de contacto opcionales. "
+            "Usa texto placeholder claro que el usuario pueda editar fácilmente."
+        ) if site_type == "portfolio" else ""
+
         context_hint = (
             "CONTEXTO: 'site_title' y 'featured' (lista de los primeros 6 items para destacados).\n"
             "CRÍTICO: usa SIEMPRE {% for item in featured %} para iterar los destacados. NUNCA uses 'items'.\n"
-            "Es la portada del sitio. Debe presentar el proyecto y facilitar la exploración del contenido."
+            "Es la portada del sitio. Debe presentar el proyecto y facilitar la exploración del contenido.\n"
+            f"Enlace al detalle de cada item: {{% url '{detail_url_name}' item.pk %}}."
+            f"{portfolio_hint}"
         )
+    
 
     page_kind = "list" if is_list else ("detail" if is_detail else ("home" if page["name"] == "home" else "other"))
-    page_requirements_text = build_page_requirements(page_kind)
-    tailwind_guidance_text = build_tailwind_guidance()
-    priority_rules_text = build_priority_rules_text()
-    theme_rules_text = build_theme_rules_text()
 
+    def _build_brief():
+        page_layout = preset_description.split(f"- {page_kind.capitalize()}:")[-1].split("\n")[0].strip() if preset_description else ""
+        color_line = preset_description.split("- Fondo:")[-1].split("\n")[0].strip() if preset_description else ""
+        accent_line = preset_description.split("- Acento:")[-1].split("\n")[0].strip() if preset_description else ""
+        
+        lines = [
+            "═══ BRIEF DE GENERACIÓN ═══",
+            f"INSTRUCCIÓN DEL USUARIO: {user_prompt or '(sin instrucciones — usa tu criterio)'}",
+            "",
+            f"PRESET VISUAL: {preset_description.split(chr(10))[0] if preset_description else 'default'}",
+            f"COLOR BASE: {color_line}",
+            f"ACENTO: {accent_line}",
+            f"LAYOUT PARA ESTA PÁGINA ({page_kind}): {page_layout}",
+            "",
+            "REGLA ABSOLUTA: el prompt del usuario tiene prioridad sobre cualquier sugerencia visual.",
+            "No mezcles estilos. No inventes clases Tailwind fuera de CDN.",
+            "═══════════════════════════",
+        ]
+        return "\n".join(lines)
+
+    brief_text = _build_brief()
+    
     rules = [
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con {% extends 'base.html' %}. Sin nada antes.",
         "CRÍTICO: base.html ya contiene navbar y footer. PROHIBIDO añadir <header>, <nav>, <footer> o cualquier navbar/footer propio dentro del {% block content %}. Solo mete contenido de página.",
@@ -590,9 +624,10 @@ def prompt_template(
         "CRÍTICO: PROHIBIDO inventar clases Tailwind que no existen. En concreto: hover:glow-*, hover:shimmer, hover:neon-*, hover:pulse-*, hover:float, hover:levitate NO son clases Tailwind reales. Para efectos hover usa exclusivamente: hover:opacity-*, hover:scale-*, hover:shadow-*, hover:ring-*, hover:bg-*, hover:text-*.",
         "CRÍTICO ABSOLUTO: el SISTEMA DE CLASES proporcionado arriba es OBLIGATORIO. Para cada elemento (tarjeta, contenedor, título, badge, botón, input, enlace) debes usar EXACTAMENTE las clases indicadas en el sistema, sin excepción. No las sustituyas, no las combines con inventos, no las ignores.",
         "VERIFICACIÓN MENTAL OBLIGATORIA: antes de escribir cualquier clase CSS, pregúntate '¿es esta una utilidad Tailwind real?'. Si no estás seguro, usa las clases del SISTEMA DE CLASES o utilidades básicas como flex, grid, p-4, text-sm, font-bold.",
-        f"CRÍTICO ABSOLUTO: la URL para volver al listado desde el detalle es EXACTAMENTE {{% url '{list_url_name}' %}}. PROHIBIDO usar 'catalog', 'list', 'items' o cualquier otro nombre inventado.",
+        f"CRÍTICO ABSOLUTO: la URL para volver desde el detalle es EXACTAMENTE {{% url '{back_url}' %}}. PROHIBIDO usar 'catalog', 'list', 'items' o cualquier otro nombre inventado.",
         "CRÍTICO: todos los campos del modelo son strings o tipos simples, NUNCA objetos. NUNCA uses item.campo.subcampo ni item.campo.atributo. Si origin, location o cualquier campo similar existe, accede como {{ item.origin }}, nunca como {{ item.origin.name }}.",
         "CRÍTICO: antes de aplicar len() a un campo, comprueba en los DATOS DE EJEMPLO que ese campo es realmente una lista. Si es una URL string o un entero, nunca uses len().",
+        "CRÍTICO: los campos BooleanField en templates Django son booleanos reales en TODAS las páginas. Usa {% if item.campo %} y {% if not item.campo %} siempre, en home, list y detail. NUNCA uses {% if item.campo == 'True' %} ni {% if item.campo == 'False' %} en ninguna página.",
         "Usa iconos SVG inline solo cuando sumen claridad real.",
         "Las animaciones, si existen, deben ser discretas y coherentes con el prompt del usuario.",
     ]
@@ -646,21 +681,7 @@ def prompt_template(
         [
             f"SITIO: {site_title}  |  TIPO: {site_type}",
             "",
-            "REGLAS DE PRIORIDAD:",
-            priority_rules_text,
-            "",
-
-            "═══ INSTRUCCIÓN DEL USUARIO (prioridad máxima) ═══",
-            f"{user_prompt or '(sin instrucciones — usa tu criterio según el dataset)'}",
-            "═══════════════════════════════════════════════════",
-            "",
-            preset_description,
-            "",
-            "PRIORIDADES GLOBALES:",
-            "\n".join(f"- {r}" for r in _GLOBAL_STYLE_RULES),
-            "",
-            "TEMA Y BASE VISUAL RECOMENDADA:",
-            theme_rules_text,
+            brief_text,
             "",
             f"PÁGINA: {page['name']} — {page['description']}",
             "",
@@ -673,9 +694,7 @@ def prompt_template(
             "DATOS DE EJEMPLO:",
             _samples_info(sample_items, 3),
             "",
-            page_requirements_text,
-            "",
-            tailwind_guidance_text,
+            design_system_text,
             "",
             "REGLAS TÉCNICAS:",
             "\n".join(f"- {r}" for r in rules),
@@ -712,6 +731,33 @@ def prompt_template(
             "adapta los campos reales, NO COPIES ESTO TAL CUAL):\n"
         )
         user_text += snippet
+
+    if generated_context:
+        ref_lines = ["\n\nREFERENCIA VISUAL (fragmentos de páginas ya generadas — mantén coherencia exacta de colores, clases y estructura):"]
+        
+        # Siempre pasar el nav de base.html
+        base_html = generated_context.get("base.html", "")
+        if base_html:
+            nav_start = base_html.find("<nav")
+            nav_end = base_html.find("</nav>")
+            if nav_start != -1 and nav_end != -1:
+                nav_fragment = base_html[nav_start:nav_end + 6][:600]
+                ref_lines.append(f"\n--- base.html (navbar) ---\n{nav_fragment}")
+        
+        # Pasar el último template generado (que no sea base.html)
+        other_templates = {k: v for k, v in generated_context.items() if k != "base.html"}
+        if other_templates:
+            last_key = list(other_templates.keys())[-1]
+            last_html = other_templates[last_key]
+            block_start = last_html.find("{% block content %}")
+            if block_start != -1:
+                fragment = last_html[block_start:block_start + 700]
+            else:
+                fragment = last_html[:700]
+            ref_lines.append(f"\n--- {last_key} (patrón de componentes) ---\n{fragment}")
+        
+        ref_lines.append("\nREGLA ABSOLUTA: replica exactamente estos colores, tipografía, radios y estructura. No los reinterpretes.")
+        user_text += "\n".join(ref_lines)
 
     return _base_system(), user_text
 
@@ -779,6 +825,7 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
             "Genera load_data.py ahora:",
         ]
     )
+
     return _base_system(), user_text
 
 

@@ -21,6 +21,13 @@ import re
 import unicodedata
 from typing import Any
 
+_SITE_TYPE_DEFAULT_PRESET = {
+    "blog":      "quiet_editorial",
+    "catalog":   "magazine_split",
+    "dashboard": "neo_terminal",
+    "portfolio": "glass_orbit",
+    "other":     "bento_pop",
+}
 
 STYLE_PRESETS: dict[str, dict[str, Any]] = {
     "neo_terminal": {
@@ -259,7 +266,7 @@ def _normalize_text(value: str) -> str:
     return normalized.strip()
 
 
-def get_preset(user_prompt: str) -> dict[str, Any]:
+def get_preset(user_prompt: str, site_type: str = "other") -> dict[str, Any]:
     """Selecciona el preset más adecuado para el prompt del usuario.
 
     La detección usa coincidencias simples por palabras clave. Si no encuentra una
@@ -268,8 +275,9 @@ def get_preset(user_prompt: str) -> dict[str, Any]:
 
     prompt = _normalize_text(user_prompt)
     if not prompt:
-        return copy.deepcopy(random.choice(list(STYLE_PRESETS.values())))
-
+        default_key = _SITE_TYPE_DEFAULT_PRESET.get(site_type, "quiet_editorial")
+        return copy.deepcopy(STYLE_PRESETS[default_key])
+    
     scored_presets: list[tuple[int, int, str]] = []
 
     for index, preset_key in enumerate(_PRESET_ORDER):
@@ -282,8 +290,10 @@ def get_preset(user_prompt: str) -> dict[str, Any]:
         scored_presets.append((score, -index, preset_key))
 
     best_score, _, best_key = max(scored_presets)
+
     if best_score <= 0:
-        return copy.deepcopy(random.choice(list(STYLE_PRESETS.values())))
+        default_key = _SITE_TYPE_DEFAULT_PRESET.get(site_type, "quiet_editorial")
+        return copy.deepcopy(STYLE_PRESETS[default_key])
 
     return copy.deepcopy(STYLE_PRESETS[best_key])
 

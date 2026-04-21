@@ -93,7 +93,7 @@ def generate_project_files(site) -> dict[str, str]:
     api_url = site.project_source.api_url
 
     # Seleccionar preset visual
-    preset = get_preset(user_prompt_normalized)
+    preset = get_preset(user_prompt_normalized, site_type=site_type)
     preset_description = describe_preset(preset)
     logger.info("[generator] Preset seleccionado: %s", preset.get("name"))
 
@@ -209,6 +209,9 @@ def generate_project_files(site) -> dict[str, str]:
     files[f"{project}/{app}/templates/base.html"] = fix_template(base_html)
 
     # ── PASO 5: template por página ──────────────────────────────────────────
+    generated_html_context = {
+        "base.html": files[f"{project}/{app}/templates/base.html"]
+    }  
     for page in pages:
         _update_step(site, f"Generando pagina '{page['name']}'...")
         logger.info("[generator] Paso 5: template '%s'", page["name"])
@@ -224,6 +227,7 @@ def generate_project_files(site) -> dict[str, str]:
             real_url_names=real_url_names,
             design_system=design_system,
             preset_description=preset_description,
+            generated_context=generated_html_context,
         )
         html = llm_call_logged(
             system,
@@ -235,7 +239,9 @@ def generate_project_files(site) -> dict[str, str]:
         if not html.strip():
             html = fallback_template(page)
 
-        files[f"{project}/{app}/templates/{page['template']}"] = fix_template(html)
+        fixed_html = fix_template(html)
+        files[f"{project}/{app}/templates/{page['template']}"] = fixed_html
+        generated_html_context[page["template"]] = fixed_html
 
     # ── PASO 6: load_data.py ─────────────────────────────────────────────────
     _update_step(site, "Generando cargador de datos...")
