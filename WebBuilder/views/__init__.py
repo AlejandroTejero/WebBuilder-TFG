@@ -4,6 +4,7 @@ from .metrics import metrics_view
 from .assistant import assistant
 from .history import history, history_analysis, history_sites, delete_analysis, delete_site
 from .edit import edit
+from .internal import health_summary, container_shutdown
 from .site import (
     site_render,
     site_generate,
@@ -45,4 +46,6 @@ __all__ = [
     "site_users_save",
 	"site_refine_file",
 	"site_code_viewer",
+	"health_summary",
+    "container_shutdown",
 ]

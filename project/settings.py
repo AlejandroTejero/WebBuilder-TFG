@@ -30,7 +30,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "")
 DEBUG = True
 
 # No vacio, asi si cambiamos DEBUG = False para el despliegue, seguira funcionando en local.
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# El ultimo para metricas de n8n
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '172.18.0.1']
 
 # Application definition
 
@@ -153,11 +154,17 @@ LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
 N8N_DEPLOY_WEBHOOK = os.getenv("N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webhook/webbuilder-deploy")
 N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
 
-#n8n login
+# n8n login
 N8N_WEBHOOK_REGISTRO = os.getenv("N8N_WEBHOOK_REGISTRO", "http://localhost:5678/webhook/WebBuilder-Register")
 N8N_WEBHOOK_LOGIN    = os.getenv("N8N_WEBHOOK_LOGIN",    "http://localhost:5678/webhook/WebBuilder-Login")
 
-# Logging
+# n8n generation
+N8N_WEBHOOK_GENERATION_DONE = os.environ.get("N8N_WEBHOOK_GENERATION_DONE", "http://localhost:5678/webhook/webbuilder-generation-done")
+
+# n8n daily metrics
+INTERNAL_TOKEN = os.environ.get("INTERNAL_TOKEN", "")
+
+# Logs
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

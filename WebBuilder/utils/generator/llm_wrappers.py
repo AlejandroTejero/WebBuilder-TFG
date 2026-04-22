@@ -51,6 +51,8 @@ def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) 
             else:
                 raise
 
+# En vez de chuks que devuleva todo de golpe
+
 def llm_json_call(system: str, user_text: str, label: str) -> dict:
     """Llama al LLM esperando JSON. Devuelve {} si falla o si el JSON es inválido."""
     raw = llm_call(system, user_text, label, temperature=0.0)

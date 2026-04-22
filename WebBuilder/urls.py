@@ -40,4 +40,7 @@ urlpatterns = [
 	path("site/<int:api_request_id>/versions/<int:version_id>/download/", views.site_version_download, name="site_version_download"),
 
     path("site/<int:api_request_id>/users/save/", views.site_users_save, name="site_users_save"),
+	
+    path("internal/health-summary/", views.health_summary, name="health_summary"),
+	path("internal/container-shutdown/", views.container_shutdown, name="container_shutdown"),
 ]

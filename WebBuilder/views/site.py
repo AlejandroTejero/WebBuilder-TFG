@@ -3,6 +3,7 @@ import os
 import threading
 import zipfile
 import json
+import time
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -22,8 +23,14 @@ from django.conf import settings
 # Generación (sin cambios respecto al original)
 # ---------------------------------------------------------------------------
 
+import time  # añade esto arriba del todo junto a los otros imports
+
 def _run_generation(site_id: int):
     from ..models import GeneratedSite
+    from ..utils.generator.notifications import notify_generation_done  # añade esto
+
+    start_time = time.time()  # añade esto
+
     try:
         site = GeneratedSite.objects.get(pk=site_id)
         files = generate_project_files(site)
@@ -31,6 +38,11 @@ def _run_generation(site_id: int):
         site.generation_status = "ready"
         site.generation_error = ""
         site.save(update_fields=["project_files", "generation_status", "generation_error"])
+
+        # Notificar a n8n
+        duration = int(time.time() - start_time)  # añade esto
+        notify_generation_done(site, duration_seconds=duration)  # añade esto
+
     except Exception as e:
         try:
             site = GeneratedSite.objects.get(pk=site_id)
@@ -39,7 +51,6 @@ def _run_generation(site_id: int):
             site.save(update_fields=["generation_status", "generation_error"])
         except Exception:
             pass
-
 
 # Recojo los campos necesarios para las estadisitcas
 @login_required

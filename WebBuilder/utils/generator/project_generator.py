@@ -28,6 +28,7 @@ from ..llm.generator_prompts import (
 from ..llm.field_extractor import extract_model_fields
 from ..llm.consistency_checker import fix_template, run_all_checks
 from ..llm.enrich_prompt import enrich_user_prompt
+from .notifications import notify_generation_done
 
 from .llm_wrappers import (
     llm_call_logged,
@@ -355,6 +356,10 @@ def generate_project_files(site) -> dict[str, str]:
 
     _update_step(site, "Generacion completada.")
     logger.info("[generator] Completado: %s archivos generados", len(files))
+
+    # Notificamos a n8n
+    notify_generation_done(site, duration_seconds=0)
+
     return files
 
 # ──────────────────────────────────────────────────────────────────────────────
