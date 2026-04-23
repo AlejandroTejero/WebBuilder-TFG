@@ -1,0 +1,62 @@
+================================================================================
+SPRINTS WEBBUILDER - TFG
+================================================================================
+
+SPRINT 1 — Definición del proyecto
+Periodo: Abril 2025 - Octubre 2025
+Reuniones: 1 a 5
+--------------------------------------------------------------------------------
+Todavía no hay código. Se define la idea, el tutor propone el módulo de IA,
+y se diseña el mini-proceso de validación y análisis de datos. Historia de
+las dos ideas iniciales descartadas y cómo se llega a WebBuilder.
+
+
+SPRINT 2 — Arranque del desarrollo: análisis sin LLM
+Periodo: Febrero 2026 (commits 5-18 feb)
+Reuniones: 6 y 7
+--------------------------------------------------------------------------------
+Primer commit enorme con toda la estructura base. El análisis todavía no usa
+LLM: existe suggestions_heuristic.py, mapping.py, normalizer.py. El sistema
+intentaba sugerir la estructura solo con scoring. Problema: la variedad de
+datasets hacía inviable cubrirlo todo con heurísticas.
+
+
+SPRINT 3 — Integración del LLM + planner
+Periodo: Febrero 2026 (commits 19-26 feb)
+Reuniones: 7
+--------------------------------------------------------------------------------
+Se abandona el enfoque sin LLM. Aparecen client.py, planner.py, n8n
+login/registro. Primera versión funcional con Groq.
+
+
+SPRINT 4 — Generador de proyectos Django
+Periodo: Marzo 2026 (commits 2-19 mar)
+Reuniones: 8
+--------------------------------------------------------------------------------
+Nace project_generator.py, generator_prompts.py. Primera web generada real
+aunque con errores. Docker + n8n deploy.
+
+
+SPRINT 5 — Refactor y consolidación
+Periodo: Marzo 2026 (commits 23-31 mar)
+--------------------------------------------------------------------------------
+Gran refactor: el generador monolítico se divide en fallbacks, llm_wrappers,
+migrations_generator, static_files. Aparecen GenerationLog, enrich_prompt,
+consistency_checker.
+
+
+SPRINT 6 — Funcionalidades avanzadas
+Periodo: Abril 2026 (commits 6-13 abr)
+--------------------------------------------------------------------------------
+Versiones, usuarios del sitio, métricas, idiomas, CSV/GeoJSON, LLM
+personalizado, editor de código.
+
+
+SPRINT 7 — Pulido y cierre
+Periodo: Abril 2026 (commits 15-22 abr)
+Reuniones: 9
+--------------------------------------------------------------------------------
+Presets visuales, snippets, few-shot examples, PostgreSQL, workflows n8n
+finales, modo claro.
+
+================================================================================

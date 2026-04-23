@@ -1,0 +1,1605 @@
+=== 2026-04-22 | Postgres SQL ===
+
+ .gitignore                                         |   1 +
+ .../Postgres SQL/instalacion_pgadmin.md            | 199 +++++++++++
+ .../Postgres SQL/migracion_postgresql.md           | 368 +++++++++++++++++++++
+ project/__pycache__/settings.cpython-312.pyc       | Bin 4434 -> 4790 bytes
+ project/settings.py                                |  16 +-
+ 5 files changed, 581 insertions(+), 3 deletions(-)
+=== 2026-04-22 | new workflows ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 3212 -> 3434 bytes
+ .../NewWorkflows/workflow_auto_shutdown.md         | 149 ++++++++++++++++++
+ .../NewWorkflows/workflow_generation_done.md       | 154 +++++++++++++++++++
+ .../NewWorkflows/workflow_health_check.md          | 171 +++++++++++++++++++++
+ WebBuilder/docs/Dudas.md                           |  20 ++-
+ WebBuilder/urls.py                                 |   3 +
+ WebBuilder/utils/generator/llm_wrappers.py         |   2 +
+ WebBuilder/utils/generator/notifications.py        |  48 ++++++
+ WebBuilder/utils/generator/project_generator.py    |   5 +
+ WebBuilder/views/__init__.py                       |   3 +
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 1027 -> 1114 bytes
+ WebBuilder/views/internal.py                       | 126 +++++++++++++++
+ WebBuilder/views/site.py                           |  13 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 4131 -> 4434 bytes
+ project/settings.py                                |  13 +-
+ 16 files changed, 699 insertions(+), 8 deletions(-)
+=== 2026-04-21 | Agrupacion pasos entrega al llm ===
+
+ WebBuilder/utils/generator/project_generator.py |  10 ++-
+ WebBuilder/utils/llm/design/presets.py          |  18 ++++-
+ WebBuilder/utils/llm/generator_prompts.py       |  97 ++++++++++++++++++------
+ db.sqlite3                                      | Bin 10354688 -> 10354688 bytes
+ 4 files changed, 94 insertions(+), 31 deletions(-)
+=== 2026-04-20 | correct errors generation ===
+
+ WebBuilder/utils/llm/consistency_checker.py |  30 ++++++++++++++++++++++++++++
+ WebBuilder/utils/llm/design/theme_rules.py  |  10 ++++++----
+ WebBuilder/utils/llm/generator_prompts.py   |  14 +++++++++++--
+ db.sqlite3                                  | Bin 10354688 -> 10354688 bytes
+ 4 files changed, 48 insertions(+), 6 deletions(-)
+=== 2026-04-18 | snnipets ===
+
+ WebBuilder/utils/generator/llm_wrappers.py      |   3 +-
+ WebBuilder/utils/generator/project_generator.py |  15 ++
+ WebBuilder/utils/llm/design/presets.py          | 332 ++++++++++++++++++++++++
+ WebBuilder/utils/llm/design/snippets.py         | 228 ++++++++++++++++
+ WebBuilder/utils/llm/generator_prompts.py       |  21 +-
+ db.sqlite3                                      | Bin 10354688 -> 10354688 bytes
+ 6 files changed, 597 insertions(+), 2 deletions(-)
+=== 2026-04-18 | presets ===
+
+ WebBuilder/docs/Opus/diagnostico_tfg.md    | 651 -----------------------------
+ WebBuilder/utils/generator/llm_wrappers.py |  43 +-
+ WebBuilder/utils/llm/design/presets.py     |   0
+ WebBuilder/utils/llm/generator_prompts.py  |  22 +-
+ db.sqlite3                                 | Bin 10354688 -> 10354688 bytes
+ 5 files changed, 41 insertions(+), 675 deletions(-)
+=== 2026-04-18 | Update portfolio + load data ===
+
+ .../WebBuilder/partials/assistant/input.html       |   1 +
+ WebBuilder/utils/generator/fallbacks.py            |  22 +-
+ WebBuilder/utils/generator/project_generator.py    |  24 +-
+ WebBuilder/utils/generator/static_files.py         | 276 ++++++++++++---------
+ WebBuilder/utils/llm/consistency_checker.py        |  79 ++++++
+ WebBuilder/utils/llm/generator_prompts.py          | 113 +++++++--
+ WebBuilder/utils/llm/planner.py                    |   2 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 8 files changed, 362 insertions(+), 155 deletions(-)
+=== 2026-04-17 | Dudas.md ===
+
+ WebBuilder/docs/Dudas.md |  14 ++++++++++++++
+ db.sqlite3               | Bin 10354688 -> 10354688 bytes
+ 2 files changed, 14 insertions(+)
+=== 2026-04-16 | buenos updates ===
+
+ WebBuilder/docs/Documentacion/fallos_generacion.md | 331 +++++++++++
+ WebBuilder/docs/Opus/diagnostico_tfg.md            | 651 +++++++++++++++++++++
+ WebBuilder/utils/generator/fallbacks.py            |   7 +-
+ WebBuilder/utils/generator/llm_wrappers.py         |  56 +-
+ WebBuilder/utils/generator/project_generator.py    |  41 +-
+ WebBuilder/utils/generator/static_files.py         |  65 +-
+ WebBuilder/utils/llm/consistency_checker.py        |  80 ++-
+ WebBuilder/utils/llm/examples/blog.py              |  12 +-
+ WebBuilder/utils/llm/examples/catalog.py           |  12 +-
+ WebBuilder/utils/llm/examples/dashboard.py         |   6 +-
+ WebBuilder/utils/llm/examples/portfolio.py         |  12 +-
+ WebBuilder/utils/llm/generator_prompts.py          | 198 ++++++-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 13 files changed, 1367 insertions(+), 104 deletions(-)
+=== 2026-04-16 | updates ===
+
+ WebBuilder/utils/generator/llm_wrappers.py      |   27 +-
+ WebBuilder/utils/generator/project_generator.py |    8 +-
+ WebBuilder/utils/llm/consistency_checker.py     |   57 +-
+ WebBuilder/utils/llm/enrich_prompt.py           |   22 +-
+ WebBuilder/utils/llm/examples/__init__.py       |   72 +-
+ WebBuilder/utils/llm/examples/blog.py           |  997 +++++++++++++++---
+ WebBuilder/utils/llm/examples/catalog.py        | 1223 +++++++++++++++++++----
+ WebBuilder/utils/llm/examples/dashboard.py      | 1211 +++++++++++++++++++---
+ WebBuilder/utils/llm/examples/portfolio.py      |  955 +++++++++++++++---
+ WebBuilder/utils/llm/generator_prompts.py       |   14 +-
+ db.sqlite3                                      |  Bin 10354688 -> 10354688 bytes
+ 11 files changed, 3925 insertions(+), 661 deletions(-)
+=== 2026-04-15 | Updates generation ===
+
+ WebBuilder/docs/Apuntes/rickymortyprompt.md        |  18 +
+ WebBuilder/docs/Mejoras/Generacion/Generacion.md   | 720 +++++++++++++++++++++
+ .../Generacion/WebBuilder_plan_y_progreso.md       | 480 ++++++++++++++
+ WebBuilder/docs/Mejoras/OrdenModoClaro.md          |   5 -
+ WebBuilder/docs/Mejoras/Updates.png                | Bin 186495 -> 0 bytes
+ WebBuilder/utils/generator/project_generator.py    | 114 ++--
+ WebBuilder/utils/llm/consistency_checker.py        | 298 +++++++--
+ WebBuilder/utils/llm/design/__init__.py            |   0
+ WebBuilder/utils/llm/design/theme_rules.py         | 129 ++++
+ WebBuilder/utils/llm/enrich_prompt.py              | 266 +++++---
+ WebBuilder/utils/llm/generator_prompts.py          | 625 ++++++++++++------
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 18065 -> 18655 bytes
+ WebBuilder/views/assistant.py                      |  48 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 14 files changed, 2295 insertions(+), 408 deletions(-)
+=== 2026-04-15 | ricky morty ===
+
+ .../WebBuilder/partials/assistant/input.html       |   1 +
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 2 files changed, 1 insertion(+)
+=== 2026-04-13 | navbar.html ===
+
+ WebBuilder/static/css/navbar.css                |  48 ++-
+ WebBuilder/templates/WebBuilder/navbar.html     |  68 +--
+ WebBuilder/templates/WebBuilder/navbar_old.html | 345 ++++++++++++++++
+ db.sqlite3                                      | Bin 10354688 -> 10354688 bytes
+ locale/en/LC_MESSAGES/django.po                 | 529 +++++++++++++++---------
+ 5 files changed, 751 insertions(+), 239 deletions(-)
+=== 2026-04-13 | metrics site render ===
+
+ WebBuilder/static/css/site_render.css            | 274 +++++++++++++++++++++++
+ WebBuilder/templates/WebBuilder/site_render.html | 169 +++++++++++---
+ WebBuilder/utils/generator/llm_wrappers.py       |   2 +-
+ WebBuilder/views/site.py                         |  54 ++++-
+ db.sqlite3                                       | Bin 10354688 -> 10354688 bytes
+ 5 files changed, 462 insertions(+), 37 deletions(-)
+=== 2026-04-13 | error deploy fixed + requirements ===
+
+ WebBuilder/utils/generator/llm_wrappers.py      |  22 +++++++++++++++++++++-
+ WebBuilder/utils/generator/project_generator.py |  16 +++++++++++++---
+ WebBuilder/utils/generator/static_files.py      |   7 ++++---
+ WebBuilder/utils/llm/generator_prompts.py       |   3 +++
+ db.sqlite3                                      | Bin 10354688 -> 10354688 bytes
+ 5 files changed, 41 insertions(+), 7 deletions(-)
+=== 2026-04-12 | Light mode ===
+
+ WebBuilder/static/css/assistant/base.css           |  78 +++++++++++---------
+ WebBuilder/static/css/assistant/editor.css         |  25 +++++--
+ WebBuilder/static/css/assistant/form.css           |  34 ++++-----
+ WebBuilder/static/css/assistant/loading.css        |   6 +-
+ WebBuilder/static/css/assistant/schema.css         |   2 +-
+ WebBuilder/static/css/code_viewer.css              |  12 ++--
+ WebBuilder/static/css/colors.css                   |  56 ++++++++++++++-
+ WebBuilder/static/css/edit.css                     |  80 ++++++++++-----------
+ WebBuilder/static/css/history.css                  |  32 ++++++++-
+ WebBuilder/static/css/home/base.css                |  19 -----
+ WebBuilder/static/css/home/hero.css                |  25 +++----
+ WebBuilder/static/css/metrics.css                  |   8 +--
+ WebBuilder/static/css/navbar.css                   |   5 +-
+ .../WebBuilder/partials/assistant/input.html       |   2 -
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 15 files changed, 234 insertions(+), 150 deletions(-)
+=== 2026-04-11 | Translate + light mode ===
+
+ WebBuilder/docs/Mejoras/OrdenModoClaro.md          |    5 +
+ WebBuilder/docs/Mejoras/UpdatesV2.md               |   10 +-
+ WebBuilder/static/css/history.css                  |   10 +-
+ WebBuilder/static/css/login.css                    |   39 +-
+ WebBuilder/static/css/metrics.css                  |   13 -
+ WebBuilder/static/css/profile.css                  |   70 +-
+ WebBuilder/templates/WebBuilder/assistant.html     |   57 +-
+ WebBuilder/templates/WebBuilder/base.html          |   10 +-
+ WebBuilder/templates/WebBuilder/code_viewer.html   |  427 ++++-
+ WebBuilder/templates/WebBuilder/edit.html          |  145 +-
+ WebBuilder/templates/WebBuilder/metrics.html       |   24 +-
+ WebBuilder/templates/WebBuilder/navbar.html        |   64 +-
+ .../WebBuilder/partials/assistant/analysis.html    |   21 +-
+ .../WebBuilder/partials/assistant/input.html       |  127 +-
+ .../WebBuilder/partials/assistant/preview.html     |   23 +-
+ .../partials/history/published_sites.html          |   53 +-
+ .../partials/history/recent_analysis.html          |   55 +-
+ .../templates/WebBuilder/partials/home/cta.html    |   10 +-
+ .../WebBuilder/partials/home/examples.html         |   20 +-
+ .../templates/WebBuilder/partials/home/hero.html   |  162 +-
+ .../templates/WebBuilder/partials/home/how.html    |   36 +-
+ .../templates/WebBuilder/partials/home/llms.html   |   82 +-
+ .../WebBuilder/partials/home/metrics.html          |   10 +-
+ .../WebBuilder/partials/metrics/activity.html      |   27 +-
+ .../WebBuilder/partials/metrics/alerts.html        |   29 +-
+ .../WebBuilder/partials/metrics/generations.html   |   23 +-
+ .../templates/WebBuilder/partials/metrics/llm.html |   45 +-
+ .../WebBuilder/partials/metrics/summary.html       |   55 +-
+ .../WebBuilder/partials/metrics/users.html         |   34 +-
+ WebBuilder/templates/WebBuilder/profile.html       |   21 +-
+ WebBuilder/templates/WebBuilder/site_render.html   |  105 +-
+ WebBuilder/templates/registration/login.html       |   17 +-
+ WebBuilder/templates/registration/register.html    |   26 +-
+ db.sqlite3                                         |  Bin 10354688 -> 10354688 bytes
+ locale/en/LC_MESSAGES/django.mo                    |  Bin 10210 -> 32892 bytes
+ locale/en/LC_MESSAGES/django.po                    | 1712 +++++++++++++++++++-
+ 36 files changed, 2788 insertions(+), 779 deletions(-)
+=== 2026-04-11 | code viewer new ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 3094 -> 3212 bytes
+ WebBuilder/static/css/code_viewer.css              | 307 ++++++++++
+ WebBuilder/static/js/code_viewer.js                | 238 ++++++++
+ WebBuilder/static/js/site_render_old.js            | 679 ---------------------
+ WebBuilder/templates/WebBuilder/code_viewer.html   |  97 +++
+ WebBuilder/templates/WebBuilder/site_render.html   |   4 +
+ .../templates/WebBuilder/site_render_old.html      | 397 ------------
+ WebBuilder/urls.py                                 |   1 +
+ WebBuilder/views/__init__.py                       |   2 +
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 995 -> 1027 bytes
+ WebBuilder/views/site.py                           |  13 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 12 files changed, 661 insertions(+), 1077 deletions(-)
+=== 2026-04-11 | refactor site render ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 2976 -> 3094 bytes
+ WebBuilder/docs/{boot => Apuntes/boot.md}          |   0
+ WebBuilder/docs/Mejoras/UpdatesV2.md               |  16 +-
+ WebBuilder/docs/Prompts/cssAssistan.md             |  40 --
+ WebBuilder/static/css/site_render.css              | 391 +++++++++++
+ WebBuilder/static/js/edit.js                       |  67 +-
+ WebBuilder/static/js/site_render.js                | 751 ++++++---------------
+ WebBuilder/static/js/site_render_old.js            | 679 +++++++++++++++++++
+ WebBuilder/templates/WebBuilder/edit.html          |  19 +-
+ .../WebBuilder/partials/assistant/input.html       |   8 +-
+ WebBuilder/templates/WebBuilder/site_render.html   | 340 ++++------
+ .../templates/WebBuilder/site_render_old.html      | 397 +++++++++++
+ WebBuilder/urls.py                                 |   4 +-
+ WebBuilder/utils/generator/project_generator.py    |   4 +-
+ WebBuilder/utils/llm/consistency_checker.py        |  40 ++
+ WebBuilder/views/__init__.py                       |   2 +
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 963 -> 995 bytes
+ WebBuilder/views/edit.py                           |  26 +-
+ WebBuilder/views/site.py                           |  89 ++-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 20 files changed, 2018 insertions(+), 855 deletions(-)
+=== 2026-04-11 | remove _old ===
+
+ WebBuilder/docs/Mejoras/UpdatesV2.md               |   9 +-
+ WebBuilder/static/css/assistant_old/base.css       | 324 ---------------
+ WebBuilder/static/css/assistant_old/editor.css     | 460 ---------------------
+ WebBuilder/static/css/assistant_old/form.css       | 458 --------------------
+ WebBuilder/static/css/assistant_old/loading.css    |  74 ----
+ WebBuilder/static/css/assistant_old/schema.css     | 101 -----
+ WebBuilder/static/css/edit_old.css                 | 290 -------------
+ WebBuilder/static/css/history_old.css              | 312 --------------
+ WebBuilder/static/css/login_old.css                | 294 -------------
+ WebBuilder/templates/WebBuilder/assistant_old.html | 123 ------
+ WebBuilder/templates/WebBuilder/edit_old.html      | 342 ---------------
+ .../templates/WebBuilder/history_BORRAR.html       |  65 ---
+ .../partials/assistant_old/analysis.html           |  39 --
+ .../WebBuilder/partials/assistant_old/input.html   | 308 --------------
+ .../WebBuilder/partials/assistant_old/preview.html |  93 -----
+ .../partials/history/published_sites_old.html      | 163 --------
+ .../partials/history/recent_analysis_old.html      | 181 --------
+ WebBuilder/templates/registration/login_old.html   | 117 ------
+ .../templates/registration/register_old.html       | 143 -------
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 20 files changed, 4 insertions(+), 3892 deletions(-)
+=== 2026-04-10 | Login/Register refactor ===
+
+ WebBuilder/static/css/history.css                  |   6 +-
+ WebBuilder/static/css/login.css                    | 344 +++++++--------------
+ WebBuilder/static/css/login_old.css                | 294 ++++++++++++++++++
+ WebBuilder/templates/WebBuilder/assistant.html     |   6 +-
+ WebBuilder/templates/WebBuilder/edit.html          |   8 +-
+ .../partials/history/published_sites.html          |   4 +-
+ .../partials/history/recent_analysis.html          |   4 +-
+ WebBuilder/templates/registration/login.html       | 124 +++-----
+ WebBuilder/templates/registration/login_old.html   | 117 +++++++
+ WebBuilder/templates/registration/register.html    | 166 ++++------
+ .../templates/registration/register_old.html       | 143 +++++++++
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 12 files changed, 777 insertions(+), 439 deletions(-)
+=== 2026-04-10 | Refactro history ===
+
+ WebBuilder/static/css/assistant/base.css           |   2 +-
+ WebBuilder/static/css/history.css                  | 403 ++++++++++++---------
+ .../{history.html => history_BORRAR.html}          |   0
+ .../partials/history/published_sites.html          | 230 +++++-------
+ .../partials/history/recent_analysis.html          | 275 +++++++-------
+ .../ingest/__pycache__/parsers.cpython-312.pyc     | Bin 5204 -> 4932 bytes
+ WebBuilder/utils/ingest/parsers.py                 |  14 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 8 files changed, 463 insertions(+), 461 deletions(-)
+=== 2026-04-09 | colors edit and users ===
+
+ WebBuilder/static/css/edit.css                     | 552 ++++++++++++++++++---
+ WebBuilder/static/css/edit_old.css                 | 290 +++++++++++
+ WebBuilder/static/css/history.css                  | 414 +++++++++-------
+ WebBuilder/static/css/history_old.css              | 312 ++++++++++++
+ WebBuilder/static/js/edit.js                       | 117 +++++
+ WebBuilder/templates/WebBuilder/edit.html          | 198 +++++---
+ WebBuilder/templates/WebBuilder/edit_old.html      | 342 +++++++++++++
+ .../WebBuilder/partials/assistant/input.html       |   2 +-
+ .../WebBuilder/partials/assistant/preview.html     |   2 +-
+ .../partials/history/published_sites.html          |  35 +-
+ .../partials/history/published_sites_old.html      | 163 ++++++
+ .../partials/history/recent_analysis.html          |  50 +-
+ .../partials/history/recent_analysis_old.html      | 181 +++++++
+ WebBuilder/views/site.py                           |   8 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 15 files changed, 2290 insertions(+), 376 deletions(-)
+=== 2026-04-09 | colors assistant ===
+
+ WebBuilder/docs/Codigos/PruebaHome/pruebaHome.css  |  943 -----------
+ WebBuilder/docs/Codigos/PruebaHome/pruebaHome.html | 1379 ---------------
+ WebBuilder/docs/Codigos/PruebaHome/pruebaHome.js   |  130 --
+ .../docs/Codigos/Refactors/assistant_old.html      |  347 ----
+ WebBuilder/docs/Codigos/Refactors/history_old.html |  217 ---
+ WebBuilder/docs/Codigos/Refactors/home_morado.html |  578 -------
+ WebBuilder/docs/Codigos/Refactors/home_new.html    |  845 ----------
+ WebBuilder/docs/Codigos/Refactors/home_old.css     |  812 ---------
+ WebBuilder/docs/Codigos/Refactors/home_old.js      |   58 -
+ WebBuilder/docs/Codigos/Refactors/home_old_.css    | 1777 --------------------
+ .../Codigos/Refactors/project_generator-old.py     |  838 ---------
+ WebBuilder/docs/Prompts/cssAssistan.md             |   40 +
+ WebBuilder/docs/boot                               |    2 +
+ WebBuilder/static/css/assistant/base.css           |  616 +++++--
+ WebBuilder/static/css/assistant/editor.css         |  599 +++----
+ WebBuilder/static/css/assistant/form.css           |  832 ++++++---
+ WebBuilder/static/css/assistant/loading.css        |  120 +-
+ WebBuilder/static/css/assistant/schema.css         |  212 ++-
+ WebBuilder/static/css/assistant_old/base.css       |  324 ++++
+ WebBuilder/static/css/assistant_old/editor.css     |  460 +++++
+ WebBuilder/static/css/assistant_old/form.css       |  458 +++++
+ WebBuilder/static/css/assistant_old/loading.css    |   74 +
+ WebBuilder/static/css/assistant_old/schema.css     |  101 ++
+ WebBuilder/static/css/colors.css                   |   54 +
+ WebBuilder/static/js/assistant.js                  |   61 +
+ WebBuilder/templates/WebBuilder/assistant.html     |   98 +-
+ WebBuilder/templates/WebBuilder/assistant_old.html |  123 ++
+ WebBuilder/templates/WebBuilder/base.html          |    1 +
+ .../WebBuilder/partials/assistant/input.html       |  122 +-
+ .../WebBuilder/partials/assistant/preview.html     |   29 -
+ .../partials/assistant_old/analysis.html           |   39 +
+ .../WebBuilder/partials/assistant_old/input.html   |  308 ++++
+ .../WebBuilder/partials/assistant_old/preview.html |   93 +
+ .../views/__pycache__/assistant.cpython-312.pyc    |  Bin 17994 -> 18065 bytes
+ WebBuilder/views/assistant.py                      |    2 +
+ db.sqlite3                                         |  Bin 10354688 -> 10354688 bytes
+ 36 files changed, 3772 insertions(+), 8920 deletions(-)
+=== 2026-04-08 | Connect process generator ===
+
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 8154 -> 8240 bytes
+ WebBuilder/docs/Mejoras/Updates.png                | Bin 0 -> 186495 bytes
+ WebBuilder/docs/Mejoras/UpdatesV2.md               |  13 ++-----
+ WebBuilder/docs/Mejoras/UpdatesV2.png              | Bin 347491 -> 0 bytes
+ .../0015_generatedsite_generation_step.py          |  18 +++++++++
+ WebBuilder/models.py                               |   3 +-
+ WebBuilder/static/css/assistant/loading.css        |   2 +-
+ WebBuilder/static/js/site_render.js                |  41 +++++++++++++++------
+ WebBuilder/templates/WebBuilder/site_render.html   |  14 +++----
+ WebBuilder/utils/generator/project_generator.py    |  34 ++++++++++++++---
+ WebBuilder/views/site.py                           |   2 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 12 files changed, 92 insertions(+), 35 deletions(-)
+=== 2026-04-08 | csv/GEOjson ===
+
+ WebBuilder/__pycache__/forms.cpython-312.pyc       | Bin 3513 -> 4497 bytes
+ WebBuilder/forms.py                                |  29 ++++++---
+ WebBuilder/static/css/assistant/base.css           |  12 ++++
+ WebBuilder/static/js/assistant.js                  |  20 +++++-
+ .../WebBuilder/partials/assistant/input.html       |   3 +
+ .../ingest/__pycache__/parsers.cpython-312.pyc     | Bin 1969 -> 5204 bytes
+ .../ingest/__pycache__/url_reader.cpython-312.pyc  | Bin 3881 -> 4128 bytes
+ WebBuilder/utils/ingest/parsers.py                 |  69 ++++++++++++++++++---
+ WebBuilder/utils/ingest/url_reader.py              |   9 ++-
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 17974 -> 17994 bytes
+ WebBuilder/views/assistant.py                      |   4 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 12 files changed, 123 insertions(+), 23 deletions(-)
+=== 2026-04-08 | REFACTOR V1 Funcional ===
+
+ WebBuilder/docs/Mejoras/UpdatesV2.md            |  19 +-
+ WebBuilder/templates/WebBuilder/base_old.html   |  58 --
+ WebBuilder/templates/WebBuilder/navbar_old.html | 285 ----------
+ WebBuilder/utils/llm/examples/__init__.py       |  25 +
+ WebBuilder/utils/llm/examples/blog.py           | 177 ++++++
+ WebBuilder/utils/llm/examples/catalog.py        | 221 ++++++++
+ WebBuilder/utils/llm/examples/dashboard.py      | 130 +++++
+ WebBuilder/utils/llm/examples/portfolio.py      | 143 +++++
+ WebBuilder/utils/llm/generator_prompts.py       |   2 +-
+ WebBuilder/utils/llm/template_examples.py       | 704 ------------------------
+ WebBuilder/views/assistant_old.py               | 505 -----------------
+ 11 files changed, 698 insertions(+), 1571 deletions(-)
+=== 2026-04-08 | Refactors ===
+
+ WebBuilder/docs/Mejoras/UpdatesV2.md               |   16 +
+ WebBuilder/static/css/assistant.css                | 1316 --------------------
+ WebBuilder/static/css/assistant/base.css           |  312 +++++
+ WebBuilder/static/css/assistant/editor.css         |  460 +++++++
+ WebBuilder/static/css/assistant/form.css           |  458 +++++++
+ WebBuilder/static/css/assistant/loading.css        |   74 ++
+ WebBuilder/static/css/assistant/schema.css         |  101 ++
+ WebBuilder/static/css/home/base_old.css            |  162 ---
+ WebBuilder/static/css/llm_selector.css             |   99 --
+ WebBuilder/static/css/metrics.css                  |   85 +-
+ WebBuilder/static/js/site_render.js                |  572 ++++++---
+ WebBuilder/templates/WebBuilder/assistant.html     |    7 +
+ WebBuilder/templates/WebBuilder/base.html          |    6 -
+ WebBuilder/templates/WebBuilder/base_old.html      |   58 +
+ WebBuilder/templates/WebBuilder/edit.html          |    7 +
+ WebBuilder/templates/WebBuilder/history.html       |    5 +-
+ WebBuilder/templates/WebBuilder/metrics.html       |  490 +-------
+ .../WebBuilder/partials/metrics/activity.html      |   78 ++
+ .../WebBuilder/partials/metrics/alerts.html        |   68 +
+ .../WebBuilder/partials/metrics/generations.html   |   46 +
+ .../templates/WebBuilder/partials/metrics/llm.html |  106 ++
+ .../WebBuilder/partials/metrics/summary.html       |  104 ++
+ .../WebBuilder/partials/metrics/users.html         |   68 +
+ WebBuilder/templates/WebBuilder/site_render.html   |  135 +-
+ .../views/__pycache__/assistant.cpython-312.pyc    |  Bin 18005 -> 17974 bytes
+ WebBuilder/views/assistant.py                      |  168 +--
+ WebBuilder/views/assistant_old.py                  |  505 ++++++++
+ db.sqlite3                                         |  Bin 10354688 -> 10354688 bytes
+ 28 files changed, 3056 insertions(+), 2450 deletions(-)
+=== 2026-04-08 | arreglo schema ===
+
+ WebBuilder/docs/Mejoras/UpdatesV2.md |  17 +++++++----------
+ WebBuilder/utils/llm/client.py       |   6 ++++--
+ db.sqlite3                           | Bin 10354688 -> 10354688 bytes
+ 3 files changed, 11 insertions(+), 12 deletions(-)
+=== 2026-04-08 | eleccion llm + llm personalizados ===
+
+ WebBuilder/__pycache__/forms.cpython-312.pyc       | Bin 2483 -> 3513 bytes
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 7307 -> 8154 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 2898 -> 2976 bytes
+ .../LLMPersonalizado/cifradoapikey.md              |  16 +
+ .../docs/Documentacion/LLMPersonalizado/memoria.md | 111 ++++
+ WebBuilder/docs/Mejoras/UpdatesV2.md               |   2 +-
+ WebBuilder/forms.py                                |  36 +-
+ WebBuilder/migrations/0014_userprofile.py          |  27 +
+ WebBuilder/models.py                               |  16 +-
+ WebBuilder/static/css/llm_selector.css             |  99 +++
+ WebBuilder/static/css/navbar_old.css               | 662 ---------------------
+ WebBuilder/static/css/profile.css                  | 276 +++++++++
+ WebBuilder/templates/WebBuilder/base.html          |   2 +
+ .../WebBuilder/partials/assistant/input.html       |  61 +-
+ WebBuilder/templates/WebBuilder/profile.html       |  67 +++
+ WebBuilder/urls.py                                 |   1 +
+ WebBuilder/utils/llm/client.py                     |   9 +-
+ WebBuilder/utils/llm/llm_catalog.py                |  32 +
+ WebBuilder/utils/llm/planner.py                    |  12 +-
+ WebBuilder/views/__init__.py                       |   3 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 940 -> 963 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 15350 -> 18005 bytes
+ WebBuilder/views/__pycache__/pages.cpython-312.pyc | Bin 1474 -> 2554 bytes
+ WebBuilder/views/assistant.py                      |  73 ++-
+ WebBuilder/views/pages.py                          |  25 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 4020 -> 4131 bytes
+ project/settings.py                                |   8 +-
+ 28 files changed, 859 insertions(+), 679 deletions(-)
+=== 2026-04-07 | metrics ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 2806 -> 2898 bytes
+ .../docs/Mejoras/{Mejoras.md => PopurriMejoras.md} |   0
+ WebBuilder/docs/Mejoras/UpdatesV2.md               |  31 +
+ WebBuilder/docs/Mejoras/UpdatesV2.png              | Bin 0 -> 347491 bytes
+ WebBuilder/docs/Mejoras/image.png                  | Bin 159363 -> 0 bytes
+ WebBuilder/docs/Mejoras/mejorasClaude.png          | Bin 322195 -> 0 bytes
+ .../docs/Mejoras/mejoras_generacion_paginas.md     | 863 ---------------------
+ WebBuilder/static/css/metrics.css                  | 478 ++++++++++++
+ WebBuilder/static/js/metrics.js                    | 105 +++
+ WebBuilder/templates/WebBuilder/base.html          |   1 +
+ WebBuilder/templates/WebBuilder/metrics.html       | 563 ++++++++++++++
+ WebBuilder/templates/WebBuilder/navbar.html        |   7 +
+ WebBuilder/templates/admin/metrics.html            | 293 -------
+ WebBuilder/urls.py                                 |   2 +
+ WebBuilder/views/__init__.py                       |   4 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 890 -> 940 bytes
+ WebBuilder/views/metrics.py                        | 252 ++++--
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 3995 -> 4020 bytes
+ project/__pycache__/urls.cpython-312.pyc           | Bin 1435 -> 1300 bytes
+ project/settings.py                                |   1 +
+ project/urls.py                                    |   4 -
+ zzzz.md                                            |  42 -
+ 23 files changed, 1395 insertions(+), 1251 deletions(-)
+=== 2026-04-07 | user/superuser pages ===
+
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 6191 -> 7307 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 2684 -> 2806 bytes
+ WebBuilder/migrations/0013_siteuser.py             |  27 +++++
+ WebBuilder/models.py                               |  26 +++-
+ WebBuilder/static/css/assistant.css                |  35 ++++++
+ WebBuilder/templates/WebBuilder/site_render.html   | 104 ++++++++++++++++
+ WebBuilder/urls.py                                 |   2 +
+ WebBuilder/utils/generator/project_generator.py    |  39 +++++-
+ WebBuilder/utils/generator/static_files.py         | 134 ++++++++++++++++++++-
+ WebBuilder/utils/llm/generator_prompts.py          |   1 +
+ WebBuilder/views/__init__.py                       |   2 +
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 854 -> 890 bytes
+ WebBuilder/views/site.py                           |  34 +++++-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ zzzz.md                                            |  42 +++++++
+ 15 files changed, 435 insertions(+), 11 deletions(-)
+=== 2026-04-07 | history versions ===
+
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 5026 -> 6191 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 2254 -> 2684 bytes
+ WebBuilder/migrations/0012_siteversion.py          |  28 +
+ WebBuilder/models.py                               |  22 +-
+ WebBuilder/static/css/assistant.css                |  57 +-
+ WebBuilder/static/css/history.css                  |  18 +
+ WebBuilder/static/css/home/base.css                |  22 +
+ WebBuilder/static/css/home/hero_old.css            | 766 ---------------------
+ WebBuilder/static/js/site_render.js                |   1 +
+ .../partials/history/published_sites.html          |  11 +
+ WebBuilder/templates/WebBuilder/site_render.html   |  91 ++-
+ WebBuilder/urls.py                                 |   5 +
+ WebBuilder/utils/generator/llm_wrappers.py         |  40 +-
+ WebBuilder/views/__init__.py                       |  18 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 752 -> 854 bytes
+ WebBuilder/views/site.py                           |  87 ++-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 17 files changed, 371 insertions(+), 795 deletions(-)
+=== 2026-04-06 | Idiomas ===
+
+ WebBuilder/docs/Documentacion/Idiomas/comandos.md  |   6 +
+ .../docs/Documentacion/Idiomas/settingsoriginal.md | 174 ++++
+ WebBuilder/docs/Mejoras/Mejoras.md                 |   4 +
+ WebBuilder/static/css/navbar.css                   | 957 +++++++++------------
+ WebBuilder/static/css/navbar_old.css               | 662 ++++++++++++++
+ WebBuilder/templates/WebBuilder/home.html          |   2 +-
+ WebBuilder/templates/WebBuilder/navbar.html        | 257 ++++--
+ WebBuilder/templates/WebBuilder/navbar_old.html    | 285 ++++++
+ .../templates/WebBuilder/partials/home/cta.html    |  34 +-
+ .../WebBuilder/partials/home/examples.html         | 253 +++---
+ .../templates/WebBuilder/partials/home/hero.html   | 584 ++++++-------
+ .../templates/WebBuilder/partials/home/how.html    | 150 ++--
+ .../templates/WebBuilder/partials/home/llms.html   | 326 +++----
+ .../WebBuilder/partials/home/metrics.html          |  24 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ locale/en/LC_MESSAGES/django.mo                    | Bin 0 -> 10210 bytes
+ locale/en/LC_MESSAGES/django.po                    | 689 +++++++++++++++
+ project/__pycache__/settings.cpython-312.pyc       | Bin 3833 -> 3995 bytes
+ project/__pycache__/urls.cpython-312.pyc           | Bin 1246 -> 1435 bytes
+ project/settings.py                                |  15 +-
+ project/urls.py                                    |   7 +-
+ 21 files changed, 3119 insertions(+), 1310 deletions(-)
+=== 2026-04-06 | intento de visor ===
+
+ .../WebBuilder/partials/assistant/preview.html     |  18 ++-
+ WebBuilder/utils/generator/llm_wrappers.py         |   2 +-
+ WebBuilder/utils/generator/project_generator.py    |   3 +-
+ WebBuilder/utils/llm/consistency_checker.py        |  44 ++++-
+ WebBuilder/utils/llm/enrich_prompt.py              | 177 ++++++++++++++++-----
+ WebBuilder/utils/llm/generator_prompts.py          |  63 ++++++--
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 7 files changed, 234 insertions(+), 73 deletions(-)
+=== 2026-04-06 | prompt guiado user ===
+
+ WebBuilder/docs/Mejoras/Mejoras.md                 |  35 +-
+ WebBuilder/docs/Mejoras/mejorasClaude.png          | Bin 0 -> 322195 bytes
+ .../docs/Mejoras/mejoras_generacion_paginas.md     | 863 +++++++++++++++++++++
+ WebBuilder/static/css/assistant.css                | 226 +++++-
+ WebBuilder/static/js/assistant.js                  |  68 ++
+ .../WebBuilder/partials/assistant/input.html       | 210 ++++-
+ WebBuilder/utils/llm/generator_prompts.py          | 101 ++-
+ WebBuilder/utils/llm/template_examples.py          | 690 ++++++++++++++--
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 9 files changed, 2089 insertions(+), 104 deletions(-)
+=== 2026-03-31 | dark/light mode ===
+
+ WebBuilder/docs/Mejoras/Mejoras.md          |   2 -
+ WebBuilder/static/css/home/base.css         |  25 +-
+ WebBuilder/static/css/home/base_old.css     | 162 ++++++
+ WebBuilder/static/css/home/cta.css          |   8 +-
+ WebBuilder/static/css/home/examples.css     |  36 +-
+ WebBuilder/static/css/home/hero.css         |   6 +-
+ WebBuilder/static/css/home/hero_old.css     | 766 ++++++++++++++++++++++++++++
+ WebBuilder/static/css/home/how.css          |   2 +-
+ WebBuilder/static/css/home/llms.css         |  14 +-
+ WebBuilder/static/css/home/metrics.css      |   2 +-
+ WebBuilder/static/css/navbar.css            |  31 ++
+ WebBuilder/templates/WebBuilder/navbar.html |  20 +
+ 12 files changed, 1046 insertions(+), 28 deletions(-)
+=== 2026-03-31 | history-fichs-metrics ===
+
+ WebBuilder/__pycache__/admin.cpython-312.pyc       |  Bin 17356 -> 20824 bytes
+ WebBuilder/__pycache__/forms.cpython-312.pyc       |  Bin 2271 -> 2483 bytes
+ WebBuilder/__pycache__/models.cpython-312.pyc      |  Bin 4893 -> 5026 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        |  Bin 1813 -> 2254 bytes
+ WebBuilder/admin.py                                |   81 +-
+ WebBuilder/docs/Apuntes/prompt.md                  |   27 -
+ WebBuilder/docs/Mejoras/ARREGLAR.md                |    4 -
+ WebBuilder/docs/Mejoras/Mejoras.md                 |   41 +-
+ WebBuilder/forms.py                                |   11 +-
+ .../migrations/0011_apirequest_input_type.py       |   18 +
+ WebBuilder/models.py                               |    6 +
+ WebBuilder/static/css/assistant.css                |   35 +
+ WebBuilder/static/css/history.css                  |  108 ++
+ WebBuilder/static/css/home/base.css                |   51 +-
+ WebBuilder/static/css/home/hero.css                |    6 +-
+ WebBuilder/static/js/assistant.js                  |   19 +
+ WebBuilder/static/js/home.js                       |   22 +
+ .../WebBuilder/partials/assistant/input.html       |   20 +-
+ .../partials/history/published_sites.html          |  181 ++-
+ .../partials/history/recent_analysis.html          |  240 +++-
+ .../templates/WebBuilder/partials/home/cta.html    |    6 +-
+ .../WebBuilder/partials/home/examples.html         |    7 +-
+ .../templates/WebBuilder/partials/home/how.html    |   16 +-
+ .../templates/WebBuilder/partials/home/llms.html   |    8 +-
+ .../WebBuilder/partials/home/metrics.html          |   10 +-
+ WebBuilder/templates/admin/metrics.html            |  293 ++++
+ WebBuilder/urls.py                                 |    7 +-
+ WebBuilder/utils/generator/llm_wrappers.py         |    2 +-
+ .../ingest/__pycache__/url_reader.cpython-312.pyc  |  Bin 3288 -> 3881 bytes
+ WebBuilder/utils/ingest/url_reader.py              |   12 +
+ WebBuilder/views/__init__.py                       |    6 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     |  Bin 630 -> 752 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    |  Bin 15095 -> 15350 bytes
+ .../views/__pycache__/history.cpython-312.pyc      |  Bin 1199 -> 4432 bytes
+ WebBuilder/views/assistant.py                      |   11 +-
+ WebBuilder/views/history.py                        |   86 +-
+ WebBuilder/views/metrics.py                        |   74 +
+ db.sqlite3                                         |  Bin 10354688 -> 10354688 bytes
+ home_sections_v2.html                              | 1470 --------------------
+ project/__pycache__/urls.cpython-312.pyc           |  Bin 1111 -> 1246 bytes
+ project/urls.py                                    |    6 +
+ prueba_home.html                                   |  849 -----------
+ 42 files changed, 1201 insertions(+), 2532 deletions(-)
+=== 2026-03-31 | details home ===
+
+ WebBuilder/static/css/home/base.css                |  2 +-
+ WebBuilder/static/css/home/examples.css            | 37 ++++++++++++++++++----
+ WebBuilder/static/css/home/hero.css                | 12 ++++---
+ .../WebBuilder/partials/home/examples.html         |  4 +--
+ .../templates/WebBuilder/partials/home/hero.html   |  3 +-
+ 5 files changed, 43 insertions(+), 15 deletions(-)
+=== 2026-03-31 | refactor html/css ===
+
+ .../docs/{ => Codigos}/PruebaHome/pruebaHome.css   |   0
+ .../docs/{ => Codigos}/PruebaHome/pruebaHome.html  |   0
+ .../docs/{ => Codigos}/PruebaHome/pruebaHome.js    |   0
+ .../docs/Codigos/Refactors/assistant_old.html      | 347 ++++++++++
+ WebBuilder/docs/Codigos/Refactors/history_old.html | 217 ++++++
+ .../Codigos/Refactors/home_morado.html}            |   0
+ .../Codigos/Refactors}/home_new.html               |   0
+ .../css => docs/Codigos/Refactors}/home_old.css    |   0
+ .../js => docs/Codigos/Refactors}/home_old.js      |   0
+ .../Codigos/Refactors/home_old_.css}               |   0
+ .../Refactors}/project_generator-old.py            |   0
+ WebBuilder/static/css/home/base.css                | 113 +++
+ WebBuilder/static/css/home/cta.css                 |  89 +++
+ WebBuilder/static/css/home/examples.css            | 279 ++++++++
+ WebBuilder/static/css/home/hero.css                | 764 +++++++++++++++++++++
+ WebBuilder/static/css/home/how.css                 | 221 ++++++
+ WebBuilder/static/css/home/llms.css                | 321 +++++++++
+ WebBuilder/static/css/home/metrics.css             |  54 ++
+ WebBuilder/templates/WebBuilder/assistant.html     | 243 +------
+ WebBuilder/templates/WebBuilder/base.html          |  62 +-
+ WebBuilder/templates/WebBuilder/history.html       | 157 +----
+ WebBuilder/templates/WebBuilder/home.html          |  14 +-
+ .../WebBuilder/partials/assistant/analysis.html    |  39 ++
+ .../WebBuilder/partials/assistant/input.html       |  74 ++
+ .../WebBuilder/partials/assistant/preview.html     |  91 +++
+ .../partials/history/published_sites.html          |  55 ++
+ .../partials/history/recent_analysis.html          |  81 +++
+ .../templates/WebBuilder/site_render_old.html      | 434 ------------
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 29 files changed, 2798 insertions(+), 857 deletions(-)
+=== 2026-03-30 | new home ===
+
+ WebBuilder/docs/Mejoras/Mejoras.md                 |    8 +
+ WebBuilder/docs/PruebaHome/pruebaHome.css          |  943 +++++++
+ WebBuilder/docs/PruebaHome/pruebaHome.html         | 1379 +++++++++++
+ WebBuilder/docs/PruebaHome/pruebaHome.js           |  130 +
+ WebBuilder/docs/terminal/home.js                   |  127 -
+ WebBuilder/static/css/home.css                     | 2573 ++++++++++++++------
+ .../terminal/home.css => static/css/home_old.css}  |  148 +-
+ WebBuilder/static/js/home.js                       |  190 +-
+ WebBuilder/static/js/home_old.js                   |   58 +
+ WebBuilder/templates/WebBuilder/base.html          |    2 +
+ WebBuilder/templates/WebBuilder/home.html          |  579 +----
+ WebBuilder/templates/WebBuilder/home_new.html      |  845 +++++++
+ .../WebBuilder/home_old.html}                      |   24 +-
+ .../templates/WebBuilder/partials/home/cta.html    |   17 +
+ .../WebBuilder/partials/home/examples.html         |  149 ++
+ .../templates/WebBuilder/partials/home/hero.html   |  355 +++
+ .../templates/WebBuilder/partials/home/how.html    |   98 +
+ .../templates/WebBuilder/partials/home/llms.html   |  198 ++
+ .../WebBuilder/partials/home/metrics.html          |   12 +
+ db.sqlite3                                         |  Bin 10354688 -> 10354688 bytes
+ home_sections_v2.html                              | 1470 +++++++++++
+ prueba_home.html                                   |  849 +++++++
+ 22 files changed, 8449 insertions(+), 1705 deletions(-)
+=== 2026-03-30 | refactor generator ===
+
+ WebBuilder/docs/project_generator-old.py           | 838 +++++++++++++++++++++
+ WebBuilder/utils/generator/fallbacks.py            | 201 +++++
+ WebBuilder/utils/generator/llm_wrappers.py         |  94 +++
+ WebBuilder/utils/generator/migrations_generator.py | 111 +++
+ WebBuilder/utils/generator/project_generator.py    | 747 +++---------------
+ WebBuilder/utils/generator/static_files.py         | 203 +++++
+ WebBuilder/views/__pycache__/auth.cpython-312.pyc  | Bin 3025 -> 2998 bytes
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 3538 -> 3833 bytes
+ 9 files changed, 1547 insertions(+), 647 deletions(-)
+=== 2026-03-27 | Hacer mejoras y refactorizar generator ===
+
+ WebBuilder/docs/Mejoras/ARREGLAR.md             |  4 +++
+ WebBuilder/utils/generator/project_generator.py | 33 ++++++++++++++++++++++---
+ WebBuilder/utils/llm/generator_prompts.py       | 25 ++++++++++++-------
+ WebBuilder/views/auth.py                        |  9 +++----
+ WebBuilder/views/site.py                        | 10 ++------
+ project/settings.py                             |  5 ++--
+ 6 files changed, 56 insertions(+), 30 deletions(-)
+=== 2026-03-27 | no n8n refactor ===
+
+ WebBuilder/docs/Mejoras/Mejoras.md |  46 +++++++++++++++++++++++++++++++++++++
+ WebBuilder/docs/Mejoras/image.png  | Bin 0 -> 159363 bytes
+ WebBuilder/views/site.py           |  13 ++---------
+ project/settings.py                |  12 ++++------
+ 4 files changed, 53 insertions(+), 18 deletions(-)
+=== 2026-03-27 | Funcional sin csv ===
+
+ db.sqlite3 | Bin 10354688 -> 10354688 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+=== 2026-03-26 | minimal changes ===
+
+ WebBuilder/utils/generator/project_generator.py    |   3 ++-
+ .../ingest/__pycache__/url_reader.cpython-312.pyc  | Bin 3288 -> 3288 bytes
+ WebBuilder/utils/ingest/url_reader.py              |   2 +-
+ WebBuilder/utils/llm/enrich_prompt.py              |   2 ++
+ WebBuilder/utils/llm/field_extractor.py            |   1 -
+ WebBuilder/utils/llm/llm_utils.py                  |   2 +-
+ WebBuilder/utils/llm/planner.py                    |   2 +-
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 15095 -> 15095 bytes
+ WebBuilder/views/assistant.py                      |   2 +-
+ WebBuilder/views/site.py                           |   3 +++
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 11 files changed, 11 insertions(+), 6 deletions(-)
+=== 2026-03-23 | upgrades ===
+
+ WebBuilder/__pycache__/admin.cpython-312.pyc       | Bin 17257 -> 17356 bytes
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 3675 -> 4893 bytes
+ WebBuilder/admin.py                                |   3 +-
+ WebBuilder/migrations/0010_generationlog.py        |  29 ++++
+ WebBuilder/models.py                               |  21 ++-
+ WebBuilder/static/js/assistant.js                  |   8 ++
+ WebBuilder/templates/WebBuilder/assistant.html     |  27 +++-
+ .../analysis/__pycache__/detection.cpython-312.pyc | Bin 6799 -> 6799 bytes
+ WebBuilder/utils/analysis/detection.py             |   6 +-
+ WebBuilder/utils/generator/project_generator.py    | 159 +++++++++++++++++++--
+ WebBuilder/utils/llm/client.py                     |   2 +-
+ WebBuilder/utils/llm/consistency_checker.py        |  44 ++++++
+ WebBuilder/utils/llm/enrich_prompt.py              |  67 +++++++++
+ WebBuilder/utils/llm/field_extractor.py            |  18 +++
+ WebBuilder/utils/llm/generator_prompts.py          |  81 +++++++++--
+ WebBuilder/utils/llm/template_examples.py          | 112 +++++++++++++++
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 3217 -> 3538 bytes
+ project/settings.py                                |  30 +++-
+ 19 files changed, 572 insertions(+), 35 deletions(-)
+=== 2026-03-19 | tmp deploys ===
+
+ WebBuilder/utils/generator/project_generator.py |   7 ++++++-
+ WebBuilder/utils/llm/generator_prompts.py       |  14 +++++++++++---
+ WebBuilder/views/edit.py                        |   1 +
+ WebBuilder/views/site.py                        |   5 ++++-
+ db.sqlite3                                      | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc    | Bin 3242 -> 3217 bytes
+ project/settings.py                             |   8 ++++++--
+ 7 files changed, 28 insertions(+), 7 deletions(-)
+=== 2026-03-17 | edit zip ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1690 -> 1813 bytes
+ WebBuilder/static/css/assistant.css                | 370 ++++++++++++++
+ WebBuilder/static/js/site_render.js                | 421 ++++++++++++++++
+ WebBuilder/templates/WebBuilder/site_render.html   | 561 ++++++++-------------
+ .../templates/WebBuilder/site_render_old.html      | 434 ++++++++++++++++
+ WebBuilder/urls.py                                 |   2 +
+ WebBuilder/views/__init__.py                       |   2 +
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 593 -> 630 bytes
+ WebBuilder/views/site.py                           |  32 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 10 files changed, 1478 insertions(+), 344 deletions(-)
+=== 2026-03-16 | docs + finish docker up n8n ===
+
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 3388 -> 3675 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1451 -> 1690 bytes
+ .../Documentacion/FlujoDocker/parteWebBuilder.md   | 403 +++++++++++++
+ .../docs/Documentacion/FlujoDocker/parten8n.md     | 641 +++++++++++++++++++++
+ .../{ => LLMimplementacion}/implementacion_ia.md   |   0
+ .../Documentacion/{ => LoginRegister}/n8n_login.md |   0
+ .../n8n_register.md}                               |   0
+ .../Documentacion/instalacion_dockerWebBuilder.md  | 228 --------
+ .../{docker_n8n.md => instalacion_docker_n8n.md}   |   0
+ .../0009_generatedsite_deploy_error_and_more.py    |  23 +
+ WebBuilder/models.py                               |  15 +
+ WebBuilder/static/css/assistant.css                |  31 +
+ WebBuilder/templates/WebBuilder/base.html          |  11 +
+ WebBuilder/templates/WebBuilder/site_render.html   | 300 ++++++++--
+ WebBuilder/urls.py                                 |   1 +
+ WebBuilder/utils/generator/project_generator.py    |  85 +++
+ WebBuilder/views/__init__.py                       |  17 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 548 -> 593 bytes
+ WebBuilder/views/site.py                           | 126 +++-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 2969 -> 3242 bytes
+ project/settings.py                                |   4 +-
+ 22 files changed, 1577 insertions(+), 308 deletions(-)
+=== 2026-03-15 | Update docker, files ===
+
+ README.md                                        | 105 +++++++++++++++++------
+ WebBuilder/docs/Apuntes/dudas.md                 |   4 -
+ WebBuilder/templates/WebBuilder/site_render.html |  10 +++
+ WebBuilder/urls.py                               |   2 +
+ WebBuilder/views/__init__.py                     |   2 +-
+ WebBuilder/views/site.py                         |  65 +++++++++++++-
+ db.sqlite3                                       | Bin 10354688 -> 10354688 bytes
+ project/settings.py                              |   3 +
+ 8 files changed, 158 insertions(+), 33 deletions(-)
+=== 2026-03-05 | terminal home ===
+
+ WebBuilder/docs/Apuntes/prompt.md               |  27 +
+ WebBuilder/docs/llm/themerOriginalGeneracion.py | 336 ---------
+ WebBuilder/docs/terminal/home.css               | 940 ++++++++++++++++++++++++
+ WebBuilder/docs/terminal/home.html              | 598 +++++++++++++++
+ WebBuilder/docs/terminal/home.js                | 127 ++++
+ 5 files changed, 1692 insertions(+), 336 deletions(-)
+=== 2026-03-03 | despliege dockern8n ===
+
+ WebBuilder/docs/Apuntes/despliege.md               |  10 +
+ WebBuilder/docs/Apuntes/fallollm.md                |  36 ----
+ WebBuilder/docs/Apuntes/prompt.txt                 |  33 ---
+ .../Documentacion/instalacion_dockerWebBuilder.md  | 228 +++++++++++++++++++++
+ WebBuilder/docs/Documentacion/n8n_login2.md        |   6 +-
+ WebBuilder/views/__pycache__/auth.cpython-312.pyc  | Bin 2280 -> 3025 bytes
+ WebBuilder/views/auth.py                           |  13 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 8 files changed, 254 insertions(+), 72 deletions(-)
+=== 2026-03-03 | First web ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1339 -> 1451 bytes
+ WebBuilder/templates/WebBuilder/site_render.html   |  68 +++++++++++++++++++++
+ WebBuilder/urls.py                                 |   2 +-
+ WebBuilder/utils/generator/project_generator.py    |   2 +-
+ WebBuilder/utils/llm/generator_prompts.py          |  13 +++-
+ WebBuilder/views/__init__.py                       |   3 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 501 -> 548 bytes
+ WebBuilder/views/site.py                           |  62 +++++++++++++------
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 9 files changed, 124 insertions(+), 26 deletions(-)
+=== 2026-03-03 | groq ia ===
+
+ README.md                                       |  75 ++++++++++++++++--------
+ WebBuilder/utils/generator/project_generator.py |   2 +-
+ db.sqlite3                                      | Bin 10354688 -> 10354688 bytes
+ 3 files changed, 50 insertions(+), 27 deletions(-)
+=== 2026-03-02 | zip generator ===
+
+ WebBuilder/__pycache__/admin.cpython-312.pyc       | Bin 16766 -> 17257 bytes
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 3014 -> 3388 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1376 -> 1339 bytes
+ WebBuilder/admin.py                                | 145 ++---
+ WebBuilder/docs/Apuntes/fallollm.md                |  36 ++
+ WebBuilder/docs/Apuntes/prompt.txt                 | 194 ++-----
+ ..._css_generatedsite_generation_error_and_more.py |  42 ++
+ WebBuilder/models.py                               |  29 +-
+ WebBuilder/templates/WebBuilder/assistant.html     |   3 +-
+ WebBuilder/templates/WebBuilder/site_render.html   | 385 +++++---------
+ WebBuilder/urls.py                                 |   7 +-
+ .../analysis/__pycache__/builder.cpython-312.pyc   | Bin 2755 -> 2173 bytes
+ .../analysis/__pycache__/constants.cpython-312.pyc | Bin 1714 -> 834 bytes
+ WebBuilder/utils/analysis/builder.py               |  42 +-
+ WebBuilder/utils/analysis/constants.py             |  24 -
+ WebBuilder/utils/analysis/suggestions_heuristic.py | 139 -----
+ WebBuilder/utils/generator/__init__.py             |   0
+ WebBuilder/utils/generator/project_generator.py    | 583 +++++++++++++++++++++
+ WebBuilder/utils/llm/generator_prompts.py          | 249 +++++++++
+ WebBuilder/utils/llm/templates.py                  | 216 --------
+ WebBuilder/utils/llm/themer.py                     | 270 ----------
+ WebBuilder/views/__init__.py                       |   6 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 508 -> 501 bytes
+ WebBuilder/views/edit.py                           |  47 +-
+ WebBuilder/views/render.py                         | 205 --------
+ WebBuilder/views/site.py                           |  72 +++
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 2969 -> 2969 bytes
+ project/settings.py                                |   2 +-
+ 29 files changed, 1297 insertions(+), 1399 deletions(-)
+=== 2026-03-02 | old preview ===
+
+ WebBuilder/docs/Apuntes/prompt.txt                 | 161 ++++++++
+ WebBuilder/docs/Documentacion/n8n_login2.md        | 106 +++++
+ WebBuilder/docs/fondos.css                         |  30 --
+ WebBuilder/docs/llm/themerOriginalGeneracion.py    | 336 ++++++++++++++++
+ WebBuilder/templates/WebBuilder/assistant.html     |   4 -
+ WebBuilder/templates/WebBuilder/edit.html          |   5 -
+ .../analysis/__pycache__/builder.cpython-312.pyc   | Bin 2755 -> 2755 bytes
+ .../analysis/__pycache__/detection.cpython-312.pyc | Bin 6799 -> 6799 bytes
+ WebBuilder/utils/analysis/builder.py               |   2 +-
+ WebBuilder/utils/analysis/detection.py             |   2 +-
+ WebBuilder/utils/llm/llm_utils.py                  |  75 ++++
+ WebBuilder/utils/llm/planner.py                    |  59 +--
+ WebBuilder/utils/llm/templates.py                  | 216 +++++++++++
+ WebBuilder/utils/llm/themer.py                     | 427 ++++++++-------------
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 14627 -> 15095 bytes
+ WebBuilder/views/assistant.py                      |  29 +-
+ WebBuilder/views/edit.py                           |  38 +-
+ WebBuilder/views/helpers.py                        |  49 +++
+ WebBuilder/views/render.py                         |  38 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 20 files changed, 1140 insertions(+), 437 deletions(-)
+=== 2026-02-26 | webhook register n8n ===
+
+ WebBuilder/views/__pycache__/auth.cpython-312.pyc | Bin 2248 -> 2280 bytes
+ WebBuilder/views/auth.py                          |   2 +-
+ db.sqlite3                                        | Bin 10354688 -> 10354688 bytes
+ 3 files changed, 1 insertion(+), 1 deletion(-)
+=== 2026-02-26 | n8n login/register ===
+
+ WebBuilder/__pycache__/forms.cpython-312.pyc       | Bin 1229 -> 2271 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1215 -> 1376 bytes
+ WebBuilder/docs/Apuntes/dudas.md                   |   7 +-
+ WebBuilder/docs/Apuntes/prompt.md                  |   5 -
+ .../docs/Apuntes/{resumenes.md => tutoria.md}      |   6 +-
+ WebBuilder/docs/Documentacion/n8n_login.md         | 206 +++++++++++++++
+ WebBuilder/forms.py                                |  57 +++--
+ WebBuilder/templates/WebBuilder/navbar.html        |  20 ++
+ WebBuilder/templates/registration/login.html       |   9 +-
+ WebBuilder/templates/registration/register.html    |  18 +-
+ WebBuilder/urls.py                                 |   7 +-
+ WebBuilder/views/__pycache__/auth.cpython-312.pyc  | Bin 892 -> 2248 bytes
+ WebBuilder/views/auth.py                           |  46 +++-
+ WebBuilder/views/sites.py                          | 285 ---------------------
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 15 files changed, 328 insertions(+), 338 deletions(-)
+=== 2026-02-26 | bugs fix ===
+
+ WebBuilder/__pycache__/admin.cpython-312.pyc       | Bin 16767 -> 16766 bytes
+ WebBuilder/__pycache__/forms.cpython-312.pyc       | Bin 2522 -> 1229 bytes
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 3015 -> 3014 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1097 -> 1215 bytes
+ WebBuilder/admin.py                                |   4 +-
+ WebBuilder/docs/Apuntes/dudas.md                   |   6 +
+ WebBuilder/docs/Apuntes/prompt.md                  |   4 +-
+ WebBuilder/{static/css => docs}/fondos.css         |   0
+ WebBuilder/forms.py                                |  42 +-----
+ ...07_rename_plublic_id_generatedsite_public_id.py |  18 +++
+ WebBuilder/models.py                               |   4 +-
+ WebBuilder/static/css/backgrounds.css              |   6 +-
+ WebBuilder/static/css/navbar.css                   |  20 +++
+ WebBuilder/templates/WebBuilder/assistant.html     |   2 -
+ WebBuilder/templates/WebBuilder/base.html          |   4 -
+ WebBuilder/templates/WebBuilder/edit.html          |   2 -
+ WebBuilder/templates/WebBuilder/history.html       |   2 -
+ WebBuilder/templates/WebBuilder/home.html          |   3 -
+ WebBuilder/urls.py                                 |   6 +-
+ WebBuilder/utils/llm/themer.py                     |  12 +-
+ WebBuilder/views/__init__.py                       |  11 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 471 -> 508 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 14495 -> 14627 bytes
+ WebBuilder/views/__pycache__/auth.cpython-312.pyc  | Bin 922 -> 892 bytes
+ .../views/__pycache__/history.cpython-312.pyc      | Bin 1199 -> 1199 bytes
+ WebBuilder/views/__pycache__/pages.cpython-312.pyc | Bin 1355 -> 1474 bytes
+ WebBuilder/views/assistant.py                      |   7 +-
+ WebBuilder/views/auth.py                           |  15 +--
+ WebBuilder/views/edit.py                           |   8 +-
+ WebBuilder/views/pages.py                          |   8 +-
+ WebBuilder/views/render.py                         | 146 +++++++++++++--------
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 2912 -> 2969 bytes
+ project/settings.py                                |  10 +-
+ 34 files changed, 189 insertions(+), 151 deletions(-)
+=== 2026-02-25 | some changes ===
+
+ WebBuilder/static/css/assistant.css            |  13 +++----
+ WebBuilder/templates/WebBuilder/assistant.html |  45 ++++++++-----------------
+ db.sqlite3                                     | Bin 10354688 -> 10354688 bytes
+ 3 files changed, 21 insertions(+), 37 deletions(-)
+=== 2026-02-25 | refresh visual ===
+
+ WebBuilder/__pycache__/admin.cpython-312.pyc       | Bin 8455 -> 16767 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1109 -> 1097 bytes
+ WebBuilder/admin.py                                | 406 ++++++---
+ WebBuilder/static/css/colores/assistantENTERO.html | 964 --------------------
+ WebBuilder/static/css/colores/assistant_old.css    | 295 -------
+ WebBuilder/static/css/colores/assistant_old.html   | 196 -----
+ WebBuilder/static/css/colores/assistant_old.js     | 420 ---------
+ .../static/css/colores/backgrounds_azulmorado.css  | 174 ----
+ .../static/css/colores/backgrounds_morado.css      | 179 ----
+ .../static/css/colores/backgrounds_plata.css       | 179 ----
+ WebBuilder/static/css/colores/fondos.css           |  43 -
+ WebBuilder/static/css/colores/home_azulmorado.css  | 512 -----------
+ WebBuilder/static/css/colores/home_morado.css      | 512 -----------
+ WebBuilder/static/css/colores/home_plata.css       | 517 -----------
+ WebBuilder/static/css/colores/home_plata.html      | 330 -------
+ WebBuilder/static/css/edit.css                     | 289 ++++++
+ WebBuilder/static/css/history.css                  | 186 ++++
+ WebBuilder/static/css/home.css                     | 567 +++++++-----
+ WebBuilder/static/css/login.css                    | 406 +++++----
+ WebBuilder/static/js/edit.js                       | 130 +++
+ WebBuilder/static/js/home.js                       |  58 +-
+ WebBuilder/templates/WebBuilder/assistant.html     |   6 +-
+ WebBuilder/templates/WebBuilder/base.html          |   2 +
+ WebBuilder/templates/WebBuilder/edit.html          | 343 ++++++++
+ WebBuilder/templates/WebBuilder/history.html       | 281 ++++--
+ WebBuilder/templates/WebBuilder/home.html          | 975 +++++++++++----------
+ WebBuilder/templates/WebBuilder/navbar.html        |   4 +-
+ WebBuilder/templates/WebBuilder/preview.html       | 322 -------
+ WebBuilder/templates/WebBuilder/site_render.html   |   4 +-
+ WebBuilder/templates/registration/login.html       | 149 ++--
+ WebBuilder/templates/registration/register.html    | 130 ++-
+ WebBuilder/urls.py                                 |   7 +-
+ WebBuilder/views/__init__.py                       |  18 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 576 -> 471 bytes
+ WebBuilder/views/__pycache__/pages.cpython-312.pyc | Bin 608 -> 1355 bytes
+ WebBuilder/views/{preview.py => edit.py}           |   6 +-
+ WebBuilder/views/pages.py                          |  24 +-
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 38 files changed, 2810 insertions(+), 5824 deletions(-)
+=== 2026-02-25 | visual assistant ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1109 -> 1109 bytes
+ WebBuilder/docs/Apuntes/prompt.md                  | 106 +--
+ WebBuilder/static/css/assistant.css                | 702 ++++++++++-----
+ WebBuilder/static/css/colores/assistantENTERO.html | 964 +++++++++++++++++++++
+ WebBuilder/static/css/colores/assistant_old.css    | 295 +++++++
+ WebBuilder/static/css/colores/assistant_old.html   | 196 +++++
+ WebBuilder/static/css/colores/assistant_old.js     | 420 +++++++++
+ WebBuilder/static/css/navbar.css                   |   8 -
+ WebBuilder/static/js/assistant.js                  | 436 +---------
+ WebBuilder/templates/WebBuilder/assistant.html     | 438 +++++++---
+ WebBuilder/urls.py                                 |   1 -
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 576 -> 576 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 12713 -> 14495 bytes
+ WebBuilder/views/assistant.py                      |  60 ++
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 15 files changed, 2756 insertions(+), 870 deletions(-)
+=== 2026-02-24 | colors ===
+
+ WebBuilder/static/css/backgrounds.css              | 266 ++++++++
+ .../static/css/{ => colores}/backgrounds_plata.css |   0
+ WebBuilder/static/css/colores/fondos.css           |  43 ++
+ WebBuilder/static/css/{ => colores}/home_plata.css |   0
+ WebBuilder/static/css/colores/home_plata.html      | 330 ++++++++++
+ WebBuilder/static/css/fondos.css                   |  47 +-
+ WebBuilder/static/css/home.css                     | 697 +++++++++++++++++++++
+ WebBuilder/templates/WebBuilder/base.html          |   4 +-
+ WebBuilder/templates/WebBuilder/home.html          | 376 ++++++++---
+ .../templatetags/{__init.py__ => __init__.py}      |   0
+ WebBuilder/views/__pycache__/pages.cpython-312.pyc | Bin 608 -> 608 bytes
+ 11 files changed, 1642 insertions(+), 121 deletions(-)
+=== 2026-02-24 | site_render ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 1080 -> 1109 bytes
+ WebBuilder/docs/Apuntes/dudas.md                   |   4 +-
+ WebBuilder/docs/Apuntes/prompt.md                  | 123 +++++--
+ WebBuilder/templates/WebBuilder/assistant.html     |  52 ++-
+ WebBuilder/templates/WebBuilder/history.html       |  22 +-
+ WebBuilder/templates/WebBuilder/preview.html       | 364 ++++++++++++-------
+ WebBuilder/templates/WebBuilder/site_render.html   | 257 ++++++++++++++
+ WebBuilder/templates/WebBuilder/site_view.html     |   1 -
+ WebBuilder/templatetags/__init.py__                |   0
+ WebBuilder/templatetags/wb_extras.py               |  20 ++
+ WebBuilder/urls.py                                 |   9 +-
+ WebBuilder/utils/llm/planner.py                    | 388 ++++++++-------------
+ WebBuilder/utils/llm/themer.py                     | 241 +++++++++----
+ WebBuilder/views/__init__.py                       |  29 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 566 -> 576 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 12653 -> 12713 bytes
+ .../views/__pycache__/history.cpython-312.pyc      | Bin 913 -> 1199 bytes
+ .../views/__pycache__/preview.cpython-312.pyc      | Bin 9602 -> 10269 bytes
+ WebBuilder/views/assistant.py                      |  65 ++--
+ WebBuilder/views/history.py                        |  11 +-
+ WebBuilder/views/preview.py                        | 248 +++++++------
+ WebBuilder/views/render.py                         | 195 +++++++++++
+ WebBuilder/views/sites.py                          | 180 +++++-----
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 24 files changed, 1476 insertions(+), 733 deletions(-)
+=== 2026-02-23 | generatedsite ===
+
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 1790 -> 3015 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 862 -> 1080 bytes
+ WebBuilder/docs/Apuntes/enlaces.md                 |   2 +-
+ WebBuilder/docs/Documentacion/docker_n8n.md        |   2 +
+ WebBuilder/migrations/0006_generatedsite.py        |  29 +++
+ WebBuilder/models.py                               |  28 ++
+ WebBuilder/templates/WebBuilder/preview.html       |  15 +-
+ WebBuilder/templates/WebBuilder/site_view.html     |   1 +
+ WebBuilder/urls.py                                 |   7 +-
+ WebBuilder/utils/llm/themer.py                     | 282 +++++++++++++++++++++
+ WebBuilder/views/__init__.py                       |   5 +
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 494 -> 566 bytes
+ .../views/__pycache__/preview.cpython-312.pyc      | Bin 7295 -> 9602 bytes
+ WebBuilder/views/preview.py                        | 113 +++++++--
+ WebBuilder/views/sites.py                          | 277 ++++++++++++++++++++
+ db.sqlite3                                         | Bin 10354688 -> 10354688 bytes
+ 16 files changed, 730 insertions(+), 31 deletions(-)
+=== 2026-02-22 | json + preview ===
+
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 1697 -> 1790 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 864 -> 862 bytes
+ .../migrations/0005_apirequest_plan_accepted.py    |  18 +
+ WebBuilder/models.py                               |   2 +
+ WebBuilder/templates/WebBuilder/assistant.html     |  14 +-
+ WebBuilder/templates/WebBuilder/preview.html       | 191 +++++++++-
+ WebBuilder/urls.py                                 |   1 -
+ WebBuilder/utils/llm/client.py                     |   9 +-
+ WebBuilder/utils/llm/planner.py                    | 400 +++++++++++++++++++++
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 8669 -> 12653 bytes
+ .../views/__pycache__/preview.cpython-312.pyc      | Bin 583 -> 7295 bytes
+ WebBuilder/views/assistant.py                      | 318 ++++++++--------
+ WebBuilder/views/preview.py                        | 165 ++++++++-
+ db.sqlite3                                         | Bin 3371008 -> 10354688 bytes
+ 14 files changed, 943 insertions(+), 175 deletions(-)
+=== 2026-02-21 | testing ===
+
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 8669 -> 8669 bytes
+ db.sqlite3                                         | Bin 3276800 -> 3371008 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+=== 2026-02-21 | n8n download ===
+
+ WebBuilder/docs/Documentacion/docker_n8n.md | 81 +++++++++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
+=== 2026-02-21 | documentation ===
+
+ WebBuilder/docs/Apuntes.md                         |  31 ----
+ WebBuilder/docs/Apuntes/dudas.md                   |   5 +
+ WebBuilder/docs/Apuntes/enlaces.md                 |  48 ++++++
+ WebBuilder/docs/Apuntes/memorias.md                |  52 +++++++
+ WebBuilder/docs/Apuntes/prompt.md                  |  20 +++
+ .../docs/{resumen.md => Apuntes/resumenes.md}      |  15 ++
+ WebBuilder/docs/Documentacion/implementacion_ia.md | 168 +++++++++++++++++++++
+ WebBuilder/docs/guiaLLM.md                         | 144 ------------------
+ 8 files changed, 308 insertions(+), 175 deletions(-)
+=== 2026-02-20 | env.example ===
+
+ .env.example | 3 +++
+ 1 file changed, 3 insertions(+)
+=== 2026-02-20 | AI assistant ===
+
+ .gitignore                                         |   4 +
+ WebBuilder/__pycache__/forms.cpython-312.pyc       | Bin 2254 -> 2522 bytes
+ WebBuilder/docs/GUIA.md                            | 189 ---------------------
+ WebBuilder/docs/guiaLLM.md                         | 144 ++++++++++++++++
+ WebBuilder/docs/resumen.md                         |   4 +
+ WebBuilder/forms.py                                |  10 ++
+ WebBuilder/templates/WebBuilder/assistant.html     |  27 ++-
+ WebBuilder/utils/llm/client.py                     |  54 ++++++
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 6382 -> 8669 bytes
+ WebBuilder/views/assistant.py                      | 177 ++++++++++++++++++-
+ db.sqlite3                                         | Bin 2957312 -> 3276800 bytes
+ manage.py                                          |   5 +-
+ project/__pycache__/settings.cpython-312.pyc       | Bin 2595 -> 2912 bytes
+ project/settings.py                                |  12 +-
+ 14 files changed, 431 insertions(+), 195 deletions(-)
+=== 2026-02-19 | llm + n8n ===
+
+ WebBuilder/__pycache__/urls.cpython-312.pyc        |  Bin 977 -> 864 bytes
+ Apuntes.md => WebBuilder/docs/Apuntes.md           |    9 +-
+ WebBuilder/docs/GUIA.md                            |  189 +++
+ WebBuilder/static/css/assistant.css                | 1481 +-------------------
+ WebBuilder/templates/WebBuilder/assistant.html     |  613 +-------
+ WebBuilder/templates/WebBuilder/preview.html       |  109 +-
+ .../WebBuilder/preview_cards_snippet.html          |   78 --
+ WebBuilder/{tests/__init__.py => test.py}          |    0
+ .../tests/__pycache__/__init__.cpython-312.pyc     |  Bin 172 -> 0 bytes
+ .../__pycache__/test_analysis.cpython-312.pyc      |  Bin 2096 -> 0 bytes
+ .../test_analysis_improved.cpython-312.pyc         |  Bin 16867 -> 0 bytes
+ .../tests/__pycache__/test_mapping.cpython-312.pyc |  Bin 1319 -> 0 bytes
+ .../test_mapping_improved.cpython-312.pyc          |  Bin 22223 -> 0 bytes
+ .../__pycache__/test_normalizer.cpython-312.pyc    |  Bin 1653 -> 0 bytes
+ .../test_normalizer_improved.cpython-312.pyc       |  Bin 24185 -> 0 bytes
+ .../tests/__pycache__/test_parsers.cpython-312.pyc |  Bin 2483 -> 0 bytes
+ .../test_parsers_improved.cpython-312.pyc          |  Bin 20687 -> 0 bytes
+ WebBuilder/tests/test_analysis_improved.py         |  378 -----
+ WebBuilder/tests/test_mapping_improved.py          |  448 ------
+ WebBuilder/tests/test_normalizer_improved.py       |  468 -------
+ WebBuilder/tests/test_parsers_improved.py          |  425 ------
+ WebBuilder/urls.py                                 |   16 +-
+ WebBuilder/utils/__init__.py                       |    9 +
+ .../utils/__pycache__/__init__.cpython-312.pyc     |  Bin 172 -> 497 bytes
+ .../utils/__pycache__/analysis.cpython-312.pyc     |  Bin 23037 -> 0 bytes
+ .../utils/__pycache__/intents.cpython-312.pyc      |  Bin 5965 -> 0 bytes
+ .../utils/__pycache__/manageData.cpython-312.pyc   |  Bin 15477 -> 0 bytes
+ .../utils/__pycache__/mapping.cpython-312.pyc      |  Bin 8405 -> 0 bytes
+ .../utils/__pycache__/normalizer.cpython-312.pyc   |  Bin 7077 -> 0 bytes
+ WebBuilder/utils/analysis/__init__.py              |   53 +-
+ .../analysis/__pycache__/__init__.cpython-312.pyc  |  Bin 1154 -> 318 bytes
+ .../analysis/__pycache__/builder.cpython-312.pyc   |  Bin 2730 -> 2755 bytes
+ .../analysis/__pycache__/constants.cpython-312.pyc |  Bin 1714 -> 1714 bytes
+ .../analysis/__pycache__/detection.cpython-312.pyc |  Bin 6799 -> 6799 bytes
+ .../analysis/__pycache__/helpers.cpython-312.pyc   |  Bin 2599 -> 2599 bytes
+ .../analysis/__pycache__/quality.cpython-312.pyc   |  Bin 2490 -> 0 bytes
+ .../__pycache__/suggestions.cpython-312.pyc        |  Bin 7443 -> 0 bytes
+ .../suggestions_heuristic.cpython-312.pyc          |  Bin 0 -> 4461 bytes
+ WebBuilder/utils/analysis/builder.py               |    5 +-
+ WebBuilder/utils/analysis/quality.py               |   90 --
+ .../{suggestions.py => suggestions_heuristic.py}   |  103 +-
+ WebBuilder/utils/ingest/__init__.py                |    4 +
+ .../ingest/__pycache__/__init__.cpython-312.pyc    |  Bin 0 -> 331 bytes
+ .../__pycache__/parsers.cpython-312.pyc            |  Bin 1962 -> 1969 bytes
+ .../__pycache__/url_reader.cpython-312.pyc         |  Bin 3281 -> 3288 bytes
+ WebBuilder/utils/{ => ingest}/parsers.py           |    0
+ WebBuilder/utils/{ => ingest}/url_reader.py        |    0
+ WebBuilder/utils/intents.py                        |  211 ---
+ WebBuilder/utils/llm/__init__.py                   |    4 +
+ WebBuilder/utils/mapping.py                        |  260 ----
+ WebBuilder/utils/normalizer.py                     |  227 ---
+ WebBuilder/views/__init__.py                       |   41 +-
+ .../views/__pycache__/__init__.cpython-312.pyc     |  Bin 551 -> 494 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    |  Bin 11948 -> 6382 bytes
+ .../views/__pycache__/preview.cpython-312.pyc      |  Bin 3340 -> 583 bytes
+ WebBuilder/views/assistant.py                      |  364 +----
+ WebBuilder/views/preview.py                        |   87 +-
+ db.sqlite3                                         |  Bin 2895872 -> 2957312 bytes
+ 58 files changed, 408 insertions(+), 5264 deletions(-)
+=== 2026-02-19 | refactor completed ===
+
+ Apuntes.md |  24 ++++++++++++++++++++++++
+ db.sqlite3 | Bin 2707456 -> 2895872 bytes
+ urls.md    |   7 -------
+ 3 files changed, 24 insertions(+), 7 deletions(-)
+=== 2026-02-18 | urls.py ===
+
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 1697 -> 1697 bytes
+ WebBuilder/models.py                               |   2 +-
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 11941 -> 11948 bytes
+ db.sqlite3                                         | Bin 2502656 -> 2707456 bytes
+ urls.md                                            |   7 +++++++
+ 5 files changed, 8 insertions(+), 1 deletion(-)
+=== 2026-02-18 | refactor views/utils ===
+
+ .../analysis/__pycache__/quality.cpython-312.pyc   | Bin 3325 -> 2490 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 13304 -> 11941 bytes
+ WebBuilder/views/__pycache__/auth.cpython-312.pyc  | Bin 1024 -> 922 bytes
+ .../views/__pycache__/history.cpython-312.pyc      | Bin 1199 -> 913 bytes
+ WebBuilder/views/__pycache__/pages.cpython-312.pyc | Bin 814 -> 608 bytes
+ .../views/__pycache__/preview.cpython-312.pyc      | Bin 3911 -> 3340 bytes
+ WebBuilder/views/assistant.py                      | 113 ++++++++++-----------
+ WebBuilder/views/auth.py                           |  12 +--
+ WebBuilder/views/history.py                        |  22 +---
+ WebBuilder/views/pages.py                          |  12 +--
+ WebBuilder/views/preview.py                        |  32 +-----
+ db.sqlite3                                         | Bin 2478080 -> 2502656 bytes
+ 12 files changed, 64 insertions(+), 127 deletions(-)
+=== 2026-02-18 | refactor utils ===
+
+ .../analysis/__pycache__/builder.cpython-312.pyc   | Bin 3904 -> 2730 bytes
+ .../__pycache__/suggestions.cpython-312.pyc        | Bin 8557 -> 7443 bytes
+ WebBuilder/utils/analysis/builder.py               |  78 +++----
+ WebBuilder/utils/analysis/quality.py               |  25 +-
+ WebBuilder/utils/analysis/suggestions.py           | 253 +++++++++------------
+ db.sqlite3                                         | Bin 2453504 -> 2478080 bytes
+ 6 files changed, 140 insertions(+), 216 deletions(-)
+=== 2026-02-18 | refactor analysis ===
+
+ .../utils/__pycache__/url_reader.cpython-312.pyc   | Bin 3281 -> 3281 bytes
+ .../analysis/__pycache__/constants.cpython-312.pyc | Bin 1801 -> 1714 bytes
+ .../analysis/__pycache__/detection.cpython-312.pyc | Bin 8302 -> 6799 bytes
+ .../analysis/__pycache__/helpers.cpython-312.pyc   | Bin 4379 -> 2599 bytes
+ WebBuilder/utils/analysis/constants.py             |  63 ++---
+ WebBuilder/utils/analysis/detection.py             | 262 ++++++++++-----------
+ WebBuilder/utils/analysis/helpers.py               | 105 +--------
+ WebBuilder/utils/url_reader.py                     |   5 +-
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 13304 -> 13304 bytes
+ WebBuilder/views/assistant.py                      |   4 +-
+ db.sqlite3                                         | Bin 2400256 -> 2453504 bytes
+ 11 files changed, 164 insertions(+), 275 deletions(-)
+=== 2026-02-18 | refactor 1/2 utils ===
+
+ WebBuilder/utils/__init__.py                       |   0
+ .../utils/__pycache__/__init__.cpython-312.pyc     | Bin 0 -> 172 bytes
+ .../utils/__pycache__/intents.cpython-312.pyc      | Bin 6397 -> 5965 bytes
+ .../utils/__pycache__/mapping.cpython-312.pyc      | Bin 9700 -> 8405 bytes
+ .../utils/__pycache__/parsers.cpython-312.pyc      | Bin 1962 -> 1962 bytes
+ .../utils/__pycache__/url_reader.cpython-312.pyc   | Bin 3284 -> 3281 bytes
+ WebBuilder/utils/intents.py                        |  53 ++++++++++++++++-----
+ db.sqlite3                                         | Bin 2334720 -> 2400256 bytes
+ 8 files changed, 41 insertions(+), 12 deletions(-)
+=== 2026-02-18 | RefactorComments ===
+
+ .../utils/__pycache__/mapping.cpython-312.pyc      | Bin 9757 -> 9700 bytes
+ .../utils/__pycache__/normalizer.cpython-312.pyc   | Bin 8935 -> 7077 bytes
+ .../utils/__pycache__/parsers.cpython-312.pyc      | Bin 1989 -> 1962 bytes
+ WebBuilder/utils/intents.py                        |   6 -
+ WebBuilder/utils/mapping.py                        | 108 ++++++++----------
+ WebBuilder/utils/normalizer.py                     | 121 +++++++++------------
+ WebBuilder/utils/parsers.py                        |  52 ++++-----
+ WebBuilder/utils/url_reader.py                     |  33 +++---
+ WebBuilder/views/__init__.py                       |   5 -
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 662 -> 551 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 13306 -> 13304 bytes
+ WebBuilder/views/__pycache__/auth.cpython-312.pyc  | Bin 1024 -> 1024 bytes
+ WebBuilder/views/assistant.py                      |   4 +-
+ db.sqlite3                                         | Bin 2330624 -> 2334720 bytes
+ 14 files changed, 132 insertions(+), 197 deletions(-)
+=== 2026-02-16 | Order ===
+
+ WebBuilder/static/css/assistant_old.css            | 962 ---------------------
+ .../css/{backgrounds.css => backgrounds_plata.css} |   0
+ .../backgrounds_azulmorado.css}                    |   0
+ .../css/{ => colores}/backgrounds_morado.css       |   0
+ .../{home_old.css => colores/home_azulmorado.css}  |   0
+ .../static/css/{ => colores}/home_morado.css       |   0
+ WebBuilder/static/css/{home.css => home_plata.css} |   0
+ .../static/css/{navbar_new.css => navbar.css}      |   0
+ WebBuilder/templates/WebBuilder/base.html          |   8 +-
+ .../WebBuilder/{navbar_new.html => navbar.html}    |   0
+ db.sqlite3                                         | Bin 2293760 -> 2330624 bytes
+ 11 files changed, 4 insertions(+), 966 deletions(-)
+=== 2026-02-13 | colors ===
+
+ WebBuilder/static/css/backgrounds.css              | 263 ++++----
+ WebBuilder/static/css/backgrounds_morado.css       | 179 +++++
+ WebBuilder/static/css/backgrounds_old.css          | 174 +++++
+ WebBuilder/static/css/home.css                     | 619 +++++++++--------
+ WebBuilder/static/css/home_morado.css              | 512 +++++++++++++++
+ WebBuilder/static/css/home_old.css                 | 731 ++++++++++-----------
+ WebBuilder/templates/WebBuilder/assistant_old.html | 644 ------------------
+ WebBuilder/templates/WebBuilder/home.html          | 517 ++++++++-------
+ .../WebBuilder/preview_cards_snippet_old.html      | 105 ---
+ db.sqlite3                                         | Bin 2260992 -> 2293760 bytes
+ 10 files changed, 1979 insertions(+), 1765 deletions(-)
+=== 2026-02-12 | backgrounds ===
+
+ WebBuilder/static/css/backgrounds.css              | 198 ++++++++
+ WebBuilder/static/css/home.css                     | 118 -----
+ WebBuilder/static/css/home_old.css                 | 539 +++++++++++++++++++++
+ WebBuilder/static/css/navbar_new.css               |  39 +-
+ WebBuilder/static/images/logo.jpg                  | Bin 0 -> 183851 bytes
+ .../static/images/{logo.png => logoOriginal.png}   | Bin
+ WebBuilder/static/images/logoSinfondo.png          | Bin 0 -> 48114 bytes
+ WebBuilder/templates/WebBuilder/assistant.html     |  14 +-
+ WebBuilder/templates/WebBuilder/base.html          |   2 +
+ WebBuilder/templates/WebBuilder/home.html          |   2 +-
+ WebBuilder/templates/WebBuilder/navbar_new.html    |   2 +-
+ db.sqlite3                                         | Bin 2166784 -> 2260992 bytes
+ 12 files changed, 784 insertions(+), 130 deletions(-)
+=== 2026-02-12 | UpdateUX ===
+
+ WebBuilder/static/css/assistant.css                | 1004 ++++++++++++++++++--
+ WebBuilder/static/css/assistant_old.css            |  962 +++++++++++++++++++
+ WebBuilder/static/js/assistant.js                  |  160 +++-
+ WebBuilder/templates/WebBuilder/assistant.html     |  458 +++++++--
+ WebBuilder/templates/WebBuilder/assistant_old.html |  644 +++++++++++++
+ .../WebBuilder/preview_cards_snippet.html          |  119 +--
+ .../WebBuilder/preview_cards_snippet_old.html      |  105 ++
+ .../utils/__pycache__/intents.cpython-312.pyc      |  Bin 0 -> 6397 bytes
+ .../utils/__pycache__/mapping.cpython-312.pyc      |  Bin 8013 -> 9757 bytes
+ .../analysis/__pycache__/builder.cpython-312.pyc   |  Bin 3904 -> 3904 bytes
+ WebBuilder/utils/intents.py                        |  188 ++++
+ WebBuilder/utils/mapping.py                        |   52 +-
+ .../views/__pycache__/assistant.cpython-312.pyc    |  Bin 11087 -> 13306 bytes
+ .../views/__pycache__/preview.cpython-312.pyc      |  Bin 3707 -> 3911 bytes
+ WebBuilder/views/assistant.py                      |  250 +++--
+ WebBuilder/views/preview.py                        |   49 +-
+ db.sqlite3                                         |  Bin 1806336 -> 2166784 bytes
+ 17 files changed, 3629 insertions(+), 362 deletions(-)
+=== 2026-02-12 | update ===
+
+ WebBuilder/files/ARQUITECTURA_UX_WEBBUILDER.md | 2060 ------------------------
+ WebBuilder/files/COMPONENTES_VISUALES.md       | 1056 ------------
+ WebBuilder/files/IMPLEMENTACION_TECNICA.md     | 1096 -------------
+ WebBuilder/files/WIREFRAMES_VISUALES.md        |  774 ---------
+ 4 files changed, 4986 deletions(-)
+=== 2026-02-12 | Update ===
+
+ WebBuilder/files/ARQUITECTURA_UX_WEBBUILDER.md     | 2060 ++++++++++++++++++++
+ WebBuilder/files/COMPONENTES_VISUALES.md           | 1056 ++++++++++
+ WebBuilder/files/IMPLEMENTACION_TECNICA.md         | 1096 +++++++++++
+ WebBuilder/files/WIREFRAMES_VISUALES.md            |  774 ++++++++
+ .../utils/__pycache__/normalizer.cpython-312.pyc   |  Bin 6243 -> 8935 bytes
+ WebBuilder/utils/normalizer.py                     |  151 +-
+ .../views/__pycache__/assistant.cpython-312.pyc    |  Bin 9351 -> 11087 bytes
+ WebBuilder/views/assistant.py                      |   85 +-
+ db.sqlite3                                         |  Bin 1744896 -> 1806336 bytes
+ 9 files changed, 5190 insertions(+), 32 deletions(-)
+=== 2026-02-11 | refactor ===
+
+ .../PRUEBAS/Funcionales/Assistant/asistChulete.css | 155 -----
+ .../Funcionales/Assistant/asistChulete.html        |  84 ---
+ .../Funcionales/Assistant/asistenteVerano.css      | 141 ----
+ .../Funcionales/Assistant/asistenteVerano.html     |  32 -
+ .../Funcionales/Assistant/assistantBASE.css        | 586 ----------------
+ .../Funcionales/Assistant/assistantBASE.html       | 234 -------
+ WebBuilder/PRUEBAS/Funcionales/Home/HOMETOCHO.html | 764 ---------------------
+ WebBuilder/PRUEBAS/Funcionales/Home/corners.css    |  59 --
+ WebBuilder/PRUEBAS/Funcionales/Home/esquinas.html  |  74 --
+ .../PRUEBAS/Funcionales/Home/homeOriginal.css      | 272 --------
+ .../PRUEBAS/Funcionales/Home/homeOriginal.html     |  49 --
+ .../PRUEBAS/Funcionales/Home/homeTOCHOClaude.html  | 764 ---------------------
+ WebBuilder/PRUEBAS/Funcionales/Home/miniLabel.js   | 156 -----
+ WebBuilder/PRUEBAS/Funcionales/Home/minitext.js    | 198 ------
+ WebBuilder/PRUEBAS/Funcionales/Home/particles.js   | 192 ------
+ .../PRUEBAS/Funcionales/Logins/loginBasico.css     |  79 ---
+ .../PRUEBAS/Funcionales/Logins/loginBasico.html    |  45 --
+ .../PRUEBAS/Funcionales/Navbar/navbarOriginal.css  | 174 -----
+ .../PRUEBAS/Funcionales/Navbar/navbarOriginal.html |  51 --
+ WebBuilder/PRUEBAS/Funcionales/fondos.css          |  58 --
+ WebBuilder/PRUEBAS/Funcionales/shimerJesus.css     |  23 -
+ WebBuilder/PRUEBAS/PosiblesFuturos/home.css        |   0
+ WebBuilder/PRUEBAS/PosiblesFuturos/home.html       |   7 -
+ WebBuilder/PRUEBAS/PosiblesFuturos/navbar.css      |   0
+ WebBuilder/PRUEBAS/PosiblesFuturos/navbar.html     |   2 -
+ WebBuilder/PRUEBAS/PosiblesFuturos/pruebanav.html  | 495 -------------
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 862 -> 977 bytes
+ WebBuilder/__pycache__/views.cpython-312.pyc       | Bin 10388 -> 11471 bytes
+ WebBuilder/files(1)/INSTRUCCIONES_NAVBAR.md        | 265 -------
+ WebBuilder/static/css/assistant.css                |  52 +-
+ WebBuilder/static/js/assistant.js                  | 304 ++++++++
+ WebBuilder/templates/WebBuilder/assistant.html     | 210 +-----
+ WebBuilder/templates/WebBuilder/preview.html       |  53 +-
+ .../WebBuilder/preview_cards_snippet.html          |  39 +-
+ WebBuilder/tests.py                                |   3 -
+ WebBuilder/urls.py                                 |   1 +
+ .../utils/__pycache__/analysis.cpython-312.pyc     | Bin 22940 -> 23037 bytes
+ .../utils/__pycache__/normalizer.cpython-312.pyc   | Bin 6071 -> 6243 bytes
+ .../utils/__pycache__/url_reader.cpython-312.pyc   | Bin 2420 -> 3284 bytes
+ WebBuilder/utils/analysis.py                       | 741 --------------------
+ WebBuilder/utils/analysis/__init__.py              |  53 ++
+ .../analysis/__pycache__/__init__.cpython-312.pyc  | Bin 0 -> 1154 bytes
+ .../analysis/__pycache__/builder.cpython-312.pyc   | Bin 0 -> 3904 bytes
+ .../analysis/__pycache__/constants.cpython-312.pyc | Bin 0 -> 1801 bytes
+ .../analysis/__pycache__/detection.cpython-312.pyc | Bin 0 -> 8302 bytes
+ .../analysis/__pycache__/helpers.cpython-312.pyc   | Bin 0 -> 4379 bytes
+ .../analysis/__pycache__/quality.cpython-312.pyc   | Bin 0 -> 3325 bytes
+ .../__pycache__/suggestions.cpython-312.pyc        | Bin 0 -> 8557 bytes
+ WebBuilder/utils/analysis/builder.py               | 128 ++++
+ WebBuilder/utils/analysis/constants.py             |  76 ++
+ WebBuilder/utils/analysis/detection.py             | 183 +++++
+ WebBuilder/utils/analysis/helpers.py               | 162 +++++
+ WebBuilder/utils/analysis/quality.py               | 111 +++
+ WebBuilder/utils/analysis/suggestions.py           | 271 ++++++++
+ WebBuilder/utils/normalizer.py                     |  14 +-
+ WebBuilder/utils/url_reader.py                     |  56 +-
+ WebBuilder/views/__init__.py                       |  52 ++
+ .../views/__pycache__/__init__.cpython-312.pyc     | Bin 0 -> 662 bytes
+ .../views/__pycache__/assistant.cpython-312.pyc    | Bin 0 -> 9351 bytes
+ WebBuilder/views/__pycache__/auth.cpython-312.pyc  | Bin 0 -> 1024 bytes
+ .../views/__pycache__/history.cpython-312.pyc      | Bin 0 -> 1199 bytes
+ WebBuilder/views/__pycache__/pages.cpython-312.pyc | Bin 0 -> 814 bytes
+ .../views/__pycache__/preview.cpython-312.pyc      | Bin 0 -> 3707 bytes
+ WebBuilder/{views.py => views/assistant.py}        | 229 ++----
+ WebBuilder/views/auth.py                           |  31 +
+ WebBuilder/views/history.py                        |  39 ++
+ WebBuilder/views/pages.py                          |  21 +
+ WebBuilder/views/preview.py                        | 115 ++++
+ db.sqlite3                                         | Bin 1744896 -> 1744896 bytes
+ 69 files changed, 1800 insertions(+), 6103 deletions(-)
+=== 2026-02-09 | readme ===
+
+ README.md | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+=== 2026-02-06 | Actualizacion ===
+
+ .../Funcionales/Home/HOMETOCHO.html}               |   0
+ .../css => PRUEBAS/Funcionales/Home}/corners.css   |   0
+ .../Funcionales/Home}/esquinas.html                |   0
+ .../Funcionales/Home}/homeOriginal.css             |   0
+ .../Funcionales/Home}/homeOriginal.html            |   0
+ .../PRUEBAS/Funcionales/Home/homeTOCHOClaude.html  | 764 +++++++++++++++++++++
+ .../js => PRUEBAS/Funcionales/Home}/miniLabel.js   |   0
+ .../js => PRUEBAS/Funcionales/Home}/minitext.js    |   0
+ .../js => PRUEBAS/Funcionales/Home}/particles.js   |   0
+ .../Funcionales/Navbar}/navbarOriginal.css         |   0
+ .../Funcionales/Navbar}/navbarOriginal.html        |   0
+ WebBuilder/__pycache__/views.cpython-312.pyc       | Bin 10394 -> 10388 bytes
+ WebBuilder/static/css/home.css                     | 538 +++++++++++++++
+ WebBuilder/static/js/home.js                       |  22 +
+ WebBuilder/templates/WebBuilder/assistant.html     |   1 -
+ WebBuilder/templates/WebBuilder/base.html          |   7 +-
+ WebBuilder/templates/WebBuilder/home.html          | 283 ++++++++
+ WebBuilder/views.py                                |   2 +-
+ db.sqlite3                                         | Bin 1744896 -> 1744896 bytes
+ 19 files changed, 1609 insertions(+), 8 deletions(-)
+=== 2026-02-05 | Home Prueba ===
+
+ WebBuilder/__pycache__/views.cpython-312.pyc    | Bin 10396 -> 10394 bytes
+ WebBuilder/templates/WebBuilder/pruebahome.html | 764 ++++++++++++++++++++++++
+ WebBuilder/views.py                             |   2 +-
+ db.sqlite3                                      | Bin 1744896 -> 1744896 bytes
+ 4 files changed, 765 insertions(+), 1 deletion(-)
+=== 2026-02-05 | Copia ===
+
+ .../PRUEBAS/Funcionales/Assistant/asistChulete.css | 155 ++++
+ .../Funcionales/Assistant/asistChulete.html        |  84 +++
+ .../Funcionales/Assistant/asistenteVerano.css      | 141 ++++
+ .../Funcionales/Assistant/asistenteVerano.html     |  32 +
+ .../Funcionales/Assistant/assistantBASE.css        | 586 ++++++++++++++++
+ .../Funcionales/Assistant/assistantBASE.html       | 234 +++++++
+ .../PRUEBAS/Funcionales/Logins/loginBasico.css     |  79 +++
+ .../PRUEBAS/Funcionales/Logins/loginBasico.html    |  45 ++
+ WebBuilder/PRUEBAS/Funcionales/fondos.css          |  58 ++
+ WebBuilder/PRUEBAS/Funcionales/shimerJesus.css     |  23 +
+ WebBuilder/PRUEBAS/PosiblesFuturos/home.css        |   0
+ WebBuilder/PRUEBAS/PosiblesFuturos/home.html       |   7 +
+ WebBuilder/PRUEBAS/PosiblesFuturos/navbar.css      |   0
+ WebBuilder/PRUEBAS/PosiblesFuturos/navbar.html     |   2 +
+ WebBuilder/PRUEBAS/PosiblesFuturos/pruebanav.html  | 495 +++++++++++++
+ WebBuilder/__init__.py                             |   0
+ WebBuilder/__pycache__/__init__.cpython-310.pyc    | Bin 0 -> 162 bytes
+ WebBuilder/__pycache__/__init__.cpython-312.pyc    | Bin 0 -> 166 bytes
+ WebBuilder/__pycache__/admin.cpython-310.pyc       | Bin 0 -> 203 bytes
+ WebBuilder/__pycache__/admin.cpython-312.pyc       | Bin 0 -> 8455 bytes
+ WebBuilder/__pycache__/apps.cpython-310.pyc        | Bin 0 -> 449 bytes
+ WebBuilder/__pycache__/apps.cpython-312.pyc        | Bin 0 -> 480 bytes
+ WebBuilder/__pycache__/forms.cpython-310.pyc       | Bin 0 -> 880 bytes
+ WebBuilder/__pycache__/forms.cpython-312.pyc       | Bin 0 -> 2254 bytes
+ WebBuilder/__pycache__/manageData.cpython-312.pyc  | Bin 0 -> 4511 bytes
+ WebBuilder/__pycache__/models.cpython-310.pyc      | Bin 0 -> 1025 bytes
+ WebBuilder/__pycache__/models.cpython-312.pyc      | Bin 0 -> 1697 bytes
+ WebBuilder/__pycache__/urls.cpython-310.pyc        | Bin 0 -> 461 bytes
+ WebBuilder/__pycache__/urls.cpython-312.pyc        | Bin 0 -> 862 bytes
+ WebBuilder/__pycache__/views.cpython-310.pyc       | Bin 0 -> 1225 bytes
+ WebBuilder/__pycache__/views.cpython-312.pyc       | Bin 0 -> 10396 bytes
+ WebBuilder/admin.py                                | 231 ++++++
+ WebBuilder/apps.py                                 |   6 +
+ WebBuilder/files(1)/INSTRUCCIONES_NAVBAR.md        | 265 +++++++
+ WebBuilder/forms.py                                |  77 ++
+ WebBuilder/migrations/0001_initial.py              |  29 +
+ ...ource_data_apirequest_error_message_and_more.py |  28 +
+ .../migrations/0003_apirequest_field_mapping.py    |  18 +
+ ...0004_rename_raw_response_apirequest_raw_data.py |  18 +
+ WebBuilder/migrations/__init__.py                  |   0
+ .../__pycache__/0001_initial.cpython-310.pyc       | Bin 0 -> 1240 bytes
+ .../__pycache__/0001_initial.cpython-312.pyc       | Bin 0 -> 1909 bytes
+ ...irequest_error_message_and_more.cpython-312.pyc | Bin 0 -> 1071 bytes
+ .../0003_apirequest_field_mapping.cpython-312.pyc  | Bin 0 -> 813 bytes
+ ...aw_response_apirequest_raw_data.cpython-312.pyc | Bin 0 -> 718 bytes
+ .../__pycache__/__init__.cpython-310.pyc           | Bin 0 -> 173 bytes
+ .../__pycache__/__init__.cpython-312.pyc           | Bin 0 -> 177 bytes
+ WebBuilder/models.py                               |  29 +
+ WebBuilder/static/css/assistant.css                | 778 +++++++++++++++++++++
+ WebBuilder/static/css/corners.css                  |  59 ++
+ WebBuilder/static/css/fondos.css                   |  43 ++
+ WebBuilder/static/css/homeOriginal.css             | 272 +++++++
+ WebBuilder/static/css/login.css                    | 206 ++++++
+ WebBuilder/static/css/navbarOriginal.css           | 174 +++++
+ WebBuilder/static/css/navbar_new.css               | 586 ++++++++++++++++
+ WebBuilder/static/images/favicon.ico               | Bin 0 -> 1392378 bytes
+ WebBuilder/static/images/logo.png                  | Bin 0 -> 1490513 bytes
+ WebBuilder/static/js/miniLabel.js                  | 156 +++++
+ WebBuilder/static/js/minitext.js                   | 198 ++++++
+ WebBuilder/static/js/particles.js                  | 192 +++++
+ WebBuilder/templates/WebBuilder/assistant.html     | 477 +++++++++++++
+ WebBuilder/templates/WebBuilder/base.html          |  45 ++
+ WebBuilder/templates/WebBuilder/esquinas.html      |  74 ++
+ WebBuilder/templates/WebBuilder/history.html       | 106 +++
+ WebBuilder/templates/WebBuilder/homeOriginal.html  |  49 ++
+ .../templates/WebBuilder/navbarOriginal.html       |  51 ++
+ WebBuilder/templates/WebBuilder/navbar_new.html    | 223 ++++++
+ WebBuilder/templates/WebBuilder/preview.html       |  98 +++
+ .../WebBuilder/preview_cards_snippet.html          |  32 +
+ WebBuilder/templates/registration/login.html       |  73 ++
+ WebBuilder/templates/registration/register.html    |   9 +
+ WebBuilder/tests.py                                |   3 +
+ WebBuilder/tests/__init__.py                       |   0
+ .../tests/__pycache__/__init__.cpython-312.pyc     | Bin 0 -> 172 bytes
+ .../__pycache__/test_analysis.cpython-312.pyc      | Bin 0 -> 2096 bytes
+ .../test_analysis_improved.cpython-312.pyc         | Bin 0 -> 16867 bytes
+ .../tests/__pycache__/test_mapping.cpython-312.pyc | Bin 0 -> 1319 bytes
+ .../test_mapping_improved.cpython-312.pyc          | Bin 0 -> 22223 bytes
+ .../__pycache__/test_normalizer.cpython-312.pyc    | Bin 0 -> 1653 bytes
+ .../test_normalizer_improved.cpython-312.pyc       | Bin 0 -> 24185 bytes
+ .../tests/__pycache__/test_parsers.cpython-312.pyc | Bin 0 -> 2483 bytes
+ .../test_parsers_improved.cpython-312.pyc          | Bin 0 -> 20687 bytes
+ WebBuilder/tests/test_analysis_improved.py         | 378 ++++++++++
+ WebBuilder/tests/test_mapping_improved.py          | 448 ++++++++++++
+ WebBuilder/tests/test_normalizer_improved.py       | 468 +++++++++++++
+ WebBuilder/tests/test_parsers_improved.py          | 425 +++++++++++
+ WebBuilder/urls.py                                 |  16 +
+ .../utils/__pycache__/analysis.cpython-312.pyc     | Bin 0 -> 22940 bytes
+ .../utils/__pycache__/manageData.cpython-312.pyc   | Bin 0 -> 15477 bytes
+ .../utils/__pycache__/mapping.cpython-312.pyc      | Bin 0 -> 8013 bytes
+ .../utils/__pycache__/normalizer.cpython-312.pyc   | Bin 0 -> 6071 bytes
+ .../utils/__pycache__/parsers.cpython-312.pyc      | Bin 0 -> 1989 bytes
+ .../utils/__pycache__/url_reader.cpython-312.pyc   | Bin 0 -> 2420 bytes
+ WebBuilder/utils/analysis.py                       | 741 ++++++++++++++++++++
+ WebBuilder/utils/mapping.py                        | 252 +++++++
+ WebBuilder/utils/normalizer.py                     | 137 ++++
+ WebBuilder/utils/parsers.py                        |  61 ++
+ WebBuilder/utils/url_reader.py                     |  70 ++
+ WebBuilder/views.py                                | 442 ++++++++++++
+ db.sqlite3                                         | Bin 0 -> 1744896 bytes
+ manage.py                                          |  22 +
+ project/__init__.py                                |   0
+ project/__pycache__/__init__.cpython-310.pyc       | Bin 0 -> 148 bytes
+ project/__pycache__/__init__.cpython-312.pyc       | Bin 0 -> 163 bytes
+ project/__pycache__/settings.cpython-310.pyc       | Bin 0 -> 2335 bytes
+ project/__pycache__/settings.cpython-312.pyc       | Bin 0 -> 2595 bytes
+ project/__pycache__/urls.cpython-310.pyc           | Bin 0 -> 1001 bytes
+ project/__pycache__/urls.cpython-312.pyc           | Bin 0 -> 1111 bytes
+ project/__pycache__/wsgi.cpython-310.pyc           | Bin 0 -> 551 bytes
+ project/__pycache__/wsgi.cpython-312.pyc           | Bin 0 -> 651 bytes
+ project/asgi.py                                    |  16 +
+ project/settings.py                                | 126 ++++
+ project/urls.py                                    |  23 +
+ project/wsgi.py                                    |  16 +
+ 114 files changed, 10187 insertions(+)

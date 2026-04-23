@@ -1,0 +1,91 @@
+2026-04-22 | Postgres SQL
+2026-04-22 | new workflows
+2026-04-21 | Agrupacion pasos entrega al llm
+2026-04-20 | correct errors generation
+2026-04-18 | snnipets
+2026-04-18 | presets
+2026-04-18 | Update portfolio + load data
+2026-04-17 | Dudas.md
+2026-04-16 | buenos updates
+2026-04-16 | updates
+2026-04-15 | Updates generation
+2026-04-15 | ricky morty
+2026-04-13 | navbar.html
+2026-04-13 | metrics site render
+2026-04-13 | error deploy fixed + requirements
+2026-04-12 | Light mode
+2026-04-11 | Translate + light mode
+2026-04-11 | code viewer new
+2026-04-11 | refactor site render
+2026-04-11 | remove _old
+2026-04-10 | Login/Register refactor
+2026-04-10 | Refactro history
+2026-04-09 | colors edit and users
+2026-04-09 | colors assistant
+2026-04-08 | Connect process generator
+2026-04-08 | csv/GEOjson
+2026-04-08 | REFACTOR V1 Funcional
+2026-04-08 | Refactors
+2026-04-08 | arreglo schema
+2026-04-08 | eleccion llm + llm personalizados
+2026-04-07 | metrics
+2026-04-07 | user/superuser pages
+2026-04-07 | history versions
+2026-04-06 | Idiomas
+2026-04-06 | intento de visor
+2026-04-06 | prompt guiado user
+2026-03-31 | dark/light mode
+2026-03-31 | history-fichs-metrics
+2026-03-31 | details home
+2026-03-31 | refactor html/css
+2026-03-30 | new home
+2026-03-30 | refactor generator
+2026-03-27 | Hacer mejoras y refactorizar generator
+2026-03-27 | no n8n refactor
+2026-03-27 | Funcional sin csv
+2026-03-26 | minimal changes
+2026-03-23 | upgrades
+2026-03-19 | tmp deploys
+2026-03-17 | edit zip
+2026-03-16 | docs + finish docker up n8n
+2026-03-15 | Update docker, files
+2026-03-05 | terminal home
+2026-03-03 | despliege dockern8n
+2026-03-03 | First web
+2026-03-03 | groq ia
+2026-03-02 | zip generator
+2026-03-02 | old preview
+2026-02-26 | webhook register n8n
+2026-02-26 | n8n login/register
+2026-02-26 | bugs fix
+2026-02-25 | some changes
+2026-02-25 | refresh visual
+2026-02-25 | visual assistant
+2026-02-24 | colors
+2026-02-24 | site_render
+2026-02-23 | generatedsite
+2026-02-22 | json + preview
+2026-02-21 | testing
+2026-02-21 | n8n download
+2026-02-21 | documentation
+2026-02-20 | env.example
+2026-02-20 | AI assistant
+2026-02-19 | llm + n8n
+2026-02-19 | refactor completed
+2026-02-18 | urls.py
+2026-02-18 | refactor views/utils
+2026-02-18 | refactor utils
+2026-02-18 | refactor analysis
+2026-02-18 | refactor 1/2 utils
+2026-02-18 | RefactorComments
+2026-02-16 | Order
+2026-02-13 | colors
+2026-02-12 | backgrounds
+2026-02-12 | UpdateUX
+2026-02-12 | update
+2026-02-12 | Update
+2026-02-11 | refactor
+2026-02-09 | readme
+2026-02-06 | Actualizacion
+2026-02-05 | Home Prueba
+2026-02-05 | Copia

@@ -1,0 +1,125 @@
+Reunion 1 (Miercoles 30/04/2025): 
+- Primera idea de TFG, web django con lectura de datos de APIs de hospitales para ayudar a los pacientes a saber que hospital es el adecuado conforme a unos parametros que el cliente meta
+- Tambien hubo una segunda idea que era, imaginate que una persona se quiere mudar a madrid, hazle toda la vida conforme a los datos de las APIs disponibles. Es decir, recoge datos de pisos, datos de colegios
+si es q tienen niños, datos de hospitales cercanos etc.
+
+
+Reunion 2 (Jueves 17/07/2025):
+- Segunda reunion para ver temas mas actualizados conforme a la situacion actual y demas. Al final se decidio hacer este proyecto, una app django que en base a los datos de apis fuese capaz de generar una pagina
+web funcional, pero todavia no habia nada claro del funcionamiento, quedaba investigar.
+
+
+Reunion 3 (Lunes 28/07/2025): 
+- En esta reunion le paso al tutor un Propuesta del TFG relacionada con lo que habiamos comentado antes y las ideas principales que tenia. Adjunto el contenido del correo de propuesta:
+
+Nombre de la aplicación: WebBuilder.
+Funcionalidad principal:
+WebBuilder es una aplicación web cuyo objetivo es procesar los datos 
+proporcionados por una API externa para generar automáticamente una página 
+web personalizada, basada en las preferencias del usuario.
+Fases de desarrollo del proyecto:
+1. Creación de la página principal (landing page)
+Esta página inicial explicará la funcionalidad de la aplicación e incluirá opciones 
+para que el usuario pueda registrarse o iniciar sesión. Tendrá algún botón para 
+comenzar que llevará a la página donde se introducirá el enlace.
+Desde esta página se podrá introducir el enlace de la API y, si la validación es 
+correcta se podrá configurar la personalización de la futura página web.
+También habrá otra página que incluirá una sección de historial, en la que se 
+guardarán todas las páginas generadas anteriormente por el usuario, así como 
+borradores o procesos no finalizados, permitiendo su consulta o reutilización en el 
+futuro
+2. Validación y procesamiento del enlace de la API
+Se leerá y verificará el enlace proporcionado por el usuario para comprobar su 
+validez. Una vez validado, se procederá al análisis y procesamiento de los datos 
+que devuelve la API.
+3. Lectura de las preferencias de personalización
+Una vez verificada la API se recogerán todas las opciones seleccionadas por el 
+usuario para personalizar la página web:
+Tema visual: Claro, oscuro o modo intercambiable.
+Idioma: Posibilidad de elegir entre varios idiomas.
+Estructura y diseño: Número de páginas a generar, estructura (horizontal, vertical, 
+responsive...).
+Tipografía: Tipo y tamaño de fuente.
+Paleta de colores: Selección de colores preferidos.
+Estilo general: Minimalista, clásico, moderno, con tarjetas, etc.
+4. Generación de la página web personalizada
+A partir de los datos procesados y la configuración seleccionada, se generarán los 
+archivos necesarios para construir y desplegar la página personalizada
+
+Contestacion del profesor: 
+
+Hola Alejandro,
+Perdona por la tardanza en contestar, ha sido una semana un poco complicada.
+Gracias por el resumen. La base del proyecto me parece buena, Pero es verdad que para que el TFG destaque y tenga un componente claramente innovador, me gustaría que incorporáramos un módulo de IA que sugiera y genere el código de Django de la aplicación a partir de la API que indique el usuario y de sus preferencias.
+Te dejo brevemente como lo veo:
+
+    Convertir WebBuilder en un asistente que, además de generar la web personalizada, proponga y cree el backend en Django (modelos, vistas/URLs, templates y tests) de forma automatizada.
+    El usuario introduce la URL de la API y las preferencias (tema, estructura, etc.).
+    WebBuilder orquesta una comunicación con la IA por etapas (habría que construir bien los prompts):
+        Primero genera una estructura y las apps necesarias
+        Genera modelos/vistas/templates/tests
+    Se valida la aplicación con pep8 y corriendo los tests
+    Levanta el proyecto en un contenedor efímero
+    Guardamos en WebBuilder todo, prompts, salidas y artefactos de cada build que se haga.
+
+Yo creo que esto es realmente interesante, ya que con solo una API una descripción hecha con lenguaje natural tendríamos una aplicación funcional generada automáticamente.
+Para usar la IA, puedes usar la API de openrouter que tiene muchos modelos (gratuitos aun que con un limit rate), la de together AI o si te ves con fuerzas puedes lanzarte tu propio modelo en local.
+Dime que te parece, esto es la chispa que necesita el TFG, ya que ahora mismo todo gira entorno a la IA y es una buena manera de que tu también aprendas y te muevas en entornos que son el presente y serán el futuro.
+Saludos,
+
+
+Reunion 4 (Jueves 2/10/2025):d
+- Estuve trabajando en el proyecto durante el verano y esta reunion fue un poco para ver los avances y asegurar la continuacion de un buen rumbo en el TFG. Comentamos que haria un guion detallado de los mini procesos que
+deberia ir añadiendo para que la pagina quedase bien. 
+
+
+Reunion 5 (Martes 7/10/2025):
+- Le envio el contenido de la lista para seguir avanzando con ella:
+
+Mini procesos
+1. URL
+    Pegar URL de los datos
+    Comprobar URL:
+        Comprobar formato: (http, https, not found, ruta vacia...)
+        Intentar conexion (200, 40x...)
+    Verificar que hay datos y se pueden leer (Independientemente del formato)
+    Traer una muestra de datos a forma de comprobacion de lectura
+        Resultado: URL validada + muestra visible
+2. DATOS
+    Detectar formato de los datos (JSON / XML)
+    Detectar conjuntos / bloques de datos
+    Detectar el tipo de datos (CharField, IntegerField) y cuantos tiene cada bloque
+    Detectar claves primarias, secundarias y relaciones de tablas o datos
+        Resultado: Lectura y creacion de esquema preliminar
+
+
+Reunion 6 (Jueves 12/02/2026):
+- Aprobe los examenes y tocaba darle duro al proyecto, simplemente le escribi para ver comp funcionaba el proceso de documentacion de la intranet de la universidad.
+
+
+Reunion 7 (Jueves 26/02/2026):
+- Aqui ya empezaban los primeros avanzaces guays, el html css y js estaba justito para ir probando cosas, adjunto el contenido importante de la reunion: 
+Hola David.
+
+Te escribo porque estoy avanzando por varios lados a la vez y quiero asegurarme de ir haciendo las cosas bien, este va a ser un correo un poco largo, perdón, pero te lo estructuro un poco para que se te haga ameno.
+
+Dudas:
+1 - Memorias y documentación
+Como ya te comente estoy cogiendo apuntes de los sitios donde me informo y los manuales que leo, y no se si podría ver alguna memoria de ejemplo, o la estructura, para coger los apuntes un poco enfocados al formato.
+2 - Base de datos
+En la última charla comentaste algunas opciones de DB que serían mejor que SQLite, pero no recuerdo bien cuales dijiste ni de qué forma podríamos implementarlas, no sé si te referiste a directamente cambiar todo el flujo de datos de la base que tenemos a una de esas u otra cosa diferente.
+Si puedes, ¿me haces un resumen breve de lo que me aconsejaste el otro día?
+
+Avances:
+1 - Asistente IA
+Ya tengo implementado el asistente y puesto de tal forma que se adapta a los mappings perfecto y he creado un apartado para modificar un poco el mapping con nombres del proyecto o de los campos por si al usuario no le gustan. Estoy viendo como hacer la generación de los demas templates y .py que eso si q tiene buena tarea.
+2 - n8n
+Ya lo tengo descargado en docker y estoy trasteando con flujos sencillos para ver como funciona y demás.
+Hoy por ejemplo estoy implementando que cuando el usuario se registre le llegue un correo de bienvenida o de aviso de que alguien ha entrado con su cuenta, es una chorrada, pero para conocer bien el funcionamiento.
+
+
+Reunion 8 (Lunes 23/03/2026):
+- Para mostrar los avances antes de semana santa y poder seguir con la implementacion de mejoras, aqui ya habia algunas generaciones de paginas aunque mayoritariamente daban error.
+
+Reunion 9 (Martes 21/04/2026):
+- Reunion mas reciente, para hablar sobre el tema de la memomoria y las pocas cosas que quedan ya de implementacion.
