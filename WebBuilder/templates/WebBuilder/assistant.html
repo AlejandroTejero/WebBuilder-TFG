@@ -200,5 +200,12 @@
   </div>
 </div>
 
+{% trans "Predeterminado" as txt_llm_default %}
+<script>
+  window.WB_I18N = Object.assign({}, window.WB_I18N || {}, {
+    llmDefaultLabel: "{{ txt_llm_default|escapejs }}"
+  });
+</script>
+
 <script src="{% static 'js/assistant.js' %}"></script>
 {% endblock %}
