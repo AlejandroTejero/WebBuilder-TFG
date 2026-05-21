@@ -53,10 +53,14 @@
 
           <div class="wb-flow-tabs">
             <button type="button" class="wb-flow-tab active" data-flow="deploy">Deploy</button>
+            <button type="button" class="wb-flow-tab" data-flow="generation-done">{% trans "Generación" %}</button>
+            <button type="button" class="wb-flow-tab" data-flow="health-check">Health Check</button>
+            <button type="button" class="wb-flow-tab" data-flow="auto-shutdown">Auto-Shutdown</button>
             <button type="button" class="wb-flow-tab" data-flow="login">Login</button>
             <button type="button" class="wb-flow-tab" data-flow="register">Register</button>
           </div>
 
+          <!-- DEPLOY -->
           <div class="wb-flow-content active" id="flow-deploy">
             <div class="wb-flow-nodes">
               <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /webbuilder-deploy</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
@@ -77,6 +81,53 @@
             </div>
           </div>
 
+          <!-- GENERATION DONE -->
+          <div class="wb-flow-content" id="flow-generation-done">
+            <div class="wb-flow-desc">{% trans "Se dispara cuando el LLM termina de generar el proyecto. Notifica al usuario por email con el enlace de preview." %}</div>
+            <div class="wb-flow-nodes">
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /webbuilder-generation-done</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">⚙</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Preparar datos" %}</div><div class="wb-node-detail">{% trans "Valida email, username, preview_url" %}</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-email">✉</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Enviar email" %}</div><div class="wb-node-detail">{% trans "Notifica al usuario con el enlace de preview" %}</div></div><span class="wb-node-badge wb-nb-email">email</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-respond">→</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Responder OK" %}</div><div class="wb-node-detail">200 · { ok: true }</div></div><span class="wb-node-badge wb-nb-ok">response</span></div>
+            </div>
+          </div>
+
+          <!-- HEALTH CHECK -->
+          <div class="wb-flow-content" id="flow-health-check">
+            <div class="wb-flow-desc">{% trans "Se ejecuta cada día a las 11:00. Consulta las métricas de Django, evalúa alertas y manda un informe al admin." %}</div>
+            <div class="wb-flow-nodes">
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-schedule">🕐</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Diario 11:00" %}</div><div class="wb-node-detail">{% trans "Cron diario" %}</div></div><span class="wb-node-badge wb-nb-trigger">schedule</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-http">⇄</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Pedir resumen a Django" %}</div><div class="wb-node-detail">GET /internal/health-summary/</div></div><span class="wb-node-badge wb-nb-http">http</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">⚙</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Evaluar alertas" %}</div><div class="wb-node-detail">{% trans "Tasa de éxito, reintentos, disco" %}</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-email">✉</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Email informe" %}</div><div class="wb-node-detail">{% trans "Resumen diario al admin" %}</div></div><span class="wb-node-badge wb-nb-email">email</span></div>
+            </div>
+          </div>
+
+          <!-- AUTO-SHUTDOWN -->
+          <div class="wb-flow-content" id="flow-auto-shutdown">
+            <div class="wb-flow-desc">{% trans "Se ejecuta cada hora. Detecta contenedores Docker inactivos, los apaga y notifica a Django para actualizar el estado." %}</div>
+            <div class="wb-flow-nodes">
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-schedule">🕐</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Cada 1 hora" %}</div><div class="wb-node-detail">{% trans "Cron cada hora" %}</div></div><span class="wb-node-badge wb-nb-trigger">schedule</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-code">⚙</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Listar contenedores inactivos" %}</div><div class="wb-node-detail">{% trans "docker ps · filtra por antigüedad" %}</div></div><span class="wb-node-badge wb-nb-code">code</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-if">⑂</div><div class="wb-node-info"><div class="wb-node-name">{% trans "¿Hay contenedores?" %}</div><div class="wb-node-detail">{% trans "Condicional" %}</div></div><span class="wb-node-badge wb-nb-code">if</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-docker">⬡</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Apagar contenedor" %}</div><div class="wb-node-detail">docker stop · docker rm</div></div><span class="wb-node-badge wb-nb-docker">docker</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-http">⇄</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Notificar a Django" %}</div><div class="wb-node-detail">POST /internal/container-shutdown/</div></div><span class="wb-node-badge wb-nb-http">http</span></div>
+              <div class="wb-flow-connector"></div>
+              <div class="wb-flow-node"><div class="wb-node-icon wb-ni-email">✉</div><div class="wb-node-info"><div class="wb-node-name">{% trans "Email al admin" %}</div><div class="wb-node-detail">{% trans "Resumen de apagados" %}</div></div><span class="wb-node-badge wb-nb-email">email</span></div>
+            </div>
+          </div>
+
+          <!-- LOGIN -->
           <div class="wb-flow-content" id="flow-login">
             <div class="wb-flow-nodes">
               <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /WebBuilder-Login</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
@@ -85,6 +136,7 @@
             </div>
           </div>
 
+          <!-- REGISTER -->
           <div class="wb-flow-content" id="flow-register">
             <div class="wb-flow-nodes">
               <div class="wb-flow-node"><div class="wb-node-icon wb-ni-webhook">⏱</div><div class="wb-node-info"><div class="wb-node-name">Webhook</div><div class="wb-node-detail">POST /WebBuilder-Register</div></div><span class="wb-node-badge wb-nb-trigger">trigger</span></div>
@@ -92,6 +144,7 @@
               <div class="wb-flow-node"><div class="wb-node-icon wb-ni-email">✉</div><div class="wb-node-info"><div class="wb-node-name">Send Email — {% trans "Bienvenida" %}</div><div class="wb-node-detail">{% trans "Correo de bienvenida al usuario" %}</div></div><span class="wb-node-badge wb-nb-email">email</span></div>
             </div>
           </div>
+
         </div>
       </div>
 

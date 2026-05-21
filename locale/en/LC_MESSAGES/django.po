@@ -1505,43 +1505,155 @@ msgid ""
 msgstr ""
 "The automated flow packages the project, builds the Docker image and deploys it on an available port."
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:52
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:55
 msgid "Flujos n8n automatizados"
 msgstr "Automated n8n flows"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:64
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:57
+msgid "Generación"
+msgstr "Generation"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:58
+msgid "Health Check"
+msgstr "Health Check"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:59
+msgid "Auto-Shutdown"
+msgstr "Auto-Shutdown"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:67
 msgid "Descomprimir Zip"
 msgstr "Unzip archive"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:66
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:69
 msgid "Restablecer Contenedor"
 msgstr "Reset container"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:68
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:71
 msgid "Elegir Puerto"
 msgstr "Choose port"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:68
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:71
 msgid "Escanea puertos 8100–8999"
 msgstr "Scans ports 8100–8999"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:74
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:77
 msgid "Verificar Docker"
 msgstr "Check Docker"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:74
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:77
 msgid "Espera 4s · comprueba estado"
 msgstr "Waits 4s · checks status"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:84
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:85
+msgid "Se dispara cuando el LLM termina de generar el proyecto. Notifica al usuario por email con el enlace de preview."
+msgstr "Triggered when the LLM finishes generating the project. Notifies the user by email with the preview link."
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:88
+msgid "Preparar datos"
+msgstr "Prepare data"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:88
+msgid "Valida email, username, preview_url"
+msgstr "Validates email, username, preview_url"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:90
+msgid "Enviar email"
+msgstr "Send email"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:90
+msgid "Notifica al usuario con el enlace de preview"
+msgstr "Notifies the user with the preview link"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:93
+msgid "Responder OK"
+msgstr "Respond OK"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:97
+msgid "Se ejecuta cada día a las 11:00. Consulta las métricas de Django, evalúa alertas y manda un informe al admin."
+msgstr "Runs every day at 11:00. Queries Django metrics, evaluates alerts and sends a report to the admin."
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:100
+msgid "Diario 11:00"
+msgstr "Daily 11:00"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:100
+msgid "Cron diario"
+msgstr "Daily cron"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:102
+msgid "Pedir resumen a Django"
+msgstr "Request summary from Django"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:104
+msgid "Evaluar alertas"
+msgstr "Evaluate alerts"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:104
+msgid "Tasa de éxito, reintentos, disco"
+msgstr "Success rate, retries, disk"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:106
+msgid "Email informe"
+msgstr "Report email"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:106
+msgid "Resumen diario al admin"
+msgstr "Daily summary to admin"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:110
+msgid "Se ejecuta cada hora. Detecta contenedores Docker inactivos, los apaga y notifica a Django para actualizar el estado."
+msgstr "Runs every hour. Detects inactive Docker containers, shuts them down and notifies Django to update the status."
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:113
+msgid "Cada 1 hora"
+msgstr "Every 1 hour"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:113
+msgid "Cron cada hora"
+msgstr "Hourly cron"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:115
+msgid "Listar contenedores inactivos"
+msgstr "List inactive containers"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:115
+msgid "docker ps · filtra por antigüedad"
+msgstr "docker ps · filters by age"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:117
+msgid "¿Hay contenedores?"
+msgstr "Any containers?"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:117
+msgid "Condicional"
+msgstr "Conditional"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:119
+msgid "Apagar contenedor"
+msgstr "Shut down container"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:121
+msgid "Notificar a Django"
+msgstr "Notify Django"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:123
+msgid "Email al admin"
+msgstr "Email to admin"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:123
+msgid "Resumen de apagados"
+msgstr "Shutdown summary"
+
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:127
 msgid "Notifica IP · hora · dispositivo"
 msgstr "Notifies IP · time · device"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:92
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:131
 msgid "Bienvenida"
 msgstr "Welcome"
 
-#: WebBuilder/templates/WebBuilder/partials/home/how.html:92
+#: WebBuilder/templates/WebBuilder/partials/home/how.html:131
 msgid "Correo de bienvenida al usuario"
 msgstr "Welcome email to the user"
 
@@ -1565,129 +1677,113 @@ msgstr "Choose the LLM that generates your project. Each model has its strengths
 msgid "Modelos disponibles"
 msgstr "Available models"
 
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:19
+msgid "predeterminado"
+msgstr "default"
+
 #: WebBuilder/templates/WebBuilder/partials/home/llms.html:46
 msgid "Personalizado"
 msgstr "Custom"
 
 #: WebBuilder/templates/WebBuilder/partials/home/llms.html:50
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:150
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:113
 msgid "Conecta tu modelo"
 msgstr "Connect your model"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:62
-msgid "alta calidad"
-msgstr "high quality"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:63
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:87
-msgid "código"
-msgstr "code"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:64
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:138
-msgid "rápido"
-msgstr "fast"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:69
-msgid ""
-"El modelo más equilibrado de OpenAI. Destaca en generación de código estructurado, comprensión de schemas complejos y seguimiento de instrucciones detalladas."
-msgstr ""
-"OpenAI's most balanced model. It stands out in structured code generation, understanding complex schemas and following detailed instructions."
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:70
-msgid "Especificaciones"
-msgstr "Specifications"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:72
-msgid "Contexto"
-msgstr "Context"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:73
-msgid "Velocidad"
-msgstr "Speed"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:73
-msgid "Alta"
-msgstr "High"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:74
-msgid "Proveedor"
-msgstr "Provider"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:75
-msgid "Coste"
-msgstr "Cost"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:75
-msgid "De pago"
-msgstr "Paid"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:86
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:120
-msgid "razonamiento"
-msgstr "reasoning"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:88
-msgid "preciso"
-msgstr "precise"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:93
-msgid ""
-"Muy fuerte en comprensión de APIs, inferencia de tipos de datos y generación de código Python/Django limpio."
-msgstr ""
-"Very strong at understanding APIs, inferring data types and generating clean Python/Django code."
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:103
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:136
-msgid "gratuito"
-msgstr "free"
-
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:104
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:60
 msgid "muy rápido"
 msgstr "very fast"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:110
-msgid "Una opción open source muy rápida para una generación económica y con buena latencia."
-msgstr "A very fast open source option for cost-effective generation with good latency."
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:61
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:82
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:99
+msgid "código"
+msgstr "code"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:121
-msgid "multimodal"
-msgstr "multimodal"
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:62
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:101
+msgid "gratuito"
+msgstr "free"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:126
-msgid ""
-"Especialmente útil cuando hay datasets largos o estructuras amplias que necesitan mucho contexto."
-msgstr ""
-"Especially useful when there are long datasets or broad structures that need a lot of context."
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:68
+msgid "Modelo rápido y eficiente de Meta, ideal para generación de código estructurado. Muy rápido, buena calidad de código y gratuito vía Groq. Contexto limitado en respuestas muy largas."
+msgstr "Fast and efficient Meta model, ideal for structured code generation. Very fast, good code quality and free via Groq. Limited context on very long responses."
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:143
-msgid "Buena relación calidad/coste y buen razonamiento para generar templates coherentes."
-msgstr "Good quality/cost ratio and solid reasoning for generating coherent templates."
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:69
+msgid "Especificaciones"
+msgstr "Specifications"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:151
-msgid "Compatible con OpenRouter y Groq"
-msgstr "Compatible with OpenRouter and Groq"
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:71
+msgid "Contexto"
+msgstr "Context"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:155
-msgid ""
-"WebBuilder es compatible con APIs estilo OpenAI. Pega tu clave y el modelo que quieras usar."
-msgstr ""
-"WebBuilder is compatible with OpenAI-style APIs. Paste your key and the model you want to use."
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:72
+msgid "Velocidad"
+msgstr "Speed"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:169
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:180
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:191
-#: WebBuilder/templates/WebBuilder/partials/metrics/llm.html:60
-msgid "Modelo"
-msgstr "Model"
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:72
+msgid "Muy alta"
+msgstr "Very high"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:187
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:73
+msgid "Proveedor"
+msgstr "Provider"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:74
+msgid "Coste"
+msgstr "Cost"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:74
+msgid "Gratuito"
+msgstr "Free"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:81
+msgid "razonamiento"
+msgstr "reasoning"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:85
+msgid "Versión grande de Llama 3, más potente para webs complejas. Mayor capacidad de razonamiento, gratis en OpenRouter. Más lento que Scout."
+msgstr "Large version of Llama 3, more powerful for complex websites. Greater reasoning capacity, free on OpenRouter. Slower than Scout."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:87
+msgid "Media"
+msgstr "Medium"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:98
+msgid "HTML/CSS limpio"
+msgstr "clean HTML/CSS"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:100
+msgid "rápido"
+msgstr "fast"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:104
+msgid "Modelo especializado en código de Alibaba, muy bueno generando HTML/CSS limpio. Optimizado para código, genera estructuras limpias. Puede ser más lento, gratuito con límites."
+msgstr "Alibaba's code-specialised model, very good at generating clean HTML/CSS. Optimised for code, produces clean structures. Can be slower, free with limits."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:107
+msgid "Gratuito (límites)"
+msgstr "Free (limited)"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:113
+msgid "Compatible con OpenRouter, Groq y Ollama"
+msgstr "Compatible with OpenRouter, Groq and Ollama"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:116
+msgid "WebBuilder es compatible con APIs estilo OpenAI. Configura tu clave y el modelo en tu perfil de usuario."
+msgstr "WebBuilder is compatible with OpenAI-style APIs. Set your key and model in your user profile."
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:127
 msgid "URL del servidor"
 msgstr "Server URL"
 
-#: WebBuilder/templates/WebBuilder/partials/home/llms.html:196
-msgid "Guardar y usar este modelo"
-msgstr "Save and use this model"
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:133
+msgid "Modelo"
+msgstr "Model"
+
+#: WebBuilder/templates/WebBuilder/partials/home/llms.html:138
+msgid "Configurar en mi perfil"
+msgstr "Configure in my profile"
 
 #: WebBuilder/templates/WebBuilder/partials/home/metrics.html:7
 msgid "modelos de IA"
@@ -2357,4 +2453,3 @@ msgstr "Optimized for code, generates clean structures."
 #: WebBuilder/utils/llm/llm_catalog.py
 msgid "Puede ser más lento, gratuito con límites."
 msgstr "May be slower; free with limits."
-

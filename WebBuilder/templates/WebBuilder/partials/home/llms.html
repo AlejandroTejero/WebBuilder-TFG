@@ -13,33 +13,27 @@
       <div class="wb-llm-list">
         <div class="wb-llm-list-label">{% trans "Modelos disponibles" %}</div>
 
-        <div class="wb-llm-item active" data-panel="llm-gpt4o">
-          <div class="wb-llm-logo wb-logo-gpt">GPT</div>
-          <div class="wb-llm-item-info"><div class="wb-llm-item-name">GPT-4o</div><div class="wb-llm-item-provider">OpenAI</div></div>
+        <!-- Llama 4 Scout — PREDETERMINADO -->
+        <div class="wb-llm-item active" data-panel="llm-scout">
+          <div class="wb-llm-logo wb-logo-scout">L4</div>
+          <div class="wb-llm-item-info">
+            <div class="wb-llm-item-name">Llama 4 Scout <span class="wb-llm-default-badge">{% trans "predeterminado" %}</span></div>
+            <div class="wb-llm-item-provider">Meta · Groq</div>
+          </div>
           <span class="wb-llm-item-arrow">›</span>
         </div>
 
-        <div class="wb-llm-item" data-panel="llm-claude">
-          <div class="wb-llm-logo wb-logo-claude">ANT</div>
-          <div class="wb-llm-item-info"><div class="wb-llm-item-name">Claude Sonnet 4</div><div class="wb-llm-item-provider">Anthropic</div></div>
-          <span class="wb-llm-item-arrow">›</span>
-        </div>
-
+        <!-- Llama 3.3 70B -->
         <div class="wb-llm-item" data-panel="llm-llama">
-          <div class="wb-llm-logo wb-logo-llama">LLM</div>
-          <div class="wb-llm-item-info"><div class="wb-llm-item-name">Llama 3.3 70B</div><div class="wb-llm-item-provider">Meta · Groq</div></div>
+          <div class="wb-llm-logo wb-logo-llama">L3</div>
+          <div class="wb-llm-item-info"><div class="wb-llm-item-name">Llama 3.3 70B</div><div class="wb-llm-item-provider">Meta · OpenRouter</div></div>
           <span class="wb-llm-item-arrow">›</span>
         </div>
 
-        <div class="wb-llm-item" data-panel="llm-gemini">
-          <div class="wb-llm-logo wb-logo-gemini">GEM</div>
-          <div class="wb-llm-item-info"><div class="wb-llm-item-name">Gemini 2.5 Pro</div><div class="wb-llm-item-provider">Google</div></div>
-          <span class="wb-llm-item-arrow">›</span>
-        </div>
-
-        <div class="wb-llm-item" data-panel="llm-qwen">
-          <div class="wb-llm-logo wb-logo-qwen">QWN</div>
-          <div class="wb-llm-item-info"><div class="wb-llm-item-name">Qwen3 32B</div><div class="wb-llm-item-provider">Alibaba · Groq</div></div>
+        <!-- Qwen3 Coder -->
+        <div class="wb-llm-item" data-panel="llm-qwen-coder">
+          <div class="wb-llm-logo wb-logo-qwen">QC</div>
+          <div class="wb-llm-item-info"><div class="wb-llm-item-name">Qwen3 Coder</div><div class="wb-llm-item-provider">Alibaba · OpenRouter</div></div>
           <span class="wb-llm-item-arrow">›</span>
         </div>
 
@@ -52,107 +46,92 @@
         </div>
       </div>
 
-      <div class="wb-llm-detail active" id="llm-gpt4o">
+      <!-- LLAMA 4 SCOUT -->
+      <div class="wb-llm-detail active" id="llm-scout">
         <div class="wb-llm-detail-head">
-          <div class="wb-llm-detail-logo">🤖</div>
+          <div class="wb-llm-detail-logo">🦙</div>
           <div>
-            <div class="wb-llm-detail-name">GPT-4o</div>
-            <div class="wb-llm-detail-model">gpt-4o · OpenAI</div>
+            <div class="wb-llm-detail-name">Llama 4 Scout</div>
+            <div class="wb-llm-detail-model">meta-llama/llama-4-scout-17b-16e-instruct · Groq</div>
             <div class="wb-llm-detail-tags">
-              <span class="wb-llm-tag tag-quality">{% trans "alta calidad" %}</span>
+              <span class="wb-llm-tag tag-speed">{% trans "muy rápido" %}</span>
               <span class="wb-llm-tag tag-code">{% trans "código" %}</span>
-              <span class="wb-llm-tag tag-speed">{% trans "rápido" %}</span>
+              <span class="wb-llm-tag tag-free">{% trans "gratuito" %}</span>
             </div>
           </div>
         </div>
         <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
-        <p class="wb-llm-overview">{% trans "El modelo más equilibrado de OpenAI. Destaca en generación de código estructurado, comprensión de schemas complejos y seguimiento de instrucciones detalladas." %}</p>
+        <p class="wb-llm-overview">{% trans "Modelo rápido y eficiente de Meta, ideal para generación de código estructurado. Muy rápido, buena calidad de código y gratuito vía Groq. Contexto limitado en respuestas muy largas." %}</p>
         <div class="wb-llm-section-title">{% trans "Especificaciones" %}</div>
         <div class="wb-llm-specs-grid">
-          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Contexto" %}</div><div class="wb-llm-spec-value">128K tokens</div></div>
-          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Velocidad" %}</div><div class="wb-llm-spec-value">{% trans "Alta" %}</div></div>
-          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Proveedor" %}</div><div class="wb-llm-spec-value">OpenAI API</div></div>
-          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Coste" %}</div><div class="wb-llm-spec-value">{% trans "De pago" %}</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Contexto" %}</div><div class="wb-llm-spec-value">10M tokens</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Velocidad" %}</div><div class="wb-llm-spec-value">{% trans "Muy alta" %}</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Proveedor" %}</div><div class="wb-llm-spec-value">Groq API</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Coste" %}</div><div class="wb-llm-spec-value">{% trans "Gratuito" %}</div></div>
         </div>
       </div>
 
-      <div class="wb-llm-detail" id="llm-claude">
-        <div class="wb-llm-detail-head">
-          <div class="wb-llm-detail-logo">◆</div>
-          <div>
-            <div class="wb-llm-detail-name">Claude Sonnet 4</div>
-            <div class="wb-llm-detail-model">claude-sonnet-4 · Anthropic</div>
-            <div class="wb-llm-detail-tags">
-              <span class="wb-llm-tag tag-reason">{% trans "razonamiento" %}</span>
-              <span class="wb-llm-tag tag-code">{% trans "código" %}</span>
-              <span class="wb-llm-tag tag-quality">{% trans "preciso" %}</span>
-            </div>
-          </div>
-        </div>
-        <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
-        <p class="wb-llm-overview">{% trans "Muy fuerte en comprensión de APIs, inferencia de tipos de datos y generación de código Python/Django limpio." %}</p>
-      </div>
-
+      <!-- LLAMA 3.3 70B -->
       <div class="wb-llm-detail" id="llm-llama">
         <div class="wb-llm-detail-head">
           <div class="wb-llm-detail-logo">🦙</div>
           <div>
             <div class="wb-llm-detail-name">Llama 3.3 70B</div>
-            <div class="wb-llm-detail-model">llama-3.3-70b-versatile · Meta via Groq</div>
+            <div class="wb-llm-detail-model">meta-llama/llama-3.3-70b-instruct · OpenRouter</div>
             <div class="wb-llm-detail-tags">
+              <span class="wb-llm-tag tag-reason">{% trans "razonamiento" %}</span>
               <span class="wb-llm-tag tag-free">{% trans "gratuito" %}</span>
-              <span class="wb-llm-tag tag-speed">{% trans "muy rápido" %}</span>
               <span class="wb-llm-tag tag-code">open source</span>
             </div>
           </div>
         </div>
         <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
-        <p class="wb-llm-overview">{% trans "Una opción open source muy rápida para una generación económica y con buena latencia." %}</p>
-      </div>
-
-      <div class="wb-llm-detail" id="llm-gemini">
-        <div class="wb-llm-detail-head">
-          <div class="wb-llm-detail-logo">✦</div>
-          <div>
-            <div class="wb-llm-detail-name">Gemini 2.5 Pro</div>
-            <div class="wb-llm-detail-model">gemini-2.5-pro · Google</div>
-            <div class="wb-llm-detail-tags">
-              <span class="wb-llm-tag tag-reason">{% trans "razonamiento" %}</span>
-              <span class="wb-llm-tag tag-quality">{% trans "multimodal" %}</span>
-            </div>
-          </div>
+        <p class="wb-llm-overview">{% trans "Versión grande de Llama 3, más potente para webs complejas. Mayor capacidad de razonamiento, gratis en OpenRouter. Más lento que Scout." %}</p>
+        <div class="wb-llm-section-title">{% trans "Especificaciones" %}</div>
+        <div class="wb-llm-specs-grid">
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Contexto" %}</div><div class="wb-llm-spec-value">128K tokens</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Velocidad" %}</div><div class="wb-llm-spec-value">{% trans "Media" %}</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Proveedor" %}</div><div class="wb-llm-spec-value">OpenRouter</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Coste" %}</div><div class="wb-llm-spec-value">{% trans "Gratuito" %}</div></div>
         </div>
-        <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
-        <p class="wb-llm-overview">{% trans "Especialmente útil cuando hay datasets largos o estructuras amplias que necesitan mucho contexto." %}</p>
       </div>
 
-      <div class="wb-llm-detail" id="llm-qwen">
+      <!-- QWEN3 CODER -->
+      <div class="wb-llm-detail" id="llm-qwen-coder">
         <div class="wb-llm-detail-head">
           <div class="wb-llm-detail-logo">🔷</div>
           <div>
-            <div class="wb-llm-detail-name">Qwen3 32B</div>
-            <div class="wb-llm-detail-model">qwen/qwen3-32b · Alibaba via Groq</div>
+            <div class="wb-llm-detail-name">Qwen3 Coder</div>
+            <div class="wb-llm-detail-model">qwen/qwen3-coder · OpenRouter</div>
             <div class="wb-llm-detail-tags">
+              <span class="wb-llm-tag tag-code">{% trans "HTML/CSS limpio" %}</span>
               <span class="wb-llm-tag tag-free">{% trans "gratuito" %}</span>
-              <span class="wb-llm-tag tag-reason">thinking</span>
               <span class="wb-llm-tag tag-speed">{% trans "rápido" %}</span>
             </div>
           </div>
         </div>
         <div class="wb-llm-section-title">{% trans "Descripción" %}</div>
-        <p class="wb-llm-overview">{% trans "Buena relación calidad/coste y buen razonamiento para generar templates coherentes." %}</p>
+        <p class="wb-llm-overview">{% trans "Modelo especializado en código de Alibaba, muy bueno generando HTML/CSS limpio. Optimizado para código, genera estructuras limpias. Puede ser más lento, gratuito con límites." %}</p>
+        <div class="wb-llm-section-title">{% trans "Especificaciones" %}</div>
+        <div class="wb-llm-specs-grid">
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Contexto" %}</div><div class="wb-llm-spec-value">128K tokens</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Velocidad" %}</div><div class="wb-llm-spec-value">{% trans "Media" %}</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Proveedor" %}</div><div class="wb-llm-spec-value">OpenRouter</div></div>
+          <div class="wb-llm-spec"><div class="wb-llm-spec-label">{% trans "Coste" %}</div><div class="wb-llm-spec-value">{% trans "Gratuito (límites)" %}</div></div>
+        </div>
       </div>
 
+      <!-- CUSTOM -->
       <div class="wb-llm-custom-detail" id="llm-custom">
         <div class="wb-llm-detail-head">
           <div class="wb-llm-detail-logo wb-dashed">API</div>
           <div>
             <div class="wb-llm-detail-name">{% trans "Conecta tu modelo" %}</div>
-            <div class="wb-llm-detail-model">{% trans "Compatible con OpenRouter y Groq" %}</div>
+            <div class="wb-llm-detail-model">{% trans "Compatible con OpenRouter, Groq y Ollama" %}</div>
           </div>
         </div>
 
-        <p class="wb-custom-note">{% trans "WebBuilder es compatible con APIs estilo OpenAI. Pega tu clave y el modelo que quieras usar." %}</p>
+        <p class="wb-custom-note">{% trans "WebBuilder es compatible con APIs estilo OpenAI. Configura tu clave y el modelo en tu perfil de usuario." %}</p>
 
         <div class="wb-provider-tabs">
           <button type="button" class="wb-provider-tab active" data-provider="openrouter">OpenRouter</button>
@@ -163,37 +142,37 @@
         <div class="wb-provider-fields active" id="fields-openrouter">
           <div class="wb-custom-input-wrap">
             <div class="wb-custom-label">API Key</div>
-            <input class="wb-custom-input" type="password" placeholder="sk-or-v1-...">
+            <input class="wb-custom-input" type="password" placeholder="sk-or-v1-..." disabled>
           </div>
           <div class="wb-custom-input-wrap">
             <div class="wb-custom-label">{% trans "Modelo" %}</div>
-            <input class="wb-custom-input" type="text" placeholder="meta-llama/llama-3.3-70b-instruct">
+            <input class="wb-custom-input" type="text" placeholder="meta-llama/llama-3.3-70b-instruct" disabled>
           </div>
         </div>
 
         <div class="wb-provider-fields" id="fields-groq">
           <div class="wb-custom-input-wrap">
             <div class="wb-custom-label">API Key</div>
-            <input class="wb-custom-input" type="password" placeholder="gsk_...">
+            <input class="wb-custom-input" type="password" placeholder="gsk_..." disabled>
           </div>
           <div class="wb-custom-input-wrap">
             <div class="wb-custom-label">{% trans "Modelo" %}</div>
-            <input class="wb-custom-input" type="text" placeholder="llama-3.3-70b-versatile">
+            <input class="wb-custom-input" type="text" placeholder="llama-3.3-70b-versatile" disabled>
           </div>
         </div>
 
         <div class="wb-provider-fields" id="fields-ollama">
           <div class="wb-custom-input-wrap">
             <div class="wb-custom-label">{% trans "URL del servidor" %}</div>
-            <input class="wb-custom-input" type="text" placeholder="http://localhost:11434">
+            <input class="wb-custom-input" type="text" placeholder="http://localhost:11434" disabled>
           </div>
           <div class="wb-custom-input-wrap">
             <div class="wb-custom-label">{% trans "Modelo" %}</div>
-            <input class="wb-custom-input" type="text" placeholder="llama3.2, mistral, gemma3...">
+            <input class="wb-custom-input" type="text" placeholder="llama3.2, mistral, gemma3..." disabled>
           </div>
         </div>
 
-        <button class="wb-custom-save">{% trans "Guardar y usar este modelo" %} →</button>
+        <a href="{% url 'profile' %}" class="wb-custom-save">{% trans "Configurar en mi perfil" %} →</a>
       </div>
     </div>
   </div>

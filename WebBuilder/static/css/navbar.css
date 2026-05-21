@@ -32,7 +32,7 @@
 /* ── 1. VARIABLES CSS — modo oscuro por defecto ─────────────── */
 
 :root {
-  --navbar-height:      64px;
+  --navbar-height:     65px;
   /* --navbar-bg:          #0a0a0a; */
   --navbar-bg: #131315;
   --navbar-border:      rgba(255, 255, 255, 0.08);
@@ -149,14 +149,14 @@
 .wb-navbar-brand:hover { opacity: 0.8; }
 
 .wb-navbar-logo {
-  width:            36px;
-  height:           36px;
+  width:            65px;
+  height:           65px;
   border-radius:    8px;
   display:          flex;
   align-items:      center;
   justify-content:  center;
   overflow:         hidden;
-  background:       linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  background:       transparent;
 }
 .wb-navbar-logo img { width: 100%; height: 100%; object-fit: contain; }
 

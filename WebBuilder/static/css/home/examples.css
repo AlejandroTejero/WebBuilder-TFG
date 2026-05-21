@@ -3,322 +3,127 @@
   border-top: 1px solid var(--wb-border);
 }
 
-.wb-carousel-wrap {
-  overflow: hidden;
-  position: relative;
-  padding: 0 60px;
-  /* Longitud cards */
-  max-width: 1600px;
-  margin: 0 auto;
+/* ── Grid 3 columnas ── */
+.wb-examples-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
-.wb-carousel-wrap::before,
-.wb-carousel-wrap::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  /* Difuminado */ 
-  width: 150px;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.wb-carousel-wrap::before {
-  left: 0;
-  background: linear-gradient(to right, var(--wb-bg), transparent);
-}
-
-.wb-carousel-wrap::after {
-  right: 0;
-  background: linear-gradient(to left, var(--wb-bg), transparent);
-}
-
-@media (max-width: 1024px) {
-  .wb-carousel-wrap {
-    padding: 0 40px;
-  }
-  .wb-carousel-wrap::before,
-  .wb-carousel-wrap::after {
-    width: 80px;
-  }
-}
-
-@media (max-width: 768px) {
-  .wb-carousel-wrap {
-    padding: 0 20px;
-  }
-  .wb-carousel-wrap::before,
-  .wb-carousel-wrap::after {
-    width: 40px;
-  }
-}
-
-.wb-carousel-track {
-  display: flex;
-  gap: 14px;
-  width: max-content;
-  animation: wbCarouselScroll 32s linear infinite;
-}
-
-.wb-carousel-wrap:hover .wb-carousel-track {
-  animation-play-state: paused;
-}
-
-@keyframes wbCarouselScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - 7px)); }
-}
-
-.wb-example-card {
+/* ── Card ── */
+.wb-ex-card {
   background: var(--wb-bg-2);
   border: 1px solid var(--wb-border);
   border-radius: 8px;
   overflow: hidden;
   transition: border-color .18s, transform .18s;
-  /* Ancho card */
-  width: 300px;
-  flex-shrink: 0;
 }
 
-.wb-example-card:hover {
+.wb-ex-card:hover {
   border-color: var(--wb-border-md);
-  transform: translateY(-3px);
+  transform: translateY(-4px);
 }
 
-.wb-example-thumb {
+/* ── Thumbnail con screenshot real ── */
+.wb-ex-thumb {
   width: 100%;
-  /* Alto card */ 
-  height: 300px;
+  height: 220px;
   position: relative;
-  overflow: hidden;
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
   border-bottom: 1px solid var(--wb-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.wb-thumb-weather { background: #071428; }
-.wb-thumb-countries { background: #071a0d; }
-.wb-thumb-pokemon { background: #1e0808; }
-.wb-thumb-crypto { background: #181200; }
-.wb-thumb-news { background: #0a0818; }
-.wb-thumb-space { background: #050e1c; }
-
-
-/* ------- Sin referenciar pq no se ve bien, se pone directamente los colores ------- */
-
-.wb-fake-ui {
-  width: 88%;
-  height: 84%;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.09);
-  border-radius: 5px;
-  padding: 11px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+.wb-ex-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.08) 0%,
+    rgba(0,0,0,0.45) 100%
+  );
 }
 
-:root.light .wb-fake-ui {
-  background: rgba(0,0,0,0.08);
-  border: 1px solid rgba(0,0,0,0.12);
+:root.light .wb-ex-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.02) 0%,
+    rgba(0,0,0,0.25) 100%
+  );
 }
 
-:root.light .wb-thumb-weather,
-:root.light .wb-thumb-countries,
-:root.light .wb-thumb-pokemon,
-:root.light .wb-thumb-crypto,
-:root.light .wb-thumb-news,
-:root.light .wb-thumb-space {
-  filter: brightness(1.3) saturate(1.2);
-}
-
-/* ---------------------------------------------------------------------------------- */
-
-
-.wb-fake-topbar {
-  height: 8px;
-  border-radius: 2px;
-  background: var(--wb-border-md);
-  width: 60%;
-}
-
-.wb-fake-row {
-  display: flex;
-  gap: 5px;
-}
-
-.wb-fake-block {
-  border-radius: 3px;
-  background: var(--wb-border-md);
-}
-
-.wb-fake-block.full { width: 100%; }
-.wb-fake-block.w60 { width: 60%; }
-.wb-fake-block.w40 { width: 40%; }
-.wb-fake-block.w50 { width: 50%; }
-.wb-fake-block.w55 { width: 55%; }
-.wb-fake-block.w30 { width: 30%; }
-.wb-fake-block.w90 { width: 90%; }
-.wb-fake-block.w80 { width: 80%; }
-.wb-fake-block.w70 { width: 70%; }
-.wb-fake-block.h30 { height: 30px; }
-.wb-fake-block.h16 { height: 16px; }
-.wb-fake-block.h10 { height: 10px; }
-.wb-fake-block.h8 { height: 8px; }
-.wb-fake-block.h7 { height: 7px; }
-.wb-fake-block.h6 { height: 6px; }
-.wb-fake-block.h5 { height: 5px; }
-
-.wb-fake-stat {
-  flex: 1;
-  height: 34px;
-  border-radius: 3px;
-  border: 1px solid var(--wb-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wb-fake-stat span {
+/* Badge tipo sitio */
+.wb-ex-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
   font-size: 9px;
   font-family: var(--wb-mono);
-  color: var(--wb-t3);
-}
-
-.wb-fake-chart {
-  flex: 1;
-  height: 44px;
+  padding: 3px 8px;
   border-radius: 3px;
-  border: 1px solid var(--wb-border);
-  overflow: hidden;
-  position: relative;
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.06em;
 }
 
-.wb-fake-chart-line {
-  position: absolute;
-  bottom: 6px;
-  left: 4px;
-  right: 4px;
-  height: 22px;
+/* ── Info inferior ── */
+.wb-ex-body {
+  padding: 16px 18px;
 }
 
-.wb-thumb-weather .wb-fake-stat:first-child { border-color: rgba(56,148,255,0.45); background: rgba(56,148,255,0.07); }
-.wb-thumb-weather .wb-fake-stat:first-child span { color: #60a5fa; }
-.wb-thumb-countries .wb-fake-stat:first-child { border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.07); }
-.wb-thumb-countries .wb-fake-stat:first-child span { color: #34d399; }
-.wb-thumb-pokemon .wb-fake-stat:first-child { border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.07); }
-.wb-thumb-pokemon .wb-fake-stat:first-child span { color: #f87171; }
-.wb-thumb-crypto .wb-fake-stat:first-child { border-color: rgba(251,191,36,0.45); background: rgba(251,191,36,0.07); }
-.wb-thumb-crypto .wb-fake-stat:first-child span { color: #fbbf24; }
-.wb-thumb-news .wb-fake-stat:first-child { border-color: rgba(192,132,252,0.45); background: rgba(192,132,252,0.07); }
-.wb-thumb-news .wb-fake-stat:first-child span { color: #c084fc; }
-
-.wb-space-accent {
-  border-color: rgba(34,211,238,0.4) !important;
-  background: rgba(34,211,238,0.07) !important;
-}
-
-.wb-space-accent span {
-  color: #22d3ee !important;
-}
-
-.wb-space-block {
-  width: 100%;
-  height: 50px;
-  border-radius: 3px;
-  background: rgba(34,211,238,0.04);
-  border: 1px solid rgba(34,211,238,0.15);
-}
-
-.wb-poke-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid rgba(248,113,113,0.3);
-  background: rgba(248,113,113,0.06);
-  flex-shrink: 0;
-}
-
-.wb-poke-meta {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  justify-content: center;
-}
-
-.wb-poke-bar {
-  border-radius: 4px;
-  background: rgba(248,113,113,0.15);
-}
-
-.wb-news-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-
-.wb-news-item {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-
-.wb-news-thumb {
-  width: 36px;
-  height: 28px;
-  flex-shrink: 0;
-  border-radius: 3px;
-  background: var(--wb-border-md);
-}
-
-.wb-news-thumb.featured {
-  background: rgba(192,132,252,0.1);
-  border: 1px solid rgba(192,132,252,0.2);
-}
-
-.wb-news-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.wb-example-info {
-  padding: 14px 16px;
-}
-
-.wb-example-name {
-  font-size: 13px;
+.wb-ex-name {
+  font-size: 14px;
   font-weight: 500;
   color: var(--wb-t1);
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
-.wb-example-api {
+.wb-ex-api {
   font-size: 10px;
   font-family: var(--wb-mono);
   color: var(--wb-t3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 10px;
+  margin-bottom: 11px;
 }
 
-.wb-example-tags {
+.wb-ex-tags {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
 }
 
-.wb-example-tag {
+.wb-ex-tag {
   font-size: 10px;
   font-family: var(--wb-mono);
   padding: 2px 7px;
   border-radius: 3px;
   background: var(--wb-bg-3);
   color: var(--wb-t3);
+}
+
+.wb-ex-tag-gen {
+  background: rgba(56,189,248,0.07);
+  color: rgba(56,189,248,0.55);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .wb-examples-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .wb-examples-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wb-ex-thumb {
+    height: 180px;
+  }
 }
