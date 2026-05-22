@@ -9,17 +9,8 @@ import requests                     # resquest para hacer peticiones http
 MAX_BYTES = 1_000_000
 # Timeout por defecto en segundos
 DEFAULT_TIMEOUT = 8
-# Cabeceras por defecto para la petición.
-# Muchas APIs públicas (p. ej. Cleveland Museum of Art) devuelven 403 si el
-# User-Agent no parece un navegador. Usamos uno realista y pedimos JSON.
-DEFAULT_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.9,es;q=0.8",
-}
+# Cabeceras por defecto para la petición
+DEFAULT_HEADERS = {"User-Agent": "WebBuilder/1.0"}
 
 
 # ========================== VALIDACION ==========================
@@ -101,3 +92,4 @@ def fetch_url(api_url: str, *, timeout: int = DEFAULT_TIMEOUT, max_bytes: int = 
 # Devuelve una previsualización truncada del texto de los 600 primeros CARACTERES
 def make_preview(raw_text: str, max_chars: int = 600) -> str:
     return raw_text[:max_chars]
+

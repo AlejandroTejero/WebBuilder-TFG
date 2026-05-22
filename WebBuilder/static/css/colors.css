@@ -35,6 +35,8 @@
   --wb-accent:        rgba(15, 118, 55, 1);
   --wb-accent-bg:     rgba(22, 163, 74, 0.14);
   --wb-accent-border: rgba(22, 163, 74, 0.45);
+  --m-green: #24b46c;
+
 
   /* Semánticos: success */
   --wb-success-bg:     rgba(52, 211, 153, 0.08);
@@ -82,6 +84,7 @@
   --wb-success-border: rgba(22, 163, 74, 0.45);
   --wb-success-text:   rgba(15, 118, 55, 1);
   --wb-success-text-2: rgba(15, 118, 55, 1);
+  --m-green: #24b46c;
 
   /* Semánticos: error */
   --wb-error-bg:       rgba(220, 38, 38, 0.07);

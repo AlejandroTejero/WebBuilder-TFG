@@ -33,6 +33,10 @@
   animation: wbFadeUp .45s ease .07s both;
 }
 
+.wb-hero-accent {
+  color: var(--m-green);
+}
+
 .wb-hero-sub {
   font-size: 14px;
   color: var(--wb-t3);

@@ -26,6 +26,11 @@ from ..llm.generator_prompts import (
     prompt_load_data,
 )
 from ..llm.field_extractor import extract_model_fields
+from ..analysis.field_roles import (
+    infer_roles,
+    pick_primary_numeric,
+    pick_signed_field,
+)
 from ..llm.consistency_checker import fix_template, run_all_checks
 from ..llm.enrich_prompt import enrich_user_prompt
 from .notifications import notify_generation_done
@@ -107,6 +112,15 @@ def generate_project_files(site) -> dict[str, str]:
     )
     logger.info("[generator] Prompt enriquecido: %s...", enriched_prompt[:100])
 
+    # Inferir roles semánticos de los campos (numeric, percent, image, category…)
+    field_roles = infer_roles(fields, sample_items)
+    primary_numeric = pick_primary_numeric(field_roles, fields)
+    signed_field = pick_signed_field(field_roles, fields)
+    logger.info(
+        "[generator] Roles de campos: %s | numérico principal: %s | con signo: %s",
+        field_roles, primary_numeric, signed_field,
+    )
+
     project = slugify(site.project_name or site_title).replace("-", "_") or "generated_site"
     app = "siteapp"
 
@@ -159,6 +173,7 @@ def generate_project_files(site) -> dict[str, str]:
         fields=fields,
         sample_items=sample_items,
         site_title=site_title,
+        field_roles=field_roles,
     )
     models_code = llm_call_logged(system, user_text, "models", temperature=0.05, site=site)
     if not models_code.strip():
@@ -183,6 +198,9 @@ def generate_project_files(site) -> dict[str, str]:
         user_prompt=enriched_prompt,
         pages=pages,
         real_fields=real_fields,
+        field_roles=field_roles,
+        primary_numeric=primary_numeric,
+        signed_field=signed_field,
     )
     views_code = llm_call_logged(system, user_text, "views", temperature=0.05, site=site)
     if not views_code.strip():
@@ -228,7 +246,11 @@ def generate_project_files(site) -> dict[str, str]:
             real_url_names=real_url_names,
             design_system=design_system,
             preset_description=preset_description,
+            preset_id=preset.get("id", ""),
             generated_context=generated_html_context,
+            field_roles=field_roles,
+            primary_numeric=primary_numeric,
+            signed_field=signed_field,
         )
         html = llm_call_logged(
             system,
@@ -253,6 +275,7 @@ def generate_project_files(site) -> dict[str, str]:
         api_url=api_url,
         main_collection_path=main_path,
         real_fields=real_fields,
+        field_roles=field_roles,
     )
     load_data_code = llm_call_logged(system, user_text, "load_data", temperature=0.05, site=site)
     if not load_data_code.strip():

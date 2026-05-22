@@ -3,11 +3,13 @@
 <!-- HERO -->
 <section class="wb-hero">
   <div class="wb-hero-copy">
-    <div class="wb-eyebrow">{% trans "Generación con IA · Django · APIs públicas" %}</div>
+    <div class="wb-eyebrow"><span class="wb-hero-accent">{% trans "Generación con IA · Django · APIs públicas" %}</span></div>
+    
     <h1 class="wb-hero-title">
       {% trans "Convierte" %} <span class="muted">{% trans "datos crudos" %}</span><br>
-      {% trans "en un proyecto Django" %} <span class="muted">{% trans "real" %}</span>
+      {% trans "en un proyecto" %} <span class="wb-hero-accent">Django</span> <span class="muted">{% trans "real" %}</span>
     </h1>
+
     <p class="wb-hero-sub">
       {% trans "Pega una URL o arrastra un archivo, WebBuilder lo analiza y se encarga de todo." %}
     </p>
@@ -297,17 +299,14 @@
               <div class="wb-new-suggestions">
                 <div class="wb-new-sugg-label">{% trans "Sugerencias rápidas" %}</div>
                 <div class="wb-new-sugg" onclick="fillAndGo('https://api.openweathermap.org/data/2.5/weather?q=Madrid')">
-                  <span>🌧</span>
                   <span class="wb-new-sugg-url">api.openweathermap.org/data/2.5/weather</span>
                   <span class="wb-new-sugg-type">{% trans "meteorología" %}</span>
                 </div>
                 <div class="wb-new-sugg" onclick="fillAndGo('https://pokeapi.co/api/v2/pokemon/ditto')">
-                  <span>⚡</span>
                   <span class="wb-new-sugg-url">pokeapi.co/api/v2/pokemon</span>
                   <span class="wb-new-sugg-type">{% trans "listado" %}</span>
                 </div>
                 <div class="wb-new-sugg" onclick="fillAndGo('https://restcountries.com/v3.1/all')">
-                  <span>🌍</span>
                   <span class="wb-new-sugg-url">restcountries.com/v3.1/all</span>
                   <span class="wb-new-sugg-type">explorer</span>
                 </div>

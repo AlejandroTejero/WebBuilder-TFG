@@ -171,5 +171,12 @@ class UserProfile(models.Model):
     custom_llm_model    = models.CharField(max_length=200, blank=True, default="")
     custom_llm_api_key  = EncryptedCharField(max_length=500, blank=True, default="")
 
+    preferred_language  = models.CharField(
+        max_length=10,
+        choices=[("es", "Español"), ("en", "English")],
+        default="en",
+        blank=True,
+    )
+
     def __str__(self):
         return f"Perfil de {self.user.username}"

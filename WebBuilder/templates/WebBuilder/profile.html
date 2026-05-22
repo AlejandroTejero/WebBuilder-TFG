@@ -3,68 +3,200 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="profile-container">
+<div class="asst-layout">
 
-  <div class="profile-header">
-    <h1 class="profile-title">{% trans "Mi perfil" %}</h1>
-    <p class="profile-subtitle">{% trans "Configura tu modelo LLM personalizado" %}</p>
-  </div>
+  <aside class="asst-sidebar">
+    <div class="asst-sidebar__inner">
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="asst-alert asst-alert--{{ message.tags }}">
-        <span class="asst-alert__icon">
-          {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% else %}ℹ{% endif %}
-        </span>
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  <div class="profile-card">
-    <form method="post">
-      {% csrf_token %}
-
-      <div class="profile-section">
-        <h2 class="profile-section__title">{% trans "🤖 Modelo LLM personalizado" %}</h2>
-        <p class="profile-section__desc">
-          {% blocktrans trimmed %}
-          Si quieres usar tu propio proveedor, rellena estos campos.
-          Debe ser compatible con la API de OpenAI (mismo formato de request).
-          Si los dejas vacíos, se usará el modelo que elijas en el asistente.
-          {% endblocktrans %}
-        </p>
-
-        <div class="profile-field">
-          <label class="profile-label">{{ form.custom_llm_base_url.label }}</label>
-          {{ form.custom_llm_base_url }}
-          <span class="profile-hint">{% trans "Ej: https://api.openai.com/v1" %}</span>
+      <div class="profile-avatar-block">
+        <div class="profile-avatar">{{ request.user.username|slice:":2"|upper }}</div>
+        <div class="profile-avatar-info">
+          <span class="profile-avatar-name">{{ request.user.username }}</span>
+          <span class="profile-avatar-join">{% trans "Since" %} {{ request.user.date_joined|date:"M Y" }}</span>
         </div>
-
-        <div class="profile-field">
-          <label class="profile-label">{{ form.custom_llm_model.label }}</label>
-          {{ form.custom_llm_model }}
-          <span class="profile-hint">{% trans "Ej: gpt-4o, claude-3-5-sonnet..." %}</span>
-        </div>
-
-        <div class="profile-field">
-          <label class="profile-label">{{ form.custom_llm_api_key.label }}</label>
-          {{ form.custom_llm_api_key }}
-          <span class="profile-hint">{% trans "Se guarda cifrada. No se muestra una vez guardada." %}</span>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <span class="profile-stat__n">{{ request.user.api_requests.count }}</span>
+            <span class="profile-stat__l">{% trans "analyses" %}</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat__n">{{ request.user.api_requests.all|length }}</span>
+            <span class="profile-stat__l">{% trans "sites" %}</span>
+          </div>
         </div>
       </div>
 
-      <div class="profile-footer">
-        <button type="submit" class="asst-btn asst-btn--primary">{% trans "Guardar cambios" %}</button>
-        <a href="{% url 'home' %}" class="asst-btn asst-btn--ghost">{% trans "Cancelar" %}</a>
+      <nav class="profile-sidenav">
+        <a href="#" class="profile-sidenav__item {% if active_tab == 'account' %}active{% endif %}"
+           onclick="switchTab('account'); return false;">
+          <span class="profile-sidenav__icon">◈</span>
+          {% trans "Account" %}
+        </a>
+        <a href="#" class="profile-sidenav__item {% if active_tab == 'llm' %}active{% endif %}"
+           onclick="switchTab('llm'); return false;">
+          <span class="profile-sidenav__icon">⬡</span>
+          {% trans "LLM model" %}
+        </a>
+      </nav>
+
+      <a href="{% url 'home' %}" class="asst-history-link">
+        ← {% trans "Back to home" %}
+      </a>
+
+    </div>
+  </aside>
+
+  <main class="asst-content">
+
+    {% if messages %}
+      <div class="asst-alerts">
+        {% for message in messages %}
+          <div class="asst-alert asst-alert--{{ message.tags }}">
+            <span class="asst-alert__icon">
+              {% if message.tags == "success" %}✓{% elif message.tags == "error" %}✗{% elif message.tags == "warning" %}⚠{% else %}ℹ{% endif %}
+            </span>
+            {{ message }}
+          </div>
+        {% endfor %}
       </div>
+    {% endif %}
 
-    </form>
-  </div>
+    <div class="profile-main-header">
+      <div class="asst-card__step-badge">⬡ {% trans "Profile" %}</div>
+      <h1 class="profile-title">{% trans "My profile" %}</h1>
+      <p class="profile-subtitle">{% trans "Manage your account and custom LLM settings" %}</p>
+    </div>
 
+    <div class="profile-tabs">
+      <button class="profile-tab {% if active_tab == 'account' %}active{% endif %}"
+              id="tab-btn-account" onclick="switchTab('account')">
+        {% trans "Account" %}
+      </button>
+      <button class="profile-tab {% if active_tab == 'llm' %}active{% endif %}"
+              id="tab-btn-llm" onclick="switchTab('llm')">
+        {% trans "LLM model" %}
+      </button>
+    </div>
+
+    <!-- PANEL: ACCOUNT -->
+    <div class="profile-panel" id="panel-account"
+         style="{% if active_tab != 'account' %}display:none{% endif %}">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="account">
+
+        <div class="asst-card">
+          <h2 class="profile-section__title">{% trans "User information" %}</h2>
+          <p class="profile-section__desc">{% trans "Basic data linked to your account." %}</p>
+
+          <div class="profile-fields-grid">
+            <div class="profile-field">
+              <label class="profile-label">{{ account_form.username.label }}</label>
+              {{ account_form.username }}
+              {% if account_form.username.errors %}
+                <span class="profile-field-error">{{ account_form.username.errors.0 }}</span>
+              {% endif %}
+            </div>
+            <div class="profile-field">
+              <label class="profile-label">{{ account_form.email.label }}</label>
+              {{ account_form.email }}
+              {% if account_form.email.errors %}
+                <span class="profile-field-error">{{ account_form.email.errors.0 }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="profile-field" style="margin-top: 10px;">
+            <label class="profile-label">{{ account_form.preferred_language.label }}</label>
+            {{ account_form.preferred_language }}
+          </div>
+        </div>
+
+        <div class="asst-card" style="margin-top: 14px;">
+          <h2 class="profile-section__title">{% trans "Change password" %}</h2>
+          <p class="profile-section__desc">{% trans "Leave blank if you don't want to change it." %}</p>
+
+          <div class="profile-field">
+            <label class="profile-label">{{ account_form.current_password.label }}</label>
+            {{ account_form.current_password }}
+            {% if account_form.current_password.errors %}
+              <span class="profile-field-error">{{ account_form.current_password.errors.0 }}</span>
+            {% endif %}
+          </div>
+          <div class="profile-field" style="margin-top: 10px;">
+            <label class="profile-label">{{ account_form.new_password.label }}</label>
+            {{ account_form.new_password }}
+            {% if account_form.new_password.errors %}
+              <span class="profile-field-error">{{ account_form.new_password.errors.0 }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="profile-footer">
+          <button type="submit" class="asst-btn asst-btn--primary">{% trans "Save changes" %}</button>
+          <a href="{% url 'home' %}" class="asst-btn asst-btn--ghost">{% trans "Cancel" %}</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- PANEL: LLM -->
+    <div class="profile-panel" id="panel-llm"
+         style="{% if active_tab != 'llm' %}display:none{% endif %}">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="llm">
+
+        <div class="asst-card">
+          <h2 class="profile-section__title">{% trans "Custom LLM model" %}</h2>
+          <p class="profile-section__desc">
+            {% blocktrans trimmed %}
+            OpenAI-compatible provider. Leave empty to use the model selected in the assistant.
+            {% endblocktrans %}
+          </p>
+
+          <div class="profile-field">
+            <label class="profile-label">{{ llm_form.custom_llm_base_url.label }}</label>
+            {{ llm_form.custom_llm_base_url }}
+            <span class="profile-hint">{% trans "e.g. https://api.openai.com/v1" %}</span>
+          </div>
+          <div class="profile-field" style="margin-top: 10px;">
+            <label class="profile-label">{{ llm_form.custom_llm_model.label }}</label>
+            {{ llm_form.custom_llm_model }}
+            <span class="profile-hint">{% trans "e.g. gpt-4o, claude-3-5-sonnet..." %}</span>
+          </div>
+          <div class="profile-field" style="margin-top: 10px;">
+            <label class="profile-label">{{ llm_form.custom_llm_api_key.label }}</label>
+            {{ llm_form.custom_llm_api_key }}
+            <span class="profile-hint">{% trans "Stored encrypted. Not shown once saved." %}</span>
+          </div>
+        </div>
+
+        <div class="profile-footer">
+          <button type="submit" class="asst-btn asst-btn--primary">{% trans "Save changes" %}</button>
+          <a href="{% url 'home' %}" class="asst-btn asst-btn--ghost">{% trans "Cancel" %}</a>
+        </div>
+      </form>
+    </div>
+
+  </main>
 </div>
+
+<script>
+function switchTab(tab) {
+  document.getElementById('panel-account').style.display = tab === 'account' ? 'block' : 'none';
+  document.getElementById('panel-llm').style.display     = tab === 'llm'     ? 'block' : 'none';
+  document.getElementById('tab-btn-account').className   = 'profile-tab' + (tab === 'account' ? ' active' : '');
+  document.getElementById('tab-btn-llm').className       = 'profile-tab' + (tab === 'llm'     ? ' active' : '');
+  document.querySelectorAll('.profile-sidenav__item').forEach((el, i) => {
+    el.className = 'profile-sidenav__item' + (
+      (tab === 'account' && i === 0) || (tab === 'llm' && i === 1) ? ' active' : ''
+    );
+  });
+}
+</script>
 {% endblock %}

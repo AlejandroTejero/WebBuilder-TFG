@@ -18,7 +18,11 @@ from .constants import (
 def _path_penalty(path: list) -> float:
 
     idxs = sum(1 for p in path if isinstance(p, int))
-    return PATH_INDEX_PENALTY * idxs + PATH_LENGTH_PENALTY * max(0, len(path) - PATH_LENGTH_THRESHOLD)
+    # Una lista cuyo path contiene un índice entero está anidada DENTRO de un item
+    # de otra colección (p.ej. data -> [0] -> citations). Casi nunca es la colección
+    # principal, así que la penalizamos con fuerza para preferir el array de nivel superior.
+    nested_pen = 8.0 if idxs > 0 else 0.0
+    return PATH_INDEX_PENALTY * idxs + PATH_LENGTH_PENALTY * max(0, len(path) - PATH_LENGTH_THRESHOLD) + nested_pen
 
 
 # Devuelve el último nombre de key en el path (ignorando índices).

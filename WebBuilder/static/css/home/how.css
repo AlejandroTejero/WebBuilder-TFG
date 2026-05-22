@@ -46,7 +46,7 @@
 .wb-step-num {
   font-size: 11px;
   font-family: var(--wb-mono);
-  color: var(--wb-t4);
+  color: #24b46c;
   padding-top: 2px;
   font-weight: 500;
 }

@@ -52,6 +52,7 @@ def build_static_files(project: str, app: str = "siteapp", design_system: dict =
         "    'django.contrib.sessions',\n"
         "    'django.contrib.messages',\n"
         "    'django.contrib.staticfiles',\n"
+        "    'django.contrib.humanize',\n"
         f"    '{app}',\n"
         "]\n"
         "\n"

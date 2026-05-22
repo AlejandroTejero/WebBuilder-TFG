@@ -91,7 +91,8 @@ body {
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--wb-t3);
+  /* color: var(--wb-t3); */
+  color: #24b46c;
   font-family: var(--wb-mono);
   margin-bottom: 16px;
 }

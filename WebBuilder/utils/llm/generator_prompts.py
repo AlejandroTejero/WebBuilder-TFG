@@ -301,30 +301,41 @@ def prompt_pages_structure(*, site_type, site_title, user_prompt, fields, sample
 
 # ── 2) MODELS.PY ───────────────────────────────────────────────────────────
 
-def prompt_models(*, fields, sample_items, site_title):
+def prompt_models(*, fields, sample_items, site_title, field_roles=None):
+    field_roles = field_roles or {}
+
     rules = [
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con 'from django.db import models'. Sin nada antes.",
         "CRÍTICO: PROHIBIDO usar ```, ```python o cualquier bloque Markdown. Código puro.",
         "Un modelo llamado 'Item' con los campos del schema.",
-        "Infiere el tipo Django correcto con los ejemplos:",
-        "  URL/imagen → URLField(blank=True)",
-        "  Si un campo se llama '*_url' pero hay otro campo con el mismo prefijo sin '_url' que contiene el valor legible (ej: 'language' vs 'languages_url'), usa el campo sin '_url' como CharField y descarta el que acaba en '_url'.",
-        "  Texto largo o HTML → TextField(blank=True)",
-        "  Texto corto → CharField(max_length=500, blank=True)",
-        "  Entero → IntegerField(null=True, blank=True)",
-        "  Decimal/precio → DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)",
-        "  Fecha → DateField(null=True, blank=True)",
-        "  Booleano → BooleanField(null=True, blank=True)",
+        "USA LOS ROLES SEMÁNTICOS de abajo como fuente principal para elegir el tipo de campo. Los ejemplos solo confirman.",
+        "  rol 'numeric'  → FloatField(null=True, blank=True). SIEMPRE FloatField aunque la API lo entregue como string (ej: \"76753.69\"). NUNCA DecimalField (puede desbordar con capitalizaciones grandes).",
+        "  rol 'percent'  → FloatField(null=True, blank=True). Admite negativos.",
+        "  rol 'image'    → URLField(max_length=500, blank=True)",
+        "  rol 'url'      → URLField(max_length=500, blank=True)",
+        "  rol 'date'     → DateField(null=True, blank=True)",
+        "  rol 'boolean'  → BooleanField(null=True, blank=True)",
+        "  rol 'long_text'→ TextField(blank=True)",
+        "  rol 'title'    → CharField(max_length=300, blank=True)",
+        "  rol 'category' → CharField(max_length=200, blank=True)",
+        "  rol 'text'     → CharField(max_length=500, blank=True)",
+        "Si un campo se llama '*_url' pero hay otro campo con el mismo prefijo sin '_url' que contiene el valor legible (ej: 'language' vs 'languages_url'), usa el campo sin '_url' como CharField y descarta el que acaba en '_url'.",
         "  OBJETO ANIDADO (dict con subkeys) → CharField(max_length=500, blank=True) guardando solo el valor más representativo como string.",
         "  LISTA de valores (array) → crea UN SOLO campo IntegerField(null=True, blank=True) con el nombre original más sufijo '_count' (ej: episode → episode_count, characters → characters_count). ELIMINA el campo original, NO lo dupliques. NUNCA uses CharField ni JSONField para una lista.",
         "Todos los campos opcionales (blank=True / null=True).",
         "Si existe un campo que actúe como identificador único del registro (url, isbn, código, id externo...), añádele unique=True para evitar duplicados al ejecutar load_data varias veces.",
         "Añade created_at = models.DateTimeField(auto_now_add=True).",
-        "__str__ devuelve el campo más representativo.",
+        "__str__ devuelve el campo más representativo (preferiblemente uno de rol 'title').",
         "Nombres de campo en snake_case. NO uses 'id' como nombre.",
         "Solo importa 'from django.db import models'.",
         "NUNCA uses JSONField para ningún campo. NUNCA uses CharField para guardar una lista — usa siempre IntegerField con el count.",
     ]
+
+    roles_block = ""
+    if field_roles:
+        roles_block = "ROLES SEMÁNTICOS INFERIDOS (clave: rol):\n" + "\n".join(
+            f"  - {k}: {v}" for k, v in field_roles.items()
+        )
 
     user_text = "\n".join(
         [
@@ -332,6 +343,8 @@ def prompt_models(*, fields, sample_items, site_title):
             "",
             "CAMPOS:",
             _fields_info(fields),
+            "",
+            roles_block,
             "",
             "DATOS DE EJEMPLO:",
             _samples_info(sample_items),
@@ -347,10 +360,12 @@ def prompt_models(*, fields, sample_items, site_title):
 
 # ── 3) VIEWS.PY ────────────────────────────────────────────────────────────
 
-def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fields=None):
+def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fields=None,
+                 field_roles=None, primary_numeric=None, signed_field=None):
     fields_list = ", ".join(f["key"] for f in fields)
     priority_rules_text = build_priority_rules_text()
-    
+    field_roles = field_roles or {}
+
     rules = [
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con 'from django.shortcuts import render, get_object_or_404'. Sin nada antes.",
         "CRÍTICO: PROHIBIDO usar ```, ```python o cualquier bloque Markdown. Código puro.",
@@ -367,11 +382,62 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
         "Pasar SOLO 'page_obj' al contexto. NUNCA uses 'items' como nombre de variable.",
         "La view de detalle: recibe pk y usa get_object_or_404(Item, pk=pk).",
         "La view de detalle ADEMÁS pasa 'related' al contexto: related = Item.objects.exclude(pk=item.pk).order_by('?')[:3]",
-        "Páginas no-listado no-detalle (home, about...): pasa SIEMPRE la variable con nombre exacto 'featured' al contexto: featured = Item.objects.all().order_by('-id')[:6]. NUNCA uses 'items' como nombre de variable.",        
+        "Páginas no-listado no-detalle (home, about...): pasa SIEMPRE la variable con nombre exacto 'featured' al contexto: featured = Item.objects.all().order_by('-id')[:6]. NUNCA uses 'items' como nombre de variable.",
         "Cada view pasa 'site_title' al contexto.",
         "Sin autenticación, sin formularios complejos.",
         "CRÍTICO: usa ÚNICAMENTE function-based views. PROHIBIDO usar clases, métodos como get_context_data, o cualquier herencia de View, ListView, DetailView o similar.",
     ]
+
+    # ── Métricas reales para DASHBOARD ──────────────────────────────────────
+    if site_type == "dashboard":
+        agg_imports = "from django.db.models import Count, Avg, Max, Min, Sum"
+        rules.append(f"CRÍTICO DASHBOARD: importa {agg_imports}.")
+        rules.append(
+            "CRÍTICO DASHBOARD: la view de la HOME debe CALCULAR MÉTRICAS REALES con el ORM y pasarlas al contexto. "
+            "No te limites a pasar 'featured'. Un dashboard sin agregados calculados es un error."
+        )
+        rules.append(
+            "La home del dashboard pasa SIEMPRE estas variables de contexto, además de 'featured' y 'site_title':\n"
+            "  - 'total_items': Item.objects.count()"
+        )
+
+        if primary_numeric:
+            rules.append(
+                f"  - Agregados sobre el campo numérico principal '{primary_numeric}':\n"
+                f"      stats = Item.objects.aggregate(\n"
+                f"          avg_val=Avg('{primary_numeric}'),\n"
+                f"          max_val=Max('{primary_numeric}'),\n"
+                f"          min_val=Min('{primary_numeric}'),\n"
+                f"          sum_val=Sum('{primary_numeric}'),\n"
+                f"      )\n"
+                f"    Pasa 'stats' al contexto. En la plantilla se accede como stats.avg_val, stats.max_val, etc.\n"
+                f"  - 'top_items': los 5 con mayor '{primary_numeric}':\n"
+                f"      top_items = Item.objects.order_by('-{primary_numeric}')[:5]"
+            )
+
+        if signed_field:
+            rules.append(
+                f"  - Conteo de variación (sube/baja) usando el campo con signo '{signed_field}':\n"
+                f"      positives = Item.objects.filter({signed_field}__gt=0).count()\n"
+                f"      negatives = Item.objects.filter({signed_field}__lt=0).count()\n"
+                f"    Pasa 'positives' y 'negatives' al contexto."
+            )
+
+        # Conteo por categoría, si existe un campo categórico
+        category_field = next(
+            (k for k, r in field_roles.items() if r == "category"), None
+        )
+        if category_field:
+            rules.append(
+                f"  - Distribución por categoría usando '{category_field}':\n"
+                f"      by_category = Item.objects.values('{category_field}').annotate(n=Count('id')).order_by('-n')[:6]\n"
+                f"    Pasa 'by_category' al contexto. En la plantilla cada fila tiene .{category_field} y .n"
+            )
+
+        rules.append(
+            "CRÍTICO: los campos numéricos del modelo son FloatField reales. Las agregaciones devuelven números, "
+            "no strings. No conviertas a string en la view."
+        )
 
     if site_type == "portfolio":
         rules.append("CRÍTICO: esto es un PORTFOLIO. PROHIBIDO generar una vista de listado (project_list, catalog, list o similar). Solo genera las vistas que aparecen en PÁGINAS: home y la de detalle con pk.")
@@ -380,6 +446,12 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
     if real_fields:
         rules.append(f"CAMPOS EXACTOS del modelo Item (úsalos tal cual): {real_fields}")
         rules.append("NUNCA uses un nombre de campo que no esté en esa lista.")
+
+    roles_block = ""
+    if field_roles:
+        roles_block = "ROLES SEMÁNTICOS DE CAMPOS:\n" + "\n".join(
+            f"  - {k}: {v}" for k, v in field_roles.items()
+        )
 
     user_text = "\n".join(
         [
@@ -395,6 +467,8 @@ def prompt_views(*, fields, site_type, site_title, user_prompt, pages, real_fiel
             "\n".join(f"- {r}" for r in _GLOBAL_STYLE_RULES),
             "",
             f"CAMPOS DEL MODELO: {fields_list}",
+            "",
+            roles_block,
             "",
             "PÁGINAS:",
             json.dumps(pages, ensure_ascii=False, indent=2),
@@ -541,7 +615,11 @@ def prompt_template(
     preset_description="",
     preset_id="",
     generated_context=None,
+    field_roles=None,
+    primary_numeric=None,
+    signed_field=None,
 ):
+    field_roles = field_roles or {}
     is_list = page.get("is_list", False)
     is_detail = page.get("is_detail", False)
 
@@ -564,17 +642,101 @@ def prompt_template(
             f"Enlace a detalle: {{% url '{detail_url_name}' item.pk %}}"
         )
     elif is_detail:
+        detail_extra = ""
+        if site_type == "portfolio":
+            image_field = next((k for k, r in field_roles.items() if r == "image"), None)
+            long_field = next((k for k, r in field_roles.items() if r == "long_text"), None)
+            url_field = next((k for k, r in field_roles.items() if r == "url"), None)
+            dt_lines = [
+                "\nPORTFOLIO DETALLE — ficha de proyecto individual:",
+                "  - Cabecera con el título del proyecto grande y, si hay categoría, un badge.",
+            ]
+            if image_field:
+                dt_lines.append(f"  - Imagen grande del proyecto ('{image_field}') como elemento protagonista, arriba o a un lado.")
+            if long_field:
+                dt_lines.append(f"  - Descripción larga del proyecto ('{long_field}') en una columna de lectura cómoda.")
+            else:
+                dt_lines.append("  - Muestra la descripción o los campos de texto disponibles de forma clara.")
+            dt_lines.append("  - Bloque de metadatos (fecha, cliente, tipo…) en una columna lateral o lista.")
+            if url_field:
+                dt_lines.append(f"  - Botón destacado 'Ver proyecto' que abra '{url_field}' en pestaña nueva si existe.")
+            detail_extra = "\n".join(dt_lines)
+
         context_hint = (
             "CONTEXTO: 'item' (objeto Item individual), 'site_title' y opcionalmente 'related'.\n"
             "Muestra los campos relevantes del item de forma clara y ordenada.\n"
             f"Enlace de vuelta: {{% url '{back_url}' %}}."
+            f"{detail_extra}"
         )
     else:
-        portfolio_hint = (
-            "\nPORTFOLIO: añade una sección de presentación personal ANTES del grid de proyectos: "
-            "H1 con nombre del autor o del sitio, párrafo de descripción breve y links de contacto opcionales. "
-            "Usa texto placeholder claro que el usuario pueda editar fácilmente."
-        ) if site_type == "portfolio" else ""
+        portfolio_hint = ""
+        if site_type == "portfolio":
+            image_field = next((k for k, r in field_roles.items() if r == "image"), None)
+            title_field = next((k for k, r in field_roles.items() if r == "title"), None)
+            category_field = next((k for k, r in field_roles.items() if r == "category"), None)
+            url_field = next((k for k, r in field_roles.items() if r == "url"), None)
+
+            pf_lines = [
+                "\nPORTFOLIO HOME — ESTRUCTURA OBLIGATORIA:",
+                "  1) SECCIÓN HERO de presentación personal ANTES del grid: H1 grande con el nombre del autor o del sitio "
+                "(usa placeholder editable como 'Tu Nombre' si no hay dato), un párrafo de bio/subtítulo breve, "
+                "y una fila de enlaces de contacto opcionales (email, GitHub, LinkedIn) como botones o links discretos. "
+                "El hero debe ocupar bastante espacio vertical y sentirse como la carta de presentación.",
+                "  2) GRID DE PROYECTOS DESTACADOS debajo del hero, iterando con {% for item in featured %}.",
+                "  3) Cada tarjeta de proyecto es VISUAL: la imagen es protagonista (grande, arriba, object-cover), "
+                "con el título y los metadatos debajo. Las tarjetas enlazan al detalle del proyecto.",
+                "El portfolio NO tiene tabla ni vista de listado tipo catálogo. Es una galería visual de trabajos.",
+            ]
+            if image_field:
+                pf_lines.append(
+                    f"  - CAMPO IMAGEN del proyecto: '{image_field}'. Úsalo como imagen protagonista de cada tarjeta "
+                    f"(aspect-[4/3] o aspect-video, object-cover, rounded). Si un proyecto no tiene imagen, muestra "
+                    f"un bloque de color de fallback, nunca un hueco roto."
+                )
+            if title_field:
+                pf_lines.append(f"  - CAMPO TÍTULO del proyecto: '{title_field}'. Es el nombre destacado de cada tarjeta.")
+            if category_field:
+                pf_lines.append(
+                    f"  - CAMPO CATEGORÍA/TIPO: '{category_field}'. Muéstralo como un badge o etiqueta pequeña sobre cada proyecto."
+                )
+            if url_field:
+                pf_lines.append(
+                    f"  - CAMPO ENLACE EXTERNO: '{url_field}'. Si existe, añade un botón 'Ver proyecto' que abra el enlace en pestaña nueva (target=_blank rel=noopener)."
+                )
+            portfolio_hint = "\n".join(pf_lines)
+
+        dashboard_hint = ""
+        if site_type == "dashboard":
+            kpi_lines = [
+                "\nDASHBOARD HOME — MÉTRICAS REALES (el contexto trae estas variables ya calculadas en la view):",
+                "  - 'total_items' (int): total de registros.",
+                "  - 'featured': primeros 6 items.",
+            ]
+            if primary_numeric:
+                kpi_lines.append(
+                    f"  - 'stats': dict con stats.avg_val, stats.max_val, stats.min_val, stats.sum_val sobre '{primary_numeric}'."
+                )
+                kpi_lines.append(
+                    f"  - 'top_items': los 5 items con mayor '{primary_numeric}' (cada uno tiene sus campos normales)."
+                )
+            if signed_field:
+                kpi_lines.append(
+                    "  - 'positives' y 'negatives' (int): nº de items que suben / bajan."
+                )
+            category_field = next((k for k, r in field_roles.items() if r == "category"), None)
+            if category_field:
+                kpi_lines.append(
+                    f"  - 'by_category': lista de filas con .{category_field} y .n (conteo) para los grupos principales."
+                )
+            kpi_lines += [
+                "ESTRUCTURA OBLIGATORIA de la home dashboard:",
+                "  1) Una fila de TARJETAS KPI (3-4) arriba mostrando total_items y los valores de 'stats' (formatea números con el filtro |floatformat:2 e |intcomma si hace falta; carga {% load humanize %} al inicio si usas intcomma).",
+                "  2) Si hay 'positives'/'negatives', una tarjeta o mini-gráfico de barras CSS mostrando la proporción sube/baja.",
+                "  3) Si hay 'by_category', una lista o barras horizontales con la distribución por categoría.",
+                "  4) Una TABLA con 'top_items' (no un grid de cards): columnas para los campos más relevantes, con badge de color en el campo de variación si existe (verde si > 0, rojo si < 0).",
+                "NO conviertas la home del dashboard en un grid de tarjetas tipo catálogo. Debe parecer un panel de control con datos agregados.",
+            ]
+            dashboard_hint = "\n".join(kpi_lines)
 
         context_hint = (
             "CONTEXTO: 'site_title' y 'featured' (lista de los primeros 6 items para destacados).\n"
@@ -582,6 +744,7 @@ def prompt_template(
             "Es la portada del sitio. Debe presentar el proyecto y facilitar la exploración del contenido.\n"
             f"Enlace al detalle de cada item: {{% url '{detail_url_name}' item.pk %}}."
             f"{portfolio_hint}"
+            f"{dashboard_hint}"
         )
     
 
@@ -635,6 +798,17 @@ def prompt_template(
     if real_fields:
         rules.append(f"CAMPOS EXACTOS del modelo Item (úsalos tal cual, ninguno más): {real_fields}")
         rules.append("NUNCA uses un campo que no esté en esa lista.")
+
+    if field_roles:
+        rules.append(
+            "ROLES SEMÁNTICOS (úsalos para maquetar bien): "
+            + ", ".join(f"{k}={v}" for k, v in field_roles.items())
+        )
+        rules.append(
+            "Usa el campo de rol 'image' como imagen, el de rol 'title' como título principal, "
+            "los de rol 'category' como badges/etiquetas, y los de rol 'numeric'/'percent' como datos destacados. "
+            "Formatea números largos con |floatformat e |intcomma ({% load humanize %})."
+        )
 
     if real_url_names:
         detail_page_name = next(
@@ -764,9 +938,10 @@ def prompt_template(
 
 # ── 6) LOAD_DATA.PY ────────────────────────────────────────────────────────
 
-def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None, real_fields=None):
+def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None, real_fields=None, field_roles=None):
     mapping = "\n".join(f"  dataset['{f['key']}'] → Item.{f['key']}" for f in fields[:10])
     priority_rules_text = build_priority_rules_text()
+    field_roles = field_roles or {}
 
     rules = [
         "CRÍTICO: tu respuesta debe empezar EXACTAMENTE con 'from django.core.management.base import BaseCommand'. Sin nada antes.",
@@ -783,7 +958,7 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
         "CRÍTICO: el JSON ya viene parseado como dict Python. NUNCA uses json.loads() sobre un campo que ya es dict.",
         "Accede directamente: raw_item['origin']['name'], NO json.loads(raw_item['origin'])['name'].",
         "Ejemplo: rating = {'rate': 4.5, 'count': 120} → guardar str(raw_item['rating']['rate'])",
-        "Limpia valores: precios → Decimal(str(valor).replace('$','').strip()), el precio puede venir como float o como string con '$', usa siempre str() primero para evitar errores. Fechas → parsear, enteros → int().",
+        "Limpia valores numéricos: los campos de rol 'numeric' y 'percent' son FloatField. Conviértelos SIEMPRE con un helper robusto que tolere strings con símbolos. Ejemplo: def to_float(v): \n            try: return float(str(v).replace('$','').replace(',','').replace('%','').strip())\n            except: return None. Aplica to_float() a cada campo numérico. NUNCA uses Decimal (los campos son FloatField). Fechas → parsear; enteros (_count) → int().",
         "Si falla la conversión → None (no romper el comando).",
         "CRÍTICO: para campos CharField/TextField NUNCA guardes None. Usa string vacío como fallback: raw_item.get('campo') or ''. Reserva None solo para IntegerField, DecimalField, DateField o BooleanField.",
         "Informa del progreso: dentro del bucle usa self.stdout.write() para indicar cuántos registros se han procesado en esa página (ej: f'Página procesada: {len(results)} registros'). Al FINAL del handle(), fuera del bucle, escribe un mensaje de éxito con el total acumulado.",
@@ -796,6 +971,13 @@ def prompt_load_data(*, fields, sample_items, api_url, main_collection_path=None
     if real_fields:
         rules.append(f"CAMPOS EXACTOS del modelo Item: {real_fields}")
         rules.append("El mapeo debe ser: raw_item['api_key'] → item_field para CADA campo.")
+
+    numeric_keys = [k for k, r in field_roles.items() if r in ("numeric", "percent")]
+    if numeric_keys:
+        rules.append(
+            f"CAMPOS NUMÉRICOS (FloatField, aplica to_float()): {', '.join(numeric_keys)}. "
+            "Estos campos pueden llegar como string en el JSON; conviértelos a float SIEMPRE."
+        )
 
     if main_collection_path:
         path_str = " -> ".join(str(p) for p in main_collection_path)

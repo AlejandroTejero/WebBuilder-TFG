@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from .models import APIRequest
 from .models import APIRequest, UserProfile
 
+from django.contrib.auth.forms import PasswordChangeForm
+
 class RegisterForm(UserCreationForm):
 
     email = forms.EmailField(
@@ -104,3 +106,61 @@ class UserProfileForm(forms.ModelForm):
             "custom_llm_base_url": "Base URL del proveedor",
             "custom_llm_model": "Nombre del modelo",
         }
+
+    
+
+class AccountForm(forms.Form):
+
+    username = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "username",
+        }),
+        label="Username",
+    )
+
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "tu@email.com",
+        }),
+        label="Email",
+    )
+
+    preferred_language = forms.ChoiceField(
+        choices=[("en", "English"), ("es", "Español")],
+        widget=forms.Select(attrs={
+            "class": "form-control",
+        }),
+        label="Language",
+    )
+
+    current_password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "••••••••",
+            "autocomplete": "off",
+        }),
+        label="Current password",
+    )
+
+    new_password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "••••••••",
+            "autocomplete": "off",
+        }),
+        label="New password",
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        current = cleaned_data.get("current_password")
+        new = cleaned_data.get("new_password")
+        if new and not current:
+            self.add_error("current_password", "Introduce tu contraseña actual para cambiarla.")
+        return cleaned_data
