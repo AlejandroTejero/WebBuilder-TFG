@@ -150,6 +150,9 @@
      CHAT DE REFINAMIENTO
   ══════════════════════════════════════════════════════════ */
 
+  // Historial de conversación en memoria para la sesión actual
+  const chatHistory = [];
+
   function addChatMessage(text, type) {
     const box = document.getElementById('chat-messages');
     if (!box) return;
@@ -163,8 +166,21 @@
     return el;
   }
 
+  function showFilePreview(filename) {
+    const preview = document.getElementById('chat-file-preview');
+    const name    = document.getElementById('chat-file-name');
+    if (!preview || !name) return;
+    name.textContent = filename;
+    preview.style.display = 'flex';
+  }
+
+  function hideFilePreview() {
+    const preview = document.getElementById('chat-file-preview');
+    if (preview) preview.style.display = 'none';
+  }
+
   async function sendRefine() {
-    const input  = document.getElementById('chat-input');
+    const input   = document.getElementById('chat-input');
     const sendBtn = document.getElementById('chat-send');
     if (!input || !sendBtn) return;
 
@@ -173,8 +189,9 @@
 
     input.value = '';
     sendBtn.disabled = true;
+    hideFilePreview();
     addChatMessage(message, 'user');
-    const thinking = addChatMessage('Pensando…', 'thinking');
+    const thinking = addChatMessage('Identificando archivo…', 'thinking');
 
     try {
       const res  = await fetch(CFG.refineUrl, {
@@ -183,25 +200,46 @@
           'Content-Type': 'application/json',
           'X-CSRFToken':  CFG.csrfToken,
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({
+          message,
+          history: chatHistory,
+        }),
       });
       const data = await res.json();
 
       if (thinking) thinking.remove();
 
       if (data.ok) {
-        addChatMessage(`✓ Modificado: ${data.file} — Recargando preview…`, 'ai');
-        // Recargar iframe
+        // Actualizar historial local
+        chatHistory.push({ role: 'user',      content: message });
+        chatHistory.push({ role: 'assistant', content: `Modifiqué ${data.file}` });
+
+        // Mostrar qué archivo se tocó
+        showFilePreview(data.file);
+
+        // Mensaje de éxito con info de versión guardada
+        const versionNote = data.version_saved ? ` (v${data.version_saved} guardada)` : '';
+        addChatMessage(`✓ ${data.file} actualizado${versionNote}`, 'ai');
+
+        // Recargar iframe si existe (sitio desplegado)
         const iframe = document.getElementById('site-iframe');
         if (iframe) {
+          const reloading = addChatMessage('Recargando preview…', 'thinking');
+          iframe.addEventListener('load', () => {
+            if (reloading) reloading.remove();
+          }, { once: true });
           iframe.src = iframe.src;
         }
+
+        // Actualizar lista de versiones para reflejar el auto-guardado
+        loadVersions();
+
       } else {
-        addChatMessage(`✗ Error: ${data.error}`, 'error');
+        addChatMessage(`✗ ${data.error}`, 'error');
       }
     } catch (e) {
       if (thinking) thinking.remove();
-      addChatMessage('✗ Error de red', 'error');
+      addChatMessage('✗ Error de red al contactar con el servidor', 'error');
     }
 
     sendBtn.disabled = false;
@@ -221,6 +259,8 @@
       }
     });
   }
+
+
 
   const GEN_STEP_MAP = [
     { id: 'gs-1', key: 'Analizando' },

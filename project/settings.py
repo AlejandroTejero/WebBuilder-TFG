@@ -14,7 +14,14 @@ from pathlib import Path
 
 # Import para el LLM
 import os
+import secrets
 
+from dotenv import load_dotenv
+
+# Cargar .env desde la raíz del proyecto (el directorio que contiene manage.py).
+# Necesario para que SECRET_KEY esté disponible cuando Django arranca vía
+# wsgi/asgi sin pasar por manage.py (que ya tiene su propio load_dotenv).
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +31,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "")
+# Si SECRET_KEY no está en .env se genera una clave aleatoria de sesión.
+# ⚠ Esto invalida sesiones activas en cada reinicio; define SECRET_KEY en .env.
+_secret_from_env = os.getenv("SECRET_KEY", "")
+SECRET_KEY = _secret_from_env if _secret_from_env else secrets.token_hex(50)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -154,6 +164,15 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 # Manda al login tras un logout
 LOGOUT_REDIRECT_URL = 'login'
+
+# ── Sesiones ──────────────────────────────────────────────────────────────────
+# Nombre de cookie único para evitar conflictos si se accede mezclando
+# localhost y 127.0.0.1 (cookies distintas por host aunque mismo puerto).
+SESSION_COOKIE_NAME = 'webbuilder_sessionid'
+# Las sesiones persisten aunque se cierre el navegador (hasta expiración).
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+# 2 semanas de vida de sesión (en segundos).
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 14
 
 # LLM
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")

@@ -426,6 +426,10 @@ def site_users_save(request, api_request_id: int):
 @login_required
 @require_POST
 def site_refine_file(request, api_request_id: int):
+    import re
+    from ..models import SiteVersion
+    from ..utils.llm.client import chat_completion, LLMError
+
     api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
     site = get_object_or_404(GeneratedSite, project_source=api_request)
 
@@ -441,21 +445,31 @@ def site_refine_file(request, api_request_id: int):
     if not message:
         return JsonResponse({"ok": False, "error": "Mensaje vacío"}, status=400)
 
-    # Identificar qué archivo tocar según el mensaje del usuario
-    file_list = "\n".join(site.project_files.keys())
+    # Historial de conversación enviado desde el cliente
+    # Formato: [{"role": "user"|"assistant", "content": "..."}]
+    history = data.get("history", [])
+
+    # ── 1. Identificar qué archivo modificar ─────────────────────────────────
+    # Se usan solo los paths de archivos de template/estilo/lógica relevantes,
+    # excluyendo migraciones, __init__, etc. para reducir ruido.
+    SKIP_PATTERNS = ("migration", "__init__", ".pyc", "manage.py", "settings", "wsgi", "asgi")
+    candidate_files = [
+        p for p in site.project_files.keys()
+        if not any(s in p for s in SKIP_PATTERNS)
+    ]
+    file_list = "\n".join(candidate_files)
+
     system_identify = (
-        "Eres un asistente que identifica qué archivo de un proyecto Django "
-        "debe modificarse según la petición del usuario. "
-        "Devuelve SOLO el path exacto del archivo más relevante, sin explicación ni comillas. "
-        "Si la petición afecta a la página de inicio responde con el path del home.html. "
-        "Si afecta al listado responde con el catalog/list html. "
-        "Si afecta al estilo global responde con base.html. "
-        "Si afecta a la lógica responde con views.py."
+        "Eres un asistente que identifica qué archivo de un proyecto Django debe modificarse "
+        "según la petición del usuario. Devuelve ÚNICAMENTE el path exacto del archivo, "
+        "sin explicación, sin comillas, sin texto extra. "
+        "Criterios: peticiones de estilo/colores/layout → templates HTML o base.html; "
+        "peticiones de datos/lógica → views.py; peticiones de URLs → urls.py; "
+        "peticiones sobre el hero o página principal → el template del index/home/list."
     )
-    user_identify = f"Archivos disponibles:\n{file_list}\n\nPetición del usuario: {message}"
+    user_identify = f"Archivos disponibles:\n{file_list}\n\nPetición: {message}"
 
     try:
-        from ..utils.llm.client import chat_completion, LLMError
         target_path = chat_completion(
             user_text=user_identify,
             system_text=system_identify,
@@ -465,25 +479,49 @@ def site_refine_file(request, api_request_id: int):
         return JsonResponse({"ok": False, "error": f"Error identificando archivo: {e}"}, status=500)
 
     if target_path not in site.project_files:
-        # Intentar match parcial
-        match = next((p for p in site.project_files if target_path in p or p.endswith(target_path)), None)
+        # Match parcial como fallback
+        match = next(
+            (p for p in site.project_files if target_path in p or p.endswith(target_path)),
+            None
+        )
         if not match:
-            return JsonResponse({"ok": False, "error": f"Archivo no encontrado: {target_path}"}, status=404)
+            return JsonResponse({"ok": False, "error": f"No sé qué archivo modificar para: '{message}'"}, status=404)
         target_path = match
 
+    # ── 2. Auto-guardar versión de seguridad antes de modificar ──────────────
+    last = site.versions.order_by("-version_number").first()
+    next_number = (last.version_number + 1) if last else 1
+    SiteVersion.objects.create(
+        site=site,
+        version_number=next_number,
+        project_files=site.project_files,
+        label=f"Antes de: {message[:60]}",
+    )
+
+    # ── 3. Reescribir el archivo con contexto del historial ───────────────────
     current_content = site.project_files[target_path]
-    ext = target_path.split(".")[-1]
+
+    # Construir el historial de cambios como contexto para el LLM
+    history_context = ""
+    if history:
+        history_lines = []
+        for turn in history[-6:]:  # últimos 6 turnos máximo para no sobrepasar contexto
+            role = "Usuario" if turn.get("role") == "user" else "IA"
+            history_lines.append(f"{role}: {turn.get('content', '')}")
+        history_context = "\nHISTORIAL DE CAMBIOS ANTERIORES EN ESTA SESIÓN:\n" + "\n".join(history_lines) + "\n"
 
     system_rewrite = (
         "Eres un desarrollador Django senior experto en Python y Tailwind CSS. "
         "REGLA ABSOLUTA: devuelves ÚNICAMENTE código puro, sin ningún tipo de Markdown. "
         "PROHIBIDO escribir ``` en cualquier parte de tu respuesta. "
-        "Tu respuesta empieza DIRECTAMENTE con la primera línea de código."
+        "Tu respuesta empieza DIRECTAMENTE con la primera línea de código. "
+        "Aplica SOLO los cambios pedidos, conserva todo lo demás intacto."
     )
     user_rewrite = (
-        f"Modifica el siguiente archivo ({target_path}) según esta petición: {message}\n\n"
-        f"ARCHIVO ACTUAL:\n{current_content}\n\n"
-        f"Devuelve el archivo COMPLETO modificado. No expliques nada, solo el código."
+        f"{history_context}"
+        f"Modifica el archivo '{target_path}' según esta petición: {message}\n\n"
+        f"CONTENIDO ACTUAL DEL ARCHIVO:\n{current_content}\n\n"
+        f"Devuelve el archivo COMPLETO con los cambios aplicados. Solo código, sin explicaciones."
     )
 
     try:
@@ -498,17 +536,21 @@ def site_refine_file(request, api_request_id: int):
     if not new_content.strip():
         return JsonResponse({"ok": False, "error": "El LLM devolvió una respuesta vacía."}, status=500)
 
-    # Limpiar fences si se colaron
-    import re
+    # Limpiar fences de Markdown por si se colaron
     new_content = re.sub(r'```[\w]*\n?', '', new_content)
     new_content = re.sub(r'```', '', new_content).strip()
 
-    files = site.project_files
+    # ── 4. Guardar el archivo modificado ─────────────────────────────────────
+    files = dict(site.project_files)
     files[target_path] = new_content
     site.project_files = files
     site.save(update_fields=["project_files"])
 
-    return JsonResponse({"ok": True, "file": target_path})
+    return JsonResponse({
+        "ok": True,
+        "file": target_path,
+        "version_saved": next_number,
+    })
 
 
 @login_required

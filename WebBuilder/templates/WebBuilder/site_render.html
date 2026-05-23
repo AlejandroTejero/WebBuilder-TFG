@@ -119,14 +119,18 @@
       </div>
 
       <!-- Chat de refinamiento -->
-      {% if site.deploy_status == 'done' %}
+      {% if site.project_files %}
       <div class="sr-chat">
         <div class="sr-chat__header">
           <span class="sr-chat__title">{% trans "Refinar con IA" %}</span>
-          <span class="sr-chat__badge">{% trans "Beta" %}</span>
+          <span class="sr-chat__badge">Beta</span>
         </div>
         <div class="sr-chat__messages" id="chat-messages">
-          <div class="sr-chat__hint">{% trans "Describe qué quieres cambiar. La IA modificará el archivo relevante." %}</div>
+          <div class="sr-chat__hint">{% trans "Describe qué quieres cambiar. La IA modificará el código y guardará una versión de seguridad automáticamente." %}</div>
+        </div>
+        <div class="sr-chat__file-preview" id="chat-file-preview" style="display:none;">
+          <span class="sr-chat__file-label">{% trans "Archivo a modificar:" %}</span>
+          <code id="chat-file-name"></code>
         </div>
         <div class="sr-chat__input-row">
           <textarea class="sr-chat__textarea" id="chat-input" placeholder="{% trans 'Ej: haz el hero más grande y cambia el color a azul...' %}" rows="2"></textarea>

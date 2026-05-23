@@ -114,7 +114,7 @@
 
     <div class="llm-modal__options">
 
-      <div class="llm-modal__option llm-modal__option--selected"
+      <div class="llm-modal__option {% if not selected_llm_label %}llm-modal__option--selected{% endif %}"
            id="llm-opt-default"
            onclick="selectLLMOption('default')">
         <div class="llm-modal__opt-header">
@@ -127,7 +127,7 @@
         </p>
       </div>
 
-      <div class="llm-modal__option" id="llm-opt-choose"
+      <div class="llm-modal__option {% if selected_llm_label and selected_llm_label != 'custom' %}llm-modal__option--selected{% endif %}" id="llm-opt-choose"
            onclick="selectLLMOption('choose')">
         <div class="llm-modal__opt-header">
           <span class="llm-modal__opt-name">{% trans "Elegir modelo" %}</span>
@@ -156,8 +156,8 @@
       </div>
 
       {% if request.user.profile.custom_llm_model %}
-      <div class="llm-modal__option" id="llm-opt-custom"
-           onclick="window.location.href='{% url 'profile' %}'">
+      <div class="llm-modal__option {% if selected_llm_label == 'custom' %}llm-modal__option--selected{% endif %}" id="llm-opt-custom"
+           onclick="selectLLMOption('custom')">
         <div class="llm-modal__opt-header">
           <span class="llm-modal__opt-name">{% trans "Modelo personalizado" %}</span>
           <span class="llm-modal__opt-badge llm-modal__opt-badge--ok">{% trans "Configurado" %}</span>
@@ -201,10 +201,17 @@
 </div>
 
 {% trans "Predeterminado" as txt_llm_default %}
+{% trans "Personalizado" as txt_llm_custom %}
 <script>
   window.WB_I18N = Object.assign({}, window.WB_I18N || {}, {
-    llmDefaultLabel: "{{ txt_llm_default|escapejs }}"
+    llmDefaultLabel: "{{ txt_llm_default|escapejs }}",
+    llmCustomLabel: "{{ txt_llm_custom|escapejs }}",
   });
+  window.WB_LLM = {
+    selectedChoice: "{{ selected_llm_choice|escapejs }}",
+    selectedLabel: "{{ selected_llm_label|default_if_none:''|escapejs }}",
+    customModelName: "{{ request.user.profile.custom_llm_model|default:''|escapejs }}",
+  };
 </script>
 
 <script src="{% static 'js/assistant.js' %}"></script>

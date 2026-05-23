@@ -3,7 +3,7 @@
   <div class="asst-card__header">
     <div class="asst-card__step-badge">{% trans "Paso 1" %}</div>
     <h2 class="asst-card__title">{% trans "Introduzca la la URL o fichero de datos" %}</h2>
-    <p class="asst-card__subtitle">{% trans "Soporta JSON y XML. La IA analizará la estructura y generará el schema automáticamente." %}</p>
+    <p class="asst-card__subtitle">{% trans "Soporta JSON, XML, CSV y geoJSON. La IA analizará la estructura y generará el schema automáticamente." %}</p>
   </div>
 
   <form method="post" class="asst-form" id="form-analyze" enctype="multipart/form-data">
@@ -229,7 +229,16 @@
       <button type="button" class="asst-btn asst-btn--ghost" id="btn-llm-selector"
               onclick="openLLMModal()">
         <span class="llm-btn-dot"></span>
-        {% trans "Modelo:" %} <span id="llm-label-display">{% trans "Predeterminado" %}</span>
+        {% trans "Modelo:" %}
+        <span id="llm-label-display">
+          {% if selected_llm_label == "custom" %}
+            {% trans "Personalizado" %}
+          {% elif selected_llm_label %}
+            {{ selected_llm_label }}
+          {% else %}
+            {% trans "Predeterminado" %}
+          {% endif %}
+        </span>
       </button>
       <button type="submit" class="asst-btn asst-btn--primary" id="btn-analyze"
               onclick="showLoading()">

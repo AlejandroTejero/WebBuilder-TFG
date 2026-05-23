@@ -242,11 +242,22 @@ def render_assistant(
     template: str = "WebBuilder/assistant.html",
 ):
     default_llm_choice = LLM_CATALOG[0]["id"] if LLM_CATALOG else ""
+    resolved_choice = selected_llm_choice or default_llm_choice
+
+    # Calcular la etiqueta legible para el botón del selector
+    if not selected_llm_choice or selected_llm_choice == "default":
+        selected_llm_label = None  # el template usará la traducción de "Predeterminado"
+    elif selected_llm_choice == "custom":
+        selected_llm_label = "custom"
+    else:
+        catalog_entry = next((m for m in LLM_CATALOG if m["id"] == selected_llm_choice), None)
+        selected_llm_label = catalog_entry["name"] if catalog_entry else selected_llm_choice
 
     context = {
         "form": form,
         "llm_catalog": LLM_CATALOG,
-        "selected_llm_choice": selected_llm_choice or default_llm_choice,
+        "selected_llm_choice": resolved_choice,
+        "selected_llm_label": selected_llm_label,
     }
     if api_request is not None:
         context["api_request"] = api_request

@@ -201,11 +201,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function openLLMModal() {
   const modal = document.getElementById('llm-modal');
+  if (!modal) return;
 
-  if (modal) {
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+  // Restaurar estado visual del modal según la selección actual del servidor
+  const llm = window.WB_LLM || {};
+  const choice = llm.selectedChoice || 'default';
+  const label  = llm.selectedLabel  || '';
+
+  // Limpiar selecciones previas
+  document.querySelectorAll('.llm-modal__option').forEach(el => {
+    el.classList.remove('llm-modal__option--selected');
+  });
+  document.querySelectorAll('.llm-modal__card').forEach(c => {
+    c.classList.remove('llm-modal__card--selected');
+  });
+
+  const cards = document.getElementById('llm-cards-list');
+
+  if (!label || choice === 'default') {
+    // Opción predeterminada
+    const optDefault = document.getElementById('llm-opt-default');
+    if (optDefault) optDefault.classList.add('llm-modal__option--selected');
+    if (cards) cards.classList.remove('visible');
+
+  } else if (choice === 'custom') {
+    // Modelo personalizado
+    const optCustom = document.getElementById('llm-opt-custom');
+    if (optCustom) optCustom.classList.add('llm-modal__option--selected');
+    if (cards) cards.classList.remove('visible');
+
+  } else {
+    // Modelo concreto del catálogo
+    const optChoose = document.getElementById('llm-opt-choose');
+    if (optChoose) optChoose.classList.add('llm-modal__option--selected');
+    if (cards) {
+      cards.classList.add('visible');
+      const card = cards.querySelector(`[data-model-id="${CSS.escape(choice)}"]`);
+      if (card) card.classList.add('llm-modal__card--selected');
+    }
   }
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeLLMModal() {
@@ -230,7 +267,6 @@ function selectLLMOption(option) {
 
   // Mostrar/ocultar lista de cards
   const cards = document.getElementById('llm-cards-list');
-
   if (cards) {
     if (option === 'choose') {
       cards.classList.add('visible');
@@ -247,6 +283,18 @@ function selectLLMOption(option) {
         : 'Predeterminado';
 
     setLLMValue('default', defaultLabel);
+    closeLLMModal();
+  }
+
+  // Si es modelo personalizado, seleccionarlo directamente (ya está configurado)
+  if (option === 'custom') {
+    const customLabel =
+      window.WB_I18N && window.WB_I18N.llmCustomLabel
+        ? window.WB_I18N.llmCustomLabel
+        : 'Personalizado';
+    const customName = (window.WB_LLM && window.WB_LLM.customModelName) || customLabel;
+
+    setLLMValue('custom', customName);
     closeLLMModal();
   }
 }
@@ -268,16 +316,26 @@ function selectLLMCard(card) {
 function setLLMValue(value, label) {
   // Actualizar el input hidden del form
   const input = document.getElementById('llm-choice-input-form');
-
   if (input) {
     input.value = value;
   }
 
+  // Sincronizar también el input hidden del modal (por si acaso)
+  const inputModal = document.getElementById('llm-choice-input');
+  if (inputModal) {
+    inputModal.value = value;
+  }
+
   // Actualizar el texto del botón
   const display = document.getElementById('llm-label-display');
-
   if (display) {
     display.textContent = label;
+  }
+
+  // Actualizar WB_LLM para que openLLMModal restaure bien si se vuelve a abrir
+  if (window.WB_LLM) {
+    window.WB_LLM.selectedChoice = value;
+    window.WB_LLM.selectedLabel  = (value === 'default') ? '' : label;
   }
 }
 

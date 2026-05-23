@@ -417,6 +417,26 @@
   const CSRF_TOKEN      = "{{ csrf_token }}";
   const GEN_STATUS_URL  = "{% url 'site_status' api_request.id %}";
   const SITE_RENDER_URL = "{% url 'site_render' api_request.id %}";
+
+  // Tipos de sitio que NO necesitan gestión de usuarios
+  const SITE_TYPES_NO_USERS = ['portfolio'];
+
+  function toggleUsersBlock(siteType) {
+    const block = document.getElementById('block-users');
+    if (!block) return;
+    block.style.display = SITE_TYPES_NO_USERS.includes(siteType) ? 'none' : '';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const select = document.querySelector('select[name="site_type"]');
+    if (!select) return;
+
+    // Estado inicial al cargar la página
+    toggleUsersBlock(select.value);
+
+    // Actualizar al cambiar
+    select.addEventListener('change', () => toggleUsersBlock(select.value));
+  });
 </script>
 <script src="{% static 'js/edit.js' %}"></script>
 

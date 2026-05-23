@@ -24,6 +24,13 @@
 
     <div class="auth-title">{% trans "Bienvenido a WebBuilder" %}</div>
 
+    {# Aviso de sesión caducada cuando hay redirección pendiente #}
+    {% if request.GET.next %}
+      <div class="auth-error">
+        {% trans "Tu sesión ha caducado. Inicia sesión para volver a donde estabas." %}
+      </div>
+    {% endif %}
+
     {% if form.non_field_errors %}
       <div class="auth-error">
         {% for err in form.non_field_errors %}
@@ -32,8 +39,14 @@
       </div>
     {% endif %}
 
-    <form action="{% url 'login' %}" method="post" class="auth-fields" novalidate>
+    {# action usa get_full_path para preservar ?next= en la URL del POST #}
+    <form action="{{ request.get_full_path }}" method="post" class="auth-fields" novalidate>
       {% csrf_token %}
+
+      {# Campo hidden por si Django auth no lee next de la URL sino del body #}
+      {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+      {% endif %}
 
       <div class="auth-field">
         {{ form.username }}
@@ -49,14 +62,14 @@
         {% endif %}
       </div>
 
-	  <button type="submit" class="auth-submit"><span>{% trans "Iniciar sesión" %}</span></button>
+      <button type="submit" class="auth-submit"><span>{% trans "Iniciar sesión" %}</span></button>
 
     </form>
 
     <div class="auth-form-footer">
       {% trans "¿No tienes cuenta?" %} <a href="{% url 'register' %}">{% trans "Regístrate" %}</a>
     </div>
-    
+
   </div>
 
   <script>

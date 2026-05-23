@@ -10,6 +10,11 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 import os
 
 from django.core.asgi import get_asgi_application
+from dotenv import load_dotenv
+
+# Cargar .env igual que manage.py para que SECRET_KEY y el resto
+# de variables estén disponibles también en despliegue ASGI.
+load_dotenv()
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 
