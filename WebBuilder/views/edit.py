@@ -143,7 +143,7 @@ def edit(request, api_request_id: int):
             api_request.field_mapping = plan
             api_request.plan_accepted = False
             api_request.save(update_fields=["field_mapping", "plan_accepted"])
-            messages.success(request, "Schema actualizado ✅ (vuelve a aceptar para publicar)")
+            messages.success(request, "Schema actualizado (vuelve a aceptar para publicar)")
             return redirect("edit", api_request_id=api_request.id)
 
         # ── Aceptar plan y publicar ─────────────────────────────────

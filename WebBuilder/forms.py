@@ -1,11 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import APIRequest
 from .models import APIRequest, UserProfile
 
 from django.contrib.auth.forms import PasswordChangeForm
-
+from django.utils.translation import gettext_lazy as _
 class RegisterForm(UserCreationForm):
 
     email = forms.EmailField(
@@ -35,7 +34,7 @@ class APIRequestForm(forms.ModelForm):
         required=False,
         widget=forms.URLInput(attrs={
             "class": "form-control",
-            "placeholder": "Introduce la URL de la API",
+            "placeholder": _("Introduce la URL de la API"),
         })
     )
 
@@ -44,7 +43,7 @@ class APIRequestForm(forms.ModelForm):
         widget=forms.Textarea(attrs={
             "rows": 4,
             "class": "form-control",
-            "placeholder": "Describe qué web quieres y cómo la quieres...",
+            "placeholder": _("Describe qué web quieres y cómo la quieres..."),
         })
     )
 
@@ -59,7 +58,7 @@ class APIRequestForm(forms.ModelForm):
     def clean_api_url(self):
         url = self.cleaned_data.get("api_url", "")
         if url and ("\n" in url or len(url.split()) > 1):
-            raise forms.ValidationError("Introduce una URL válida, no texto.")
+            raise forms.ValidationError(_("Introduce una URL válida, no texto."))
         return url
 
     def clean(self):
@@ -67,7 +66,7 @@ class APIRequestForm(forms.ModelForm):
         api_url = cleaned_data.get("api_url")
         file_input = cleaned_data.get("file_input")
         if not api_url and not file_input:
-            raise forms.ValidationError("Introduce una URL o sube un fichero.")
+            raise forms.ValidationError(_("Introduce una URL o sube un fichero."))
         return cleaned_data
 
     class Meta:

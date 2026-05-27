@@ -310,6 +310,7 @@ def prompt_models(*, fields, sample_items, site_title, field_roles=None):
         "Un modelo llamado 'Item' con los campos del schema.",
         "USA LOS ROLES SEMÁNTICOS de abajo como fuente principal para elegir el tipo de campo. Los ejemplos solo confirman.",
         "  rol 'numeric'  → FloatField(null=True, blank=True). SIEMPRE FloatField aunque la API lo entregue como string (ej: \"76753.69\"). NUNCA DecimalField (puede desbordar con capitalizaciones grandes).",
+        "  EXCEPCIÓN CRÍTICA: si el campo se llama 'id', '*_id' o actúa como identificador externo (entero único del registro), usa IntegerField(null=True, blank=True) aunque su rol sea 'numeric'. NUNCA FloatField para IDs.",
         "  rol 'percent'  → FloatField(null=True, blank=True). Admite negativos.",
         "  rol 'image'    → URLField(max_length=500, blank=True)",
         "  rol 'url'      → URLField(max_length=500, blank=True)",
