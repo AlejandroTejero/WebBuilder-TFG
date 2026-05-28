@@ -1,0 +1,172 @@
+{% extends 'WebBuilder/base.html' %}
+{% load i18n static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/assistant/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/faq.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="asst-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="asst-sidebar">
+    <div class="asst-sidebar__inner">
+
+      <div class="faq-sidebar-header">
+        <span class="faq-sidebar-title">{% trans "Preguntas frecuentes" %}</span>
+      </div>
+
+      <nav class="faq-sidenav">
+        <a href="#uso-basico" class="faq-sidenav__item active">{% trans "Uso básico" %}</a>
+        <a href="#generacion" class="faq-sidenav__item">{% trans "Generación" %}</a>
+        <a href="#configuracion" class="faq-sidenav__item">{% trans "Configuración" %}</a>
+        <a href="#despliegue" class="faq-sidenav__item">{% trans "Despliegue" %}</a>
+      </nav>
+
+      <a href="{% url 'home' %}" class="asst-history-link">
+        ← {% trans "Volver al inicio" %}
+      </a>
+
+    </div>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <main class="asst-content">
+    <div class="faq-content-wrapper">
+
+      <div class="faq-main-header">
+        <h1 class="faq-title">{% trans "Preguntas frecuentes" %}</h1>
+        <p class="faq-subtitle">{% trans "Todo lo que necesitas saber sobre WebBuilder." %}</p>
+      </div>
+
+      <!-- SECCIÓN: Uso básico -->
+      <div class="faq-section" id="uso-basico">
+        <div class="faq-section-label">{% trans "Uso básico" %}</div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Qué tipo de APIs acepta WebBuilder?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "Cualquier API pública que devuelva JSON o XML. WebBuilder detecta el formato automáticamente. La URL debe ser accesible sin autenticación." %}</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Qué ocurre si mi API devuelve muchos datos?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "WebBuilder envía una muestra al LLM para el análisis, no el dataset completo. Los datos se cargan en su totalidad al ejecutar el comando load_data del proyecto generado." %}</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Puedo regenerar el plan si no me gusta el que propone la IA?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "Sí. En el paso de revisión puedes escribir un prompt personalizado en lenguaje natural para ajustar el plan antes de aceptarlo." %}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN: Generación -->
+      <div class="faq-section" id="generacion">
+        <div class="faq-section-label">{% trans "Generación" %}</div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Qué archivos incluye el proyecto generado?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "El ZIP incluye models.py, views.py, urls.py, templates con Tailwind CSS, un management command load_data, Dockerfile y entrypoint.sh. Es un proyecto Django completo listo para ejecutar." %}</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Por qué a veces falla la generación?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "El LLM puede producir código con errores de sintaxis ocasionalmente. El sistema incluye validaciones automáticas y puedes regenerar con un prompt correctivo si se detecta algún fallo." %}</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Puedo editar el código generado antes de descargarlo?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "Sí, WebBuilder incluye un editor de código integrado que te permite modificar cualquier archivo del proyecto antes de descargarlo." %}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN: Configuración -->
+      <div class="faq-section" id="configuracion">
+        <div class="faq-section-label">{% trans "Configuración" %}</div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Puedo usar mi propio modelo de IA?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "Sí. Desde tu perfil puedes configurar un LLM personalizado con tu propia base URL, modelo y API key. Es compatible con cualquier proveedor que implemente el formato OpenAI (/chat/completions)." %}</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿En qué idiomas está disponible WebBuilder?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "La interfaz está disponible en español e inglés. Puedes cambiar el idioma desde tu perfil o desde el selector en la barra de navegación." %}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN: Despliegue -->
+      <div class="faq-section" id="despliegue">
+        <div class="faq-section-label">{% trans "Despliegue" %}</div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Cómo ejecuto el proyecto descargado?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "Descomprime el ZIP, construye la imagen Docker con docker build y ejecuta el contenedor. El entrypoint.sh se encarga de las migraciones y la carga de datos automáticamente." %}</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">
+            <span>{% trans "¿Qué necesito tener instalado para desplegarlo?" %}</span>
+            <i class="faq-icon">+</i>
+          </div>
+          <div class="faq-a">
+            <div class="faq-a-inner">{% trans "Solo Docker. El proyecto generado es completamente autocontenido y no requiere instalar Python, dependencias ni configurar bases de datos manualmente." %}</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /faq-content-wrapper -->
+  </main>
+
+</div>
+
+{% block extra_js %}
+  <script src="{% static 'js/faq.js' %}"></script>
+{% endblock %}
+
+{% endblock %}

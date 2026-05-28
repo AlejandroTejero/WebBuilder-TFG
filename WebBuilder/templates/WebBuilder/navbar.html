@@ -90,35 +90,22 @@
           <span class="wb-nav-arrow"></span>
         </div>
         <div class="wb-dropdown">
-          <a href="#" class="wb-dropdown-item">
+          <a href="https://alejandrotejero.github.io/WebBuilder-landing/" target="_blank" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
               <div class="wb-dropdown-title">{% trans "Documentación" %}</div>
               <div class="wb-dropdown-description">{% trans "Guías y tutoriales" %}</div>
             </div>
           </a>
-          <a href="#" class="wb-dropdown-item">
+          <a href="{% url 'faq' %}" class="wb-dropdown-item">
             <div class="wb-dropdown-content">
               <div class="wb-dropdown-title">{% trans "FAQ" %}</div>
               <div class="wb-dropdown-description">{% trans "Preguntas frecuentes" %}</div>
             </div>
           </a>
-          <a href="#" class="wb-dropdown-item">
-            <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">{% trans "Contacto" %}</div>
-              <div class="wb-dropdown-description">{% trans "¿Necesitas ayuda?" %}</div>
-            </div>
-          </a>
-          <div class="wb-dropdown-divider"></div>
-          <a href="#" class="wb-dropdown-item">
-            <div class="wb-dropdown-content">
-              <div class="wb-dropdown-title">{% trans "Reportar un problema" %}</div>
-              <div class="wb-dropdown-description">{% trans "Feedback y sugerencias" %}</div>
-            </div>
-          </a>
         </div>
       </div>
 
-    </div><!-- /wb-nav-menu -->
+    </div>
 
 
     <!-- ── 3. SECCIÓN DERECHA ── -->
@@ -132,11 +119,6 @@
             <span class="wb-nav-arrow"></span>
           </div>
           <div class="wb-dropdown wb-dropdown--right">
-            <a href="{% url 'history' %}" class="wb-dropdown-item">
-              <div class="wb-dropdown-content">
-                <div class="wb-dropdown-title">{% trans "Mis Proyectos" %}</div>
-              </div>
-            </a>
             <a href="{% url 'profile' %}" class="wb-dropdown-item">
               <div class="wb-dropdown-content">
                 <div class="wb-dropdown-title">{% trans "Configuración" %}</div>

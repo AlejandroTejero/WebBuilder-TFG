@@ -17,7 +17,7 @@
 }
 
 .wb-cta-title .wb-hero-accent {
-  color:  #24b46c;
+  color: var(--wb-t1);
 }
 
 

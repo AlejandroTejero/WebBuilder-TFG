@@ -38,6 +38,10 @@ def home(request):
         return render(request, "WebBuilder/home.html", {})
 
 
+def faq(request):
+    return render(request, "WebBuilder/faq.html")
+
+
 @login_required
 def profile(request):
     profile_obj, _ = UserProfile.objects.get_or_create(user=request.user)
