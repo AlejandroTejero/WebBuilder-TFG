@@ -37,11 +37,15 @@ _secret_from_env = os.getenv("SECRET_KEY", "")
 SECRET_KEY = _secret_from_env if _secret_from_env else secrets.token_hex(50)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+
 
 # No vacio, asi si cambiamos DEBUG = False para el despliegue, seguira funcionando en local.
 # El ultimo para metricas de n8n
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '172.18.0.1']
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '172.18.0.1']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,172.18.0.1').split(',')
 
 # Application definition
 
@@ -152,6 +156,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

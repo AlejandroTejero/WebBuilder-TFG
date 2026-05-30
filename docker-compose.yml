@@ -1,0 +1,83 @@
+services:
+
+  # ──────────────────────────────────────────────
+  # Base de datos PostgreSQL
+  # ──────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME}
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────────
+  # Django app (gunicorn)
+  # ──────────────────────────────────────────────
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Apunta a la DB del compose, no a localhost
+      DB_HOST: db
+      # Carpeta compartida con n8n donde Django deposita los ZIPs antes del deploy
+      N8N_LOCAL_FILES_PATH: /files
+      # Los webhooks usan el nombre del servicio n8n dentro de la red Docker
+      N8N_DEPLOY_WEBHOOK:          http://n8n:5678/webhook/webbuilder-deploy
+      N8N_WEBHOOK_REGISTRO:        http://n8n:5678/webhook/WebBuilder-Register
+      N8N_WEBHOOK_LOGIN:           http://n8n:5678/webhook/WebBuilder-Login
+      N8N_WEBHOOK_GENERATION_DONE: http://n8n:5678/webhook/webbuilder-generation-done
+    volumes:
+      - static_files:/app/staticfiles   # nginx sirve estos estáticos
+      - shared_files:/files             # ZIPs que recoge n8n para el deploy
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ──────────────────────────────────────────────
+  # n8n (imagen custom: n8n + Docker CLI)
+  # ──────────────────────────────────────────────
+  n8n:
+    build: ./n8n
+    restart: unless-stopped
+    environment:
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      # URL pública de n8n (la IP del VPS) — necesario para que los webhooks funcionen
+      WEBHOOK_URL:        http://${VPS_IP}:5678
+      # Expuesta al workflow de deploy para construir la preview_url correcta
+      VPS_IP:             ${VPS_IP}
+      GENERIC_TIMEZONE:   Europe/Madrid
+    volumes:
+      - n8n_data:/home/node/.n8n        # workflows, credenciales, etc.
+      - shared_files:/files             # misma carpeta compartida con Django
+      - /var/run/docker.sock:/var/run/docker.sock  # acceso al Docker del host → deploy
+    ports:
+      - "5678:5678"   # panel de n8n accesible directamente: http://VPS_IP:5678
+
+  # ──────────────────────────────────────────────
+  # Nginx — proxy inverso + archivos estáticos
+  # ──────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_files:/static:ro
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:   # datos de PostgreSQL
+  static_files:    # CSS/JS/imágenes de Django (collectstatic)
+  n8n_data:        # workflows y credenciales de n8n
+  shared_files:    # ZIPs de deploy compartidos entre Django y n8n
