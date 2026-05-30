@@ -234,3 +234,6 @@ LOGGING = {
 
 # LLM personalizados
 FIELD_ENCRYPTION_KEY = os.getenv("FIELD_ENCRYPTION_KEY", "")
+
+# Despligue Railway
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
