@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-02 19:17+0000\n"
+"POT-Creation-Date: 2026-06-02 19:26+0000\n"
 "PO-Revision-Date: 2026-05-27 00:00+0000\n"
 "Last-Translator: ChatGPT <noreply@example.com>\n"
-"Language: en\n"
 "Language-Team: English\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: WebBuilder/forms.py:37
@@ -280,7 +280,8 @@ msgstr "Schema"
 
 #: WebBuilder/templates/WebBuilder/edit.html:147
 msgid "Ajusta el tipo, título y campos. Al guardar, el preview se actualiza."
-msgstr "Adjust the type, title, and fields. When you save, the preview updates."
+msgstr ""
+"Adjust the type, title, and fields. When you save, the preview updates."
 
 #: WebBuilder/templates/WebBuilder/edit.html:156
 msgid "Tipo de sitio"
@@ -429,14 +430,17 @@ msgid "Sitio publicado"
 msgstr "Published site"
 
 #: WebBuilder/templates/WebBuilder/edit.html:358
-msgid "La IA ya generó el diseño. Puedes verlo o regenerarlo con el schema actual."
+msgid ""
+"La IA ya generó el diseño. Puedes verlo o regenerarlo con el schema actual."
 msgstr ""
 "AI has already generated the design. You can view it or regenerate it with "
 "the current schema."
 
 #: WebBuilder/templates/WebBuilder/edit.html:360
-msgid "Cuando el schema esté listo, la IA generará el HTML/CSS del sitio completo."
-msgstr "When the schema is ready, AI will generate the HTML/CSS for the entire site."
+msgid ""
+"Cuando el schema esté listo, la IA generará el HTML/CSS del sitio completo."
+msgstr ""
+"When the schema is ready, AI will generate the HTML/CSS for the entire site."
 
 #: WebBuilder/templates/WebBuilder/edit.html:370
 #: WebBuilder/templates/WebBuilder/site_render.html:327
@@ -545,9 +549,9 @@ msgstr "What happens if my API returns a lot of data?"
 
 #: WebBuilder/templates/WebBuilder/faq.html:63
 msgid ""
-"WebBuilder envía una muestra al LLM para el análisis, no el dataset completo."
-" Los datos se cargan en su totalidad al ejecutar el comando load_data del "
-"proyecto generado."
+"WebBuilder envía una muestra al LLM para el análisis, no el dataset "
+"completo. Los datos se cargan en su totalidad al ejecutar el comando "
+"load_data del proyecto generado."
 msgstr ""
 "WebBuilder sends a sample to the LLM for analysis, not the full dataset. "
 "Thedata is fully loaded when running the load_data command in the "
@@ -599,8 +603,8 @@ msgstr "Can I edit the generated code before downloading it?"
 
 #: WebBuilder/templates/WebBuilder/faq.html:108
 msgid ""
-"Sí, WebBuilder incluye un editor de código integrado que te permite modificar"
-" cualquier archivo del proyecto antes de descargarlo."
+"Sí, WebBuilder incluye un editor de código integrado que te permite "
+"modificar cualquier archivo del proyecto antes de descargarlo."
 msgstr ""
 "Yes, WebBuilder includes a built-in code editor that lets you modify "
 "anyproject file before downloading it."
@@ -611,13 +615,13 @@ msgstr "Can I use my own AI model?"
 
 #: WebBuilder/templates/WebBuilder/faq.html:123
 msgid ""
-"Sí. Desde tu perfil puedes configurar un LLM personalizado con tu propia base"
-" URL, modelo y API key. Es compatible con cualquier proveedor que implemente "
-"el formato OpenAI (/chat/completions)."
+"Sí. Desde tu perfil puedes configurar un LLM personalizado con tu propia "
+"base URL, modelo y API key. Es compatible con cualquier proveedor que "
+"implemente el formato OpenAI (/chat/completions)."
 msgstr ""
-"Yes. From your profile, you can configure a custom LLM with your own baseURL,"
-" model and API key. It is compatible with any provider that implementsthe "
-"OpenAI format (/chat/completions)."
+"Yes. From your profile, you can configure a custom LLM with your own "
+"baseURL, model and API key. It is compatible with any provider that "
+"implementsthe OpenAI format (/chat/completions)."
 
 #: WebBuilder/templates/WebBuilder/faq.html:129
 msgid "¿En qué idiomas está disponible WebBuilder?"
@@ -628,8 +632,8 @@ msgid ""
 "La interfaz está disponible en español e inglés. Puedes cambiar el idioma "
 "desde tu perfil o desde el selector en la barra de navegación."
 msgstr ""
-"The interface is available in Spanish and English. You can change thelanguage"
-" from your profile or from the selector in the navigation bar."
+"The interface is available in Spanish and English. You can change "
+"thelanguage from your profile or from the selector in the navigation bar."
 
 #: WebBuilder/templates/WebBuilder/faq.html:144
 msgid "¿Cómo ejecuto el proyecto descargado?"
@@ -641,8 +645,9 @@ msgid ""
 "contenedor. El entrypoint.sh se encarga de las migraciones y la carga de "
 "datos automáticamente."
 msgstr ""
-"Unzip the ZIP, build the Docker image with docker build and run thecontainer."
-" The entrypoint.sh handles migrations and data loadingautomatically."
+"Unzip the ZIP, build the Docker image with docker build and run "
+"thecontainer. The entrypoint.sh handles migrations and data "
+"loadingautomatically."
 
 #: WebBuilder/templates/WebBuilder/faq.html:154
 msgid "¿Qué necesito tener instalado para desplegarlo?"
@@ -809,8 +814,8 @@ msgstr "Enter the URL or data file"
 
 #: WebBuilder/templates/WebBuilder/partials/assistant/input.html:6
 msgid ""
-"Soporta JSON, XML, CSV y geoJSON. La IA analizará la estructura y generará el"
-" schema automáticamente."
+"Soporta JSON, XML, CSV y geoJSON. La IA analizará la estructura y generará "
+"el schema automáticamente."
 msgstr ""
 "Supports JSON, XML, CSV and GeoJSON. AI will analyze the structure and "
 "generate the schema automatically."
@@ -921,7 +926,8 @@ msgstr "Tables, metrics, blue and gray, professional"
 msgid ""
 "Pulsa un ejemplo para usarlo como punto de partida. Puedes editarlo en modo "
 "libre."
-msgstr "Click an example to use it as a starting point. You can edit it in free mode."
+msgstr ""
+"Click an example to use it as a starting point. You can edit it in free mode."
 
 #: WebBuilder/templates/WebBuilder/partials/assistant/input.html:100
 msgid "¿Qué estilo visual quieres?"
@@ -1085,8 +1091,8 @@ msgid ""
 "La IA analizó tu dataset y propuso este schema. Puedes ajustarlo campo a "
 "campo en el boton de editar."
 msgstr ""
-"AI analyzed your dataset and proposed this schema. You can adjust it field by"
-" field in the edit button."
+"AI analyzed your dataset and proposed this schema. You can adjust it field "
+"by field in the edit button."
 
 #: WebBuilder/templates/WebBuilder/partials/assistant/preview.html:24
 #: WebBuilder/templates/WebBuilder/site_render.html:220
@@ -1116,7 +1122,9 @@ msgstr "The schema will appear here"
 msgid ""
 "Introduce una URL y la IA generará automáticamente el schema de campos para "
 "tu sitio."
-msgstr "Enter a URL and AI will automatically generate the field schema for your site."
+msgstr ""
+"Enter a URL and AI will automatically generate the field schema for your "
+"site."
 
 #: WebBuilder/templates/WebBuilder/partials/history/published_sites.html:17
 #: WebBuilder/templates/WebBuilder/partials/history/recent_analysis.html:17
@@ -1236,7 +1244,8 @@ msgid "construir"
 msgstr "build"
 
 #: WebBuilder/templates/WebBuilder/partials/home/examples.html:9
-msgid "Proyectos Django reales generados con WebBuilder a partir de APIs públicas."
+msgid ""
+"Proyectos Django reales generados con WebBuilder a partir de APIs públicas."
 msgstr "Real Django projects generated with WebBuilder from public APIs."
 
 #: WebBuilder/templates/WebBuilder/partials/home/examples.html:26
@@ -1594,8 +1603,8 @@ msgstr "Connect your source"
 
 #: WebBuilder/templates/WebBuilder/partials/home/how.html:19
 msgid ""
-"Pega una URL de API pública o arrastra un archivo JSON, CSV o XML. WebBuilder"
-" lo descarga y parsea automáticamente."
+"Pega una URL de API pública o arrastra un archivo JSON, CSV o XML. "
+"WebBuilder lo descarga y parsea automáticamente."
 msgstr ""
 "Paste a public API URL or drag a JSON, CSV or XML file. WebBuilder downloads "
 "and parses it automatically."
@@ -1697,8 +1706,8 @@ msgid ""
 "Se ejecuta cada día a las 11:00. Consulta las métricas de Django, evalúa "
 "alertas y manda un informe al admin."
 msgstr ""
-"Runs every day at 11:00. Queries Django metrics, evaluates alerts and sends a"
-" report to the admin."
+"Runs every day at 11:00. Queries Django metrics, evaluates alerts and sends "
+"a report to the admin."
 
 #: WebBuilder/templates/WebBuilder/partials/home/how.html:102
 msgid "Diario 11:00"
@@ -1801,8 +1810,10 @@ msgid "modelo de IA"
 msgstr "AI model"
 
 #: WebBuilder/templates/WebBuilder/partials/home/llms.html:9
-msgid "Selecciona el LLM que genera tu proyecto. Cada modelo tiene sus fortalezas."
-msgstr "Choose the LLM that generates your project. Each model has its strengths."
+msgid ""
+"Selecciona el LLM que genera tu proyecto. Cada modelo tiene sus fortalezas."
+msgstr ""
+"Choose the LLM that generates your project. Each model has its strengths."
 
 #: WebBuilder/templates/WebBuilder/partials/home/llms.html:14
 msgid "Modelos disponibles"
@@ -2028,7 +2039,8 @@ msgstr "Site stuck in \"generating\""
 
 #: WebBuilder/templates/WebBuilder/partials/metrics/alerts.html:22
 #, python-format
-msgid "%(project_name)s — usuario: %(username)s — sin actualización desde %(since)s"
+msgid ""
+"%(project_name)s — usuario: %(username)s — sin actualización desde %(since)s"
 msgstr "%(project_name)s — user: %(username)s — no update since %(since)s"
 
 #: WebBuilder/templates/WebBuilder/partials/metrics/alerts.html:31
@@ -2725,7 +2737,8 @@ msgstr "Slower than Scout."
 msgid ""
 "Modelo especializado en código de Alibaba, muy bueno generando HTML/CSS "
 "limpio."
-msgstr "Alibaba code-specialized model, very good at generating clean HTML/CSS."
+msgstr ""
+"Alibaba code-specialized model, very good at generating clean HTML/CSS."
 
 #: WebBuilder/utils/llm/llm_catalog.py:31
 msgid "Optimizado para código, genera estructuras limpias."
@@ -2814,19 +2827,13 @@ msgstr "May be slower; free with limits."
 #~ msgstr "Custom LLM model"
 
 #~ msgid ""
-#~ "Si quieres usar tu propio proveedor, "
-#~ "rellena estos campos. Debe ser compatible"
-#~ " con la API de OpenAI (mismo "
-#~ "formato de request). Si los dejas "
-#~ "vacíos, se usará el modelo que elijas"
-#~ " en el asistente."
+#~ "Si quieres usar tu propio proveedor, rellena estos campos. Debe ser "
+#~ "compatible con la API de OpenAI (mismo formato de request). Si los dejas "
+#~ "vacíos, se usará el modelo que elijas en el asistente."
 #~ msgstr ""
-#~ "If you want to use your own "
-#~ "provider, fill in these fields. It "
-#~ "must be compatible with the OpenAI API"
-#~ " (same request format). If you leave "
-#~ "them empty, the model you choose in"
-#~ " the assistant will be used."
+#~ "If you want to use your own provider, fill in these fields. It must be "
+#~ "compatible with the OpenAI API (same request format). If you leave them "
+#~ "empty, the model you choose in the assistant will be used."
 
 #~ msgid "Se guarda cifrada. No se muestra una vez guardada."
 #~ msgstr "It is stored encrypted. It is not shown once saved."
