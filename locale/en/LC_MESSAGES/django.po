@@ -2621,7 +2621,7 @@ msgstr "Your session has expired. Log in to return to where you were."
 
 # | msgid "Inicia sesión"
 #: WebBuilder/templates/registration/login.html:68
-#, fuzzy
+
 msgid "o inicia sesión con"
 msgstr "Log in"
 
@@ -2641,7 +2641,7 @@ msgstr "Create account"
 
 # | msgid "Regístrate"
 #: WebBuilder/templates/registration/register.html:72
-#, fuzzy
+
 msgid "o regístrate con"
 msgstr "Sign up"
 
@@ -2663,13 +2663,13 @@ msgstr "Repeat password"
 
 # | msgid "Crear cuenta"
 #: WebBuilder/templates/socialaccount/login.html:8
-#, fuzzy
+
 msgid "Conectar cuenta"
 msgstr "Create account"
 
 # | msgid "Conecta tu fuente"
 #: WebBuilder/templates/socialaccount/login.html:25
-#, fuzzy
+
 msgid "Conectar con"
 msgstr "Connect your source"
 
@@ -2692,14 +2692,14 @@ msgstr "Continue"
 # | msgid "Volver al inicio"
 #: WebBuilder/templates/socialaccount/login.html:41
 #: WebBuilder/templates/socialaccount/signup.html:61
-#, fuzzy
+
 msgid "Volver al login"
 msgstr "Back to home"
 
 # | msgid "Total registrados"
 #: WebBuilder/templates/socialaccount/signup.html:8
 #: WebBuilder/templates/socialaccount/signup.html:25
-#, fuzzy
+
 msgid "Completar registro"
 msgstr "Total registered"
 
