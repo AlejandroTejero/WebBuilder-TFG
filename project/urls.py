@@ -14,14 +14,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import set_language
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
+    # Redirige el error de OAuth al login en vez de mostrar la página sin render
+    path('accounts/social/login/error/', RedirectView.as_view(url='/login/'), name='socialaccount_login_error'),
     path('accounts/', include('allauth.urls')),
     path('', include('WebBuilder.urls')),
 ]
