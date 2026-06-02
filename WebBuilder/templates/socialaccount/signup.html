@@ -1,0 +1,74 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans "Completar registro" %} — WebBuilder</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/colors.css' %}">
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <script>if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');</script>
+</head>
+<body class="auth-page">
+
+  <div class="auth-wrap">
+
+    <div class="auth-logo">
+      <img src="{% static 'images/logo.png' %}" alt="WB">
+    </div>
+
+    <div class="auth-title">{% trans "Completar registro" %}</div>
+
+    <p style="text-align:center; color: var(--wb-t2); margin-bottom: 24px; font-size: 0.9rem;">
+      {% trans "Necesitamos un dato más para crear tu cuenta." %}
+    </p>
+
+    {% if form.non_field_errors %}
+      <div class="auth-error">
+        {% for err in form.non_field_errors %}
+          <div>{{ err }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" class="auth-fields" novalidate>
+      {% csrf_token %}
+
+      {% for field in form.visible_fields %}
+        <div class="auth-field">
+          {{ field }}
+          {% if field.errors %}
+            <div class="auth-field-error">{{ field.errors.0 }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      {% for field in form.hidden_fields %}
+        {{ field }}
+      {% endfor %}
+
+      <button type="submit" class="auth-submit">
+        <span>{% trans "Continuar" %}</span>
+      </button>
+    </form>
+
+    <div class="auth-form-footer">
+      <a href="{% url 'login' %}">{% trans "Volver al login" %}</a>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const email = document.querySelector('input[name="email"]');
+      if (email) email.placeholder = "Email";
+    });
+  </script>
+
+</body>
+</html>
