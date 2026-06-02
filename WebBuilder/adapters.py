@@ -1,8 +1,13 @@
 import datetime
+import logging
 import requests
 
 from django.conf import settings
+from django.shortcuts import redirect
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.core.exceptions import ImmediateHttpResponse
+
+logger = logging.getLogger(__name__)
 
 
 def _llamar_webhook(url: str, datos: dict) -> None:
@@ -29,9 +34,16 @@ class WebBuilderSocialAccountAdapter(DefaultSocialAccountAdapter):
 
         return user
 
-    def authentication_error(self, request, provider_id, error=None, exception=None, extra_context=None):
-        """Captura errores OAuth por si quieres loguearlos."""
-        pass
+    def on_authentication_error(self, request, provider, error=None, exception=None, extra_context=None):
+        """
+        Se llama cuando falla el login OAuth.
+        Logueamos el error y redirigimos al login en vez de mostrar la página fea de allauth.
+        """
+        logger.error(
+            "[OAuth] Error en provider=%s | error=%s | exception=%s",
+            provider, error, exception
+        )
+        raise ImmediateHttpResponse(redirect("login"))
 
     def pre_social_login(self, request, sociallogin):
         """
