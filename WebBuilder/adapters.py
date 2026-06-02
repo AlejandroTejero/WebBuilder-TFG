@@ -35,15 +35,10 @@ class WebBuilderSocialAccountAdapter(DefaultSocialAccountAdapter):
         return user
 
     def on_authentication_error(self, request, provider, error=None, exception=None, extra_context=None):
-        """
-        Se llama cuando falla el login OAuth.
-        Logueamos el error y redirigimos al login en vez de mostrar la página fea de allauth.
-        """
         logger.error(
             "[OAuth] Error en provider=%s | error=%s | exception=%s",
             provider, error, exception
         )
-        raise ImmediateHttpResponse(redirect("login"))
 
     def pre_social_login(self, request, sociallogin):
         """
