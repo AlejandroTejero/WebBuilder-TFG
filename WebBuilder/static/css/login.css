@@ -191,3 +191,53 @@ body.auth-page {
 @media (max-width: 480px) {
   .auth-wrap { padding: 0 28px; }
 }
+
+
+/* Oauth */
+/* ── OAuth ─────────────────────────────────────── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 16px;
+  color: var(--text-muted, #888);
+  font-size: 0.8rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border, #333);
+}
+
+.auth-oauth {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.auth-oauth-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  border: 1px solid var(--border, #333);
+}
+.auth-oauth-btn:hover { opacity: 0.8; }
+
+.auth-oauth-google {
+  background: #fff;
+  color: #333;
+}
+.auth-oauth-github {
+  background: #24292e;
+  color: #fff;
+}

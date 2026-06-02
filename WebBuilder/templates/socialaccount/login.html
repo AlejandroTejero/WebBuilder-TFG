@@ -1,0 +1,47 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans "Conectar cuenta" %} — WebBuilder</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/colors.css' %}">
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <script>if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');</script>
+</head>
+<body class="auth-page">
+
+  <div class="auth-wrap">
+
+    <div class="auth-logo">
+      <img src="{% static 'images/logo.png' %}" alt="WB">
+    </div>
+
+    <div class="auth-title">{% trans "Conectar con" %} {{ provider.name }}</div>
+
+    <p style="text-align:center; color: var(--wb-t2); margin-bottom: 24px; font-size: 0.9rem;">
+      {% blocktrans with provider=provider.name %}
+        Vas a iniciar sesión usando tu cuenta de {{ provider }}.
+      {% endblocktrans %}
+    </p>
+
+	<form method="post" action="{{ request.path }}">
+      {% csrf_token %}
+      <button type="submit" class="auth-submit">
+        <span>{% trans "Continuar" %}</span>
+      </button>
+    </form>
+
+    <div class="auth-form-footer">
+      <a href="{% url 'login' %}">{% trans "Volver al login" %}</a>
+    </div>
+
+  </div>
+
+</body>
+</html>
