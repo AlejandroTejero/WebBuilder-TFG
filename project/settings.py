@@ -255,33 +255,30 @@ FIELD_ENCRYPTION_KEY = os.getenv("FIELD_ENCRYPTION_KEY", "")
 # Despligue Railway
 CSRF_TRUSTED_ORIGINS = [x for x in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if x]
 
-
-# OAuth (django-allauth) 
+# ── OAuth (django-allauth) ─────────────────────────────────────────────────
 SITE_ID = 1
 
 SOCIALACCOUNT_ADAPTER = 'WebBuilder.adapters.WebBuilderSocialAccountAdapter'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_EMAIL_REQUIRED = False
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id':     os.getenv('GOOGLE_CLIENT_ID', ''),
-            'secret':        os.getenv('GOOGLE_CLIENT_SECRET', ''),
+            'client_id':  os.getenv('GOOGLE_CLIENT_ID', ''),
+            'secret':     os.getenv('GOOGLE_CLIENT_SECRET', ''),
         },
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
     },
     'github': {
         'APP': {
-            'client_id':     os.getenv('GITHUB_CLIENT_ID', ''),
-            'secret':        os.getenv('GITHUB_CLIENT_SECRET', ''),
+            'client_id':  os.getenv('GITHUB_CLIENT_ID', ''),
+            'secret':     os.getenv('GITHUB_CLIENT_SECRET', ''),
         },
         'SCOPE': ['user:email'],
     },
 }
-
-# No redirigir a /accounts/email/ a rellenar el email si el proveedor no lo da
-SOCIALACCOUNT_EMAIL_REQUIRED = False
-# Crear la cuenta automáticamente sin confirmación de email
-SOCIALACCOUNT_AUTO_SIGNUP = True
-# No enviar email de confirmación
-ACCOUNT_EMAIL_VERIFICATION = 'none'
