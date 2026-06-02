@@ -2810,8 +2810,8 @@ msgstr "May be slower; free with limits."
 #~ msgid "Configura tu modelo LLM personalizado"
 #~ msgstr "Set up your custom LLM model"
 
-#~ msgid "🤖 Modelo LLM personalizado"
-#~ msgstr "🤖 Custom LLM model"
+#~ msgid "Modelo LLM personalizado"
+#~ msgstr "Custom LLM model"
 
 #~ msgid ""
 #~ "Si quieres usar tu propio proveedor, "
