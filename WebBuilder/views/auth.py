@@ -29,7 +29,8 @@ def register(request):
                 "email":    user.email,
             })
 
-            login(request, user)
+            # login(request, user)
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect("home")
     else:
         form = RegisterForm()
