@@ -11,44 +11,28 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
-# Import para el LLM
 import os
 import secrets
-
 from dotenv import load_dotenv
 
 # Cargar .env desde la raíz del proyecto (el directorio que contiene manage.py).
-# Necesario para que SECRET_KEY esté disponible cuando Django arranca vía
-# wsgi/asgi sin pasar por manage.py (que ya tiene su propio load_dotenv).
+# Necesario para que SECRET_KEY esté disponible cuando Django arranca vía wsgi/asgi sin pasar por manage.py (que ya tiene su propio load_dotenv).
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# Si SECRET_KEY no está en .env se genera una clave aleatoria de sesión.
-# ⚠ Esto invalida sesiones activas en cada reinicio; define SECRET_KEY en .env.
+# Si SECRET_KEY no está en .env se genera una clave aleatoria de sesión. Esto invalida sesiones activas en cada reinicio
 _secret_from_env = os.getenv("SECRET_KEY", "")
 SECRET_KEY = _secret_from_env if _secret_from_env else secrets.token_hex(50)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+# Debug: False (Produccion) / True (Local)
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-
-
-# No vacio, asi si cambiamos DEBUG = False para el despliegue, seguira funcionando en local.
-# El ultimo para metricas de n8n
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '172.18.0.1']
+# Host permitidos
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,172.18.0.1').split(',')
 
 # Application definition
-
 INSTALLED_APPS = [
     'WebBuilder',
     'django.contrib.admin',
@@ -70,17 +54,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
 ]
 
-#MIDDLEWARE = [
-#    'django.middleware.security.SecurityMiddleware',
-#    'django.contrib.sessions.middleware.SessionMiddleware',
-#	'django.middleware.locale.LocaleMiddleware',
-#    'django.middleware.common.CommonMiddleware',
-#    'django.middleware.csrf.CsrfViewMiddleware',
-#    'django.contrib.auth.middleware.AuthenticationMiddleware',
-#    'django.contrib.messages.middleware.MessageMiddleware',
-#    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-#]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -91,13 +64,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	
 	# Oauth
     'allauth.account.middleware.AccountMiddleware',
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',            # login normal (usuario + contraseña)
-    'allauth.account.auth_backends.AuthenticationBackend',  # login OAuth
+	# Login normal (usuario + contraseña)
+    'django.contrib.auth.backends.ModelBackend',  
+	# Login OAuth          
+    'allauth.account.auth_backends.AuthenticationBackend',  
 ]
 
 
@@ -124,14 +100,6 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -145,7 +113,6 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -164,7 +131,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'es'
 
 LANGUAGES = [
@@ -182,13 +148,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Directo al login si no esta logueado
@@ -198,7 +162,7 @@ LOGIN_REDIRECT_URL = 'home'
 # Manda al login tras un logout
 LOGOUT_REDIRECT_URL = 'login'
 
-# ── Sesiones ──────────────────────────────────────────────────────────────────
+# Sesiones
 # Nombre de cookie único para evitar conflictos si se accede mezclando
 # localhost y 127.0.0.1 (cookies distintas por host aunque mismo puerto).
 SESSION_COOKIE_NAME = 'webbuilder_sessionid'
@@ -212,18 +176,12 @@ LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
 
-# n8n deploy
+# n8n
 N8N_DEPLOY_WEBHOOK = os.getenv("N8N_DEPLOY_WEBHOOK", "http://localhost:5678/webhook/webbuilder-deploy")
 N8N_LOCAL_FILES_PATH = os.getenv("N8N_LOCAL_FILES_PATH", "/home/alejandro/Desktop/TFG/docker/n8n/local-files")
-
-# n8n login
 N8N_WEBHOOK_REGISTRO = os.getenv("N8N_WEBHOOK_REGISTRO", "http://localhost:5678/webhook/WebBuilder-Register")
 N8N_WEBHOOK_LOGIN    = os.getenv("N8N_WEBHOOK_LOGIN",    "http://localhost:5678/webhook/WebBuilder-Login")
-
-# n8n generation
 N8N_WEBHOOK_GENERATION_DONE = os.environ.get("N8N_WEBHOOK_GENERATION_DONE", "http://localhost:5678/webhook/webbuilder-generation-done")
-
-# n8n daily metrics
 INTERNAL_TOKEN = os.environ.get("INTERNAL_TOKEN", "")
 
 # Logs
@@ -248,14 +206,13 @@ LOGGING = {
     },
 }
 
-
 # LLM personalizados
 FIELD_ENCRYPTION_KEY = os.getenv("FIELD_ENCRYPTION_KEY", "")
 
-# Despligue Railway
+# Despligue Railway (Despliegue secundario)
 CSRF_TRUSTED_ORIGINS = [x for x in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if x]
 
-# ── OAuth (django-allauth) ─────────────────────────────────────────────────
+# OAuth (django-allauth)
 SITE_ID = 1
 
 SOCIALACCOUNT_ADAPTER = 'WebBuilder.adapters.WebBuilderSocialAccountAdapter'
