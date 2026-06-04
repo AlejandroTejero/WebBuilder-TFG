@@ -16,12 +16,11 @@ Nuevo schema (field_mapping):
   }
 """
 
-from __future__ import annotations
-
 import hashlib
 import json
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -41,14 +40,16 @@ from ..utils.llm.llm_catalog import LLM_CATALOG
 from ..utils.llm.planner import PlanError, generate_site_plan
 
 
-# ────────────────────────── CONFIG ──────────────────────────────────
-
+# -------------------------------------------------------------------------
+# CONFIG
+# -------------------------------------------------------------------------
 CACHE_TIMEOUT = 3600  # 1h
 CACHE_KEY_PREFIX = "api_analysis"
 
 
-# ────────────────────────── HELPERS LLM ─────────────────────────────
-
+# -------------------------------------------------------------------------
+# HELPERS LLM
+# -------------------------------------------------------------------------
 def _resolve_llm(user, llm_choice: str) -> tuple[str, str, str]:
     """
     Devuelve (model, base_url, api_key) según la elección del usuario.
@@ -71,8 +72,6 @@ def _resolve_llm(user, llm_choice: str) -> tuple[str, str, str]:
     catalog_entry = next((m for m in LLM_CATALOG if m["id"] == llm_choice), None)
     if not catalog_entry:
         raise ValueError(f"Modelo '{llm_choice}' no encontrado en el catálogo.")
-
-    from django.conf import settings
 
     return (
         catalog_entry["id"],
@@ -132,7 +131,9 @@ def _call_llm_plan(
         return None, str(e)
 
 
-# ────────────────────────── HELPERS DE DATOS ────────────────────────
+# -------------------------------------------------------------------------
+# HELPERS DE DATOS
+# -------------------------------------------------------------------------
 
 def _get_cache_key(api_url: str) -> str:
     url_hash = hashlib.md5(api_url.encode("utf-8")).hexdigest()
@@ -226,9 +227,9 @@ def _build_preview_items(
 
     return result
 
-
-# ────────────────────────── RENDER ──────────────────────────────────
-
+# -------------------------------------------------------------------------
+# RENDER
+# -------------------------------------------------------------------------
 def render_assistant(
     request,
     *,
@@ -254,8 +255,8 @@ def render_assistant(
         selected_llm_label = catalog_entry["name"] if catalog_entry else selected_llm_choice
 
     context = {
-        "form": form,
-        "llm_catalog": LLM_CATALOG,
+        "form":               form,
+        "llm_catalog":        LLM_CATALOG,
         "selected_llm_choice": resolved_choice,
         "selected_llm_label": selected_llm_label,
     }
@@ -279,9 +280,9 @@ def render_assistant(
 
     return render(request, template, context)
 
-
-# ────────────────────────── GET ─────────────────────────────────────
-
+# -------------------------------------------------------------------------
+# GET
+# -------------------------------------------------------------------------
 @login_required
 def get_assistant(request):
     """
@@ -307,7 +308,7 @@ def get_assistant(request):
     if api_request.parsed_data:
         analysis = build_analysis(api_request.parsed_data, raw_text=api_request.raw_data or "")
         form = APIRequestForm(initial={
-            "api_url": api_request.api_url,
+            "api_url":     api_request.api_url,
             "user_prompt": saved_prompt,
         })
 
@@ -324,9 +325,9 @@ def get_assistant(request):
         llm_plan=api_request.field_mapping,
     )
 
-
-# ────────────────────────── POST ────────────────────────────────────
-
+# -------------------------------------------------------------------------
+# POST
+# -------------------------------------------------------------------------
 @login_required
 def analyze_url(request):
     if request.method != "POST":
@@ -335,7 +336,7 @@ def analyze_url(request):
     action = (request.POST.get("action") or "analyze").strip().lower()
     api_request_id = (request.POST.get("api_request_id") or "").strip()
 
-    # ── Acciones sobre análisis existente ───────────────────────────
+    # Acciones sobre análisis existente
     if action in {"regenerate", "accept_plan"}:
         api_request_obj = APIRequest.objects.filter(id=api_request_id, user=request.user).first()
         if not api_request_obj:
@@ -350,7 +351,7 @@ def analyze_url(request):
             if hasattr(api_request_obj, "plan_accepted"):
                 api_request_obj.plan_accepted = True
                 api_request_obj.save(update_fields=["plan_accepted"])
-            messages.success(request, "Plan aceptado ✅")
+            messages.success(request, "Plan aceptado")
             return redirect(reverse("assistant") + f"?api_request_id={api_request_obj.id}")
 
         # action == regenerate
@@ -377,7 +378,7 @@ def analyze_url(request):
         )
 
         if llm_plan is not None:
-            messages.success(request, "Schema regenerado ✅")
+            messages.success(request, "Schema regenerado")
 
         form = APIRequestForm(initial={"api_url": api_request_obj.api_url, "user_prompt": user_prompt})
         return render_assistant(
@@ -391,7 +392,7 @@ def analyze_url(request):
             selected_llm_choice=llm_choice,
         )
 
-    # ── Análisis normal ─────────────────────────────────────────────
+    # Análisis normal
     form = APIRequestForm(request.POST, request.FILES)
     if not form.is_valid():
         messages.error(request, "Por favor corrige los errores del formulario.")
@@ -410,9 +411,9 @@ def analyze_url(request):
     cache_key = _get_cache_key(api_url)
     cached_data = cache.get(cache_key)
 
-    # ── CACHE HIT ───────────────────────────────────────────────────
+    # Cache hit
     if cached_data:
-        messages.info(request, "⚡ Análisis cargado desde caché (datos recientes).")
+        messages.info(request, "Análisis cargado desde caché (datos recientes).")
 
         one_hour_ago = timezone.now() - timedelta(hours=1)
         api_request_obj = (
@@ -458,7 +459,7 @@ def analyze_url(request):
             selected_llm_choice=llm_choice,
         )
 
-    # ── CACHE MISS ──────────────────────────────────────────────────
+    # Cache miss
     api_request_obj = APIRequest.objects.create(
         user=request.user,
         api_url=api_url,
@@ -490,8 +491,8 @@ def analyze_url(request):
         cache.set(
             cache_key,
             {
-                "raw_text": raw_text,
-                "parsed_payload": parsed_payload,
+                "raw_text":        raw_text,
+                "parsed_payload":  parsed_payload,
                 "response_summary": response_summary,
             },
             CACHE_TIMEOUT,
@@ -537,8 +538,9 @@ def analyze_url(request):
         )
 
 
-# ────────────────────────── VISTA PRINCIPAL ─────────────────────────
-
+# -------------------------------------------------------------------------
+# VISTA PRINCIPAL
+# -------------------------------------------------------------------------
 @login_required
 def assistant(request):
     if request.method == "GET":

@@ -380,7 +380,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="action" value="accept_plan">
                   <button type="submit" class="asst-btn asst-btn--ghost" onclick="showPublishLoading()">
-                    🔄 {% trans "Regenerar diseño" %}
+                     {% trans "Regenerar diseño" %}
                   </button>
                 </form>
               {% endif %}

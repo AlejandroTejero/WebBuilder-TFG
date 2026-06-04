@@ -1,22 +1,21 @@
 """
 internal.py — Endpoints internos para n8n (no expuestos al usuario).
 """
+import json
+import logging
 import os
 from datetime import timedelta
 
 from django.conf import settings
 from django.http import JsonResponse
 from django.utils import timezone
-from django.views.decorators.http import require_GET
-
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-import json
+from django.views.decorators.http import require_GET, require_POST
 
-import logging
+from ..models import GeneratedSite
+
 logger = logging.getLogger(__name__)
 
-from ..models import GeneratedSite, GenerationLog
 
 def _check_token(request) -> bool:
     token = request.headers.get("X-Internal-Token", "")
@@ -36,11 +35,11 @@ def health_summary(request):
 
     if total == 0:
         success_rate = 100
-        retry_rate = 0
+        retry_rate   = 0
         avg_duration = 0
-        failed = 0
+        failed       = 0
     else:
-        ready = sites_24h.filter(generation_status="ready").count()
+        ready  = sites_24h.filter(generation_status="ready").count()
         failed = sites_24h.filter(generation_status="error").count()
         success_rate = round((ready / total) * 100, 1)
 
@@ -72,7 +71,7 @@ def health_summary(request):
             )
             disk_used_mb = round(total_bytes / (1024 * 1024), 1)
 
-    # Errores más frecuentes
+    # Errores más frecuentes en las últimas 24h
     errors = (
         sites_24h.filter(generation_status="error")
         .exclude(generation_error="")
@@ -81,16 +80,15 @@ def health_summary(request):
     errors_last_24h = list(set(e[:80] for e in errors))[:5]
 
     return JsonResponse({
-        "generations_last_24h":  total,
-        "success_rate_24h":      success_rate,
-        "retry_rate_24h":        retry_rate,
-        "avg_duration_seconds":  avg_duration,
-        "failed_generations":    failed,
-        "active_containers":     active_containers,
-        "disk_used_mb":          disk_used_mb,
-        "errors_last_24h":       errors_last_24h,
+        "generations_last_24h": total,
+        "success_rate_24h":     success_rate,
+        "retry_rate_24h":       retry_rate,
+        "avg_duration_seconds": avg_duration,
+        "failed_generations":   failed,
+        "active_containers":    active_containers,
+        "disk_used_mb":         disk_used_mb,
+        "errors_last_24h":      errors_last_24h,
     })
-
 
 
 @csrf_exempt
@@ -109,18 +107,16 @@ def container_shutdown(request):
         return JsonResponse({"error": "container_name vacío"}, status=400)
 
     # El nombre del contenedor es wb_<project_name>
-    # Buscamos el sitio por project_name
     project_name = container_name.replace("wb_", "", 1)
 
-    
-    site = GeneratedSite.objects.filter(project_name=project_name).order_by('-created_at').first()
+    site = GeneratedSite.objects.filter(project_name=project_name).order_by("-created_at").first()
     if not site:
         logger.warning("[internal] Contenedor %s no encontrado en BD", container_name)
         return JsonResponse({"ok": False, "error": "Sitio no encontrado"}, status=404)
 
     site.deploy_status = "idle"
-    site.preview_url = ""
+    site.preview_url   = ""
     site.save(update_fields=["deploy_status", "preview_url"])
     logger.info("[internal] Contenedor %s marcado como idle (sin desplegar)", container_name)
-    
+
     return JsonResponse({"ok": True, "project_name": project_name})

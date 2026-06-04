@@ -1,35 +1,32 @@
 import io
 import os
+import re
 import threading
+import time
 import zipfile
 import json
-import time
 
+import requests as http_requests
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
-from ..models import APIRequest, GeneratedSite
+from ..models import APIRequest, GeneratedSite, SiteUser, SiteVersion
+from ..utils.generator.notifications import notify_generation_done
 from ..utils.generator.project_generator import generate_project_files
+from ..utils.llm.client import LLMError, chat_completion
 
-from django.views.decorators.http import require_GET, require_POST
-
-import requests as http_requests
-from django.conf import settings
 
 # ---------------------------------------------------------------------------
-# Generación (sin cambios respecto al original)
+# Helpers privados
 # ---------------------------------------------------------------------------
-
-import time  # añade esto arriba del todo junto a los otros imports
 
 def _run_generation(site_id: int):
-    from ..models import GeneratedSite
-    from ..utils.generator.notifications import notify_generation_done  # añade esto
-
-    start_time = time.time()  # añade esto
+    start_time = time.time()
 
     try:
         site = GeneratedSite.objects.get(pk=site_id)
@@ -39,9 +36,8 @@ def _run_generation(site_id: int):
         site.generation_error = ""
         site.save(update_fields=["project_files", "generation_status", "generation_error"])
 
-        # Notificar a n8n
-        duration = int(time.time() - start_time)  # añade esto
-        notify_generation_done(site, duration_seconds=duration)  # añade esto
+        duration = int(time.time() - start_time)
+        notify_generation_done(site, duration_seconds=duration)
 
     except Exception as e:
         try:
@@ -52,130 +48,6 @@ def _run_generation(site_id: int):
         except Exception:
             pass
 
-# Recojo los campos necesarios para las estadisitcas
-@login_required
-def site_render(request, api_request_id: int):
-    import re
-    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site, _ = GeneratedSite.objects.get_or_create(project_source=api_request)
-
-    plan = site.accepted_plan or {}
-
-    # — Campos del modelo (parseando models.py generado)
-    model_fields = []
-    models_code = next((v for k, v in (site.project_files or {}).items() if k.endswith("models.py")), "")
-    if models_code:
-        for match in re.finditer(r'^\s+(\w+)\s*=\s*models\.(\w+)', models_code, re.MULTILINE):
-            name, field_type = match.group(1), match.group(2)
-            if name not in ("id", "created_at", "updated_at"):
-                model_fields.append({"name": name, "type": field_type})
-
-    # — Páginas generadas (parseando urls.py de la app)
-    pages = []
-    urls_code = next((v for k, v in (site.project_files or {}).items()
-                      if k.endswith("siteapp/urls.py") or k.endswith("urls.py")), "")
-    if urls_code:
-        for match in re.finditer(r"path\('([^']*)',\s*views\.(\w+),\s*name='(\w+)'", urls_code):
-            url, view, name = match.group(1), match.group(2), match.group(3)
-            if name != "register":
-                pages.append({"url": "/" + url, "view": view, "name": name})
-
-    # — Stats de generación (desde los logs)
-    logs = site.generation_logs.all().order_by("created_at")
-    llm_model = logs.first().llm_model if logs.exists() else "—"
-    total_calls = logs.count()
-    retries = logs.filter(had_retry=True).count()
-    consistency_errors = sum(len(l.consistency_errors) for l in logs)
-
-    # — Desglose de archivos por tipo
-    files = site.project_files or {}
-    files_py   = sum(1 for k in files if k.endswith(".py"))
-    files_html = sum(1 for k in files if k.endswith(".html"))
-    files_other = len(files) - files_py - files_html
-
-    return render(request, "WebBuilder/site_render.html", {
-        "api_request":         api_request,
-        "site":                site,
-        "site_users":          site.site_users.all(),
-        "plan":                plan,
-        "model_fields":        model_fields,
-        "pages":               pages,
-        "llm_model":           llm_model,
-        "total_calls":         total_calls,
-        "retries":             retries,
-        "consistency_errors":  consistency_errors,
-        "files_py":            files_py,
-        "files_html":          files_html,
-        "files_other":         files_other,
-    })
-
-@login_required
-def site_generate(request, api_request_id: int):
-    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site = get_object_or_404(GeneratedSite, project_source=api_request)
-
-    if request.method != "POST":
-        return redirect("site_render", api_request_id=api_request.id)
-
-    # Si ya había archivos generados, guardamos snapshot antes de borrarlos
-    if site.project_files:
-        from ..models import SiteVersion
-        last = site.versions.order_by('-version_number').first()
-        next_number = (last.version_number + 1) if last else 1
-        SiteVersion.objects.create(
-            site=site,
-            version_number=next_number,
-            project_files=site.project_files,
-            label="Antes de regenerar",
-        )
-
-    site.generation_status = "generating"
-    site.generation_error = ""
-    site.project_files = {}
-    site.save(update_fields=["generation_status", "generation_error", "project_files"])
-
-    thread = threading.Thread(target=_run_generation, args=(site.pk,), daemon=True)
-    thread.start()
-
-    return redirect("site_render", api_request_id=api_request.id)
-
-@login_required
-@require_GET
-def site_status(request, api_request_id: int):
-    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site = get_object_or_404(GeneratedSite, project_source=api_request)
-    return JsonResponse({
-        "status": site.generation_status,
-        "error": site.generation_error or "",
-        "files_count": len(site.project_files) if site.project_files else 0,
-        "step": site.generation_step or "",
-    })
-
-@login_required
-def site_download_zip(request, api_request_id: int):
-    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site = get_object_or_404(GeneratedSite, project_source=api_request)
-
-    if not site.project_files:
-        messages.error(request, "No hay archivos generados todavía.")
-        return redirect("site_render", api_request_id=api_request.id)
-
-    buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for path, content in (site.project_files or {}).items():
-            safe_path = str(path).lstrip("/").replace("..", "")
-            zf.writestr(safe_path, content or "")
-
-    buf.seek(0)
-    filename = f"{site.project_name or 'generated_site'}.zip".replace(" ", "_")
-    resp = HttpResponse(buf.getvalue(), content_type="application/zip")
-    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
-    return resp
-
-
-# ---------------------------------------------------------------------------
-# Despliegue asíncrono
-# ---------------------------------------------------------------------------
 
 def _run_deploy(site_id: int):
     """
@@ -185,8 +57,6 @@ def _run_deploy(site_id: int):
       3. Hace POST al webhook de n8n y espera la respuesta
       4. Guarda preview_url / deploy_status en la BD
     """
-    from ..models import GeneratedSite
-
     def _set_error(site, msg: str):
         site.deploy_status = "error"
         site.deploy_error = msg
@@ -253,6 +123,137 @@ def _run_deploy(site_id: int):
     site.save(update_fields=["preview_url", "deploy_status", "deploy_error"])
 
 
+# ---------------------------------------------------------------------------
+# Vistas — generación
+# ---------------------------------------------------------------------------
+
+@login_required
+def site_render(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site, _ = GeneratedSite.objects.get_or_create(project_source=api_request)
+
+    plan = site.accepted_plan or {}
+
+    # Campos del modelo (parseando models.py generado)
+    model_fields = []
+    models_code = next((v for k, v in (site.project_files or {}).items() if k.endswith("models.py")), "")
+    if models_code:
+        for match in re.finditer(r'^\s+(\w+)\s*=\s*models\.(\w+)', models_code, re.MULTILINE):
+            name, field_type = match.group(1), match.group(2)
+            if name not in ("id", "created_at", "updated_at"):
+                model_fields.append({"name": name, "type": field_type})
+
+    # Páginas generadas (parseando urls.py de la app)
+    pages = []
+    urls_code = next(
+        (v for k, v in (site.project_files or {}).items()
+         if k.endswith("siteapp/urls.py") or k.endswith("urls.py")),
+        "",
+    )
+    if urls_code:
+        for match in re.finditer(r"path\('([^']*)',\s*views\.(\w+),\s*name='(\w+)'", urls_code):
+            url, view, name = match.group(1), match.group(2), match.group(3)
+            if name != "register":
+                pages.append({"url": "/" + url, "view": view, "name": name})
+
+    # Stats de generación (desde los logs)
+    logs = site.generation_logs.all().order_by("created_at")
+    llm_model = logs.first().llm_model if logs.exists() else "—"
+    total_calls = logs.count()
+    retries = logs.filter(had_retry=True).count()
+    consistency_errors = sum(len(l.consistency_errors) for l in logs)
+
+    # Desglose de archivos por tipo
+    files = site.project_files or {}
+    files_py    = sum(1 for k in files if k.endswith(".py"))
+    files_html  = sum(1 for k in files if k.endswith(".html"))
+    files_other = len(files) - files_py - files_html
+
+    return render(request, "WebBuilder/site_render.html", {
+        "api_request":        api_request,
+        "site":               site,
+        "site_users":         site.site_users.all(),
+        "plan":               plan,
+        "model_fields":       model_fields,
+        "pages":              pages,
+        "llm_model":          llm_model,
+        "total_calls":        total_calls,
+        "retries":            retries,
+        "consistency_errors": consistency_errors,
+        "files_py":           files_py,
+        "files_html":         files_html,
+        "files_other":        files_other,
+    })
+
+
+@login_required
+def site_generate(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+
+    if request.method != "POST":
+        return redirect("site_render", api_request_id=api_request.id)
+
+    # Guardar snapshot antes de borrar archivos existentes
+    if site.project_files:
+        last = site.versions.order_by("-version_number").first()
+        next_number = (last.version_number + 1) if last else 1
+        SiteVersion.objects.create(
+            site=site,
+            version_number=next_number,
+            project_files=site.project_files,
+            label="Antes de regenerar",
+        )
+
+    site.generation_status = "generating"
+    site.generation_error = ""
+    site.project_files = {}
+    site.save(update_fields=["generation_status", "generation_error", "project_files"])
+
+    threading.Thread(target=_run_generation, args=(site.pk,), daemon=True).start()
+
+    return redirect("site_render", api_request_id=api_request.id)
+
+
+@login_required
+@require_GET
+def site_status(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+    return JsonResponse({
+        "status":      site.generation_status,
+        "error":       site.generation_error or "",
+        "files_count": len(site.project_files) if site.project_files else 0,
+        "step":        site.generation_step or "",
+    })
+
+
+@login_required
+def site_download_zip(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+
+    if not site.project_files:
+        messages.error(request, "No hay archivos generados todavía.")
+        return redirect("site_render", api_request_id=api_request.id)
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for path, content in (site.project_files or {}).items():
+            safe_path = str(path).lstrip("/").replace("..", "")
+            zf.writestr(safe_path, content or "")
+
+    buf.seek(0)
+    filename = f"{site.project_name or 'generated_site'}.zip".replace(" ", "_")
+    resp = HttpResponse(buf.getvalue(), content_type="application/zip")
+    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return resp
+
+
+# ---------------------------------------------------------------------------
+# Vistas — despliegue
+# ---------------------------------------------------------------------------
+
 @login_required
 def site_deploy(request, api_request_id: int):
     if request.method != "POST":
@@ -265,13 +266,11 @@ def site_deploy(request, api_request_id: int):
         messages.error(request, "El proyecto debe estar generado antes de desplegarlo.")
         return redirect("site_render", api_request_id=api_request_id)
 
-    # Marcar como desplegando y responder inmediatamente al navegador
     site.deploy_status = "deploying"
     site.deploy_error = ""
     site.save(update_fields=["deploy_status", "deploy_error"])
 
-    thread = threading.Thread(target=_run_deploy, args=(site.pk,), daemon=True)
-    thread.start()
+    threading.Thread(target=_run_deploy, args=(site.pk,), daemon=True).start()
 
     return redirect("site_render", api_request_id=api_request_id)
 
@@ -292,9 +291,12 @@ def site_deploy_status(request, api_request_id: int):
     })
 
 
-# Modificar el codigo hecho por el llm
+# ---------------------------------------------------------------------------
+# Vistas — edición de archivos
+# ---------------------------------------------------------------------------
+
 @login_required
-@require_POST  # Evita que alguien entre en cualquier peticion
+@require_POST
 def site_update_file(request, api_request_id: int):
     api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
     site = get_object_or_404(GeneratedSite, project_source=api_request)
@@ -320,116 +322,10 @@ def site_update_file(request, api_request_id: int):
 
     return JsonResponse({"ok": True})
 
-@login_required
-@require_GET
-def site_versions(request, api_request_id: int):
-    from ..models import SiteVersion
-    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site = get_object_or_404(GeneratedSite, project_source=api_request)
-
-    versions = site.versions.order_by('-version_number').values(
-        'id', 'version_number', 'label', 'created_at'
-    )
-
-    return JsonResponse({
-        'versions': [
-            {
-                'id': v['id'],
-                'version_number': v['version_number'],
-                'label': v['label'],
-                'created_at': v['created_at'].strftime('%d/%m/%Y %H:%M'),
-            }
-            for v in versions
-        ]
-    })
-
-
-@login_required
-@require_POST
-def site_version_restore(request, api_request_id: int, version_id: int):
-    from ..models import SiteVersion
-    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site = get_object_or_404(GeneratedSite, project_source=api_request)
-    version = get_object_or_404(SiteVersion, id=version_id, site=site)
-
-    # Guardamos la versión actual antes de restaurar
-    if site.project_files:
-        last = site.versions.order_by('-version_number').first()
-        next_number = (last.version_number + 1) if last else 1
-        SiteVersion.objects.create(
-            site=site,
-            version_number=next_number,
-            project_files=site.project_files,
-            label="Antes de restaurar",
-        )
-
-    # Restauramos
-    site.project_files = version.project_files
-    site.generation_status = "ready"
-    site.save(update_fields=["project_files", "generation_status"])
-
-    return JsonResponse({'ok': True})
-
-@login_required
-@require_GET
-def site_version_download(request, api_request_id: int, version_id: int):
-    from ..models import SiteVersion
-    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site = get_object_or_404(GeneratedSite, project_source=api_request)
-    version = get_object_or_404(SiteVersion, id=version_id, site=site)
-
-    buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for path, content in (version.project_files or {}).items():
-            safe_path = str(path).lstrip("/").replace("..", "")
-            zf.writestr(safe_path, content or "")
-
-    buf.seek(0)
-    filename = f"{site.project_name or 'version'}_v{version.version_number}.zip"
-    resp = HttpResponse(buf.getvalue(), content_type="application/zip")
-    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
-    return resp
-
-@login_required
-@require_POST
-def site_users_save(request, api_request_id: int):
-    from ..models import SiteUser
-    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
-    site, _ = GeneratedSite.objects.get_or_create(
-            project_source=api_request,
-            defaults={"accepted_plan": False}
-        )
-    
-    try:
-        data = json.loads(request.body)
-        users = data.get('users', [])
-    except json.JSONDecodeError:
-        return JsonResponse({'ok': False, 'error': 'JSON inválido'}, status=400)
-
-    # Validación básica
-    for u in users:
-        if not u.get('username') or not u.get('password'):
-            return JsonResponse({'ok': False, 'error': 'Usuario o contraseña vacíos'}, status=400)
-
-    # Borramos los anteriores y guardamos los nuevos
-    SiteUser.objects.filter(site=site).delete()
-    for u in users:
-        SiteUser.objects.create(
-            site=site,
-            username=u['username'].strip(),
-            password=u['password'].strip(),
-            role=u.get('role', 'normal'),
-        )
-
-    return JsonResponse({'ok': True, 'saved': len(users)})
 
 @login_required
 @require_POST
 def site_refine_file(request, api_request_id: int):
-    import re
-    from ..models import SiteVersion
-    from ..utils.llm.client import chat_completion, LLMError
-
     api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
     site = get_object_or_404(GeneratedSite, project_source=api_request)
 
@@ -449,9 +345,8 @@ def site_refine_file(request, api_request_id: int):
     # Formato: [{"role": "user"|"assistant", "content": "..."}]
     history = data.get("history", [])
 
-    # ── 1. Identificar qué archivo modificar ─────────────────────────────────
-    # Se usan solo los paths de archivos de template/estilo/lógica relevantes,
-    # excluyendo migraciones, __init__, etc. para reducir ruido.
+    # 1. Identificar qué archivo modificar
+    # Se excluyen migraciones, __init__, etc. para reducir ruido.
     SKIP_PATTERNS = ("migration", "__init__", ".pyc", "manage.py", "settings", "wsgi", "asgi")
     candidate_files = [
         p for p in site.project_files.keys()
@@ -482,13 +377,16 @@ def site_refine_file(request, api_request_id: int):
         # Match parcial como fallback
         match = next(
             (p for p in site.project_files if target_path in p or p.endswith(target_path)),
-            None
+            None,
         )
         if not match:
-            return JsonResponse({"ok": False, "error": f"No sé qué archivo modificar para: '{message}'"}, status=404)
+            return JsonResponse(
+                {"ok": False, "error": f"No sé qué archivo modificar para: '{message}'"},
+                status=404,
+            )
         target_path = match
 
-    # ── 2. Auto-guardar versión de seguridad antes de modificar ──────────────
+    # 2. Auto-guardar versión de seguridad antes de modificar
     last = site.versions.order_by("-version_number").first()
     next_number = (last.version_number + 1) if last else 1
     SiteVersion.objects.create(
@@ -498,14 +396,13 @@ def site_refine_file(request, api_request_id: int):
         label=f"Antes de: {message[:60]}",
     )
 
-    # ── 3. Reescribir el archivo con contexto del historial ───────────────────
+    # 3. Reescribir el archivo con contexto del historial
     current_content = site.project_files[target_path]
 
-    # Construir el historial de cambios como contexto para el LLM
     history_context = ""
     if history:
         history_lines = []
-        for turn in history[-6:]:  # últimos 6 turnos máximo para no sobrepasar contexto
+        for turn in history[-6:]:  # últimos 6 turnos para no sobrepasar el contexto
             role = "Usuario" if turn.get("role") == "user" else "IA"
             history_lines.append(f"{role}: {turn.get('content', '')}")
         history_context = "\nHISTORIAL DE CAMBIOS ANTERIORES EN ESTA SESIÓN:\n" + "\n".join(history_lines) + "\n"
@@ -540,7 +437,7 @@ def site_refine_file(request, api_request_id: int):
     new_content = re.sub(r'```[\w]*\n?', '', new_content)
     new_content = re.sub(r'```', '', new_content).strip()
 
-    # ── 4. Guardar el archivo modificado ─────────────────────────────────────
+    # 4. Guardar el archivo modificado
     files = dict(site.project_files)
     files[target_path] = new_content
     site.project_files = files
@@ -553,6 +450,117 @@ def site_refine_file(request, api_request_id: int):
     })
 
 
+# ---------------------------------------------------------------------------
+# Vistas — versiones
+# ---------------------------------------------------------------------------
+
+@login_required
+@require_GET
+def site_versions(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+
+    versions = site.versions.order_by("-version_number").values(
+        "id", "version_number", "label", "created_at"
+    )
+
+    return JsonResponse({
+        "versions": [
+            {
+                "id":             v["id"],
+                "version_number": v["version_number"],
+                "label":          v["label"],
+                "created_at":     v["created_at"].strftime("%d/%m/%Y %H:%M"),
+            }
+            for v in versions
+        ]
+    })
+
+
+@login_required
+@require_POST
+def site_version_restore(request, api_request_id: int, version_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+    version = get_object_or_404(SiteVersion, id=version_id, site=site)
+
+    # Guardar snapshot de la versión actual antes de restaurar
+    if site.project_files:
+        last = site.versions.order_by("-version_number").first()
+        next_number = (last.version_number + 1) if last else 1
+        SiteVersion.objects.create(
+            site=site,
+            version_number=next_number,
+            project_files=site.project_files,
+            label="Antes de restaurar",
+        )
+
+    site.project_files = version.project_files
+    site.generation_status = "ready"
+    site.save(update_fields=["project_files", "generation_status"])
+
+    return JsonResponse({"ok": True})
+
+
+@login_required
+@require_GET
+def site_version_download(request, api_request_id: int, version_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site = get_object_or_404(GeneratedSite, project_source=api_request)
+    version = get_object_or_404(SiteVersion, id=version_id, site=site)
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for path, content in (version.project_files or {}).items():
+            safe_path = str(path).lstrip("/").replace("..", "")
+            zf.writestr(safe_path, content or "")
+
+    buf.seek(0)
+    filename = f"{site.project_name or 'version'}_v{version.version_number}.zip"
+    resp = HttpResponse(buf.getvalue(), content_type="application/zip")
+    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return resp
+
+
+# ---------------------------------------------------------------------------
+# Vistas — usuarios del sitio generado
+# ---------------------------------------------------------------------------
+
+@login_required
+@require_POST
+def site_users_save(request, api_request_id: int):
+    api_request = get_object_or_404(APIRequest, id=api_request_id, user=request.user)
+    site, _ = GeneratedSite.objects.get_or_create(
+        project_source=api_request,
+        defaults={"accepted_plan": False},
+    )
+
+    try:
+        data = json.loads(request.body)
+        users = data.get("users", [])
+    except json.JSONDecodeError:
+        return JsonResponse({"ok": False, "error": "JSON inválido"}, status=400)
+
+    for u in users:
+        if not u.get("username") or not u.get("password"):
+            return JsonResponse({"ok": False, "error": "Usuario o contraseña vacíos"}, status=400)
+
+    SiteUser.objects.filter(site=site).delete()
+    for u in users:
+        SiteUser.objects.create(
+            site=site,
+            username=u["username"].strip(),
+            password=u["password"].strip(),
+            role=u.get("role", "normal"),
+        )
+
+    return JsonResponse({"ok": True, "saved": len(users)})
+
+
+# ---------------------------------------------------------------------------
+# Vistas — visor de código
+# ---------------------------------------------------------------------------
+
 @login_required
 @require_GET
 def site_code_viewer(request, api_request_id: int):
@@ -560,5 +568,5 @@ def site_code_viewer(request, api_request_id: int):
     site = get_object_or_404(GeneratedSite, project_source=api_request)
     return render(request, "WebBuilder/code_viewer.html", {
         "api_request": api_request,
-        "site": site,
+        "site":        site,
     })

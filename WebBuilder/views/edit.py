@@ -1,5 +1,5 @@
 """
-Vista de preview — trabaja con el nuevo schema dinámico.
+Vista de edición — trabaja con el schema dinámico del asistente.
 
 Schema (field_mapping):
   {
@@ -8,39 +8,35 @@ Schema (field_mapping):
     "fields": [{"key": str, "label": str}, ...]
   }
 
-En preview el usuario puede:
+El usuario puede:
   - Ver los items con todos los campos del schema.
   - Editar site_type, site_title y reordenar/activar/desactivar campos.
   - Aceptar el plan → genera el tema con el LLM y crea el GeneratedSite.
 """
 
-from __future__ import annotations
-
-from typing import Any
+import threading
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils.text import slugify
 
 from ..models import APIRequest, GeneratedSite
 from ..utils.analysis import build_analysis
 from ..utils.analysis.helpers import get_by_path
+from ..utils.generator.project_generator import generate_project_files
 from .helpers import _get_fields_from_plan, _normalize_item
 
 
-# ────────────────────────── helpers ─────────────────────────────────
+# ---------------------------------------------------------------------------
+# Helpers privados
+# ---------------------------------------------------------------------------
 
 def _normalize_site_type(value: str | None) -> str:
     allowed = {"blog", "portfolio", "catalog", "dashboard", "other"}
     v = (value or "").strip().lower()
     return v if v in allowed else "other"
-
-
-def _get_available_keys_from_analysis(api_request: APIRequest) -> list[str]:
-    analysis = build_analysis(api_request.parsed_data, raw_text=api_request.raw_data or "")
-    keys_info = analysis.get("keys") or {}
-    return (keys_info.get("top") or [])[:30]
 
 
 def _validate_fields_against_keys(fields: list[dict], available_keys: list[str]) -> list[dict]:
@@ -52,7 +48,23 @@ def _validate_fields_against_keys(fields: list[dict], available_keys: list[str])
     return [f for f in fields if isinstance(f, dict) and f.get("key") in available_set]
 
 
-# ────────────────────────── vista principal ──────────────────────────
+def _run_initial_generation(site):
+    """Ejecuta la generación inicial en un hilo secundario."""
+    try:
+        files = generate_project_files(site)
+        site.project_files     = files
+        site.generation_status = "ready"
+        site.generation_error  = ""
+        site.save(update_fields=["project_files", "generation_status", "generation_error"])
+    except Exception as e:
+        site.generation_status = "error"
+        site.generation_error  = str(e)
+        site.save(update_fields=["generation_status", "generation_error"])
+
+
+# ---------------------------------------------------------------------------
+# Vista principal
+# ---------------------------------------------------------------------------
 
 @login_required
 def edit(request, api_request_id: int):
@@ -70,7 +82,7 @@ def edit(request, api_request_id: int):
         messages.error(request, "Este análisis no tiene datos parseados.")
         return redirect(reverse("assistant") + f"?api_request_id={api_request.id}")
 
-    # Normalizar plan (compatibilidad con schema antiguo y nuevo)
+    # Normalizar plan
     if not isinstance(plan, dict):
         plan = {}
 
@@ -78,7 +90,7 @@ def edit(request, api_request_id: int):
     if "mapping" in plan and "fields" not in plan:
         old_mapping = plan.get("mapping") or {}
         plan = {
-            "site_type": plan.get("site_type", "other"),
+            "site_type":  plan.get("site_type", "other"),
             "site_title": plan.get("site_type_custom") or plan.get("site_type", "Site"),
             "fields": [
                 {"key": v, "label": k.capitalize()}
@@ -91,7 +103,7 @@ def edit(request, api_request_id: int):
     plan.setdefault("site_title", "Site")
     plan.setdefault("fields", [])
 
-    # Recalcular analysis para keys disponibles y main_path
+    # Calcular analysis para keys disponibles y main_path
     analysis = build_analysis(api_request.parsed_data, raw_text=api_request.raw_data or "")
     main = analysis.get("main_collection") or {}
     main_path = main.get("path")
@@ -109,13 +121,15 @@ def edit(request, api_request_id: int):
         if isinstance(node, list):
             items = node[:12]
 
-    # ──────────────── POST ────────────────────────────────────────────
+    # -------------------------------------------------------------------------
+    # POST
+    # -------------------------------------------------------------------------
     if request.method == "POST":
         action = (request.POST.get("action") or "").strip().lower()
 
-        # ── Guardar edición del schema ──────────────────────────────
+        # Guardar edición del schema
         if action == "save_schema":
-            new_site_type = _normalize_site_type(request.POST.get("site_type"))
+            new_site_type  = _normalize_site_type(request.POST.get("site_type"))
             new_site_title = (request.POST.get("site_title") or "").strip()[:120] or new_site_type
 
             # Los fields se envían como campos ocultos: field_key_0, field_label_0, ...
@@ -126,7 +140,7 @@ def edit(request, api_request_id: int):
                 key = request.POST.get(f"field_key_{i}")
                 if key is None:
                     break
-                label = (request.POST.get(f"field_label_{i}") or key).strip()
+                label  = (request.POST.get(f"field_label_{i}") or key).strip()
                 active = request.POST.get(f"field_active_{i}") == "on"
                 if active and key in set(available_keys):
                     new_fields.append({"key": key, "label": label})
@@ -136,9 +150,9 @@ def edit(request, api_request_id: int):
             if not new_fields:
                 new_fields = plan["fields"]
 
-            plan["site_type"] = new_site_type
+            plan["site_type"]  = new_site_type
             plan["site_title"] = new_site_title
-            plan["fields"] = new_fields
+            plan["fields"]     = new_fields
 
             api_request.field_mapping = plan
             api_request.plan_accepted = False
@@ -146,17 +160,15 @@ def edit(request, api_request_id: int):
             messages.success(request, "Schema actualizado (vuelve a aceptar para publicar)")
             return redirect("edit", api_request_id=api_request.id)
 
-        # ── Aceptar plan y publicar ─────────────────────────────────
+        # Aceptar plan y arrancar generación
         if action == "accept_plan":
-            fields = _get_fields_from_plan(plan)
-            site_type = plan.get("site_type") or "other"
+            fields     = _get_fields_from_plan(plan)
+            site_type  = plan.get("site_type") or "other"
             site_title = plan.get("site_title") or site_type
 
             api_request.plan_accepted = True
             api_request.save(update_fields=["plan_accepted"])
 
-            # Sample items normalizados (de momento los seguimos calculando
-            # por si luego los reutilizas para el generator)
             sample_items = [
                 _normalize_item(it, fields, index=idx)
                 for idx, it in enumerate(items[:6])
@@ -172,65 +184,41 @@ def edit(request, api_request_id: int):
             if plan_changed:
                 site.accepted_plan = plan
 
-            # Preparar estado para generación del proyecto (reemplaza el "themer")
-            # - project_name: slug usable para carpeta/proyecto
-            # - generation_status: pending para que un botón / job lo genere después
-            from django.utils.text import slugify
-
-            site.project_name = (slugify(site_title)[:80] or "generated_site")
-            site.generation_status = "pending"
+            site.project_name     = slugify(site_title)[:80] or "generated_site"
             site.generation_error = ""
-            site.preview_url = None
+            site.preview_url      = None
 
-            # Si el plan cambió, normalmente también invalidas los archivos previos
             if plan_changed:
                 site.project_files = {}
 
-            # (Opcional) guardar ejemplos normalizados dentro del plan aceptado
-            # para que el generator los tenga a mano sin recalcular.
-            # Si no lo quieres, borra este bloque.
+            # Guardar ejemplos normalizados en el plan para que el generator
+            # los tenga disponibles sin recalcular
             if isinstance(site.accepted_plan, dict):
                 ap = dict(site.accepted_plan)
                 ap.setdefault("_meta", {})
-                ap["_meta"]["sample_items"] = sample_items
+                ap["_meta"]["sample_items"]         = sample_items
                 ap["_meta"]["main_collection_path"] = main_path
                 site.accepted_plan = ap
 
+            # Arrancar generación — un único save con el estado final
+            site.generation_status = "generating"
+            site.project_files     = {}
             site.save()
 
-            # Arrancar generación automáticamente
-            site.generation_status = "generating"
-            site.generation_error  = ""
-            site.project_files     = {}
-            site.save(update_fields=["generation_status", "generation_error", "project_files"])
-
-            import threading
-            from ..utils.generator.project_generator import generate_project_files
-
-            def _run():
-                try:
-                    files = generate_project_files(site)
-                    site.project_files     = files
-                    site.generation_status = "ready"
-                    site.generation_error  = ""
-                    site.save(update_fields=["project_files", "generation_status", "generation_error"])
-                except Exception as e:
-                    site.generation_status = "error"
-                    site.generation_error  = str(e)
-                    site.save(update_fields=["generation_status", "generation_error"])
-
-            threading.Thread(target=_run, daemon=True).start()
+            threading.Thread(target=_run_initial_generation, args=(site,), daemon=True).start()
 
             messages.success(request, "Plan aceptado. Generando el proyecto...")
             return redirect("site_render", api_request_id=api_request.id)
 
-    # ──────────────── GET — construir contexto ────────────────────────
-    fields = _get_fields_from_plan(plan)
+    # -------------------------------------------------------------------------
+    # GET — construir contexto
+    # -------------------------------------------------------------------------
+    fields        = _get_fields_from_plan(plan)
     preview_items = [_normalize_item(it, fields, index=idx) for idx, it in enumerate(items)]
-    site_obj = getattr(api_request, "site", None)
+    site_obj      = getattr(api_request, "site", None)
 
     # Keys disponibles que aún no están en el schema (para poder añadirlas)
-    used_keys = {f["key"] for f in fields}
+    used_keys   = {f["key"] for f in fields}
     unused_keys = [k for k in available_keys if k not in used_keys]
 
     return render(

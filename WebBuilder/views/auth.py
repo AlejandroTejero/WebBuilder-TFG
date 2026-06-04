@@ -1,10 +1,13 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.contrib.auth.views import LoginView
+import datetime
+
 import requests
 
-from ..forms import RegisterForm
 from django.conf import settings
+from django.contrib.auth import login
+from django.contrib.auth.views import LoginView
+from django.shortcuts import render, redirect
+
+from ..forms import RegisterForm
 
 
 def _llamar_webhook(url: str, datos: dict) -> None:
@@ -46,11 +49,11 @@ class WebBuilderLoginView(LoginView):
         )
 
         _llamar_webhook(settings.N8N_WEBHOOK_LOGIN, {
-            "username": user.username,
-            "email":    user.email,
-            "ip":       ip,
+            "username":    user.username,
+            "email":       user.email,
+            "ip":          ip,
             "dispositivo": request.META.get("HTTP_USER_AGENT", "desconocido"),
-            "hora":     __import__("datetime").datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "hora":        datetime.datetime.now().strftime("%d/%m/%Y %H:%M"),
         })
 
         return super().form_valid(form)
