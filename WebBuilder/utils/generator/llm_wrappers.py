@@ -18,21 +18,6 @@ from ..llm.llm_utils import parse_llm_json
 
 logger = logging.getLogger(__name__)
 
-
-#def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) -> str:
-#    """Llamada básica al LLM. Devuelve '' si falla."""
-#    try:
-#        time.sleep(20)
-#        return chat_completion(
-#            user_text=user_text,
-#            system_text=system,
-#            temperature=temperature,
-#        )
-#    except LLMError as e:
-#        logger.error(f"[generator] LLM falló en '{label}': {e}")
-#        # propagar en vez de pasar
-#        raise   
-
 # INCREMENTAL EN TIEMPO POR CADA ERROR
 def llm_call(system: str, user_text: str, label: str, temperature: float = 0.3) -> str:
     delays = [5, 15, 30]  # esperas entre reintentos si hay 429
@@ -79,7 +64,7 @@ def llm_call_logged(
     try:
         result = llm_call(system, user_text, label, temperature)
     except LLMError as e:
-        error_msg = str(e)   # ← capturamos el error real aquí
+        error_msg = str(e) 
         logger.error(f"[generator] Error capturado en '{label}': {error_msg}")
 
     if site is not None:
@@ -92,7 +77,7 @@ def llm_call_logged(
                 llm_model=settings.LLM_MODEL,
                 system_prompt=system[:2000],
                 user_prompt=user_text[:2000],
-                raw_output=result[:5000] if result else f"[ERROR] {error_msg}",  # ← el error queda visible
+                raw_output=result[:5000] if result else f"[ERROR] {error_msg}", 
             )
         except Exception:
             pass
@@ -112,7 +97,6 @@ def strip_markdown_fences(code: str) -> str:
     clean = [line for line in lines if not re.match(r"^\s*```", line)]
     code = "\n".join(clean).strip()
 
-    # ← NUEVO: eliminar artefactos típicos del LLM al final del archivo
     artifacts = {"EOF", "# end of file", "# EOF", "# fin", "# end"}
     final_lines = code.splitlines()
     while final_lines and final_lines[-1].strip() in artifacts:

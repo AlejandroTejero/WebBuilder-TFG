@@ -17,45 +17,38 @@ import logging
 
 from django.utils.text import slugify
 
-from ..llm.generator_prompts import (
-    prompt_pages_structure,
-    prompt_models,
-    prompt_views,
-    prompt_base_template,
-    prompt_template,
-    prompt_load_data,
-)
-from ..llm.field_extractor import extract_model_fields
-from ..analysis.field_roles import (
-    infer_roles,
-    pick_primary_numeric,
-    pick_signed_field,
-)
+from ..analysis.field_roles import infer_roles, pick_primary_numeric, pick_signed_field
 from ..llm.consistency_checker import fix_template, run_all_checks
+from ..llm.design.presets import describe_preset, get_preset
 from ..llm.enrich_prompt import enrich_user_prompt
-from .notifications import notify_generation_done
-
+from ..llm.field_extractor import extract_model_fields
+from ..llm.generator_prompts import (
+    prompt_base_template,
+    prompt_load_data,
+    prompt_models,
+    prompt_pages_structure,
+    prompt_template,
+    prompt_views,
+)
+from .fallbacks import (
+    fallback_base_html,
+    fallback_load_data,
+    fallback_models,
+    fallback_pages,
+    fallback_template,
+    fallback_views,
+)
 from .llm_wrappers import (
+    extract_requirements,
     llm_call_logged,
+    llm_design_system_call,
     llm_json_call,
     strip_markdown_fences,
-    extract_requirements,
     translate_prompt_to_english,
-    llm_design_system_call,
 )
-
-from .fallbacks import (
-    fallback_pages,
-    fallback_models,
-    fallback_views,
-    fallback_base_html,
-    fallback_template,
-    fallback_load_data,
-)
-from .static_files import build_static_files, build_app_urls
 from .migrations_generator import generate_initial_migration
-
-from ..llm.design.presets import get_preset, describe_preset
+from .notifications import notify_generation_done
+from .static_files import build_app_urls, build_static_files
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +148,7 @@ def generate_project_files(site) -> dict[str, str]:
         if not pages or not has_list or not has_detail:
             logger.warning("[generator] Páginas inválidas, usando fallback")
             pages = fallback_pages(site_type)
-            
+
     # ── PASO 1b: Design system ───────────────────────────────────────────────
     _update_step(site, "Generando sistema de diseño...")
     logger.info("[generator] Paso 1b: design system")
@@ -230,7 +223,7 @@ def generate_project_files(site) -> dict[str, str]:
     # ── PASO 5: template por página ──────────────────────────────────────────
     generated_html_context = {
         "base.html": files[f"{project}/{app}/templates/base.html"]
-    }  
+    }
     for page in pages:
         _update_step(site, f"Generando pagina '{page['name']}'...")
         logger.info("[generator] Paso 5: template '%s'", page["name"])
@@ -384,6 +377,7 @@ def generate_project_files(site) -> dict[str, str]:
     notify_generation_done(site, duration_seconds=0)
 
     return files
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # AUTOCORRECCIÓN DE ERRORES LLM

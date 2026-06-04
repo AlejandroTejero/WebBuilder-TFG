@@ -16,7 +16,7 @@ from __future__ import annotations
 import re
 
 
-# ── HELPERS INTERNOS ────────────────────────────────────────────────────────
+# ── CONSTANTES ───────────────────────────────────────────────────────────────
 
 _DJANGO_ATTRS = {"pk", "__str__", "objects", "save", "delete"}
 
@@ -46,6 +46,14 @@ _INVENTED_CLASS_PATTERNS = [
     r'\bhover:levitate\b',
 ]
 
+# Solo palabras en inglés, ya que se traduce el prompt
+_NEGATION_WORDS = {"without", "no", "avoid", "remove", "eliminate", "none", "don't", "dont", "exclude"}
+_IMAGE_WORDS    = {"image", "images", "photo", "photos", "picture", "pictures", "img"}
+_PRICE_WORDS    = {"price", "prices", "cost", "costs", "fee", "fees", "rate"}
+
+
+# ── HELPERS INTERNOS ─────────────────────────────────────────────────────────
+
 def _find_first_matching_file(files: dict[str, str], suffix: str) -> str:
     return next((v for k, v in files.items() if k.endswith(suffix)), "")
 
@@ -74,6 +82,13 @@ def _page_type_from_path(path: str) -> str:
     if "home" in path_lower or path_lower.endswith("index.html"):
         return "home"
     return "other"
+
+
+def _prompt_bans(prompt: str, target_words: set[str]) -> bool:
+    words = set(prompt.lower().split())
+    has_target = bool(words & target_words)
+    has_negation = bool(words & _NEGATION_WORDS)
+    return has_target and has_negation
 
 
 # ── LIMPIEZA DE TEMPLATES ───────────────────────────────────────────────────
@@ -204,6 +219,7 @@ def check_tailwind_validity(files: dict[str, str]) -> list[str]:
 
     return errors
 
+
 # ── ESTRUCTURA MÍNIMA DE TEMPLATES ─────────────────────────────────────────
 
 def check_template_structure(files: dict[str, str]) -> list[str]:
@@ -245,19 +261,6 @@ def check_template_structure(files: dict[str, str]) -> list[str]:
                 errors.append(f"{path}: página de detalle sin uso claro del objeto item")
 
     return errors
-
-
-# ── SETS DE PALABRAS CLAVE (añadir arriba junto a _DJANGO_ATTRS) ────────────
-# Solo palabras en ingles, ya que se traduce el prompt
-_NEGATION_WORDS = {"without", "no", "avoid", "remove", "eliminate", "none", "don't", "dont", "exclude"}
-_IMAGE_WORDS = {"image", "images", "photo", "photos", "picture", "pictures", "img"}
-_PRICE_WORDS = {"price", "prices", "cost", "costs", "fee", "fees", "rate"}
-
-def _prompt_bans(prompt: str, target_words: set[str]) -> bool:
-    words = set(prompt.lower().split())
-    has_target = bool(words & target_words)
-    has_negation = bool(words & _NEGATION_WORDS)
-    return has_target and has_negation
 
 
 # ── CONTRADICCIONES SIMPLES CONTRA EL PROMPT DEL USUARIO ───────────────────
@@ -310,6 +313,7 @@ def check_prompt_contradictions(files: dict[str, str], user_prompt: str | None =
 
     return errors
 
+
 # ── CHEQUEO DE LOAD_DATA.PY ─────────────────────────────────────────────────
 
 def check_load_data_integrity(files: dict[str, str], api_url: str | None = None) -> list[str]:
@@ -328,7 +332,7 @@ def check_load_data_integrity(files: dict[str, str], api_url: str | None = None)
     if not load_data_code:
         return errors
 
-    # ── 1. URL correcta ──────────────────────────────────────────────────────
+    # 1. URL correcta
     if api_url:
         urls_in_code = re.findall(r"https?://[^\s'\"]+", load_data_code)
         # Extraer el path de la api_url para comparación parcial
@@ -350,14 +354,14 @@ def check_load_data_integrity(files: dict[str, str], api_url: str | None = None)
                 f"Asegúrate de que el comando apunta a {api_url!r}."
             )
 
-    # ── 2. Except suficientemente amplio ────────────────────────────────────
+    # 2. Except suficientemente amplio
     if "except Exception" not in load_data_code and "except requests.RequestException" in load_data_code:
         errors.append(
             "load_data.py: el except solo captura requests.RequestException. "
             "Usa 'except Exception' para no silenciar errores de conversión de tipos."
         )
 
-    # ── 3. Hay al menos un insert real ──────────────────────────────────────
+    # 3. Hay al menos un insert real
     has_insert = bool(re.search(r'\.(get_or_create|update_or_create|create)\(', load_data_code))
     if not has_insert:
         errors.append(
@@ -365,7 +369,7 @@ def check_load_data_integrity(files: dict[str, str], api_url: str | None = None)
             "El comando no insertará datos en la BD."
         )
 
-    # ── 4. str() guardado en IntegerField ───────────────────────────────────
+    # 4. str() guardado en IntegerField
     if models_code:
         integer_fields = set(re.findall(
             r'^\s+(\w+)\s*=\s*models\.IntegerField',
@@ -382,6 +386,8 @@ def check_load_data_integrity(files: dict[str, str], api_url: str | None = None)
     return errors
 
 
+# ── CHEQUEO DE VIEWS Y URLS ─────────────────────────────────────────────────
+
 def check_views_urls_consistency(files: dict[str, str]) -> list[str]:
     """
     Detecta funciones definidas en views.py que no tienen
@@ -390,7 +396,7 @@ def check_views_urls_consistency(files: dict[str, str]) -> list[str]:
     errors = []
 
     views_code = _find_first_matching_file(files, "views.py")
-    urls_code = _find_first_matching_file(files, "urls.py")
+    urls_code  = _find_first_matching_file(files, "urls.py")
 
     if not views_code or not urls_code:
         return errors
@@ -410,7 +416,8 @@ def check_views_urls_consistency(files: dict[str, str]) -> list[str]:
 
     return errors
 
-# ── FUNCIÓN PRINCIPAL PARA EJECUTAR TODOS LOS CHECKS ───────────────────────
+
+# ── FUNCIÓN PRINCIPAL ────────────────────────────────────────────────────────
 
 def run_all_checks(
     files: dict[str, str],
@@ -448,5 +455,5 @@ def run_all_checks(
 
     return {
         "blocking": _flatten_dedup(blocking_checks),
-        "warning": _flatten_dedup(warning_checks),
+        "warning":  _flatten_dedup(warning_checks),
     }
