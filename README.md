@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧩 WebBuilder
+# WebBuilder
 
 **Convierte cualquier API pública en un sitio web Django completo, listo para desplegar — usando IA generativa.**
 
