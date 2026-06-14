@@ -123,7 +123,7 @@ La aplicación principal (Django + PostgreSQL) corre detrás de Nginx, y se comu
 
 ---
 
-## ⚙️ Automatizaciones (n8n)
+## Automatizaciones (n8n)
 
 | Workflow | Disparador | Acción |
 |----------|-----------|--------|
